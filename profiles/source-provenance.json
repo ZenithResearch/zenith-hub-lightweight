@@ -22,10 +22,36 @@
       {
         "path": "profiles/process-macos/process_mac.py",
         "sha256": "8b2bf3c7573c9fff5ece62abd1623880187ab58f2fa4ed6a02311f0412afee84"
+      }
+    ]
+  },
+  {
+    "repository": "public component baselines",
+    "build": "SOURCE_DATE_EPOCH=1767225600; Python 3.12; setuptools 84.0.0; two matching builds per component",
+    "components": {
+      "frank": {
+        "package": "frank-executor",
+        "source_commit": "fc92945a7dc8f8853bc922b5b5e2a9e9da63a0fe",
+        "version": "0.1.0",
+        "wheel_sha256": "d16b9b5cd1eb90e8bfd4b8885781e0fc8ac431ee7af6a1b8ace915e3904258b0"
       },
+      "process-runtime": {
+        "package": "process-runtime",
+        "source_commit": "200179067b48ba9f2e6b3ebab8c6d7ce7164dc27",
+        "version": "0.1.0",
+        "wheel_sha256": "acf3af9efd252f0150a2ab70561c699748bdc8c6801c7c6235f67004d02e470d"
+      },
+      "service-management": {
+        "package": "service-management",
+        "source_commit": "baa9cfaecbac1ca93d9668d67e399554a08eb03d",
+        "version": "0.1.0",
+        "wheel_sha256": "a9a785d06d12ed8b0192427e23b4f12020fe96f15690ec5694d3c0eca1403bef"
+      }
+    },
+    "files": [
       {
         "path": "profiles/process-macos/release.v1.json",
-        "sha256": "9d44dd0ee10ae406bc24d80a702cb485a45c542acd853e4c93980c5af41e7f24"
+        "sha256": "5eee43e9375732cee7efaf25bb67091dbb5bd588c82f0892841d2ed9079d441a"
       }
     ]
   }

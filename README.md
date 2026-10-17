@@ -31,8 +31,7 @@ Mac bundle and `ZENITH_PROCESS_ROOT` to its final, absent destination. Click
 **Install base stack**, review the destination and manifest digest, then apply.
 The server requires the exact repository-pinned release profile and the Python
 controller checks every bundle payload. Existing data is never overwritten.
-The offline bundle is not included in this frontend repository; the application source is public, while the offline release bundle and the remaining
-Runtime/Service/Frank/Wallet source baselines are not published by this repository.
+Download the [Apple-silicon base installer](https://github.com/ZenithResearch/zenith-hub-lightweight/releases/tag/mac-base-2026.10.16) and verify its ZIP with the release’s `SHA256SUMS`. The release includes the offline wheel closure and exact public component commit/hash pins. This is a base-installation prerelease; native authority remains pending.
 
 Use **Run doctor**, **Start**, **Stop** and **Refresh status** to manage that one
 installation. Status refreshes every 15 seconds while the tab is visible.
@@ -70,3 +69,14 @@ replaced by this deployment UI; there is no official-Hub upload dependency.
 
 This source baseline preserves the existing unlicensed project status; public
 visibility does not grant a new open-source license. See [NOTICE.md](NOTICE.md).
+
+## Component sources
+
+- [Process Runtime](https://github.com/ZenithResearch/process-runtime)
+- [Service Management](https://github.com/ZenithResearch/service-management)
+- [Frank executor](https://github.com/ZenithResearch/frank-executor)
+- [Devgraph roadmap demo](https://github.com/ZenithResearch/devgraph-roadmap)
+
+The roadmap is a separate read-only observer with synthetic public examples;
+SDK generalization remains tracked separately from this deployer. Wallet source
+publication is checked independently; it is not installed or enrolled by this bundle.

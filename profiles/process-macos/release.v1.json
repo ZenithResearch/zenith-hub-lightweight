@@ -2,21 +2,21 @@
   "components": {
     "frank": {
       "package": "frank-executor",
-      "source_commit": "844ee8e942b76bf53ef5311c1c738d07c0ced28c",
+      "source_commit": "fc92945a7dc8f8853bc922b5b5e2a9e9da63a0fe",
       "version": "0.1.0",
-      "wheel_sha256": "c5fab4bcc2ddb4c009da9c3a1fd5c6edefadc0082ac115038d9cd13ccd89c422"
+      "wheel_sha256": "d16b9b5cd1eb90e8bfd4b8885781e0fc8ac431ee7af6a1b8ace915e3904258b0"
     },
     "process-runtime": {
       "package": "process-runtime",
-      "source_commit": "a5f3cf0d8cf0da378d143d3028be921d5df4fdb7",
+      "source_commit": "200179067b48ba9f2e6b3ebab8c6d7ce7164dc27",
       "version": "0.1.0",
-      "wheel_sha256": "d1a52ca595034149aa95099d3af8a6b3ca0698e4aa41d93cbaf79be4dd82c24d"
+      "wheel_sha256": "acf3af9efd252f0150a2ab70561c699748bdc8c6801c7c6235f67004d02e470d"
     },
     "service-management": {
       "package": "service-management",
-      "source_commit": "44b25d6a84e45c5d35f9b90329bebe9e96cc328f",
+      "source_commit": "baa9cfaecbac1ca93d9668d67e399554a08eb03d",
       "version": "0.1.0",
-      "wheel_sha256": "e8c2a5167e0d816e90ee4e12c4a68dc173117d4b5cd83fedab58d2bec1b95a9e"
+      "wheel_sha256": "a9a785d06d12ed8b0192427e23b4f12020fe96f15690ec5694d3c0eca1403bef"
     }
   },
   "machine": "arm64",
@@ -49,10 +49,10 @@
       "version": "2026.7.22"
     },
     {
-      "bytes": 91249,
+      "bytes": 92119,
       "filename": "frank_executor-0.1.0-py3-none-any.whl",
       "name": "frank-executor",
-      "sha256": "c5fab4bcc2ddb4c009da9c3a1fd5c6edefadc0082ac115038d9cd13ccd89c422",
+      "sha256": "d16b9b5cd1eb90e8bfd4b8885781e0fc8ac431ee7af6a1b8ace915e3904258b0",
       "version": "0.1.0"
     },
     {
@@ -98,10 +98,10 @@
       "version": "2025.9.1"
     },
     {
-      "bytes": 81557,
+      "bytes": 82341,
       "filename": "process_runtime-0.1.0-py3-none-any.whl",
       "name": "process-runtime",
-      "sha256": "d1a52ca595034149aa95099d3af8a6b3ca0698e4aa41d93cbaf79be4dd82c24d",
+      "sha256": "acf3af9efd252f0150a2ab70561c699748bdc8c6801c7c6235f67004d02e470d",
       "version": "0.1.0"
     },
     {
@@ -119,10 +119,10 @@
       "version": "2026.9.1"
     },
     {
-      "bytes": 45827,
+      "bytes": 46549,
       "filename": "service_management-0.1.0-py3-none-any.whl",
       "name": "service-management",
-      "sha256": "e8c2a5167e0d816e90ee4e12c4a68dc173117d4b5cd83fedab58d2bec1b95a9e",
+      "sha256": "a9a785d06d12ed8b0192427e23b4f12020fe96f15690ec5694d3c0eca1403bef",
       "version": "0.1.0"
     },
     {
