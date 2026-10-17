@@ -76,7 +76,8 @@ visibility does not grant a new open-source license. See [NOTICE.md](NOTICE.md).
 - [Service Management](https://github.com/ZenithResearch/service-management)
 - [Frank executor](https://github.com/ZenithResearch/frank-executor)
 - [Devgraph roadmap demo](https://github.com/ZenithResearch/devgraph-roadmap)
+- [Castalia Wallet](https://github.com/ZenithResearch/castalia-wallet)
 
 The roadmap is a separate read-only observer with synthetic public examples;
-SDK generalization remains tracked separately from this deployer. Wallet source
-publication is checked independently; it is not installed or enrolled by this bundle.
+SDK generalization remains tracked separately from this deployer. Wallet source is public with its own verification and disclosure evidence; it is
+not installed or enrolled by this bundle.
