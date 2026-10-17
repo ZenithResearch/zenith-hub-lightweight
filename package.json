@@ -1,0 +1,32 @@
+{
+  "name": "zenith-hub-lightweight",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "typecheck": "tsc --noEmit",
+    "operator": "node scripts/operator.mjs",
+    "test:deployer": "node --test tests/deployer/*.test.mjs",
+    "operator:start": "node scripts/operator.mjs --production",
+    "check:source": "node scripts/check-source.mjs"
+  },
+  "dependencies": {
+    "next": "16.4.2",
+    "react": "19.2.4",
+    "react-dom": "19.2.4"
+  },
+  "devDependencies": {
+    "@types/node": "24.12.2",
+    "@types/react": "19.2.14",
+    "@types/react-dom": "19.2.3",
+    "typescript": "6.0.2"
+  },
+  "license": "UNLICENSED",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ZenithResearch/zenith-hub-lightweight.git"
+  }
+}

@@ -1,0 +1,49 @@
+@import './tokens.css';
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  overflow: auto;
+  background: var(--color-base);
+  color: var(--color-base-content);
+  font-family: var(--font-technical);
+  font-size: var(--text-body);
+  line-height: var(--leading-normal);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+::selection {
+  background: var(--flesh-400);
+  color: var(--flesh-950);
+}
+
+::-moz-selection {
+  background: var(--flesh-400);
+  color: var(--flesh-950);
+}
+
+button {
+  font: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+body { font-family: system-ui, -apple-system, sans-serif; }

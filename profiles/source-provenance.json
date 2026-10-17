@@ -1,0 +1,32 @@
+[
+  {
+    "repository": "https://github.com/ZenithResearch/zenith-ui-deployment",
+    "commit": "5cb3b50394ea10c0e43ccf4e6ec6bd5a98e9cb6d",
+    "files": [
+      {
+        "path": "src/vendor/zenith-ui/DeploymentMonitor/DeploymentMonitor.tsx",
+        "sha256": "16b40269aceaf55f6faa6fbd51d723e1b8d4307f71795112d5ae041cee3a6c27",
+        "upstream_path": "src/DeploymentMonitor/DeploymentMonitor.tsx"
+      },
+      {
+        "path": "src/vendor/zenith-ui/DeploymentMonitor/DeploymentMonitor.css",
+        "sha256": "11d7b026f35a4da184450d9dcd1ebf4f43ae1ee443888b8ce2181ac9e005e151",
+        "upstream_path": "src/DeploymentMonitor/DeploymentMonitor.css"
+      }
+    ]
+  },
+  {
+    "repository": "hub",
+    "commit": "464a00675ec65cae8031c88d67eebf2f05f24699",
+    "files": [
+      {
+        "path": "profiles/process-macos/process_mac.py",
+        "sha256": "8b2bf3c7573c9fff5ece62abd1623880187ab58f2fa4ed6a02311f0412afee84"
+      },
+      {
+        "path": "profiles/process-macos/release.v1.json",
+        "sha256": "9d44dd0ee10ae406bc24d80a702cb485a45c542acd853e4c93980c5af41e7f24"
+      }
+    ]
+  }
+]
