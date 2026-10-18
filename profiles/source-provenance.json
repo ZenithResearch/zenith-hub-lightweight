@@ -17,11 +17,11 @@
   },
   {
     "repository": "hub",
-    "commit": "be6565cde5a46d5a311b0e0c22ba4df5e1c80d93",
+    "commit": "26baade1423454835e385bf01654d04df7896c3a",
     "files": [
       {
         "path": "profiles/process-macos/process_mac.py",
-        "sha256": "d2e654b096932db70e31875e74333bdc8894417bf354b5dfa1be3734ad1c894b"
+        "sha256": "088ab50f859309288b0001f96018aae9cd6e8b9b2662c3b98d11a9b1f8ba67a4"
       }
     ]
   },
