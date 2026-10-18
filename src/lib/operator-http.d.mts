@@ -1,4 +1,4 @@
-export function readAction(request: Request): Promise<unknown>;
+export function readAction(request: Request, options?: {limit?: number; deadline?: number}): Promise<unknown>;
 export function normalizeNextRequest(
   request: Request,
   origin?: string,

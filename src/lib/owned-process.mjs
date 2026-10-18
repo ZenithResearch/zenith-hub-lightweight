@@ -5,20 +5,43 @@ export function executeOwned(
   file,
   args,
   options,
-  { signalGroup = process.kill.bind(process) } = {},
+  { signalGroup = process.kill.bind(process), spawnProcess = spawn } = {},
 ) {
   return new Promise((resolve, reject) => {
+    // Snapshot caller input before spawning. Only the private pipe receives it.
+    const suppliedInput = options.input;
+    let input;
+    if (suppliedInput !== undefined) {
+      const invalid = (code) => {
+        const failure = new Error("Controller input must be bounded UTF-8 text");
+        failure.code = code;
+        reject(failure);
+      };
+      if (typeof suppliedInput !== "string") {
+        invalid("OPERATOR_INVALID_INPUT");
+        return;
+      }
+      if (Buffer.byteLength(suppliedInput, "utf8") > 65536) {
+        invalid("OPERATOR_INPUT_TOO_LARGE");
+        return;
+      }
+      input = Buffer.from(suppliedInput, "utf8");
+      if (input.toString("utf8") !== suppliedInput) {
+        invalid("OPERATOR_INVALID_INPUT");
+        return;
+      }
+    }
     let timer,
       error,
       stdout = [],
       stderr = [],
       size = 0;
-    const child = spawn(file, args, {
+    const child = spawnProcess(file, args, {
       cwd: options.cwd,
       env: options.env,
       shell: false,
       detached: true,
-      stdio: ["ignore", "pipe", "pipe"],
+      stdio: [input === undefined ? "ignore" : "pipe", "pipe", "pipe"],
     });
     function terminate() {
       if (child.pid)
@@ -76,5 +99,22 @@ export function executeOwned(
       error = new Error("Controller timed out");
       terminate();
     }, options.timeout);
+    if (input !== undefined) {
+      const inputFailed = (cause) => {
+        const failure = new Error("Controller input stream failed");
+        failure.code = cause?.code === "EPIPE"
+          ? "OPERATOR_INPUT_CLOSED" : "OPERATOR_INPUT_FAILED";
+        error = error || failure;
+        terminate();
+      };
+      // Writable errors are asynchronous, including EPIPE after an early exit.
+      // Keep the ordinary close/group-cleanup gate responsible for completion.
+      child.stdin.on("error", inputFailed);
+      try {
+        child.stdin.end(input);
+      } catch (cause) {
+        inputFailed(cause);
+      }
+    }
   });
 }

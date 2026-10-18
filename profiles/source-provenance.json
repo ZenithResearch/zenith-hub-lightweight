@@ -1,7 +1,7 @@
 [
   {
     "repository": "https://github.com/ZenithResearch/zenith-ui-deployment",
-    "commit": "5cb3b50394ea10c0e43ccf4e6ec6bd5a98e9cb6d",
+    "commit": "0ffd12fecd49be610b0b92154d6d798a725f146f",
     "files": [
       {
         "path": "src/vendor/zenith-ui/DeploymentMonitor/DeploymentMonitor.tsx",
@@ -12,16 +12,26 @@
         "path": "src/vendor/zenith-ui/DeploymentMonitor/DeploymentMonitor.css",
         "sha256": "11d7b026f35a4da184450d9dcd1ebf4f43ae1ee443888b8ce2181ac9e005e151",
         "upstream_path": "src/DeploymentMonitor/DeploymentMonitor.css"
+      },
+      {
+        "path": "src/vendor/zenith-ui/WorkspaceConsole/WorkspaceConsole.tsx",
+        "sha256": "2d0291c837312fae0ec7a9fcc54066a81fd5f5d6bf336248d33567c37e2ab684",
+        "upstream_path": "src/WorkspaceConsole/WorkspaceConsole.tsx"
+      },
+      {
+        "path": "src/vendor/zenith-ui/WorkspaceConsole/WorkspaceConsole.css",
+        "sha256": "ab1dd52d036f6cba27e0322bdd30f7fc939a4e46bb24f917ebe654ef18c076d9",
+        "upstream_path": "src/WorkspaceConsole/WorkspaceConsole.css"
       }
     ]
   },
   {
     "repository": "hub",
-    "commit": "26baade1423454835e385bf01654d04df7896c3a",
+    "commit": "a6662b6bface0e515e552850195a35da81495266",
     "files": [
       {
         "path": "profiles/process-macos/process_mac.py",
-        "sha256": "088ab50f859309288b0001f96018aae9cd6e8b9b2662c3b98d11a9b1f8ba67a4"
+        "sha256": "24781c7101eae052f3e269162b7477f82b7e9b97bba1bfa184d0a5258480ce96"
       }
     ]
   },
@@ -52,6 +62,62 @@
       {
         "path": "profiles/process-macos/release.v1.json",
         "sha256": "5eee43e9375732cee7efaf25bb67091dbb5bd588c82f0892841d2ed9079d441a"
+      }
+    ]
+  },
+  {
+    "repository": "component workspace closure",
+    "profile": "workspace-v1",
+    "components": {
+      "frank": {
+        "package": "frank-executor",
+        "source_commit": "ff6b332cd34c79acd3bf7dc339c6395b185fc86c",
+        "version": "0.1.0",
+        "wheel_sha256": "c0e4735c5b48f9037adf75edfd63a8a9f5466532b78b5cefcf838301c66e18fd"
+      },
+      "process-runtime": {
+        "package": "process-runtime",
+        "source_commit": "200179067b48ba9f2e6b3ebab8c6d7ce7164dc27",
+        "version": "0.1.0",
+        "wheel_sha256": "acf3af9efd252f0150a2ab70561c699748bdc8c6801c7c6235f67004d02e470d"
+      },
+      "service-management": {
+        "package": "service-management",
+        "source_commit": "baa9cfaecbac1ca93d9668d67e399554a08eb03d",
+        "version": "0.1.0",
+        "wheel_sha256": "a9a785d06d12ed8b0192427e23b4f12020fe96f15690ec5694d3c0eca1403bef"
+      }
+    },
+    "native": [
+      {
+        "bytes": 11677088,
+        "filename": "castalia-wallet-service",
+        "mode": 320,
+        "role": "wallet-command",
+        "sha256": "67ae3e7ebc2b9270d05dcc3008357848563229c4970be5e31bed771c3cf81cb1",
+        "source_commit": "10cbcc2a412cac1bf7fd96583ad27991db466e20"
+      },
+      {
+        "bytes": 4720128,
+        "filename": "castalia-wallet-workspace-setup",
+        "mode": 320,
+        "role": "owner-setup",
+        "sha256": "a5a5482ca455e81308f85f2be20e73dd3884c598fd04e14c99e09e119915c339",
+        "source_commit": "10cbcc2a412cac1bf7fd96583ad27991db466e20"
+      },
+      {
+        "bytes": 702960,
+        "filename": "process-runtime-secs-check",
+        "mode": 320,
+        "role": "context-verifier",
+        "sha256": "b044785f3b9b45e9858ecee108a997d3c577a8262f4284e40e42e6b506b8e280",
+        "source_commit": "c69261fea3cd7a21033a7ffcd681c5e460f3e3b6"
+      }
+    ],
+    "files": [
+      {
+        "path": "profiles/process-macos/release.workspace.v1.json",
+        "sha256": "1a7de2180c46966539c5e900054e85d81eff2d6baec96534c9cbeaf116006f96"
       }
     ]
   }

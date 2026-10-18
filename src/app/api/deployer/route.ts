@@ -3,13 +3,14 @@ import { createController, OperatorError } from "@/lib/pilot-controller.mjs";
 import { readAction, normalizeNextRequest } from "@/lib/operator-http.mjs";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
-const controller = createController();
+const controller = process.env.ZENITH_PROCESS_PROFILE === "workspace" ? null : createController();
 const headers = {
   "Cache-Control": "no-store",
   "X-Content-Type-Options": "nosniff",
 };
 export async function GET(request: Request) {
   try {
+    if (!controller) return Response.json({schema:"zenith.deployer.v1",mode:"disabled",profile:"workspace",reason:"Use the workspace page."},{headers});
     return Response.json(
       await controller.get(
         controller.enabled ? normalizeNextRequest(request) : request,
@@ -22,6 +23,7 @@ export async function GET(request: Request) {
 }
 export async function POST(request: Request) {
   try {
+    if (!controller) return Response.json({error:"workspace_profile_selected"},{status:403,headers});
     const effective = normalizeNextRequest(request);
     controller.admitMutation(effective);
     const body = await readAction(request);
