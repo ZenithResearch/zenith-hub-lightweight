@@ -31,3 +31,7 @@ Unknown command outcome is not permission to create a replacement request. Keep 
 The optional local-review recipe remains separate and is not part of this workspace bootstrap. Real provider choice, SOP compilation beyond explicit JSON, actor execution, result authority and installed native qualification are independent follow-up work. This UI does not imply those are enabled.
 
 See [the bridge details](workspace-ui.md) for request bounds, exact Python/Frank handoff and source-only test scope.
+
+## Renew an expired permission
+
+Keep the existing identity. Stop the workspace, use **Prepare permission renewal**, then review **Renew workspace permissions** for the same five authoring/read scopes and at most one hour. Start the workspace separately after success. A retained transition offers only exact-plan resume when cleanup permits it. An older installed controller first needs the allowlisted offline software upgrade. See [the renewal and software upgrade guide](workspace-permission-renewal.md) for exact commands, receipts and recovery limits.

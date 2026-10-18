@@ -27,7 +27,7 @@ export function canonical(value, depth = 0) {
     fail("invalid_payload");
 }
 const cliActions = new Set(["catalog", "get", "validate", "draft-put", "publish", "resume-command"]);
-const lifecycle = new Set(["workspace-prepare", "workspace-setup", "workspace-start", "workspace-stop"]);
+const lifecycle = new Set(["workspace-prepare", "workspace-setup", "workspace-start", "workspace-stop", "workspace-renew-prepare", "workspace-renew", "workspace-renew-resume"]);
 function validatePayload(action, p) {
     if (!object(p))
         fail("invalid_payload");
@@ -125,8 +125,9 @@ export function createWorkspaceController({ env = process.env, platform = proces
         if (!stat.isDirectory() || stat.isSymbolicLink())
             fail("unsafe_target", 409);
         const files = {};
-        let setup = null;
-        for (const name of ["logs/workspace-operation.json", "data/frank-workspace-cleanup.json", "config/workspace-setup-plan.json", "config/frank-workspace.json", "config/workspace-admission.json", "authority/COMPLETE.json", "authority/config/wallet-command.json", "authority/config/runtime-policy.json", "authority/config/runtime-receiver.json", "authority/config/command-authority.json"]) {
+        let setup = null, renewal = null, currentReceipt = null, selectedReceipt = null, renewalOperation = null;
+        const names = ["logs/workspace-operation.json", "data/frank-workspace-cleanup.json", "config/workspace-setup-plan.json", "config/frank-workspace.json", "config/workspace-admission.json", "authority/COMPLETE.json", "authority/config/wallet-command.json", "authority/config/runtime-policy.json", "authority/config/runtime-receiver.json", "authority/config/command-authority.json", "config/workspace-native-selection.json", "config/workspace-renewal-plan.json", "logs/workspace-renewal.json", "logs/workspace-software-upgrade.json"];
+        for (const name of names) {
             try {
                 const file = path.join(root, name), m = await lstat(file);
                 if (!m.isFile() || m.isSymbolicLink() || m.nlink !== 1 || m.uid !== process.getuid() || (m.mode & 0o777) !== 0o600 || m.size > 65536)
@@ -135,6 +136,40 @@ export function createWorkspaceController({ env = process.env, platform = proces
                 if (bytes.length !== m.size)
                     fail("workspace_configuration_changed", 409);
                 files[name] = digest(bytes);
+                if (name === "config/workspace-native-selection.json") {
+                    const p = JSON.parse(bytes.toString("utf8"));
+                    closed(p, ["schema", "native_generation", "complete_sha256"]);
+                    if (p.schema !== "hub.workspace-native-selection.v1" || !Number.isSafeInteger(p.native_generation) || p.native_generation < 2 || typeof p.complete_sha256 !== "string" || !/^[a-f0-9]{64}(?![\s\S])/.test(p.complete_sha256))
+                        fail("unsafe_workspace_configuration", 409);
+                    selectedReceipt = { name: `authority/renewals/${p.native_generation}/COMPLETE.json`, digest: p.complete_sha256 };
+                    names.push(selectedReceipt.name, ...["command-authority.json", "wallet-command.json", "runtime-policy.json", "runtime-receiver.json"].map(file => `authority/renewals/${p.native_generation}/config/${file}`));
+                }
+                if (name === "authority/COMPLETE.json" || name === selectedReceipt?.name) {
+                    if (name === selectedReceipt?.name && digest(bytes) !== selectedReceipt.digest)
+                        fail("workspace_configuration_changed", 409);
+                    currentReceipt = JSON.parse(bytes.toString("utf8"));
+                }
+                if (name === "logs/workspace-renewal.json")
+                    renewalOperation = JSON.parse(bytes.toString("utf8"));
+                if (name === "config/workspace-renewal-plan.json") {
+                    try {
+                        const p = JSON.parse(bytes.toString("utf8"));
+                        closed(p, ["schema", "workspace_root", "previous_complete", "not_before", "not_after", "wallet_command_sha256", "verifier_sha256"]);
+                        closed(p.previous_complete, ["path", "sha256"]);
+                        const time = value => typeof value === "string" && /^[1-9][0-9]*(?![\s\S])/.test(value) && Number.isSafeInteger(Number(value));
+                        const pin = value => typeof value === "string" && /^[a-f0-9]{64}(?![\s\S])/.test(value);
+                        if (p.schema === "castalia.wallet-workspace-renewal.v1" && p.workspace_root === root && typeof p.previous_complete.path === "string" && time(p.not_before) && time(p.not_after) && Number(p.not_before) < Number(p.not_after) && Number(p.not_after) - Number(p.not_before) <= 3600 && pin(p.previous_complete.sha256) && pin(p.wallet_command_sha256) && pin(p.verifier_sha256))
+                            renewal = { not_before: p.not_before, not_after: p.not_after, previous_complete_sha256: p.previous_complete.sha256, previous_complete_path: p.previous_complete.path, scope: "Same five authoring/read operations in this isolated Runtime store. No run execution or providers. Identity and journals are retained." };
+                        if (renewal) {
+                            const relative = path.relative(root, renewal.previous_complete_path);
+                            if (relative !== "authority/COMPLETE.json" && !/^authority\/renewals\/[1-9][0-9]{0,15}\/COMPLETE\.json(?![\s\S])/.test(relative))
+                                renewal = null;
+                            else if (!names.includes(relative))
+                                names.push(relative, ...["command-authority.json", "wallet-command.json", "runtime-policy.json", "runtime-receiver.json"].map(file => path.join(path.dirname(relative), "config", file)));
+                        }
+                    }
+                    catch { renewal = null; }
+                }
                 if (name === "config/workspace-setup-plan.json") {
                     try {
                         const p = JSON.parse(bytes.toString("utf8"));
@@ -157,15 +192,23 @@ export function createWorkspaceController({ env = process.env, platform = proces
                     throw e;
             }
         }
-        return { identity: { device: stat.dev, inode: stat.ino }, files, digest: digest(canonical(files)), setup, selection: files["config/workspace-setup-plan.json"] };
+        if (renewal) {
+            const previousName = path.relative(root, renewal.previous_complete_path);
+            const retained = renewalOperation?.schema === "hub.workspace-renewal-operation.v1" && renewalOperation.plan_sha256 === files["config/workspace-renewal-plan.json"] && renewalOperation.previous_complete?.path === renewal.previous_complete_path && renewalOperation.previous_complete?.sha256 === renewal.previous_complete_sha256;
+            if ((!retained && previousName !== (selectedReceipt?.name || "authority/COMPLETE.json")) || renewal.previous_complete_sha256 !== files[previousName])
+                renewal = null;
+            else
+                renewal.identity_not_after = Number.isSafeInteger(currentReceipt?.identity_not_after || currentReceipt?.holder?.not_after) ? String(currentReceipt.identity_not_after || currentReceipt.holder.not_after) : null;
+        }
+        return { identity: { device: stat.dev, inode: stat.ino }, files, digest: digest(canonical(files)), setup, renewal, selection: files["config/workspace-setup-plan.json"], renewal_selection: files["config/workspace-renewal-plan.json"] };
     }
     async function invoke(action, request = null, selection = null) {
         if (blocked)
             fail("controller_cleanup_unresolved", 503);
         const args = ["-I", "-S", "-B", controller, action, "--root", root];
-        if (action === "workspace-setup" && !selection)
+        if (["workspace-setup", "workspace-renew", "workspace-renew-resume"].includes(action) && !selection)
             fail("workspace_setup_not_selected", 409);
-        if (["workspace-prepare", "workspace-setup"].includes(action) && selection)
+        if (["workspace-prepare", "workspace-setup", "workspace-renew-prepare", "workspace-renew", "workspace-renew-resume"].includes(action) && selection)
             args.push("--selection-sha256", selection);
         if (request)
             args.push("--request-stdin", "--request-sha256", digest(request));
@@ -185,13 +228,29 @@ export function createWorkspaceController({ env = process.env, platform = proces
             fail("workspace_command_unconfirmed", 422);
         }
     }
-    function projectStatus(r) { const w = r?.workspace; return { installed: r?.installed === true, workspace: { setup: ["not_selected", "absent", "configured", "partial"].includes(w?.setup) ? w.setup : "unknown", authority: ["pending", "configured_native_unqualified", "unavailable"].includes(w?.authority) ? w.authority : "pending", cleanup_unresolved: w?.cleanup_unresolved === true, execution_enabled: false, provider_enabled: false, workflow_selected: false }, components: ["runtime", "service"].map(name => ({ name, live: r?.components?.[name]?.live === true, ready: r?.components?.[name]?.ready === true, managed: r?.components?.[name]?.managed === true })) }; }
+    function projectPermission(p) {
+        const time = value => typeof value === "string" && /^(0|[1-9][0-9]*)(?![\s\S])/.test(value) && Number.isSafeInteger(Number(value));
+        const observed = time(p?.observed_at) ? p.observed_at : null;
+        const result = { state: "unknown", not_before: null, not_after: null, identity_not_after: null, observed_at: observed };
+        if (!time(p?.not_before) || !time(p?.not_after) || !observed || Number(p.not_before) <= 0 || Number(p.not_before) >= Number(p.not_after) || Number(p.not_after) - Number(p.not_before) > 3600 || (p.identity_not_after !== null && p.identity_not_after !== undefined && (!time(p.identity_not_after) || Number(p.identity_not_after) < Number(p.not_after))))
+            return result;
+        return { state: Number(observed) < Number(p.not_before) ? "not_yet_valid" : Number(observed) < Number(p.not_after) ? "active" : "expired", not_before: p.not_before, not_after: p.not_after, identity_not_after: p.identity_not_after || null, observed_at: observed };
+    }
+    function projectStatus(r) { const w = r?.workspace; return { installed: r?.installed === true, workspace: { setup: ["not_selected", "absent", "configured", "partial"].includes(w?.setup) ? w.setup : "unknown", authority: ["pending", "configured_native_unqualified", "unavailable"].includes(w?.authority) ? w.authority : "pending", cleanup_unresolved: w?.cleanup_unresolved === true, permission: projectPermission(w?.permission), renewal: { state: w?.renewal?.state === "recovery_required" ? "recovery_required" : "none", resumable: w?.renewal?.resumable === true }, execution_enabled: false, provider_enabled: false, workflow_selected: false }, components: ["runtime", "service"].map(name => ({ name, live: r?.components?.[name]?.live === true, ready: r?.components?.[name]?.ready === true, managed: r?.components?.[name]?.managed === true })) }; }
     async function state(b) { if (!b.identity)
         return { installed: false, workspace: { setup: "not_selected", authority: "pending", cleanup_unresolved: false, execution_enabled: false, provider_enabled: false, workflow_selected: false }, components: [] }; return projectStatus(await invoke("workspace-status")); }
-    function available(s, b) { if (!s.installed)
-        return []; const running = s.components.some(c => c.managed); if (s.workspace.cleanup_unresolved || b.files["logs/workspace-operation.json"] || b.files["data/frank-workspace-cleanup.json"])
-        return running ? ["workspace-stop"] : []; if (s.workspace.setup === "configured")
-        return [...cliActions, running ? "workspace-stop" : "workspace-start"]; return !running && ["not_selected", "absent"].includes(s.workspace.setup) ? ["workspace-prepare", ...(s.workspace.setup === "absent" && b.selection && b.setup ? ["workspace-setup"] : [])] : running ? ["workspace-stop"] : []; }
+    function available(s, b) {
+        if (!s.installed)
+            return [];
+        const running = s.components.some(c => c.managed);
+        if (s.workspace.cleanup_unresolved || b.files["logs/workspace-operation.json"] || b.files["data/frank-workspace-cleanup.json"] || b.files["logs/workspace-software-upgrade.json"] || b.files["logs/workspace-renewal.json"])
+            return running ? ["workspace-stop"] : s.workspace.renewal?.resumable && b.renewal && !b.files["logs/workspace-operation.json"] && !b.files["data/frank-workspace-cleanup.json"] && !b.files["logs/workspace-software-upgrade.json"] ? ["workspace-renew-resume"] : [];
+        if (s.workspace.setup === "configured") {
+            const active = s.workspace.permission?.state === "active";
+            return [...(active ? cliActions : ["validate"]), ...(running ? ["workspace-stop"] : [...(active ? ["workspace-start"] : []), "workspace-renew-prepare", ...(b.renewal ? ["workspace-renew"] : [])])];
+        }
+        return !running && ["not_selected", "absent"].includes(s.workspace.setup) ? ["workspace-prepare", ...(s.workspace.setup === "absent" && b.selection && b.setup ? ["workspace-setup"] : [])] : running ? ["workspace-stop"] : [];
+    }
     function prune() { for (const [id, p] of plans)
         if (clock() >= p.expires + (p.result ? 300000 : 0))
             plans.delete(id); }
@@ -223,8 +282,8 @@ export function createWorkspaceController({ env = process.env, platform = proces
                 prune();
                 if (plans.size >= 8)
                     fail("too_many_plans", 429);
-                const payload = request ? JSON.parse(request).payload : {}, p = { id: token(), action: action, request, binding: canonical(b), selection: b.selection, expires: clock() + 60000 };
-                p.preview = { id: p.id, action: p.action, target: root, payload_sha256: request ? digest(request) : null, configuration_digest: b.digest, setup: action === "workspace-setup" ? b.setup : null, expected_version: Object.hasOwn(payload, "expected_version") ? payload.expected_version : null, request_id: payload.request_id || null, payload, expires_at: p.expires };
+                const payload = request ? JSON.parse(request).payload : {}, p = { id: token(), action: action, request, binding: canonical(b), selection: action.startsWith("workspace-renew") ? b.renewal_selection : b.selection, expires: clock() + 60000 };
+                p.preview = { id: p.id, action: p.action, target: root, payload_sha256: request ? digest(request) : null, configuration_digest: b.digest, setup: action === "workspace-setup" ? b.setup : null, renewal: ["workspace-renew", "workspace-renew-resume"].includes(action) ? b.renewal : null, expected_version: Object.hasOwn(payload, "expected_version") ? payload.expected_version : null, request_id: payload.request_id || null, payload, expires_at: p.expires };
                 plans.set(p.id, p);
                 return { schema: "zenith.workspace-plan.v1", plan: structuredClone(p.preview) };
             }

@@ -17,7 +17,7 @@ async function fixture(t, override = {}) {
     const calls = [];
     let now = 100;
     const env = { ZENITH_LOCAL_OPERATOR: "1", ZENITH_PROCESS_PROFILE: "workspace", ZENITH_PROCESS_ROOT: root };
-    const run = async (exe, args, options) => { calls.push({ exe, args, options }); return { stdout: JSON.stringify(args[4] === "workspace-status" ? { installed: true, workspace: { setup: "configured", configuration_digest: "b".repeat(64) }, components: { runtime: { live: true, ready: true, managed: true } } } : { schema: "runtime.result.v1", operation: "process.draft.put", request_id: "request-1", duplicate: false, resource: "processes/demo", version: 1, result: { process_id: "demo", version: 1, revision: 1, draft }, secret: "NEVER_PROJECT" }) }; };
+    const run = async (exe, args, options) => { calls.push({ exe, args, options }); return { stdout: JSON.stringify(args[4] === "workspace-status" ? { installed: true, workspace: { setup: "configured", permission: {state:"active",not_before:"100",not_after:"3700",identity_not_after:"31536100",observed_at:"200"}, configuration_digest: "b".repeat(64) }, components: { runtime: { live: true, ready: true, managed: true } } } : { schema: "runtime.result.v1", operation: "process.draft.put", request_id: "request-1", duplicate: false, resource: "processes/demo", version: 1, result: { process_id: "demo", version: 1, revision: 1, draft }, secret: "NEVER_PROJECT" }) }; };
     const c = createWorkspaceController({ env, platform: "darwin", arch: "arm64", run, clock: () => now, ...override });
     const state = await c.get(req());
     const post = (body, headers = {}) => c.post(req({ origin, "content-type": "application/json", "x-zenith-csrf": state.csrf, ...headers }), { schema: "zenith.workspace-action.v1", ...body });
@@ -78,7 +78,7 @@ test("concurrent apply is single-flight and retains exact result", async (t) => 
     const start = new Promise(r => entered = r);
     let count = 0;
     const f = await fixture(t, { run: async (exe, args) => { if (args[4] === "workspace-status")
-            return { stdout: JSON.stringify({ installed: true, workspace: { setup: "configured", configuration_digest: "b".repeat(64) }, components: { runtime: { live: true, ready: true, managed: true } } }) }; count++; entered(); await new Promise(r => unblock = r); return { stdout: JSON.stringify({ schema: "frank.workspace.validation.v1", valid: true, compilation_hash: "c".repeat(64) }) }; } });
+            return { stdout: JSON.stringify({ installed: true, workspace: { setup: "configured", permission: {state:"active",not_before:"100",not_after:"3700",identity_not_after:"31536100",observed_at:"200"}, configuration_digest: "b".repeat(64) }, components: { runtime: { live: true, ready: true, managed: true } } }) }; count++; entered(); await new Promise(r => unblock = r); return { stdout: JSON.stringify({ schema: "frank.workspace.validation.v1", valid: true, compilation_hash: "c".repeat(64) }) }; } });
     const { plan } = await f.post({ operation: "plan", action: "validate", payload: draft });
     const pending = f.post({ operation: "apply", plan_id: plan.id });
     await start;
@@ -101,7 +101,7 @@ test("controller retains action and request even if input mutates during status 
     const f = await fixture(t, { run: async (exe, args) => { if (args[4] === "workspace-status") {
             input.action = "workspace-stop";
             input.payload.resource = "processes/changed";
-            return { stdout: JSON.stringify({ installed: true, workspace: { setup: "configured" }, components: { runtime: { managed: true } } }) };
+            return { stdout: JSON.stringify({ installed: true, workspace: { setup: "configured", permission: {state:"active",not_before:"100",not_after:"3700",identity_not_after:"31536100",observed_at:"200"} }, components: { runtime: { managed: true } } }) };
         } return { stdout: JSON.stringify({ schema: "runtime.result.v1", operation: "process.draft.put", request_id: "request-1", resource: "processes/demo", duplicate: false, version: 1, result: {} }) }; } });
     input.action = "draft-put";
     input.payload = structuredClone(command);
@@ -111,7 +111,7 @@ test("controller retains action and request even if input mutates during status 
     await f.post({ operation: "apply", plan_id: plan.id });
 });
 test("a mismatched Runtime result is never marked as the reviewed command", async (t) => {
-    const f = await fixture(t, { run: async (exe, args) => ({ stdout: JSON.stringify(args[4] === "workspace-status" ? { installed: true, workspace: { setup: "configured" }, components: {} } : { schema: "runtime.result.v1", request_id: "another-command", operation: "process.draft.put", resource: "processes/demo", version: 1, result: {} }) }) });
+    const f = await fixture(t, { run: async (exe, args) => ({ stdout: JSON.stringify(args[4] === "workspace-status" ? { installed: true, workspace: { setup: "configured", permission: {state:"active",not_before:"100",not_after:"3700",identity_not_after:"31536100",observed_at:"200"} }, components: {} } : { schema: "runtime.result.v1", request_id: "another-command", operation: "process.draft.put", resource: "processes/demo", version: 1, result: {} }) }) });
     const { plan } = await f.post({ operation: "plan", action: "draft-put", payload: command });
     await assert.rejects(f.post({ operation: "apply", plan_id: plan.id }), { code: "workspace_result_binding_changed" });
 });
@@ -179,4 +179,55 @@ test("changing only the machine identity expiry invalidates the reviewed setup",
     await writeFile(path.join(f.root, "config/workspace-setup-plan.json"), JSON.stringify({ ...setup, identity_not_after: "31536099" }), { mode: 0o600 });
     await assert.rejects(f.post({ operation: "apply", plan_id: plan.id }), { code: "plan_changed_or_expired" });
     assert.equal(calls.filter(a => a[4] === "workspace-setup").length, 0);
+});
+
+
+test("workspace status projects finite permission expiry and omits arbitrary child metadata", async (t) => {
+    const f = await fixture(t, { run: async () => ({ stdout: JSON.stringify({ installed: true, workspace: { setup: "configured", permission: { state: "expired", not_before: "100", not_after: "3700", identity_not_after: "31536100", observed_at: "4000", secret: "PRIVATE_NOT_STATUS" } }, components: {} }) }) });
+    const status = await f.c.get(req());
+    assert.deepEqual(status.status.workspace.permission, { state: "expired", not_before: "100", not_after: "3700", identity_not_after: "31536100", observed_at: "4000" });
+    assert.ok(!JSON.stringify(status).includes("PRIVATE_NOT_STATUS"));
+});
+
+
+async function renewalFixture(t, { pending = false, resumable = false } = {}) {
+    const calls = [];
+    const f = await fixture(t, { run: async (exe, args) => { calls.push(args); return { stdout: JSON.stringify(args[4] === "workspace-status" ? { installed: true, workspace: { setup: pending ? "partial" : "configured", cleanup_unresolved: pending, permission: { state: "expired", not_before: "100", not_after: "3700", identity_not_after: "31536100", observed_at: "4000" }, renewal: { state: pending ? "recovery_required" : "none", resumable } }, components: {} } : { ok: true }) }; } });
+    await mkdir(path.join(f.root, "config")); await mkdir(path.join(f.root, "authority"));
+    const old = JSON.stringify({ identity_not_after: 31536100, native_generation: 1 });
+    await writeFile(path.join(f.root, "authority/COMPLETE.json"), old, { mode: 0o600 });
+    const oldHash = createHash("sha256").update(old).digest("hex");
+    const proposal = { schema: "castalia.wallet-workspace-renewal.v1", workspace_root: f.root, previous_complete: { path: path.join(f.root, "authority/COMPLETE.json"), sha256: oldHash }, not_before: "4000", not_after: "7600", wallet_command_sha256: "a".repeat(64), verifier_sha256: "b".repeat(64) };
+    const bytes = JSON.stringify(proposal), pin = createHash("sha256").update(bytes).digest("hex");
+    await writeFile(path.join(f.root, "config/workspace-renewal-plan.json"), bytes, { mode: 0o600 });
+    if (pending) { await mkdir(path.join(f.root, "logs")); await writeFile(path.join(f.root, "logs/workspace-renewal.json"), JSON.stringify({ schema: "hub.workspace-renewal-operation.v1", plan_sha256: pin, previous_complete: proposal.previous_complete }), { mode: 0o600 }); }
+    return { ...f, nativeCalls: calls, proposal, pin, oldHash };
+}
+test("expired configured custody can review exact same-identity renewal but cannot dispatch expired commands", async (t) => {
+    const f = await renewalFixture(t), state = await f.c.get(req());
+    for (const action of ["workspace-renew-prepare", "workspace-renew", "validate"]) assert.ok(state.actions.includes(action));
+    for (const action of ["draft-put", "publish", "get", "workspace-start", "workspace-setup"]) assert.ok(!state.actions.includes(action));
+    const { plan } = await f.post({ operation: "plan", action: "workspace-renew", payload: {} });
+    assert.equal(plan.renewal.not_after, "7600"); assert.equal(plan.renewal.identity_not_after, "31536100"); assert.equal(plan.renewal.previous_complete_sha256, f.oldHash);
+    await f.post({ operation: "apply", plan_id: plan.id });
+    const args = f.nativeCalls.find(a => a[4] === "workspace-renew"); assert.equal(args[args.indexOf("--selection-sha256") + 1], f.pin); assert.ok(!args.includes("--request-stdin"));
+});
+test("renewal review rejects changed predecessor and proposal without dispatch", async (t) => {
+    const f = await renewalFixture(t); const { plan } = await f.post({ operation: "plan", action: "workspace-renew", payload: {} });
+    await writeFile(path.join(f.root, "authority/COMPLETE.json"), "{}", { mode: 0o600 });
+    await assert.rejects(f.post({ operation: "apply", plan_id: plan.id }), { code: "plan_changed_or_expired" }); assert.ok(!f.nativeCalls.some(a => a[4] === "workspace-renew"));
+});
+test("pending renewal offers only exact resume and never bypasses retained process cleanup", async (t) => {
+    const f = await renewalFixture(t, { pending: true, resumable: true }); assert.deepEqual((await f.c.get(req())).actions, ["workspace-renew-resume"]);
+    await writeFile(path.join(f.root, "logs/workspace-operation.json"), "{}", { mode: 0o600 }); assert.deepEqual((await f.c.get(req())).actions, []);
+});
+test("exact retained renewal remains resumable after successor selection publication", async (t) => {
+    const f = await renewalFixture(t, { pending: true, resumable: true }), dir = path.join(f.root, "authority/renewals/2"); await mkdir(path.join(dir, "config"), { recursive: true });
+    const bytes = JSON.stringify({ identity_not_after: 31536100, native_generation: 2 }), pin = createHash("sha256").update(bytes).digest("hex");
+    await writeFile(path.join(dir, "COMPLETE.json"), bytes, { mode: 0o600 });
+    for (const name of ["command-authority.json", "wallet-command.json", "runtime-policy.json", "runtime-receiver.json"]) await writeFile(path.join(dir, "config", name), "{}", { mode: 0o600 });
+    await writeFile(path.join(f.root, "config/workspace-native-selection.json"), JSON.stringify({ schema: "hub.workspace-native-selection.v1", native_generation: 2, complete_sha256: pin }), { mode: 0o600 });
+    assert.deepEqual((await f.c.get(req())).actions, ["workspace-renew-resume"]);
+    const { plan } = await f.post({ operation: "plan", action: "workspace-renew-resume", payload: {} }); assert.equal(plan.renewal.previous_complete_sha256, f.oldHash);
+    await f.post({ operation: "apply", plan_id: plan.id }); const args = f.nativeCalls.find(a => a[4] === "workspace-renew-resume"); assert.equal(args[args.indexOf("--selection-sha256") + 1], f.pin);
 });

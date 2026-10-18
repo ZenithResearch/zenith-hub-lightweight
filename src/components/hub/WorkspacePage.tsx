@@ -60,7 +60,7 @@ export function WorkspacePage() {
             setValidation(null);
         }
         else if (action.startsWith("workspace-"))
-            setMessage(action === "workspace-prepare" ? "Public setup proposal prepared. Review its finite window and scope before setting up native identity." : "Workspace action completed. Native configuration is separate from production qualification.");
+            setMessage(action === "workspace-prepare" ? "Public setup proposal prepared. Review its finite window and scope before setting up native identity." : action === "workspace-renew-prepare" ? "Public renewal proposal prepared. Review the finite command permission window; the existing identity and journals are retained." : ["workspace-renew", "workspace-renew-resume"].includes(action) ? "Permission renewal completed for the retained identity. Start the workspace explicitly; no run or provider was enabled." : "Workspace action completed. Native configuration is separate from production qualification.");
     }
     async function apply(p: Plan) { const v = await post({ operation: "apply", plan_id: p.id }); if (v.schema !== "zenith.workspace-result.v1" || v.applied !== true)
         throw Error("Unsupported workspace result"); acceptResult(v.result || {}, p.action); setPlan(null); await refresh(); }
