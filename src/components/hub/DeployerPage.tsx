@@ -10,6 +10,9 @@ type Status = {
   pilot_ready: boolean;
   external_effects: boolean;
   actor_count: number | null;
+  pilot?: { setup: string; cleanup_unresolved: boolean; workflow: {
+    observed_at: number | null; run_state: string; recoverable: boolean; export_available: boolean;
+  } | null } | null;
   components: { name: string; live: boolean | null; ready: boolean | null }[];
 };
 type Snapshot = {
@@ -29,6 +32,7 @@ type Plan = {
   target: string;
   detail: string;
   release_digest: string | null;
+  configuration_digest?: string | null;
 };
 export function DeployerPage() {
   const [snapshot, setSnapshot] = useState<Snapshot | null>(null),
@@ -124,7 +128,8 @@ export function DeployerPage() {
         v.schema === "zenith.deployer-plan.v1" &&
         v.plan &&
         typeof v.plan.id === "string" &&
-        ["install", "doctor", "start", "stop"].includes(v.plan.action) &&
+        ["install", "doctor", "start", "stop", "pilot-setup", "pilot-initialize", "pilot-next",
+          "pilot-inspect", "pilot-resume", "pilot-renew", "pilot-export"].includes(v.plan.action) &&
         typeof v.plan.target === "string" &&
         typeof v.plan.detail === "string"
       ) {
@@ -151,6 +156,7 @@ export function DeployerPage() {
   }
   const s = snapshot?.status;
   const known = snapshot?.mode === "local";
+  const pilot = snapshot?.profile === "local-review-v1";
   const items: DeploymentItem[] = ["service", "runtime"].map((name) => {
     const c = s?.components?.find((c) => c.name === name);
     return {
@@ -173,9 +179,12 @@ export function DeployerPage() {
   });
   items.push({
     name: "Frank",
-    detail: "Executes eligible work through configured provider adapters.",
+    detail: pilot ? "Runs the selected local-review process; authority is checked for each request."
+      : "Executes eligible work through configured provider adapters.",
     state: s?.actor_count ? "pending" : "unknown",
-    label: s?.actor_count === 0 ? "No enabled actors" : "Not qualified",
+    label: pilot ? s?.pilot?.cleanup_unresolved ? "Cleanup unresolved"
+      : s?.pilot?.setup === "configured" ? "Configured · bounded actions" : "Setup pending"
+      : s?.actor_count === 0 ? "No enabled actors" : "Not qualified",
   });
   const checkpoints: DeploymentItem[] = [
     {
@@ -187,27 +196,34 @@ export function DeployerPage() {
     {
       name: "Connect native authority",
       detail: "Wallet custody, scoped permissions and receiver verification.",
-      state: "blocked",
-      label: s?.authority === "pending" ? "Pending" : "Not qualified",
+      state: pilot && s?.pilot?.setup === "configured" ? "ready" : "blocked",
+      label: pilot ? s?.pilot?.setup === "configured" ? "Configured · checked per request"
+        : s?.pilot?.setup === "partial" ? "Partial setup retained" : "Pending"
+        : s?.authority === "pending" ? "Pending" : "Not qualified",
     },
-    {
+    ...(!pilot ? [{
       name: "Connect Matrix intake",
       detail: "Frank intake submits an authorized ServiceRequest.",
       state: "pending",
       label: "Not connected",
-    },
+    } satisfies DeploymentItem] : []),
     {
-      name: "Run the first useful workflow",
-      detail: "Enable a qualified provider and verify committed results.",
-      state: "pending",
-      label: s?.external_effects ? "Review readiness" : "Effects disabled",
+      name: pilot ? "Run the selected local review" : "Run the first useful workflow",
+      detail: pilot ? s?.pilot?.workflow?.observed_at
+        ? `Runtime observed ${new Date(s.pilot.workflow.observed_at).toLocaleString()}; external effects stay disabled.`
+        : "Initialize the selected inputs, run eligible steps and export committed Markdown."
+        : "Enable a qualified provider and verify committed results.",
+      state: pilot && s?.pilot?.workflow?.export_available ? "ready" : "pending",
+      label: pilot ? s?.pilot?.workflow?.run_state ? `Observed: ${s.pilot.workflow.run_state}` : "No Runtime observation"
+        : s?.external_effects ? "Review readiness" : "Effects disabled",
     },
   ];
   return (
     <DeploymentMonitor
       title="Your local environment"
-      subtitle="Set up one Mac to receive requests and execute approved work."
-      profile="Process pilot · Apple silicon"
+      subtitle={pilot ? "One owner-selected local review on this Mac. External effects stay disabled."
+        : "Set up one Mac to receive requests and execute approved work."}
+      profile={pilot ? "Local review · Apple silicon" : "Process pilot · Apple silicon"}
       connection={known ? "Local controller" : "Controller not connected"}
       items={items}
       checkpoints={checkpoints}
@@ -220,7 +236,7 @@ export function DeployerPage() {
         },
         {
           id: "install",
-          label: "Install base stack",
+          label: pilot ? "Install local-review stack" : "Install base stack",
           disabled: !snapshot?.actions?.includes("install"),
         },
         {
@@ -233,6 +249,15 @@ export function DeployerPage() {
           label: "Stop",
           disabled: !snapshot?.actions?.includes("stop"),
         },
+        ...(pilot ? [
+          {id:"pilot-setup", label:"Set up native identity"},
+          {id:"pilot-initialize", label:"Initialize selected review"},
+          {id:"pilot-next", label:"Run next eligible step"},
+          {id:"pilot-inspect", label:"Inspect selected review"},
+          {id:"pilot-resume", label:"Resume retained work"},
+          {id:"pilot-renew", label:"Renew retained attestation"},
+          {id:"pilot-export", label:"Export committed Markdown"},
+        ].map((a) => ({...a,disabled:!snapshot?.actions?.includes(a.id)})) : []),
       ]}
       onAction={action}
       busy={busy}
@@ -244,7 +269,7 @@ export function DeployerPage() {
               detail: plan.detail,
               destination: plan.target,
               digest:
-                plan.release_digest ||
+                plan.configuration_digest || plan.release_digest ||
                 "Existing installed release; doctor checks its pins.",
             }
           : undefined
