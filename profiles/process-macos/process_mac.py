@@ -785,7 +785,7 @@ WORKSPACE_RENEW_HOLD = 'logs/workspace-renewal.json'
 WORKSPACE_UPGRADE_HOLD = 'logs/workspace-software-upgrade.json'
 WORKSPACE_PROVIDER_SERVICE_PLAN = 'config/provider-service-plan.json'
 WORKSPACE_PROVIDER_SERVICE_SELECTION = 'config/provider-service-selection.json'
-WORKSPACE_PROVIDER_SCOPE = 'finite Frank Hermes pilot for one exact Actor and one exact Run; authoring/catalog retained'
+WORKSPACE_PROVIDER_SCOPE = 'finite Frank Hermes pilot for one exact handoff, derived Run and Actor; authoring/catalog retained'
 PROVIDER_PROCESS_ID = 'zenith.anima.brand-package'
 PROVIDER_PROCESS_VERSION = 'zenith.anima.brand-package-v1'
 PROVIDER_PROCESS_COMPILATION = '1b4848c714775871a7b1cee4b04d73e43994e30838ec5a312ea10993d0b07ee2'
@@ -900,14 +900,16 @@ def workspace_renewal_plan(root, selection):
             and hashlib.sha256(raw).hexdigest() == selection, 'Workspace renewal plan changed after review')
     value = closed_json(raw)
     ordinary = {'schema','workspace_root','previous_complete','not_before','not_after','wallet_command_sha256','verifier_sha256'}
-    live = ordinary | {'actor_id','run_id'}
+    live = ordinary | {'actor_id','run_id','handoff_id'}
     require(type(value) is dict and set(value) == (live if value.get('schema') == 'castalia.wallet-workspace-live-provider-authority.v1' else ordinary)
             and value['schema'] in {'castalia.wallet-workspace-renewal.v1','castalia.wallet-workspace-live-provider-authority.v1'}
             and value['workspace_root'] == str(root),
             'Invalid workspace renewal proposal')
     if value['schema'] == 'castalia.wallet-workspace-live-provider-authority.v1':
-        require(all(type(value[k]) is str and re.fullmatch('[a-zA-Z0-9._:-]{1,128}',value[k]) for k in ('actor_id','run_id')),
-                'Invalid provider Actor or Run identity')
+        require(type(value['actor_id']) is str and re.fullmatch('[a-zA-Z0-9._:-]{1,128}',value['actor_id'])
+                and type(value['handoff_id']) is str and re.fullmatch('[a-f0-9]{64}',value['handoff_id'])
+                and value['run_id'] == 'handoff-'+value['handoff_id'][:48],
+                'Invalid provider Actor, handoff or derived Run identity')
     previous = value['previous_complete']
     require(type(previous) is dict and set(previous) == {'path','sha256'}
             and type(previous['path']) is str and type(previous['sha256']) is str
@@ -923,7 +925,7 @@ def workspace_renewal_plan(root, selection):
     return raw,value
 
 
-def workspace_prepare_renewal(root, expected=None, *, actor_id=None, run_id=None):
+def workspace_prepare_renewal(root, expected=None, *, actor_id=None, run_id=None, handoff_id=None):
     require(not workspace_holds(root), 'Workspace renewal or cleanup must be reconciled')
     workspace_stopped(root)
     receipt = workspace_ready(root)
@@ -939,19 +941,21 @@ def workspace_prepare_renewal(root, expected=None, *, actor_id=None, run_id=None
     identity_end = receipt.get('identity_not_after',receipt.get('holder',{}).get('not_after'))
     require(type(identity_end) is int and end <= identity_end, 'Machine identity cannot cover the proposed permission window; identity is retained')
     rows={row['role']:row for row in native_rows(workspace_profile(root))}
-    provider = actor_id is not None or run_id is not None
-    require(not provider or all(type(v) is str and re.fullmatch('[a-zA-Z0-9._:-]{1,128}',v) for v in (actor_id,run_id)),
-            'Provider authority requires exact Actor and Run identities')
+    provider = actor_id is not None or run_id is not None or handoff_id is not None
+    require(not provider or (type(actor_id) is str and re.fullmatch('[a-zA-Z0-9._:-]{1,128}',actor_id)
+            and type(handoff_id) is str and re.fullmatch('[a-f0-9]{64}',handoff_id)
+            and run_id == 'handoff-'+handoff_id[:48]),
+            'Provider authority requires an exact Actor, handoff and derived Run')
     value={'schema':'castalia.wallet-workspace-live-provider-authority.v1' if provider else 'castalia.wallet-workspace-renewal.v1','workspace_root':str(root),
            'previous_complete':{'path':str(previous),'sha256':hashlib.sha256(previous_raw).hexdigest()},
            'not_before':str(start),'not_after':str(end),
            'wallet_command_sha256':rows['wallet-command']['sha256'],'verifier_sha256':rows['context-verifier']['sha256']}
-    if provider:value.update(actor_id=actor_id,run_id=run_id)
+    if provider:value.update(actor_id=actor_id,run_id=run_id,handoff_id=handoff_id)
     raw=workspace_bytes(value);workspace_store(plan,raw,replace=old is not None)
     return {'schema':'hub.workspace-renewal-proposal.v1','plan_sha256':hashlib.sha256(raw).hexdigest(),
             'not_before':value['not_before'],'not_after':value['not_after'],'identity_not_after':str(identity_end),
             'same_identity':True,'authority_changed':provider,
-            **({'actor_id':actor_id,'run_id':run_id,'permission_count':22} if provider else {})}
+            **({'actor_id':actor_id,'run_id':run_id,'handoff_id':handoff_id,'permission_count':23} if provider else {})}
 
 
 def workspace_renewal_identity(old,new,plan):
@@ -965,8 +969,9 @@ def workspace_renewal_identity(old,new,plan):
             and new.get('journal_capacity') == old.get('journal_capacity'), 'Renewal changed identity, issuer or capacity')
     if plan['schema'] == 'castalia.wallet-workspace-live-provider-authority.v1':
         require(new.get('scope') == WORKSPACE_PROVIDER_SCOPE
-                and new.get('actor_id') == plan['actor_id'] and new.get('run_id') == plan['run_id'],
-                'Provider renewal changed the exact Actor, Run or fixed scope')
+                and new.get('actor_id') == plan['actor_id'] and new.get('run_id') == plan['run_id']
+                and new.get('handoff_id') == plan['handoff_id'],
+                'Provider renewal changed the exact Actor, handoff, derived Run or fixed scope')
     else:
         require(new.get('scope') == old.get('scope'), 'Renewal changed authority scope')
 
@@ -1540,7 +1545,7 @@ def workspace_report(root):
             if receipt.get('scope') == WORKSPACE_PROVIDER_SCOPE:
                 result.update(provider_authority={'state':'configured_native_unqualified',
                               'actor_id':receipt.get('actor_id'),'run_id':receipt.get('run_id'),
-                              'permission_count':22})
+                              'handoff_id':receipt.get('handoff_id'),'permission_count':23})
         except (InstallError, OSError, ValueError, KeyError, TypeError):
             result.update(setup='partial', authority='unavailable')
     elif (root/'config/workspace-setup-plan.json').exists():
@@ -1569,7 +1574,7 @@ def workspace_report(root):
 
 
 def workspace_action(root, action, raw=None, expected=None, selection=None, *, actor_id=None, run_id=None,
-                     requester_policy_sha256=None):
+                     handoff_id=None, requester_policy_sha256=None):
     installed(root)
     workspace_profile(root)
     if action == 'workspace-stop':
@@ -1583,7 +1588,7 @@ def workspace_action(root, action, raw=None, expected=None, selection=None, *, a
     if action in {'workspace-renew','workspace-renew-resume'}:
         return workspace_renew(root,selection,resume=action=='workspace-renew-resume')
     if action == 'workspace-provider-authority-prepare':
-        return workspace_prepare_renewal(root,selection,actor_id=actor_id,run_id=run_id)
+        return workspace_prepare_renewal(root,selection,actor_id=actor_id,run_id=run_id,handoff_id=handoff_id)
     if action in {'workspace-provider-authority','workspace-provider-authority-resume'}:
         raw_plan,plan=workspace_renewal_plan(root,selection)
         require(plan['schema'] == 'castalia.wallet-workspace-live-provider-authority.v1',
@@ -1942,6 +1947,7 @@ def main():
     parser.add_argument('--request-sha256')
     parser.add_argument('--actor-id')
     parser.add_argument('--run-id')
+    parser.add_argument('--handoff-id')
     parser.add_argument('--provider-policy-sha256')
     parser.add_argument('--component', choices=COMPONENTS)
     parser.add_argument('--route',choices=['live','ready'],default='live')
@@ -1977,13 +1983,14 @@ def main():
                     result = workspace_software_upgrade(args.bundle,root,args.bundle_sha256)
                 elif args.action in WORKSPACE_ACTIONS:
                     require(args.action == 'workspace-provider-authority-prepare'
-                            or args.actor_id is None and args.run_id is None,
-                            'Actor and Run are accepted only while preparing provider authority')
+                            or args.actor_id is None and args.run_id is None and args.handoff_id is None,
+                            'Actor, handoff and Run are accepted only while preparing provider authority')
                     require(args.action in {'workspace-provider-admit-once','workspace-provider-resume-admission-once'}
                             or args.provider_policy_sha256 is None,
                             'Requester policy pin is accepted only for provider admission')
                     result = workspace_action(root, args.action, request_raw, args.request_sha256,
                                               args.selection_sha256, actor_id=args.actor_id, run_id=args.run_id,
+                                              handoff_id=args.handoff_id,
                                               requester_policy_sha256=args.provider_policy_sha256)
                 elif args.action in PILOT_ACTIONS:
                     require(args.selection_sha256 is not None, 'Supply the reviewed pilot selection pin')

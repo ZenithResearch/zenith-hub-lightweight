@@ -52,14 +52,17 @@ class ProviderActivationTests(unittest.TestCase):
         self.temp.cleanup()
 
     def test_provider_runtime_plan_binds_one_actor_and_run(self):
+        handoff_id = "a" * 64
+        run_id = "handoff-" + handoff_id[:48]
         proposal = process_mac.workspace_prepare_renewal(
-            self.root, actor_id="frank-anima", run_id="anima-brand-request-001"
+            self.root, actor_id="frank-anima", run_id=run_id, handoff_id=handoff_id
         )
         raw, plan = process_mac.workspace_renewal_plan(self.root, proposal["plan_sha256"])
         self.assertEqual(plan["schema"], "castalia.wallet-workspace-live-provider-authority.v1")
         self.assertEqual(plan["actor_id"], "frank-anima")
-        self.assertEqual(plan["run_id"], "anima-brand-request-001")
-        self.assertEqual(proposal["permission_count"], 22)
+        self.assertEqual(plan["run_id"], run_id)
+        self.assertEqual(plan["handoff_id"], handoff_id)
+        self.assertEqual(proposal["permission_count"], 23)
         self.assertEqual(hashlib.sha256(raw).hexdigest(), proposal["plan_sha256"])
         with self.assertRaises(process_mac.InstallError):
             process_mac.workspace_prepare_renewal(self.root, actor_id="frank-anima")
@@ -132,11 +135,13 @@ class ProviderActivationTests(unittest.TestCase):
         old = {"holder": holder, "command_issuer": {"key": "issuer"},
                "identity_not_after": 9999999999,
                "journal_capacity": "local_review_pilot_512", "scope": "authoring"}
+        handoff_id = "a" * 64
+        run_id = "handoff-" + handoff_id[:48]
         new = {**old, "holder": {**holder, "state_revision": 2},
                "scope": process_mac.WORKSPACE_PROVIDER_SCOPE,
-               "actor_id": "frank-anima", "run_id": "run-1"}
+               "actor_id": "frank-anima", "run_id": run_id, "handoff_id": handoff_id}
         plan = {"schema": "castalia.wallet-workspace-live-provider-authority.v1",
-                "actor_id": "frank-anima", "run_id": "run-1"}
+                "actor_id": "frank-anima", "run_id": run_id, "handoff_id": handoff_id}
         process_mac.workspace_renewal_identity(old, new, plan)
         with self.assertRaises(process_mac.InstallError):
             process_mac.workspace_renewal_identity(old, {**new, "run_id": "run-2"}, plan)
@@ -200,6 +205,9 @@ class ProviderActivationTests(unittest.TestCase):
         }
         runtime_receipt = {
             "scope": process_mac.WORKSPACE_PROVIDER_SCOPE,
+            "actor_id": "frank-anima",
+            "handoff_id": "a" * 64,
+            "run_id": "handoff-" + "a" * 48,
             "not_before": int(time.time()) - 5,
             "not_after": int(time.time()) + 3500,
             "identity_not_after": int(time.time()) + 86400,

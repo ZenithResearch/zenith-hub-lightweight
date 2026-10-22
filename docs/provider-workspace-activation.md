@@ -5,7 +5,7 @@ Status: source candidate. The current published workspace bundle does not yet co
 The generic Process Workspace remains the only root. Provider preparation is explicit, runs only while Runtime and Service are stopped, preserves the existing workspace identity and keeps run admission closed. It creates two independent authority surfaces:
 
 - a separate `application=service` identity with twelve fixed Service lifecycle/query permissions over the local `requests/` and `cases/` namespaces;
-- a successor Runtime policy with twenty-two fixed permissions for one exact Frank Actor and one exact Run, while retaining the five authoring/catalog permissions.
+- a successor Runtime policy with twenty-three fixed permissions for one exact Service handoff, its derived Run and one exact Frank Actor, while retaining the five authoring/catalog permissions.
 
 Neither action configures a queue, stores a Vercel credential, publishes a workflow, registers Frank, starts a service, enables Runtime admission or enables a provider. Those steps require the reviewed provider bundle and their own evidence.
 
@@ -30,14 +30,19 @@ The controller verifies the native `COMPLETE.json`, its three configuration dige
 
 ## Review one Actor/Run Runtime authority
 
-The Run identity must come from the exact retained Service lifecycle command; do not invent or reuse it after an uncertain or terminal run.
+The successful approved Service lifecycle result supplies `activation.handoff_id`
+and `activation.run_id`. The Run must equal `handoff-` plus the first 48 hex
+characters of the 64-hex handoff ID. Do not invent or reuse either identity after
+an uncertain or terminal run.
 
 ```bash
 "$PYTHON" -I -S -B "$ROOT/control.py" workspace-provider-authority-prepare \
-  --root "$ROOT" --actor-id frank-anima --run-id EXACT_RETAINED_RUN_ID
+  --root "$ROOT" --actor-id frank-anima \
+  --handoff-id EXACT_RETAINED_HANDOFF_ID --run-id EXACT_DERIVED_RUN_ID
 ```
 
-Review the same identity, predecessor receipt, exact Actor, exact Run, finite window, permission count `22` and `plan_sha256`, then apply:
+Review the same identity, predecessor receipt, exact Actor, handoff, derived Run,
+finite window, permission count `23` and `plan_sha256`, then apply:
 
 ```bash
 "$PYTHON" -I -S -B "$ROOT/control.py" workspace-provider-authority \
