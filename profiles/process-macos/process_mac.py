@@ -728,7 +728,9 @@ WORKSPACE_ACTIONS = {'workspace-status', 'workspace-prepare', 'workspace-setup',
                      'workspace-stop', 'workspace-command', 'workspace-renew-prepare', 'workspace-renew', 'workspace-renew-resume',
                      'workspace-provider-authority-prepare', 'workspace-provider-authority',
                      'workspace-provider-authority-resume', 'workspace-provider-service-prepare',
-                     'workspace-provider-service-setup'}
+                     'workspace-provider-service-setup', 'workspace-provider-admit-once',
+                     'workspace-provider-resume-admission-once', 'workspace-provider-advance-once',
+                     'workspace-provider-resume-once'}
 WORKSPACE_CONFIGS = {'command-authority.json', 'wallet-command.json',
                      'runtime-policy.json', 'runtime-receiver.json'}
 
@@ -784,6 +786,9 @@ WORKSPACE_UPGRADE_HOLD = 'logs/workspace-software-upgrade.json'
 WORKSPACE_PROVIDER_SERVICE_PLAN = 'config/provider-service-plan.json'
 WORKSPACE_PROVIDER_SERVICE_SELECTION = 'config/provider-service-selection.json'
 WORKSPACE_PROVIDER_SCOPE = 'finite Frank Hermes pilot for one exact Actor and one exact Run; authoring/catalog retained'
+PROVIDER_PROCESS_ID = 'zenith.anima.brand-package'
+PROVIDER_PROCESS_VERSION = 'zenith.anima.brand-package-v1'
+PROVIDER_PROCESS_COMPILATION = '1b4848c714775871a7b1cee4b04d73e43994e30838ec5a312ea10993d0b07ee2'
 
 
 def workspace_sync(directory):
@@ -1457,6 +1462,69 @@ def workspace_provider_service_status(root):
             'permission':workspace_permission(receipt)}
 
 
+def workspace_provider_worker(root, action, requester_policy_sha256=None):
+    commands = {
+        'workspace-provider-admit-once':'admit-once',
+        'workspace-provider-resume-admission-once':'resume-admission-once',
+        'workspace-provider-advance-once':'advance-brand-package-once',
+        'workspace-provider-resume-once':'resume-brand-package-once',
+    }
+    require(action in commands, 'Unsupported provider worker action')
+    require(not workspace_holds(root), 'Workspace transition or cleanup must be reconciled')
+    service_status=workspace_provider_service_status(root)
+    require(service_status['state'] == 'configured_native_unqualified'
+            and service_status['permission']['state'] == 'active',
+            'Active finite provider Service authority is required')
+    service_receipt=workspace_provider_service_receipt(root)
+    service_dir=root/'authority/provider-service/1/config'
+    rows={row['role']:row for row in native_rows(workspace_profile(root))}
+    admission_actions={'workspace-provider-admit-once','workspace-provider-resume-admission-once'}
+    lifecycle_actions={'workspace-provider-advance-once','workspace-provider-resume-once'}
+    require((action in admission_actions and requester_policy_sha256 is not None)
+            or (action in lifecycle_actions and requester_policy_sha256 is None),
+            'Requester policy pin is accepted only for provider admission')
+    argv=[root/'venv/bin/python','-I','-B','-m','service_management.provider_worker',commands[action],
+          '--intake-database',root/'data/provider-intake.db','--service-database',root/'data/service.db',
+          '--native-verifier',root/'native'/rows['context-verifier']['filename'],
+          '--native-verifier-sha256',rows['context-verifier']['sha256'],
+          '--receiver-policy',service_dir/'service-receiver.json',
+          '--wallet-command',root/'native'/rows['wallet-command']['filename'],
+          '--wallet-command-sha256',rows['wallet-command']['sha256'],
+          '--wallet-configuration',service_dir/'wallet-command.json',
+          '--wallet-configuration-sha256',service_receipt['configuration_hashes']['wallet-command.json'],
+          '--limit','1','--timeout','5']
+    if action in lifecycle_actions:
+        runtime_receipt=workspace_ready(root)
+        require(runtime_receipt.get('scope') == WORKSPACE_PROVIDER_SCOPE
+                and workspace_permission(runtime_receipt)['state'] == 'active',
+                'Active exact Actor/Run Runtime authority is required')
+        runtime_dir=workspace_config_directory(root,runtime_receipt)
+        require(owns_listener(root,'runtime'),'Start the exact workspace Runtime before lifecycle advancement')
+        argv += ['--runtime-endpoint','http://127.0.0.1:'+str(config(root)['runtime_port']),
+                 '--runtime-wallet-command',root/'native'/rows['wallet-command']['filename'],
+                 '--runtime-wallet-command-sha256',rows['wallet-command']['sha256'],
+                 '--runtime-wallet-configuration',runtime_dir/'wallet-command.json',
+                 '--runtime-wallet-configuration-sha256',runtime_receipt['configuration_hashes']['wallet-command.json'],
+                 '--process-id',PROVIDER_PROCESS_ID,'--process-version',PROVIDER_PROCESS_VERSION,
+                 '--compilation-hash',PROVIDER_PROCESS_COMPILATION]
+    else:
+        policy=root/'config/provider-requester-policy.json'
+        require(type(requester_policy_sha256) is str and re.fullmatch('[a-f0-9]{64}',requester_policy_sha256)
+                and hashlib.sha256(bounded_private(policy,262144)).hexdigest() == requester_policy_sha256,
+                'Exact reviewed requester policy is required')
+        argv += ['--requester-policy',policy]
+    result=workspace_run(argv,root)
+    require(type(result) is dict and set(result) in (
+                {'schema','command','processed','results'},
+                {'schema','command','processed','results','error','recovery'})
+            and result.get('schema') == 'service.provider-worker-result.v1'
+            and result.get('command') == commands[action]
+            and type(result.get('processed')) is int and 0 <= result['processed'] <= 1
+            and type(result.get('results')) is list and len(result['results']) == result['processed'],
+            'Provider worker result differs from the fixed command')
+    return result
+
+
 def workspace_report(root):
     workspace_profile(root)
     pending = workspace_holds(root)
@@ -1500,7 +1568,8 @@ def workspace_report(root):
     return result
 
 
-def workspace_action(root, action, raw=None, expected=None, selection=None, *, actor_id=None, run_id=None):
+def workspace_action(root, action, raw=None, expected=None, selection=None, *, actor_id=None, run_id=None,
+                     requester_policy_sha256=None):
     installed(root)
     workspace_profile(root)
     if action == 'workspace-stop':
@@ -1524,6 +1593,9 @@ def workspace_action(root, action, raw=None, expected=None, selection=None, *, a
         return workspace_prepare_provider_service(root,selection)
     if action == 'workspace-provider-service-setup':
         return workspace_provider_service_setup(root,selection)
+    if action in {'workspace-provider-admit-once','workspace-provider-resume-admission-once',
+                  'workspace-provider-advance-once','workspace-provider-resume-once'}:
+        return workspace_provider_worker(root,action,requester_policy_sha256)
     if action == 'workspace-prepare':
         require(not any(launch_status(root, name) for name in COMPONENTS), 'Stop workspace before preparing setup')
         return workspace_prepare_plan(root, selection)
@@ -1870,6 +1942,7 @@ def main():
     parser.add_argument('--request-sha256')
     parser.add_argument('--actor-id')
     parser.add_argument('--run-id')
+    parser.add_argument('--provider-policy-sha256')
     parser.add_argument('--component', choices=COMPONENTS)
     parser.add_argument('--route',choices=['live','ready'],default='live')
     parser.add_argument('--runtime-port', type=int, default=8092)
@@ -1906,8 +1979,12 @@ def main():
                     require(args.action == 'workspace-provider-authority-prepare'
                             or args.actor_id is None and args.run_id is None,
                             'Actor and Run are accepted only while preparing provider authority')
+                    require(args.action in {'workspace-provider-admit-once','workspace-provider-resume-admission-once'}
+                            or args.provider_policy_sha256 is None,
+                            'Requester policy pin is accepted only for provider admission')
                     result = workspace_action(root, args.action, request_raw, args.request_sha256,
-                                              args.selection_sha256, actor_id=args.actor_id, run_id=args.run_id)
+                                              args.selection_sha256, actor_id=args.actor_id, run_id=args.run_id,
+                                              requester_policy_sha256=args.provider_policy_sha256)
                 elif args.action in PILOT_ACTIONS:
                     require(args.selection_sha256 is not None, 'Supply the reviewed pilot selection pin')
                     result = pilot_action(root, args.action, args.selection_sha256)
