@@ -7,6 +7,8 @@
 
 ### Fixed
 
+- Repin the required provider Queue bundle to the source head whose public CI
+  installs and exercises the same Queue and Castalia dependencies as the release.
 - Repin the provider workspace to Service Management's per-request runtime OIDC binding and current seven-day Vercel Queue limit — prevents stale build-token capture and keeps the required offline mailbox on the documented API range.
 - Allow an exact numeric-loopback HTTP browser origin in the local provider
   projection while retaining HTTPS for every non-loopback origin, and repin the
