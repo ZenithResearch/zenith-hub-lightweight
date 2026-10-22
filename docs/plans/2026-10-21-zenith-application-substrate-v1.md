@@ -17,17 +17,20 @@ Anima browser
   -> provider Mac pull and durable inbox commit
   -> separate requester-membership verification
   -> native-authorized Service Management request.create
-  -> authoritative status, receipt and deliverable projection
+  -> Case pinned to zenith.anima.brand-package
+  -> Process Runtime / Frank execution and human review
+  -> authoritative status, artifact, receipt and deliverable projection
 ```
 
 Anima remains a replaceable HTML/TypeScript/Rust-WASM client. It does not own or
 embed Service Management, Process Runtime, Frank, provider credentials, local
 deployment, or canonical service state.
 
-This first slice does not claim workflow execution. The next slice pins an actual
-`zenith.anima.brand-package` workflow, creates a Case, runs it through Process
-Runtime and Frank, and returns real artifacts. Tailscale peer synchronization and
-Daycall conformance follow after that path works.
+The reviewed source chain now includes the workflow, Runtime handoff, Frank input
+hydration and artifact materialization. Production qualification still requires
+merging and releasing those exact sources, deploying the transport and authority,
+and running one substantive request through human review and returned artifacts.
+Direct peer synchronization and Daycall conformance follow after that path works.
 
 ## 2. Canonical Devgraph placement
 
@@ -59,14 +62,19 @@ mark it complete merely because this sequence supersedes an earlier gate plan.
   and receipt references.
 - Exact authorization is an injected callback; transport acknowledgement never
   becomes service progress.
-- Anima has consumed the source client and reports its contract/UI checks passing.
+- Anima has consumed Service client 0.9.0/catalog v4 and reports 142 regressions,
+  nine real IndexedDB checks and the full 13-step walkthrough passing. It prepares
+  the request/reference pair once, stores both exact ciphertexts before either
+  send, and retries their transports independently. Live sending remains closed.
 
 ### Delivered local admission source
 
-- A bounded public gateway core validates canonical intake, exact idempotency and
-  provider routing, verifies requester intent before sealing, and publishes through
-  the official Queue SDK with an opaque stable deduplication key.
-- `service.intake.v1` closes the request shape and verifies the reviewed brief hash.
+- A bounded public gateway validates the encrypted envelope header, expiry,
+  ciphertext bounds, stable idempotency and exact provider routing, then publishes
+  ciphertext through the official Queue SDK with an opaque stable deduplication
+  key. Reviewed request bytes and requester evidence remain encrypted.
+- Separate request and bounded reference-object envelopes preserve one requester
+  evidence result and stable identities while using independent Queue topics.
 - A separate SQLite inbox persists exact intake bytes, requester evidence and the
   transport receipt before acknowledgement.
 - Duplicate delivery, acknowledgement loss and process restart retain one logical
@@ -81,30 +89,40 @@ mark it complete merely because this sequence supersedes an earlier gate plan.
 - The optional Vercel poll adapter uses the official Python SDK, deploymentless
   polling, byte transport, bounded batch size and the documented 30–3600 second
   lease range.
-- secS PR #301 implements the bounded `service.intake-envelope.v1`, WASM producer
-  and fixed-purpose macOS provider opener. The opener owns canonical recipient-key
-  custody and returns one closed binary frame.
-- Service Management commit `60412b5` content-pins that executable by SHA-256,
-  rechecks it for every invocation, supplies no key path or inherited environment,
-  and accepts only the exact bounded intake/evidence response.
+- secS PR #302 head `a6cda6d99a8f8674c1264dd4258ddf16f9a048fc`
+  supplies the browser producer and fixed-purpose macOS provider opener.
+- Service Management PR #1 head
+  `434f3cb04f8e494fb87317647fe5f2a6e5e41515` implements the
+  request/reference gateways, durable stores, local admission, Runtime handoff,
+  client projections and all three bounded production Vercel routes.
+- Process Runtime PR #1 head `cbb9c2fbf5b9faa8bba300941ad2639591ecec6e`
+  contains the reviewed Markdown, explicit process JSON and compiled
+  `zenith.anima.brand-package` snapshot at SHA-256
+  `1b4848c714775871a7b1cee4b04d73e43994e30838ec5a312ea10993d0b07ee2`.
+- Frank PR #2 head `0a9ca3d66020a799da25e4353d72e83cd2273736`
+  verifies the exact Runtime brief/reference artifacts, presents the selected image
+  in the same model turn and commits substantive output artifacts.
+- Hub PR #2 head `f4f77f1b29726d854b8e5cb539c176ee2d4119a2`
+  composes 26 wheels and six native tools; two bundle builds match at manifest
+  SHA-256 `68b0ba30762612852e86013e400a135919edb6bcaa8f21472ff7538955f62c67`.
 
 ### Verified limitations
 
 - No Vercel project, production Queue, public gateway or spending approval has
   been provisioned.
-- The encrypted queue envelope and native opener are source-qualified in secS PR
-  #301 but are not merged, released, installed or exercised through a live Queue.
-- The gateway has not yet consumed a released secS WASM producer, and the provider
-  contract does not yet publish the reviewed intake key ID, public key and rotation
-  window.
+- The six reviewed component PRs are green and mergeable but remain unmerged and
+  unreleased. The exact provider bundle is prepared but not published or installed.
+- The gateway has not yet consumed released secS producer/opener artifacts or an
+  activated recipient key and finite provider authority.
 - The requester-membership verifier port is not wired to a production Castalia /
   Zenith membership authority.
-- Authorized online status and artifact projection storage is not selected.
+- The reviewed response path is a Hub-supervised read-only local projection behind
+  an exact Tailscale Funnel path mount; the route remains unapplied.
 - The installed Mac bundle is an installation-only base: Service Management and
   Process Runtime are live but report `authority=default_deny`; native authority
   qualification and provider activation remain incomplete in the released path.
-- No checked-in `zenith.anima.brand-package` workflow and no qualified Frank actor
-  execution currently satisfy the production proof.
+- No released-byte `zenith.anima.brand-package` execution has completed the real
+  human-review step and returned its three substantive deliverables to Anima.
 - Existing Nostr dispatcher material is design-only and does not provide a
   qualified exact-recipient transport implementation.
 
@@ -183,7 +201,8 @@ Reviews: privacy/authorization, API contract, projection truthfulness, recovery.
 ### Lane E — First useful workflow and release proof
 
 **Owner:** Process Runtime, Frank, Hub and service operators.  
-**State:** blocked by released-runtime authority/provider gap and missing workflow.
+**State:** source-qualified workflow and actor path; release, authority, deployment
+and real human-reviewed execution remain.
 
 Acceptance:
 
@@ -203,13 +222,23 @@ installed release and recovery.
 **Owner:** Zenith Transfer and application adapters.  
 **State:** deliberately after the production slice.
 
-Acceptance:
+Implementation sequence and acceptance:
 
-1. Define supported records/objects, source ownership, cursors and conflicts.
-2. Qualify direct Tailscale synchronization between authorized peers.
-3. Add Zenith Transfer install/configuration only after standalone installation
-   and service delivery pass.
-4. Make Daycall consume the same client contracts without Anima-specific fields.
+1. Extract a transport-neutral adapter port from the proven Queue intake and
+   response path. Preserve exact logical identity, digest, cursor,
+   acknowledgement and unknown-outcome reconciliation behavior.
+2. Treat browser and intermittent applications as clients, not peers. Qualify one
+   pull adapter through Matrix or another real message source, and one explicit
+   file/object mailbox adapter. A local folder is the smallest storage candidate;
+   Dropbox, Nostr and hosted storage remain replaceable options.
+3. Qualify direct Tailscale synchronization between two full local stacks for one
+   declared record family plus content-addressed objects. No arbitrary directory
+   mirroring or last-write-wins behavior.
+4. Require digest/owner/version/authority checks before local commit and advance
+   a cursor or remove a mailbox item only after that durable commit.
+5. Add Zenith Transfer installation/configuration after standalone provider
+   delivery passes, then make Daycall consume the same contracts without
+   Anima-specific fields.
 
 ## 5. Dependency graph
 
@@ -229,7 +258,9 @@ flowchart TD
     X[Enabled Frank actor] --> E
     E --> D[Artifacts and receipts returned]
     F --> D
-    D --> T[Tailscale peer sync]
+    D --> Z[Transport-neutral adapter port]
+    Z --> T[Tailscale full-stack peer sync]
+    Z --> B[Client message or file mailbox adapter]
     D --> Y[Daycall conformance]
 ```
 
@@ -286,31 +317,32 @@ Current assessment: **not started on released artifacts**.
 - Zenith Transfer adds the qualified installation/configuration path.
 - Tailscale synchronization and Daycall use the same protocol families.
 
-Current assessment: **later work**.
+Current assessment: **adapter boundary specified; implementations follow Gate 5**.
 
 ## 7. Immediate engineering sequence
 
-1. Merge secS PR #301, publish reviewed WASM and macOS artifacts, and record their
-   exact digests and contract versions.
-2. Extend the provider contract with the signed intake key ID, public key,
-   envelope profile and validity/rotation window; wire Anima only to that public
-   metadata and a configurable gateway URL.
-3. Wire the released WASM sealer into the bounded gateway and implement the
-   production Zenith membership verifier with negative tests.
-4. Implement the authorized status/artifact boundary against local fakes; keep
-   cloud resource identifiers injectable.
-5. Select the Vercel project, region, retention and spending owner, then provision
-   only the minimum Queue, OIDC and gateway resources.
-6. Compose the Hub release with the pinned native opener, explicitly provisioned
-   provider key, poll worker, durable inbox and production Service authority issuer.
-7. Run the public request round trip into native-authorized Service Management and
-   expose its exact authoritative projection to Anima.
-8. Close the remaining released Runtime/provider gap and repeat from the clean
-   installer.
-9. Author, publish and execute `zenith.anima.brand-package` with real inputs, then
-   return artifacts/receipts to Anima and record exact evidence in Devgraph.
-10. Begin Tailscale peer synchronization, Zenith Transfer installation and Daycall
-    reuse only after Gate 5.
+1. Merge the six exact green PR heads through normal controls and publish the
+   reproducible Hub provider bundle.
+2. Select the Vercel project, region, retention and spending owner, then provision
+   only the two Queue topics, OIDC and bounded gateway routes required by the
+   reviewed request/reference implementation.
+3. Configure the exact Anima origin, released secS producer/opener, provider key,
+   production Zenith membership verifier and finite Service/Runtime authority.
+4. Install the released bundle and run the public request round trip into
+   native-authorized Service Management.
+5. Apply the separately reviewed read-only response mount and expose authoritative
+   request/Case status, artifacts and receipts to Anima.
+6. Execute `zenith.anima.brand-package` from released bytes with real inputs and
+   the explicit human-review step; return substantive artifacts and canonical
+   receipts.
+7. Run authorized/denied, duplicate, offline, restart, unknown-outcome, digest and
+   retrieval acceptance, then record exact evidence in Devgraph.
+8. Extract the proven Queue and response behavior behind the transport-neutral
+   adapter ports without changing their wire contracts.
+9. Qualify a two-full-stack Tailscale peer path for one record family and immutable
+   objects. Then qualify one client message adapter and one file/object mailbox.
+10. Add Zenith Transfer installation and Daycall reuse after the peer/client split
+    is proven.
 
 ## 8. Evidence rules
 

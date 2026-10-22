@@ -88,7 +88,7 @@ flowchart TB
     end
 
     subgraph Substrate[Local Zenith substrate]
-      Sync[Peer sync service]
+      Sync[Local sync service]
       SM[Service Management]
       Runtime[Process Runtime]
       Frank[Frank / provider actors]
@@ -107,10 +107,14 @@ flowchart TB
       Matrix[Matrix]
       Nostr[Nostr dispatcher]
       Queue[Temporary online queue]
+      Mailbox[File or object mailbox]
     end
 
     Apps --> Transfer
-    Apps --> Sync
+    Apps --> Matrix
+    Apps --> Nostr
+    Apps --> Queue
+    Apps --> Mailbox
     Author --> Runtime
     Transfer --> Wallet
     Transfer --> Tail
@@ -122,6 +126,7 @@ flowchart TB
     Matrix --> Sync
     Nostr --> Sync
     Queue --> Sync
+    Mailbox --> Sync
     Sync --> Objects
     Sync --> SM
     SM --> Runtime
@@ -234,11 +239,57 @@ New workflows use namespaced identifiers such as:
 Existing unnamespaced identifiers retain their historical meaning. Renaming them
 creates new identities rather than rewriting retained pins.
 
-## 8. Peer synchronization protocol
+## 8. Synchronization and delivery adapters
 
-### 8.1 Scope
+### 8.1 Participation modes
 
-Version 1 is a bounded synchronization protocol for application records and
+There are two materially different participants. They share record and object
+semantics, but they do not share a network topology.
+
+**Full-stack peers** run the local substrate: sync service, object store, local
+authority, Service Management where applicable, and the components needed for
+their role. Two full-stack peers may communicate directly over an authenticated
+private route such as Tailscale HTTPS. Each side validates and durably commits an
+offered record or object before acknowledging it.
+
+**Clients and intermittently connected applications** are not peers merely
+because they can author a draft or display a projection. A browser does not run a
+sync daemon, join the provider tailnet, expose an inbound port, own provider
+authority or retain peer cursors for the provider's canonical state. It sends or
+pulls through an adapter: a bounded online queue, Matrix, Nostr, or an explicitly
+configured file/object mailbox. The local substrate consumes that adapter and
+applies the same validation and durable-commit rules used for a peer offer.
+
+An installation may move from client mode to full-stack peer mode later without
+changing the identity of retained requests, records or immutable objects.
+
+### 8.2 Transport-neutral adapter ports
+
+The sync service owns one transport-neutral inbox/outbox boundary. Concrete
+adapters do not write component databases and do not reinterpret domain state.
+The conceptual operations are:
+
+```text
+capabilities and health
+publish immutable envelope or object reference
+poll after opaque cursor
+fetch immutable object by digest
+acknowledge only after durable local commit
+reconcile an unknown publication or acknowledgement
+```
+
+These names describe behavior rather than approved endpoint or schema names.
+The contract implementation must define exact versioned wire schemas and limits.
+Every adapter must preserve the same stable logical identity, idempotency key,
+content digest, sender/receiver binding, expiry and opaque reconciliation token.
+
+Adapter acknowledgements mean only that the adapter accepted or removed an item.
+They never imply ServiceRequest admission, Case creation, Runtime execution,
+artifact publication or membership issuance.
+
+### 8.3 Replicated records and objects
+
+Version 1 is bounded synchronization for supported application records and
 content-addressed objects. It is not general filesystem synchronization.
 
 Each peer maintains:
@@ -250,7 +301,7 @@ Each peer maintains:
 - explicit tombstones for supported deletions;
 - bounded reconciliation evidence.
 
-The logical operations are:
+The logical peer operations are:
 
 ```text
 status
@@ -267,7 +318,11 @@ issue. The contract must bind at least namespace, record type, stable record ID,
 revision, operation, content digest, media type, origin, predecessor where
 applicable, and recorded time.
 
-### 8.2 Conflict policy
+For a client mailbox, the same model is expressed as immutable envelopes,
+manifests and blobs rather than a continuously reachable peer feed. A local
+consumer derives its own cursor and acknowledgement state from the adapter.
+
+### 8.4 Conflict policy
 
 There is no generic last-write-wins rule.
 
@@ -278,7 +333,7 @@ There is no generic last-write-wins rule.
   visible for application-level resolution.
 - A tombstone cannot silently erase an immutable receipt or published workflow.
 
-### 8.3 Public intake transport
+### 8.5 Public intake transport
 
 The first external request path uses Vercel Queues poll mode. The public gateway
 validates size, schema, stable request identity and provider routing, then emits a
@@ -294,42 +349,90 @@ to a local durable inbox, and only then acknowledges the queue delivery. Queue
 delivery is at-least-once, so every retry preserves the same request and
 idempotency IDs.
 
-The envelope primitive, WASM producer and fixed-purpose macOS opener are
-source-qualified in secS PR #301. Service Management commit `60412b5` implements
-the native opener adapter and exact bounds. They are dependencies of the target
-release until PR #301 is merged, published as reviewed artifacts and pinned in
-the Hub composition; source qualification alone is not installed qualification.
+The envelope primitive, browser producer and fixed-purpose macOS opener are
+source-qualified in secS PR #302 at
+`a6cda6d99a8f8674c1264dd4258ddf16f9a048fc`. Service Management PR #1 at
+`434f3cb04f8e494fb87317647fe5f2a6e5e41515` implements the bounded gateway,
+separate request/reference Queue paths, native opener, durable local admission
+and production Vercel route mapping. They remain dependencies of the target
+release until merged, published as reviewed artifacts and pinned in the Hub
+composition; source qualification alone is not installed qualification.
 
 The initial choice is based on an implemented official poll SDK and documented
 off-platform consumers. The existing Nostr material is design documentation and
 does not yet provide a qualified exact-recipient dispatcher or credential path.
 
-### 8.4 Tailscale peer synchronization
+### 8.6 Direct full-stack peer synchronization
 
-Tailscale HTTPS is the planned direct transport between trusted peers. Zenith
-Transfer already contains an embedded private-network session and a fail-closed
-URLSession route on iOS. The sync implementation must reuse that route and add a
-supported Mac/provider route. Loss of the private network cancels active requests;
-there is no direct-network fallback.
+Tailscale HTTPS is the planned first direct transport between full-stack peers.
+Zenith Transfer already contains an embedded private-network session and a
+fail-closed URLSession route on iOS. The sync implementation must reuse that route
+and add a supported Mac/provider route. Loss of the private network cancels active
+requests; there is no direct-network fallback.
 
 Tailscale membership proves neither Wallet identity nor application permission.
 Recurring reads use receiver-issued scoped credentials where supported. Privileged
 mutations use the appropriate Wallet/secS authorization bound to the exact
 operation and resource.
 
-### 8.5 Other transports
+Direct synchronization starts with one owner-declared record family and immutable
+objects between two Macs. It does not begin with arbitrary directory mirroring.
+The receiving peer lists changes from its retained cursor, fetches missing blobs
+by digest, validates owner/revision/authority, commits locally, and then advances
+the cursor. Snapshot/reseed is explicit when retention has elapsed.
 
-Matrix, Nostr and temporary queues are adapters to the same logical records:
+### 8.7 Client mailbox and message adapters
+
+Matrix, Nostr, temporary queues and user-selected storage are adapters to the same
+logical records:
 
 - Matrix may carry encrypted assets and notifications.
 - A backend Nostr dispatcher may carry encrypted pending envelopes using its own
   scoped service transport identity.
 - A temporary online queue may hold a bounded encrypted envelope while a local
   authority is offline.
+- A local folder, Dropbox folder, WebDAV location or compatible object store may
+  act as an explicit mailbox. The adapter writes immutable, content-addressed
+  payloads and a bounded manifest; it never assumes identical filesystem paths.
+- A Zenith-hosted mailbox may offer the same contract for a client that does not
+  run a local stack. It stores ciphertext and bounded routing/retention metadata,
+  not canonical Service, Runtime or identity state.
 
 Their acknowledgements remain transport facts. Pull, validate, commit locally and
 deduplicate before acknowledging consumption. Transport retries retain the same
 logical request identity and content digest.
+
+Large assets need not pass through the message body. The message or envelope may
+carry an immutable object descriptor whose location is explicitly allowed by the
+receiver. The receiver streams with size limits, verifies the exact digest before
+commit, and treats a missing or changed object as unavailable. A URL, Matrix event
+or Dropbox path is not itself an artifact receipt.
+
+Adapters have narrow credentials for their own medium. A Matrix access token,
+Nostr dispatcher key, Dropbox token, object-store credential or Queue OIDC token
+does not grant membership, organization authority, workflow authority or provider
+execution.
+
+### 8.8 Delivery sequence
+
+Synchronization is delivered in layers:
+
+1. Keep the current Vercel Queue request/reference adapters and read-only response
+   projection as the first provider proof.
+2. Extract their stable identity, cursor, acknowledgement and reconciliation
+   behavior behind the transport-neutral ports without changing wire bytes.
+3. Qualify one direct Tailscale peer adapter between two full local stacks for one
+   supported record family and content-addressed objects.
+4. Add one message adapter and one file/object mailbox adapter only when a real
+   application needs them. Matrix is the leading message candidate; a local folder
+   is the smallest storage candidate. Dropbox, Nostr and a hosted mailbox remain
+   replaceable adapters rather than mandatory substrate dependencies.
+5. Add broader record families, reseed, multi-peer operation and application-level
+   conflict resolution after the two-peer path is reliable.
+
+Steps three through five are not prerequisites for the first Anima provider
+delivery. The first provider implementation must preserve the adapter boundary so
+it does not hard-code Vercel Queue as the only future transport.
 
 ## 9. Service delivery
 
@@ -495,8 +598,8 @@ guessing inside code:
 9. The first supported retention/reseed policy for intermittently connected peers.
 10. Vercel project, Queue region, retention and spending owner for production intake.
 11. Authorized client status/artifact storage and query boundary.
-12. The merged secS release identity and artifact digests that carry the reviewed
-    `service.intake-envelope.v1` producer and provider opener.
+12. The released secS identity and artifact digests that carry the reviewed
+    request/reference envelope producers and provider opener.
 
 ## 19. Acceptance boundary
 
