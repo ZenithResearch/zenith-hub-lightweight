@@ -454,21 +454,41 @@ Steps three through five are not prerequisites for the first Anima provider
 delivery. The first provider implementation must preserve the adapter boundary so
 it does not hard-code Vercel Queue as the only future transport.
 
-### 8.9 Sync core and adapter boundary
+### 8.9 Optional sync core, direct intake and RPC boundary
 
-The delivery sequence above converges on one local sync core. It owns four
-transport-neutral stores:
+The delivery sequence does not converge every operation on one mandatory sync
+service. It defines four compositions that may share envelope, identity and
+receipt contracts without sharing the same execution path:
+
+1. **Direct provider intake:** a browser or native client sends an authorized
+   request directly to the provider's configured intake gateway. The gateway and
+   Service Management boundary own validation and admission; no client-side or
+   provider-wide sync hop is required.
+2. **Mailbox pull:** Queue, Matrix, WebDAV, Dropbox or another explicit mailbox
+   retains a bounded encrypted package while the receiver is offline. A local
+   adapter pulls it into a durable inbox before domain admission.
+3. **Full-stack secS Magik RPC:** two full local stacks may call an exact
+   receiver-owned operation directly. Tailscale can provide private reachability,
+   but secS Magik still verifies and authorizes the RPC. That RPC does not need to
+   be translated into a sync operation merely because both participants also
+   synchronize records.
+4. **Peer synchronization:** full local stacks exchange owned record projections,
+   manifests, immutable objects and cursors when durable replication is desired.
+
+The optional local sync/mailbox core owns four transport-neutral stores when a
+composition needs durable transfer or replication:
 
 - **Inbox:** received record envelopes, validation state and durable-commit state.
 - **Outbox:** exact envelopes awaiting transfer, retry state and expiry.
 - **Object store:** immutable bytes addressed by digest plus verified manifests.
 - **Cursor store:** opaque per-adapter/per-peer continuation and acknowledgement.
 
-Client-only applications use these adapters differently from full local stacks.
+Client-only applications use these routes differently from full local stacks.
 They retain drafts, stable request identities and prepared encrypted envelopes in
 their own bounded client storage, but they do not host the substrate database or
-advertise peer-sync endpoints. They submit through a configured mailbox adapter
-and read canonical projections from the owning provider.
+advertise peer-sync endpoints. They may submit directly to an intake gateway or
+through a configured mailbox, then read canonical projections from the owning
+provider.
 
 A message may carry either a bounded encrypted package or a wake hint containing
 an opaque locator. A Matrix event, Nostr event or notification can therefore tell
@@ -479,21 +499,24 @@ file service chosen by the user or provider. The locator is not authority and th
 adapter must not broaden its configured origin or storage allowlist from payload
 data.
 
-Adapters translate transport operations into the same core calls. The first
-adapter set is:
+Only mailbox and synchronization adapters must translate transport operations
+into sync-core calls. Direct Service intake and secS Magik RPC target their
+receiver-owned domain ports. The first route set is:
 
-| Adapter | Intended participant | Direction | Initial role |
+| Route or adapter | Intended participant | Direction | Initial role |
 | --- | --- | --- | --- |
+| Direct provider intake | browser/native client to online provider | direct submit | lowest-hop authorized service request |
 | Queue mailbox | browser client to provider Mac | submit, provider pull | first public service intake |
 | Authorized projection | provider Mac to browser client | client pull | status, deliverables and receipts |
+| secS Magik RPC | full local stack to full local stack | exact request/response | authenticated machine operation |
 | Tailscale peer | full local substrate to full local substrate | pull, later optional push | trusted direct synchronization |
 | Matrix/Nostr hint | client or service to a receiver | notification or bounded payload | wake and locate, never infer admission |
-| File/object mailbox | intermittent client or operator | deposit and pull | explicit opt-in fallback for immutable packages |
+| WebDAV/Dropbox/file/object mailbox | intermittent client or operator | deposit and pull | explicit opt-in fallback for immutable packages |
 
-The core never gives an adapter Service Management, Process Runtime, membership
-or provider authority. It verifies the authorization supplied with each exact
-operation, records the adapter's delivery fact separately, and calls the domain
-owner only after durable local commit.
+The sync core never gives an adapter Service Management, Process Runtime,
+membership or provider authority. A direct route also receives no ambient
+authority: the receiver verifies the authorization supplied with each exact
+operation. Transport delivery facts remain separate from domain admission.
 
 The initial reconciliation key is the stable record identity plus owner/version
 and content digest. Replaying the same identity and digest is idempotent. Reusing
@@ -501,11 +524,11 @@ that identity for different bytes is a conflict and enters quarantine. Source-ow
 projections advance monotonically; drafts require an expected revision; objects
 are immutable. No adapter performs automatic three-way merge in v1.
 
-This boundary lets a client move between Queue, Matrix, a temporary object mailbox
-or a direct local stack without changing the ServiceRequest, Case, Run, artifact
-or receipt identities. A different transport may resume the same logical transfer
-only when it presents the same retained envelope or manifest and passes the same
-receiver policy.
+This boundary lets a client move between direct intake, Queue, Matrix, a temporary
+object mailbox or a direct local stack without changing the ServiceRequest, Case,
+Run, artifact or receipt identities. A different transport may resume the same
+logical transfer only when that domain contract supports it, it presents the same
+retained envelope or manifest, and it passes the same receiver policy.
 
 ## 9. Service delivery
 

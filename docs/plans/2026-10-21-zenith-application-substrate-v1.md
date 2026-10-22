@@ -344,12 +344,29 @@ Current assessment: **adapter boundary specified; implementations follow Gate 5*
    receipts.
 7. Run authorized/denied, duplicate, offline, restart, unknown-outcome, digest and
    retrieval acceptance, then record exact evidence in Devgraph.
-8. Extract the proven Queue and response behavior behind the transport-neutral
-   adapter ports without changing their wire contracts.
-9. Qualify a two-full-stack Tailscale peer path for one record family and immutable
-   objects. Then qualify one client message adapter and one file/object mailbox.
-10. Add Zenith Transfer installation and Daycall reuse after the peer/client split
-    is proven.
+8. Preserve separate direct-intake, mailbox-pull, secS Magik RPC and peer-sync
+   seams. Extract shared envelope/cursor/reconciliation code only where two proven
+   routes actually need it; do not require all submissions to traverse a sync
+   service.
+9. Qualify direct secS Magik RPC between two full local stacks separately from a
+   two-full-stack Tailscale synchronization path for one record family and
+   immutable objects. Tailscale reachability does not replace secS authorization.
+10. Add one client message adapter and one file/object mailbox only when a real
+    application requires them. WebDAV, Dropbox and arbitrary user connectors stay
+    optional exploration work rather than first-provider dependencies.
+11. Add Zenith Transfer installation and Daycall reuse after the direct/mailbox/RPC/
+    peer boundaries are proven.
+
+The related exploration backlog is canonical in Devgraph:
+
+- `Task/explore-substrate-transport-routing-and-connectors` compares direct
+  intake, secS Magik RPC, Queue, Matrix/Nostr, WebDAV, Dropbox, object mailboxes
+  and other user-authorized connectors without implementing them.
+- `Task/evaluate-devgraph-space-and-research-organization` evaluates whether
+  Arena plus Work already covers long-lived exploration before proposing a new
+  Space concept.
+- `Task/evaluate-devgraph-reminders-and-due-dates` evaluates scheduling semantics;
+  ontology v0.8.0 currently has no canonical due-date or reminder field.
 
 ## 8. Evidence rules
 
