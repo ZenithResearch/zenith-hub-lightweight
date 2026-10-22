@@ -26,12 +26,15 @@
     ]
   },
   {
-    "repository": "hub",
-    "commit": "5e742355be8c4eb9a128b3638284bf45c1c9c45d",
+    "repository": "https://github.com/ZenithResearch/zenith-hub-lightweight",
+    "derived_from": {
+      "repository": "hub",
+      "commit": "5e742355be8c4eb9a128b3638284bf45c1c9c45d"
+    },
     "files": [
       {
         "path": "profiles/process-macos/process_mac.py",
-        "sha256": "26ba418c22466cb10a9170e6ef07537bfd8883712ae347469dce66d69806673a"
+        "sha256": "4b9eac71f62ffe26d9abfe18be427adbff0c42f540f8b46c6fb2ec8ada44f6b4"
       }
     ]
   },

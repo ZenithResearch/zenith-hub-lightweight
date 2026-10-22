@@ -725,7 +725,10 @@ def pilot_action(root, action, expected):
 
 # Generic authoring has no SOP, run, executor or provider activation.
 WORKSPACE_ACTIONS = {'workspace-status', 'workspace-prepare', 'workspace-setup', 'workspace-start',
-                     'workspace-stop', 'workspace-command', 'workspace-renew-prepare', 'workspace-renew', 'workspace-renew-resume'}
+                     'workspace-stop', 'workspace-command', 'workspace-renew-prepare', 'workspace-renew', 'workspace-renew-resume',
+                     'workspace-provider-authority-prepare', 'workspace-provider-authority',
+                     'workspace-provider-authority-resume', 'workspace-provider-service-prepare',
+                     'workspace-provider-service-setup'}
 WORKSPACE_CONFIGS = {'command-authority.json', 'wallet-command.json',
                      'runtime-policy.json', 'runtime-receiver.json'}
 
@@ -778,6 +781,9 @@ WORKSPACE_SELECTION = 'config/workspace-native-selection.json'
 WORKSPACE_RENEW_PLAN = 'config/workspace-renewal-plan.json'
 WORKSPACE_RENEW_HOLD = 'logs/workspace-renewal.json'
 WORKSPACE_UPGRADE_HOLD = 'logs/workspace-software-upgrade.json'
+WORKSPACE_PROVIDER_SERVICE_PLAN = 'config/provider-service-plan.json'
+WORKSPACE_PROVIDER_SERVICE_SELECTION = 'config/provider-service-selection.json'
+WORKSPACE_PROVIDER_SCOPE = 'finite Frank Hermes pilot for one exact Actor and one exact Run; authoring/catalog retained'
 
 
 def workspace_sync(directory):
@@ -888,9 +894,15 @@ def workspace_renewal_plan(root, selection):
     require(type(selection) is str and re.fullmatch('[a-f0-9]{64}',selection)
             and hashlib.sha256(raw).hexdigest() == selection, 'Workspace renewal plan changed after review')
     value = closed_json(raw)
-    require(type(value) is dict and set(value) == {'schema','workspace_root','previous_complete','not_before','not_after','wallet_command_sha256','verifier_sha256'}
-            and value['schema'] == 'castalia.wallet-workspace-renewal.v1' and value['workspace_root'] == str(root),
+    ordinary = {'schema','workspace_root','previous_complete','not_before','not_after','wallet_command_sha256','verifier_sha256'}
+    live = ordinary | {'actor_id','run_id'}
+    require(type(value) is dict and set(value) == (live if value.get('schema') == 'castalia.wallet-workspace-live-provider-authority.v1' else ordinary)
+            and value['schema'] in {'castalia.wallet-workspace-renewal.v1','castalia.wallet-workspace-live-provider-authority.v1'}
+            and value['workspace_root'] == str(root),
             'Invalid workspace renewal proposal')
+    if value['schema'] == 'castalia.wallet-workspace-live-provider-authority.v1':
+        require(all(type(value[k]) is str and re.fullmatch('[a-zA-Z0-9._:-]{1,128}',value[k]) for k in ('actor_id','run_id')),
+                'Invalid provider Actor or Run identity')
     previous = value['previous_complete']
     require(type(previous) is dict and set(previous) == {'path','sha256'}
             and type(previous['path']) is str and type(previous['sha256']) is str
@@ -906,7 +918,7 @@ def workspace_renewal_plan(root, selection):
     return raw,value
 
 
-def workspace_prepare_renewal(root, expected=None):
+def workspace_prepare_renewal(root, expected=None, *, actor_id=None, run_id=None):
     require(not workspace_holds(root), 'Workspace renewal or cleanup must be reconciled')
     workspace_stopped(root)
     receipt = workspace_ready(root)
@@ -922,17 +934,22 @@ def workspace_prepare_renewal(root, expected=None):
     identity_end = receipt.get('identity_not_after',receipt.get('holder',{}).get('not_after'))
     require(type(identity_end) is int and end <= identity_end, 'Machine identity cannot cover the proposed permission window; identity is retained')
     rows={row['role']:row for row in native_rows(workspace_profile(root))}
-    value={'schema':'castalia.wallet-workspace-renewal.v1','workspace_root':str(root),
+    provider = actor_id is not None or run_id is not None
+    require(not provider or all(type(v) is str and re.fullmatch('[a-zA-Z0-9._:-]{1,128}',v) for v in (actor_id,run_id)),
+            'Provider authority requires exact Actor and Run identities')
+    value={'schema':'castalia.wallet-workspace-live-provider-authority.v1' if provider else 'castalia.wallet-workspace-renewal.v1','workspace_root':str(root),
            'previous_complete':{'path':str(previous),'sha256':hashlib.sha256(previous_raw).hexdigest()},
            'not_before':str(start),'not_after':str(end),
            'wallet_command_sha256':rows['wallet-command']['sha256'],'verifier_sha256':rows['context-verifier']['sha256']}
+    if provider:value.update(actor_id=actor_id,run_id=run_id)
     raw=workspace_bytes(value);workspace_store(plan,raw,replace=old is not None)
     return {'schema':'hub.workspace-renewal-proposal.v1','plan_sha256':hashlib.sha256(raw).hexdigest(),
             'not_before':value['not_before'],'not_after':value['not_after'],'identity_not_after':str(identity_end),
-            'same_identity':True,'authority_changed':False}
+            'same_identity':True,'authority_changed':provider,
+            **({'actor_id':actor_id,'run_id':run_id,'permission_count':22} if provider else {})}
 
 
-def workspace_renewal_identity(old,new):
+def workspace_renewal_identity(old,new,plan):
     immutable=['schema','store_id','subject_id','purpose','application','key_generation','key_id','public_key_hex','public_key_sha256','created_at','key_created_at','not_before','not_after','state','revoked_at']
     a,b=old.get('holder'),new.get('holder')
     require(type(a) is dict and type(b) is dict and all(k in a and k in b and a[k] == b[k] for k in immutable)
@@ -940,8 +957,13 @@ def workspace_renewal_identity(old,new):
             and b.get('state_revision') == a['state_revision']+1
             and new.get('command_issuer') == old.get('command_issuer')
             and new.get('identity_not_after',b.get('not_after')) == old.get('identity_not_after',a.get('not_after'))
-            and new.get('journal_capacity') == old.get('journal_capacity')
-            and new.get('scope') == old.get('scope'), 'Renewal changed identity, issuer, scope or capacity')
+            and new.get('journal_capacity') == old.get('journal_capacity'), 'Renewal changed identity, issuer or capacity')
+    if plan['schema'] == 'castalia.wallet-workspace-live-provider-authority.v1':
+        require(new.get('scope') == WORKSPACE_PROVIDER_SCOPE
+                and new.get('actor_id') == plan['actor_id'] and new.get('run_id') == plan['run_id'],
+                'Provider renewal changed the exact Actor, Run or fixed scope')
+    else:
+        require(new.get('scope') == old.get('scope'), 'Renewal changed authority scope')
 
 
 def workspace_frank(root, action, master, pin, input_path=None, input_pin=None):
@@ -1024,7 +1046,7 @@ def workspace_renew(root, selection, *, resume=False):
         require(new.get('native_generation') == generation and new.get('plan_sha256') == selection
                 and new.get('previous_complete') == plan['previous_complete']
                 and new.get('not_before') == int(plan['not_before']) and new.get('not_after') == int(plan['not_after']), 'Native renewal binding changed')
-        workspace_renewal_identity(old,new)
+        workspace_renewal_identity(old,new,plan)
         workspace_receipt(root,old_path,plan['previous_complete']['sha256'])
         workspace_store(operation_dir/'native-result.json',workspace_bytes(output))
         next_master=workspace_bytes(workspace_master(root,new))
@@ -1313,6 +1335,128 @@ def workspace_permission(receipt):
     return result
 
 
+def workspace_provider_service_plan(root, selection):
+    raw = bounded_private(root/WORKSPACE_PROVIDER_SERVICE_PLAN, 16384)
+    require(type(selection) is str and re.fullmatch('[a-f0-9]{64}', selection)
+            and hashlib.sha256(raw).hexdigest() == selection,
+            'Provider Service plan changed after review')
+    value = closed_json(raw)
+    fields = {'schema','workspace_root','generation','not_before','not_after',
+              'wallet_command_sha256','verifier_sha256'}
+    require(type(value) is dict and set(value) == fields
+            and value['schema'] == 'castalia.wallet-provider-service-authority.v1'
+            and value['workspace_root'] == str(root) and value['generation'] == '1',
+            'Invalid first provider Service plan')
+    for key in ('not_before','not_after'):
+        require(type(value[key]) is str and re.fullmatch('[1-9][0-9]{0,15}',value[key])
+                and int(value[key]) <= 9007199254740991, 'Invalid provider Service authority time')
+    require(int(value['not_before']) < int(value['not_after'])
+            and int(value['not_after'])-int(value['not_before']) <= 3600,
+            'Provider Service authority exceeds one hour')
+    rows = {row['role']: row for row in native_rows(workspace_profile(root))}
+    require(value['wallet_command_sha256'] == rows['wallet-command']['sha256']
+            and value['verifier_sha256'] == rows['context-verifier']['sha256'],
+            'Provider Service executable pins changed')
+    return raw,value
+
+
+def workspace_prepare_provider_service(root, expected=None):
+    require(not workspace_holds(root), 'Workspace transition or cleanup must be reconciled')
+    workspace_stopped(root);workspace_ready(root)
+    selection = root/WORKSPACE_PROVIDER_SERVICE_SELECTION
+    require(not selection.exists() and not selection.is_symlink(),
+            'The first provider Service authority is already selected')
+    base = root/'authority/provider-service/1'
+    require(not base.exists() and not base.is_symlink(),
+            'Partial provider Service authority is retained for recovery')
+    plan = root/WORKSPACE_PROVIDER_SERVICE_PLAN
+    old = bounded_private(plan,16384) if plan.exists() or plan.is_symlink() else None
+    require((hashlib.sha256(old).hexdigest() if old is not None else None) == expected,
+            'Provider Service proposal changed after review')
+    if old is not None:
+        workspace_store(root/'config'/('provider-service-proposal-history-'+expected+'.json'),old)
+    at=int(time.time());rows={row['role']:row for row in native_rows(workspace_profile(root))}
+    value={'schema':'castalia.wallet-provider-service-authority.v1','workspace_root':str(root),
+           'generation':'1','not_before':str(at-5),'not_after':str(at+3590),
+           'wallet_command_sha256':rows['wallet-command']['sha256'],
+           'verifier_sha256':rows['context-verifier']['sha256']}
+    raw=workspace_bytes(value);workspace_store(plan,raw,replace=old is not None)
+    return {'schema':'hub.workspace-provider-service-proposal.v1',
+            'plan_sha256':hashlib.sha256(raw).hexdigest(),'generation':'1',
+            'not_before':value['not_before'],'not_after':value['not_after'],
+            'permission_count':12,'authority_created':False,'provider_enabled':False}
+
+
+def workspace_provider_service_receipt(root, expected=None):
+    path=root/'authority/provider-service/1/COMPLETE.json';raw=bounded_private(path)
+    require(expected is None or hashlib.sha256(raw).hexdigest() == expected,
+            'Selected provider Service receipt changed')
+    receipt=closed_json(raw)
+    require(type(receipt) is dict
+            and receipt.get('schema') == 'castalia.wallet-provider-service-authority-complete.v1'
+            and receipt.get('root') == str(root) and receipt.get('generation') == 1
+            and receipt.get('activation') is False and receipt.get('service_started') is False
+            and receipt.get('scope') == 'finite local provider lifecycle authority in one isolated Service Management store'
+            and set(receipt.get('configuration_hashes',{})) == {'command-authority.json','wallet-command.json','service-receiver.json'},
+            'Provider Service receipt differs from the fixed authority profile')
+    plan_raw=bounded_private(root/WORKSPACE_PROVIDER_SERVICE_PLAN,16384)
+    require(receipt.get('plan_sha256') == hashlib.sha256(plan_raw).hexdigest(),
+            'Provider Service receipt differs from the reviewed plan')
+    config_dir=path.parent/'config'
+    for name,digest in receipt['configuration_hashes'].items():
+        require(type(digest) is str and re.fullmatch('[a-f0-9]{64}',digest)
+                and hashlib.sha256(bounded_private(config_dir/name)).hexdigest() == digest,
+                'Provider Service configuration changed')
+    return receipt
+
+
+def workspace_provider_service_setup(root, selection):
+    workspace_stopped(root);workspace_ready(root)
+    raw,plan=workspace_provider_service_plan(root,selection)
+    selected=root/WORKSPACE_PROVIDER_SERVICE_SELECTION
+    if selected.exists() or selected.is_symlink():
+        value=closed_json(bounded_private(selected,4096))
+        require(type(value) is dict and set(value) == {'schema','generation','complete_sha256'}
+                and value['schema'] == 'hub.workspace-provider-service-selection.v1'
+                and value['generation'] == 1,'Invalid provider Service selection')
+        receipt=workspace_provider_service_receipt(root,value['complete_sha256'])
+        return {'schema':'hub.workspace-provider-service-complete.v1','duplicate':True,
+                'plan_sha256':selection,'complete_sha256':value['complete_sha256'],
+                'generation':1,'provider_enabled':False,'receipt':receipt['schema']}
+    complete=root/'authority/provider-service/1/COMPLETE.json'
+    base=complete.parent
+    require(not base.exists() or complete.is_file(),
+            'Partial provider Service authority is retained; do not replay native creation')
+    if not complete.exists() and not complete.is_symlink():
+        output=workspace_run([root/'native/castalia-wallet-workspace-setup','create-provider-service',
+                              '--plan',root/WORKSPACE_PROVIDER_SERVICE_PLAN,'--plan-sha256',selection],root)
+        require(type(output) is dict
+                and output == {'schema':'castalia.wallet-provider-service-authority-output.v1',
+                               'status':'configured_not_activated','root':str(root),'generation':1},
+                'Provider Service native output differs from the reviewed plan')
+    receipt=workspace_provider_service_receipt(root)
+    pin=hashlib.sha256(bounded_private(complete)).hexdigest()
+    workspace_store(selected,workspace_bytes({'schema':'hub.workspace-provider-service-selection.v1',
+                    'generation':1,'complete_sha256':pin}))
+    return {'schema':'hub.workspace-provider-service-complete.v1','duplicate':False,
+            'plan_sha256':selection,'complete_sha256':pin,'generation':1,
+            'provider_enabled':False,'receipt':receipt['schema']}
+
+
+def workspace_provider_service_status(root):
+    selected=root/WORKSPACE_PROVIDER_SERVICE_SELECTION
+    if not selected.exists() and not selected.is_symlink():
+        return {'state':'proposal_ready' if (root/WORKSPACE_PROVIDER_SERVICE_PLAN).exists() else 'absent',
+                'generation':None,'permission':None}
+    value=closed_json(bounded_private(selected,4096))
+    require(type(value) is dict and set(value) == {'schema','generation','complete_sha256'}
+            and value['schema'] == 'hub.workspace-provider-service-selection.v1'
+            and value['generation'] == 1,'Invalid provider Service selection')
+    receipt=workspace_provider_service_receipt(root,value['complete_sha256'])
+    return {'state':'configured_native_unqualified','generation':1,
+            'permission':workspace_permission(receipt)}
+
+
 def workspace_report(root):
     workspace_profile(root)
     pending = workspace_holds(root)
@@ -1325,6 +1469,10 @@ def workspace_report(root):
             receipt = workspace_ready(root)
             result.update(setup='configured', authority='configured_native_unqualified',
                           permission=workspace_permission(receipt))
+            if receipt.get('scope') == WORKSPACE_PROVIDER_SCOPE:
+                result.update(provider_authority={'state':'configured_native_unqualified',
+                              'actor_id':receipt.get('actor_id'),'run_id':receipt.get('run_id'),
+                              'permission_count':22})
         except (InstallError, OSError, ValueError, KeyError, TypeError):
             result.update(setup='partial', authority='unavailable')
     elif (root/'config/workspace-setup-plan.json').exists():
@@ -1345,10 +1493,14 @@ def workspace_report(root):
                 and not (root/'data/frank-workspace-cleanup.json').exists(),plan_sha256=pin)
         except (InstallError,OSError,ValueError,KeyError,TypeError):
             pass
+    try:
+        result['provider_service_authority']=workspace_provider_service_status(root)
+    except (InstallError,OSError,ValueError,KeyError,TypeError):
+        result['provider_service_authority']={'state':'unavailable','generation':None,'permission':None}
     return result
 
 
-def workspace_action(root, action, raw=None, expected=None, selection=None):
+def workspace_action(root, action, raw=None, expected=None, selection=None, *, actor_id=None, run_id=None):
     installed(root)
     workspace_profile(root)
     if action == 'workspace-stop':
@@ -1361,6 +1513,17 @@ def workspace_action(root, action, raw=None, expected=None, selection=None):
         return workspace_prepare_renewal(root,selection)
     if action in {'workspace-renew','workspace-renew-resume'}:
         return workspace_renew(root,selection,resume=action=='workspace-renew-resume')
+    if action == 'workspace-provider-authority-prepare':
+        return workspace_prepare_renewal(root,selection,actor_id=actor_id,run_id=run_id)
+    if action in {'workspace-provider-authority','workspace-provider-authority-resume'}:
+        raw_plan,plan=workspace_renewal_plan(root,selection)
+        require(plan['schema'] == 'castalia.wallet-workspace-live-provider-authority.v1',
+                'Provider authority requires the reviewed live-provider plan')
+        return workspace_renew(root,selection,resume=action.endswith('-resume'))
+    if action == 'workspace-provider-service-prepare':
+        return workspace_prepare_provider_service(root,selection)
+    if action == 'workspace-provider-service-setup':
+        return workspace_provider_service_setup(root,selection)
     if action == 'workspace-prepare':
         require(not any(launch_status(root, name) for name in COMPONENTS), 'Stop workspace before preparing setup')
         return workspace_prepare_plan(root, selection)
@@ -1705,6 +1868,8 @@ def main():
     parser.add_argument('--selection-sha256')
     parser.add_argument('--request-stdin', action='store_true')
     parser.add_argument('--request-sha256')
+    parser.add_argument('--actor-id')
+    parser.add_argument('--run-id')
     parser.add_argument('--component', choices=COMPONENTS)
     parser.add_argument('--route',choices=['live','ready'],default='live')
     parser.add_argument('--runtime-port', type=int, default=8092)
@@ -1738,7 +1903,11 @@ def main():
                     require(args.bundle and args.bundle_sha256, 'Supply the exact supported workspace upgrade bundle and digest')
                     result = workspace_software_upgrade(args.bundle,root,args.bundle_sha256)
                 elif args.action in WORKSPACE_ACTIONS:
-                    result = workspace_action(root, args.action, request_raw, args.request_sha256, args.selection_sha256)
+                    require(args.action == 'workspace-provider-authority-prepare'
+                            or args.actor_id is None and args.run_id is None,
+                            'Actor and Run are accepted only while preparing provider authority')
+                    result = workspace_action(root, args.action, request_raw, args.request_sha256,
+                                              args.selection_sha256, actor_id=args.actor_id, run_id=args.run_id)
                 elif args.action in PILOT_ACTIONS:
                     require(args.selection_sha256 is not None, 'Supply the reviewed pilot selection pin')
                     result = pilot_action(root, args.action, args.selection_sha256)
