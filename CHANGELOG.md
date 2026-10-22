@@ -7,6 +7,7 @@
 
 ### Fixed
 
+- Repin the provider workspace to Service Management's 24-hour Vercel Queue retention fix — prevents the first live request/reference publish from exceeding the current Queue API limit while preserving legacy catalog readability.
 - Allow an exact numeric-loopback HTTP browser origin in the local provider
   projection while retaining HTTPS for every non-loopback origin, and repin the
   workspace bundle to the corresponding Service Management wheel.

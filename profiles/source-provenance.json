@@ -86,9 +86,9 @@
       },
       "service-management": {
         "package": "service-management",
-        "source_commit": "0eb69f2cd7b04e4509175bb55c7a8c4d0aec5835",
+        "source_commit": "a495ae3d4f3abbcf8c05116ec49fa5d9dfa5bf1c",
         "version": "0.1.0",
-        "wheel_sha256": "83e142a910c7d266be8d56c0ddd0de16c700169a18af11c94079ee71c21dd174"
+        "wheel_sha256": "913e5200320ea08166be62a0f81549bff59f4bb1c73a55b4ceab32c114b3db4a"
       }
     },
     "native": [
@@ -144,7 +144,7 @@
     "files": [
       {
         "path": "profiles/process-macos/release.workspace.v1.json",
-        "sha256": "d3c0034d682697bba168ac56c33cc7d08fbfd69331221739a0974837fc72def3"
+        "sha256": "868ae43a1f94f67b4d2e37e2881447b1b98b1ca7771a586a4ce317aa62817be8"
       }
     ],
     "wheels": [
@@ -282,10 +282,10 @@
         "version": "2026.9.1"
       },
       {
-        "bytes": 99425,
+        "bytes": 99424,
         "filename": "service_management-0.1.0-py3-none-any.whl",
         "name": "service-management",
-        "sha256": "83e142a910c7d266be8d56c0ddd0de16c700169a18af11c94079ee71c21dd174",
+        "sha256": "913e5200320ea08166be62a0f81549bff59f4bb1c73a55b4ceab32c114b3db4a",
         "version": "0.1.0"
       },
       {
