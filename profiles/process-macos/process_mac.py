@@ -740,9 +740,16 @@ WORKSPACE_ACTIONS = {'workspace-status', 'workspace-prepare', 'workspace-setup',
                      'workspace-provider-resume-once', 'workspace-provider-activation-once',
                      'workspace-provider-admission-open-prepare',
                      'workspace-provider-admission-close-prepare', 'workspace-provider-admission-apply',
-                     'workspace-provider-deliver-handoff-once'}
+                     'workspace-provider-deliver-handoff-once',
+                     'workspace-provider-frank-operation',
+                     'workspace-provider-review-operation'}
 WORKSPACE_CONFIGS = {'command-authority.json', 'wallet-command.json',
                      'runtime-policy.json', 'runtime-receiver.json'}
+PROVIDER_FRANK_ACTOR = 'frank-hermes-pilot'
+PROVIDER_REVIEW_ACTOR = 'zenith-brand-reviewer'
+PROVIDER_FRANK_STEPS = {'qualify-intake', 'research-market', 'research-visual',
+                        'develop-strategy', 'develop-system', 'roundtable-review',
+                        'package-deliverables'}
 
 
 def workspace_profile(root):
@@ -1678,6 +1685,87 @@ def workspace_provider_worker(root, action, requester_policy_sha256=None, provid
     return result
 
 
+def workspace_provider_actor_operation(root, action, selection):
+    """Run one exact reviewed automated or human provider operation."""
+    reviewer = action == 'workspace-provider-review-operation'
+    require(reviewer or action == 'workspace-provider-frank-operation',
+            'Unsupported provider Actor operation')
+    plan_name = 'provider-review-operation.json' if reviewer else 'provider-frank-operation.json'
+    plan_path = root/'config'/plan_name
+    raw = bounded_private(plan_path, 65536)
+    require(type(selection) is str and re.fullmatch('[a-f0-9]{64}', selection)
+            and hashlib.sha256(raw).hexdigest() == selection,
+            'Exact reviewed provider Actor operation is required')
+    plan = closed_json(raw)
+    expected = ({'schema','action','config_sha256','run_id','request_id','decision_sha256'}
+                if reviewer else
+                {'schema','action','config_sha256','run_id','step_id','request_id','effect_key'})
+    require(type(plan) is dict and set(plan) == expected,
+            'Invalid provider Actor operation shape')
+    schema = ('hub.provider-review-operation.v1' if reviewer
+              else 'hub.provider-frank-operation.v1')
+    allowed = ({'register','work','claim','decide'} if reviewer
+               else {'check-config','register','work','execute','resume','renew'})
+    require(plan['schema'] == schema and plan['action'] in allowed
+            and type(plan['run_id']) is str and re.fullmatch('[A-Za-z0-9][A-Za-z0-9._:-]{0,127}',plan['run_id'])
+            and type(plan['config_sha256']) is str and re.fullmatch('[a-f0-9]{64}',plan['config_sha256']),
+            'Invalid provider Actor operation')
+    receipt = workspace_ready(root)
+    actor = PROVIDER_REVIEW_ACTOR if reviewer else PROVIDER_FRANK_ACTOR
+    require(receipt.get('scope') == WORKSPACE_PROVIDER_SCOPE
+            and receipt.get('actor_id') == actor
+            and receipt.get('run_id') == plan['run_id']
+            and workspace_permission(receipt)['state'] == 'active',
+            'Active exact Actor/Run Runtime authority is required')
+    require(owns_listener(root,'runtime'), 'Start the exact workspace Runtime before Actor execution')
+    config_name = 'brand-approval.json' if reviewer else 'frank-live-provider.json'
+    selected_config = root/'config'/config_name
+    require(hashlib.sha256(bounded_private(selected_config,65536)).hexdigest() == plan['config_sha256'],
+            'Provider Actor configuration changed after review')
+    module = ('frank_executor.brand_approval_cli' if reviewer
+              else 'frank_executor.live_provider_cli')
+    argv = [root/'venv/bin/python','-I','-B','-m',module,plan['action'],
+            '--config',selected_config,'--config-sha256',plan['config_sha256']]
+    if reviewer:
+        request_id, decision_pin = plan['request_id'], plan['decision_sha256']
+        require((plan['action'] == 'claim' and type(request_id) is str
+                 and re.fullmatch('[A-Za-z0-9][A-Za-z0-9._:-]{0,127}',request_id)
+                 and decision_pin is None)
+                or (plan['action'] == 'decide' and request_id is None
+                    and type(decision_pin) is str and re.fullmatch('[a-f0-9]{64}',decision_pin))
+                or (plan['action'] in {'register','work'} and request_id is None
+                    and decision_pin is None),
+                'Review operation arguments differ from its fixed action')
+        if plan['action'] == 'claim':
+            argv += ['--request-id',request_id]
+        elif plan['action'] == 'decide':
+            decision = root/'config/brand-approval-decision.json'
+            require(hashlib.sha256(bounded_private(decision,1024*1024+65536)).hexdigest() == decision_pin,
+                    'Approval decision changed after review')
+            argv += ['--decision',decision,'--decision-sha256',decision_pin]
+    else:
+        step_id, request_id, effect_key = plan['step_id'], plan['request_id'], plan['effect_key']
+        require((plan['action'] == 'execute' and step_id in PROVIDER_FRANK_STEPS
+                 and type(request_id) is str and re.fullmatch('[A-Za-z0-9][A-Za-z0-9._:-]{0,127}',request_id)
+                 and effect_key is None)
+                or (plan['action'] in {'resume','renew'} and step_id is None
+                    and request_id is None and type(effect_key) is str
+                    and re.fullmatch('[A-Za-z0-9][A-Za-z0-9._:-]{0,127}',effect_key))
+                or (plan['action'] in {'check-config','register','work'}
+                    and step_id is None and request_id is None and effect_key is None),
+                'Frank operation arguments differ from its fixed action')
+        if plan['action'] == 'execute':
+            argv += ['--run-id',plan['run_id'],'--step-id',step_id,'--operation','compute',
+                     '--scope','zenith.anima.brand-package','--request-id',request_id]
+        elif plan['action'] in {'resume','renew'}:
+            argv += ['--effect-key',effect_key]
+    result = workspace_run(argv,root)
+    require(type(result) is dict, 'Provider Actor returned an unsupported result')
+    return {'schema':'hub.provider-actor-operation-result.v1','actor_id':actor,
+            'run_id':plan['run_id'],'action':plan['action'],'plan_sha256':selection,
+            'result':result}
+
+
 def workspace_report(root):
     workspace_profile(root)
     pending = workspace_holds(root)
@@ -1756,6 +1844,8 @@ def workspace_action(root, action, raw=None, expected=None, selection=None, *, a
                   'workspace-provider-activation-once','workspace-provider-advance-once',
                   'workspace-provider-resume-once','workspace-provider-deliver-handoff-once'}:
         return workspace_provider_worker(root,action,requester_policy_sha256,provider_config_sha256)
+    if action in {'workspace-provider-frank-operation','workspace-provider-review-operation'}:
+        return workspace_provider_actor_operation(root,action,selection)
     if action == 'workspace-prepare':
         require(not any(launch_status(root, name) for name in COMPONENTS), 'Stop workspace before preparing setup')
         return workspace_prepare_plan(root, selection)

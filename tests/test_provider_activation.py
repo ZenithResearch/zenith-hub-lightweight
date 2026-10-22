@@ -392,6 +392,71 @@ class ProviderActivationTests(unittest.TestCase):
         self.assertEqual(argv[argv.index("--process-version") + 1], process_mac.PROVIDER_PROCESS_VERSION)
         self.assertEqual(argv[argv.index("--compilation-hash") + 1], process_mac.PROVIDER_PROCESS_COMPILATION)
 
+    def test_reviewed_frank_operation_runs_one_exact_brand_step(self):
+        run_id = "handoff-" + "a" * 48
+        config = private_file(self.root / "config/frank-live-provider.json", {"selected": True})
+        plan = private_file(self.root / "config/provider-frank-operation.json", {
+            "schema": "hub.provider-frank-operation.v1", "action": "execute",
+            "config_sha256": hashlib.sha256(config).hexdigest(), "run_id": run_id,
+            "step_id": "qualify-intake", "request_id": "claim-qualify-1", "effect_key": None,
+        })
+        receipt = {"scope": process_mac.WORKSPACE_PROVIDER_SCOPE,
+                   "actor_id": process_mac.PROVIDER_FRANK_ACTOR, "run_id": run_id,
+                   "not_before": int(time.time()) - 5, "not_after": int(time.time()) + 3500,
+                   "identity_not_after": int(time.time()) + 86400}
+        with mock.patch.object(process_mac, "workspace_ready", return_value=receipt), \
+                mock.patch.object(process_mac, "workspace_permission", return_value={"state": "active"}), \
+                mock.patch.object(process_mac, "owns_listener", return_value=True), \
+                mock.patch.object(process_mac, "workspace_run", return_value={"effect_key": "effect-1"}) as run:
+            result = process_mac.workspace_provider_actor_operation(
+                self.root, "workspace-provider-frank-operation", hashlib.sha256(plan).hexdigest())
+        self.assertEqual(result["actor_id"], process_mac.PROVIDER_FRANK_ACTOR)
+        argv = [str(value) for value in run.call_args.args[0]]
+        self.assertEqual(argv[argv.index("--scope") + 1], "zenith.anima.brand-package")
+        self.assertEqual(argv[argv.index("--step-id") + 1], "qualify-intake")
+        self.assertEqual(argv[argv.index("--run-id") + 1], run_id)
+
+    def test_reviewed_human_decision_uses_exact_pinned_file(self):
+        run_id = "handoff-" + "a" * 48
+        config = private_file(self.root / "config/brand-approval.json", {"selected": True})
+        decision = private_file(self.root / "config/brand-approval-decision.json", {"approved": True})
+        plan = private_file(self.root / "config/provider-review-operation.json", {
+            "schema": "hub.provider-review-operation.v1", "action": "decide",
+            "config_sha256": hashlib.sha256(config).hexdigest(), "run_id": run_id,
+            "request_id": None, "decision_sha256": hashlib.sha256(decision).hexdigest(),
+        })
+        receipt = {"scope": process_mac.WORKSPACE_PROVIDER_SCOPE,
+                   "actor_id": process_mac.PROVIDER_REVIEW_ACTOR, "run_id": run_id,
+                   "not_before": int(time.time()) - 5, "not_after": int(time.time()) + 3500,
+                   "identity_not_after": int(time.time()) + 86400}
+        with mock.patch.object(process_mac, "workspace_ready", return_value=receipt), \
+                mock.patch.object(process_mac, "workspace_permission", return_value={"state": "active"}), \
+                mock.patch.object(process_mac, "owns_listener", return_value=True), \
+                mock.patch.object(process_mac, "workspace_run", return_value={"approved": True}) as run:
+            process_mac.workspace_provider_actor_operation(
+                self.root, "workspace-provider-review-operation", hashlib.sha256(plan).hexdigest())
+        argv = [str(value) for value in run.call_args.args[0]]
+        self.assertEqual(argv[argv.index("--decision-sha256") + 1], hashlib.sha256(decision).hexdigest())
+        self.assertEqual(argv[argv.index("--decision") + 1],
+                         str(self.root / "config/brand-approval-decision.json"))
+
+    def test_provider_actor_operation_denies_authority_for_other_actor(self):
+        run_id = "handoff-" + "a" * 48
+        config = private_file(self.root / "config/frank-live-provider.json", {"selected": True})
+        plan = private_file(self.root / "config/provider-frank-operation.json", {
+            "schema": "hub.provider-frank-operation.v1", "action": "work",
+            "config_sha256": hashlib.sha256(config).hexdigest(), "run_id": run_id,
+            "step_id": None, "request_id": None, "effect_key": None,
+        })
+        receipt = {"scope": process_mac.WORKSPACE_PROVIDER_SCOPE,
+                   "actor_id": process_mac.PROVIDER_REVIEW_ACTOR, "run_id": run_id}
+        with mock.patch.object(process_mac, "workspace_ready", return_value=receipt), \
+                mock.patch.object(process_mac, "workspace_run") as run:
+            with self.assertRaises(process_mac.InstallError):
+                process_mac.workspace_provider_actor_operation(
+                    self.root, "workspace-provider-frank-operation", hashlib.sha256(plan).hexdigest())
+        run.assert_not_called()
+
 
 if __name__ == "__main__":
     unittest.main()

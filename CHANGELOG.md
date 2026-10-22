@@ -10,6 +10,9 @@
 
 - One-item encrypted Queue pull composition using an optional release-pinned secS opener, a reviewed closed route, and an owner-private OIDC token file kept out of argv, environment and browser state.
 - Read-only deterministic activation preview, reviewed Runtime admission open/close transitions, and exact one-handoff delivery composition for the first provider path.
+- Review-pinned automated Frank and human approval operations for the one selected
+  brand-package Run, with explicit Actor authority rotation and exact unknown-
+  outcome recovery identities.
 
 - Fixed local review pilot actions with pinned configuration and persistent cleanup holds — makes reviewed operator actions visible without enabling an unqualified native bundle.
 
