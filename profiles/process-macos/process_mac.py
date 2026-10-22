@@ -1801,7 +1801,9 @@ def workspace_provider_projection_config(root, expected=None):
     require(parsed is not None and parsed.scheme == 'https' and parsed.hostname
             and parsed.username is None and parsed.password is None
             and not parsed.query and not parsed.fragment and not public.endswith('/')
-            and all(segment not in {'','.','..'} for segment in segments),
+            and all(segment not in {'','.','..'}
+                    and re.fullmatch('[A-Za-z0-9._~-]+',segment)
+                    for segment in segments),
             'Provider projection public base must be an exact HTTPS URL with an optional normalized path')
     policy = root/'config/provider-requester-policy.json'
     require(hashlib.sha256(bounded_private(policy,262144)).hexdigest()
