@@ -226,7 +226,9 @@ Implementation sequence and acceptance:
 
 1. Extract a transport-neutral adapter port from the proven Queue intake and
    response path. Preserve exact logical identity, digest, cursor,
-   acknowledgement and unknown-outcome reconciliation behavior.
+   acknowledgement and unknown-outcome reconciliation behavior. The extracted
+   core has explicit inbox, outbox, object and cursor ports without changing the
+   qualified Queue or projection wire contracts.
 2. Treat browser and intermittent applications as clients, not peers. Qualify one
    pull adapter through Matrix or another real message source, and one explicit
    file/object mailbox adapter. A local folder is the smallest storage candidate;
@@ -239,6 +241,11 @@ Implementation sequence and acceptance:
 5. Add Zenith Transfer installation/configuration after standalone provider
    delivery passes, then make Daycall consume the same contracts without
    Anima-specific fields.
+
+The first slice does not mirror directories, merge arbitrary files, make browsers
+serve peer endpoints or require every client to join the tailnet. It synchronizes
+versioned records and content-addressed objects between full substrates and gives
+intermittent clients a pull/mailbox route to the same logical identities.
 
 ## 5. Dependency graph
 

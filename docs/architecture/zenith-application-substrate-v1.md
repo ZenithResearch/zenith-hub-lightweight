@@ -381,6 +381,26 @@ The receiving peer lists changes from its retained cursor, fetches missing blobs
 by digest, validates owner/revision/authority, commits locally, and then advances
 the cursor. Snapshot/reseed is explicit when retention has elapsed.
 
+This adapter is available only when both ends run the local substrate. Each end
+has a durable inbox, outbox, object store and cursor store and can prove a record
+was validated and committed locally before acknowledging it. A browser tab or
+client-only application does not expose this surface and is not represented as a
+peer merely because it can reach a Tailscale or public HTTPS URL.
+
+The first direct-peer protocol slice is intentionally small:
+
+1. exchange supported namespaces, record kinds and protocol versions;
+2. request source-owned changes after an opaque peer cursor;
+3. fetch a manifest and any missing content-addressed objects;
+4. verify owner, version, predecessor, digest and operation authority;
+5. commit the record and objects in one local reconciliation transaction;
+6. return a durable-commit acknowledgement and advance the cursor.
+
+There is no directory mirroring. Paths stay local. The protocol moves immutable
+objects and versioned records, and the receiver decides where those bytes live.
+Push is optional and separately authorized; pull remains sufficient for the first
+two-full-stack qualification.
+
 ### 8.7 Client mailbox and message adapters
 
 Matrix, Nostr, temporary queues and user-selected storage are adapters to the same
@@ -433,6 +453,59 @@ Synchronization is delivered in layers:
 Steps three through five are not prerequisites for the first Anima provider
 delivery. The first provider implementation must preserve the adapter boundary so
 it does not hard-code Vercel Queue as the only future transport.
+
+### 8.9 Sync core and adapter boundary
+
+The delivery sequence above converges on one local sync core. It owns four
+transport-neutral stores:
+
+- **Inbox:** received record envelopes, validation state and durable-commit state.
+- **Outbox:** exact envelopes awaiting transfer, retry state and expiry.
+- **Object store:** immutable bytes addressed by digest plus verified manifests.
+- **Cursor store:** opaque per-adapter/per-peer continuation and acknowledgement.
+
+Client-only applications use these adapters differently from full local stacks.
+They retain drafts, stable request identities and prepared encrypted envelopes in
+their own bounded client storage, but they do not host the substrate database or
+advertise peer-sync endpoints. They submit through a configured mailbox adapter
+and read canonical projections from the owning provider.
+
+A message may carry either a bounded encrypted package or a wake hint containing
+an opaque locator. A Matrix event, Nostr event or notification can therefore tell
+a client or provider that work is available, but the receiver still resolves the
+manifest or object, verifies it and commits it locally. For large objects, the
+locator may refer to Matrix content, an object/CDN URL, Dropbox or another explicit
+file service chosen by the user or provider. The locator is not authority and the
+adapter must not broaden its configured origin or storage allowlist from payload
+data.
+
+Adapters translate transport operations into the same core calls. The first
+adapter set is:
+
+| Adapter | Intended participant | Direction | Initial role |
+| --- | --- | --- | --- |
+| Queue mailbox | browser client to provider Mac | submit, provider pull | first public service intake |
+| Authorized projection | provider Mac to browser client | client pull | status, deliverables and receipts |
+| Tailscale peer | full local substrate to full local substrate | pull, later optional push | trusted direct synchronization |
+| Matrix/Nostr hint | client or service to a receiver | notification or bounded payload | wake and locate, never infer admission |
+| File/object mailbox | intermittent client or operator | deposit and pull | explicit opt-in fallback for immutable packages |
+
+The core never gives an adapter Service Management, Process Runtime, membership
+or provider authority. It verifies the authorization supplied with each exact
+operation, records the adapter's delivery fact separately, and calls the domain
+owner only after durable local commit.
+
+The initial reconciliation key is the stable record identity plus owner/version
+and content digest. Replaying the same identity and digest is idempotent. Reusing
+that identity for different bytes is a conflict and enters quarantine. Source-owned
+projections advance monotonically; drafts require an expected revision; objects
+are immutable. No adapter performs automatic three-way merge in v1.
+
+This boundary lets a client move between Queue, Matrix, a temporary object mailbox
+or a direct local stack without changing the ServiceRequest, Case, Run, artifact
+or receipt identities. A different transport may resume the same logical transfer
+only when it presents the same retained envelope or manifest and passes the same
+receiver policy.
 
 ## 9. Service delivery
 
