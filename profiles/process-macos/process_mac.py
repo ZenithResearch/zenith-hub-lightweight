@@ -27,7 +27,7 @@ import venv
 import zipfile
 import uuid
 
-ROOT = Path(__file__).resolve().parents[1]
+PROFILE_ROOT = Path(__file__).resolve().parent
 DEFAULT = Path.home()/'Library/Application Support/Zenith/Process'
 COMPONENTS = {'runtime': 'process_runtime', 'service': 'service_management'}
 PROVIDER_PROJECTION = 'provider-projection'
@@ -43,7 +43,11 @@ NATIVE_ROLES = {
 WORKSPACE_ROLES = {'wallet-command': 'castalia-wallet-service',
                    'owner-setup': 'castalia-wallet-workspace-setup',
                    'context-verifier': 'process-runtime-secs-check'}
-WORKSPACE_PROVIDER_ROLES = {'provider-intake-opener': 'secs-provider-intake-v1'}
+WORKSPACE_LIVE_ROLES = {**WORKSPACE_ROLES,
+                        'result-attester': 'secs-frank-connector-result',
+                        'result-owner-setup': 'secs-frank-connector-result-setup'}
+WORKSPACE_PROVIDER_ROLES = {**WORKSPACE_LIVE_ROLES,
+                            'provider-intake-opener': 'secs-provider-intake-v1'}
 MAX_NATIVE_BYTES = 64 * 1024 * 1024
 
 
@@ -55,14 +59,16 @@ def native_rows(profile):
     require(set(profile) == {'schema', 'platform', 'machine', 'python', 'components',
                             'wheels', 'native_profile', 'native'}
             and profile['schema'] == 'hub.process-macos-release.v2'
-            and profile['native_profile'] in {'local-review-v1', 'workspace-v1'},
+            and profile['native_profile'] in {'local-review-v1', 'workspace-v1',
+                                              'workspace-live-provider-v1',
+                                              'workspace-provider-v1'},
             'Unsupported Mac release profile')
-    workspace = profile['native_profile'] == 'workspace-v1'
-    required = WORKSPACE_ROLES if workspace else NATIVE_ROLES
-    roles = required | (WORKSPACE_PROVIDER_ROLES if workspace else {})
+    required = ({'workspace-v1': WORKSPACE_ROLES,
+                 'workspace-live-provider-v1': WORKSPACE_LIVE_ROLES,
+                 'workspace-provider-v1': WORKSPACE_PROVIDER_ROLES}
+                .get(profile['native_profile'], NATIVE_ROLES))
     rows = profile['native']
-    require(type(rows) is list and (len(rows) == len(required)
-            or workspace and len(rows) == len(roles)),
+    require(type(rows) is list and len(rows) == len(required),
             'Incomplete native payload closure')
     seen = set()
     for row in rows:
@@ -70,16 +76,15 @@ def native_rows(profile):
                                                   'source_commit', 'mode'},
                 'Invalid native payload record')
         role = row['role']
-        require(type(role) is str and role in roles and role not in seen
-                and row['filename'] == roles[role]
+        require(type(role) is str and role in required and role not in seen
+                and row['filename'] == required[role]
                 and type(row['bytes']) is int and 0 < row['bytes'] <= MAX_NATIVE_BYTES
                 and type(row['mode']) is int and row['mode'] == 0o500
                 and type(row['sha256']) is str and re.fullmatch('[a-f0-9]{64}', row['sha256'])
                 and type(row['source_commit']) is str and re.fullmatch('[a-f0-9]{40}', row['source_commit']),
                 'Invalid native payload pin')
         seen.add(role)
-    require(set(required) <= seen and (seen == set(required) or seen == set(roles)),
-            'Incomplete native payload closure')
+    require(seen == set(required), 'Incomplete native payload closure')
     return rows
 
 
@@ -205,9 +210,9 @@ def check_bundle(bundle, expected):
 def bundle(wheelhouse, destination, *, profile_name='installation', nativehouse=None):
     wheelhouse, destination = Path(wheelhouse).resolve(), Path(destination).absolute()
     require(profile_name in {'installation', 'local-review', 'workspace'}, 'Unsupported bundle profile')
-    profile = load(ROOT/'config'/('process-macos-release.v1.json' if profile_name == 'installation'
-                                 else 'process-macos-workspace-release.v1.json' if profile_name == 'workspace'
-                                 else 'process-macos-pilot-release.v1.json'))
+    profile = load(PROFILE_ROOT/('release.v1.json' if profile_name == 'installation'
+                                else 'release.workspace.v1.json' if profile_name == 'workspace'
+                                else 'release.local-review.v1.json'))
     require((profile_name == 'installation') == (profile.get('schema') == 'hub.process-macos-release.v1'),
             'Bundle profile selection differs from release')
     native = native_rows(profile)
@@ -321,7 +326,9 @@ def install(source, root, expected, runtime_port=8092, service_port=8091):
     require(not root.exists(), 'Installation already exists; data is never overwritten')
     require(type(runtime_port) is int and type(service_port) is int and runtime_port != service_port
             and all(1024 <= p <= 65535 for p in (runtime_port, service_port)), 'Invalid or duplicate ports')
-    mode = {'local-review-v1': 'local_review', 'workspace-v1': 'workspace'}.get(profile.get('native_profile'), 'installation_only')
+    mode = {'local-review-v1': 'local_review', 'workspace-v1': 'workspace',
+            'workspace-live-provider-v1': 'workspace',
+            'workspace-provider-v1': 'workspace'}.get(profile.get('native_profile'), 'installation_only')
     if mode == 'workspace':
         require(root.name == 'Process-Workspace' and runtime_port == 8292 and service_port == 8291,
                 'Workspace requires a separate Process-Workspace installation on ports 8292/8291')
@@ -388,7 +395,8 @@ def config(root):
                 and value['runtime_port'] == 8192 and value['service_port'] == 8191,
                 'Local-review mode requires its isolated pinned release and ports')
     if value['mode'] == 'workspace':
-        require(load(root/'profile.json').get('native_profile') == 'workspace-v1'
+        require(load(root/'profile.json').get('native_profile') in {
+                    'workspace-v1', 'workspace-live-provider-v1', 'workspace-provider-v1'}
                 and root.name == 'Process-Workspace' and value['runtime_port'] == 8292
                 and value['service_port'] == 8291, 'Workspace target differs from isolated release')
     frank = load(private(root/'config/frank.json'))
@@ -1245,21 +1253,42 @@ def workspace_run(argv, root, *, native_renewal=False):
 
 
 def workspace_upgrade_policy(old,new):
-    require(old.get('native_profile') == new.get('native_profile') == 'workspace-v1'
+    profiles = (old.get('native_profile'), new.get('native_profile'))
+    require(profiles in {('workspace-v1', 'workspace-v1'),
+                         ('workspace-v1', 'workspace-live-provider-v1'),
+                         ('workspace-live-provider-v1', 'workspace-live-provider-v1'),
+                         ('workspace-v1', 'workspace-provider-v1'),
+                         ('workspace-live-provider-v1', 'workspace-provider-v1'),
+                         ('workspace-provider-v1', 'workspace-provider-v1')}
             and all(old.get(k) == new.get(k) for k in ['schema','platform','machine','python']),
             'Software upgrade requires the same isolated workspace release profile')
     a,b={r['role']:r for r in native_rows(old)},{r['role']:r for r in native_rows(new)}
-    require(all(a[k] == b[k] for k in ['wallet-command','context-verifier']),
-            'Software upgrade cannot change Wallet command or verifier bytes or provenance')
+    if profiles[1] == 'workspace-provider-v1':
+        require(set(b) == set(WORKSPACE_PROVIDER_ROLES)
+                and set(a).issubset(set(b))
+                and all(a[k]['filename'] == b[k]['filename'] for k in a),
+                'Provider upgrade requires the complete fixed native role closure')
+    else:
+        protected = (WORKSPACE_LIVE_ROLES if profiles[0] == 'workspace-live-provider-v1'
+                     else WORKSPACE_ROLES)
+        require(set(protected).issubset(a) and set(protected).issubset(b)
+                and all(a[k] == b[k] for k in protected),
+                'Software upgrade cannot change protected native bytes or provenance')
     a,b={r['name']:r for r in old['wheels']},{r['name']:r for r in new['wheels']}
-    require(set(a) == set(b) and len(a) == 15 and 'frank-executor' in a
-            and all(a[k] == b[k] for k in a if k != 'frank-executor'),
-            'Software upgrade can change only the Frank wheel')
+    require(set(a) == set(b) and len(a) == 15
+            and {'frank-executor','process-runtime','service-management'} <= set(a),
+            'Software upgrade requires the fixed dependency closure')
+    if profiles[1] != 'workspace-provider-v1':
+        require(all(a[k] == b[k] for k in a if k != 'frank-executor'),
+                'Software upgrade can change only the Frank wheel')
     a,b=old.get('components'),new.get('components')
-    require(type(a) is dict and type(b) is dict and set(a) == set(b) and 'frank' in a
-            and all(a[k] == b[k] for k in a if k != 'frank')
-            and a['frank'].get('package') == b['frank'].get('package') == 'frank-executor',
-            'Software upgrade cannot change Runtime, Service or component closure')
+    require(type(a) is dict and type(b) is dict and set(a) == set(b)
+            and set(a) == {'frank','process-runtime','service-management'}
+            and all(a[k].get('package') == b[k].get('package') for k in a),
+            'Software upgrade cannot change component identities')
+    if profiles[1] != 'workspace-provider-v1':
+        require(all(a[k] == b[k] for k in a if k != 'frank'),
+                'Software upgrade cannot change Runtime or Service closure')
 
 
 def workspace_software_upgrade(source,root,expected):

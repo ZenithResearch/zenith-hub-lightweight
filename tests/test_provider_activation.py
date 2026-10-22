@@ -523,5 +523,48 @@ class ProviderActivationTests(unittest.TestCase):
         run.assert_not_called()
 
 
+class ProviderReleaseProfileTests(unittest.TestCase):
+    def profile(self, native_profile, roles, marker):
+        wheels = [
+            {"name": name, "filename": f"{name.replace('-', '_')}-0.1.0-py3-none-any.whl",
+             "version": "0.1.0", "bytes": 1, "sha256": marker * 64}
+            for name in ("frank-executor", "process-runtime", "service-management",
+                         *(f"dependency-{index}" for index in range(12)))
+        ]
+        components = {
+            "frank": {"package": "frank-executor", "version": "0.1.0",
+                      "source_commit": marker * 40, "wheel_sha256": marker * 64},
+            "process-runtime": {"package": "process-runtime", "version": "0.1.0",
+                                "source_commit": marker * 40, "wheel_sha256": marker * 64},
+            "service-management": {"package": "service-management", "version": "0.1.0",
+                                   "source_commit": marker * 40, "wheel_sha256": marker * 64},
+        }
+        native = [
+            {"role": role, "filename": filename, "bytes": 1, "sha256": marker * 64,
+             "source_commit": marker * 40, "mode": 0o500}
+            for role, filename in roles.items()
+        ]
+        return {"schema": "hub.process-macos-release.v2", "platform": "darwin",
+                "machine": "arm64", "python": [3, 12], "components": components,
+                "wheels": wheels, "native_profile": native_profile, "native": native}
+
+    def test_provider_profile_requires_connector_and_intake_native_closure(self):
+        profile = self.profile("workspace-provider-v1", process_mac.WORKSPACE_PROVIDER_ROLES, "a")
+        self.assertEqual(
+            {row["role"] for row in process_mac.native_rows(profile)},
+            set(process_mac.WORKSPACE_PROVIDER_ROLES),
+        )
+        profile["native"] = profile["native"][:-1]
+        with self.assertRaises(process_mac.InstallError):
+            process_mac.native_rows(profile)
+
+    def test_explicit_provider_upgrade_accepts_changed_pinned_stack_and_rejects_downgrade(self):
+        old = self.profile("workspace-live-provider-v1", process_mac.WORKSPACE_LIVE_ROLES, "a")
+        new = self.profile("workspace-provider-v1", process_mac.WORKSPACE_PROVIDER_ROLES, "b")
+        process_mac.workspace_upgrade_policy(old, new)
+        with self.assertRaises(process_mac.InstallError):
+            process_mac.workspace_upgrade_policy(new, old)
+
+
 if __name__ == "__main__":
     unittest.main()

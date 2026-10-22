@@ -1,6 +1,6 @@
 # Prepare finite provider authority in Process Workspace
 
-Status: source candidate. The current published workspace bundle does not yet contain the required Wallet build, so these commands must not be described as installed or released.
+Status: source candidate. The repository-pinned `workspace-provider-v1` profile now names the exact reviewed Wallet, secS, Runtime, Service and Frank candidate artifacts, but no public release or production installation is claimed until the component PRs, bundle and installed-byte qualification complete.
 
 The generic Process Workspace remains the only root. Provider preparation is explicit, runs only while Runtime and Service are stopped, preserves the existing workspace identity and keeps run admission closed. It creates two independent authority surfaces:
 
@@ -11,10 +11,11 @@ Neither action configures a queue, stores a Vercel credential, publishes a workf
 
 ## Pull one encrypted request
 
-The provider-capable bundle may add one release-pinned
-`secs-provider-intake-v1` native role. The current published workspace bundle
-does not contain that role, so pull remains unavailable there. A candidate with
-the role can consume at most one delivery using a closed operator-owned route:
+The provider-capable bundle adds the release-pinned `secs-provider-intake-v1`,
+`secs-frank-connector-result` and `secs-frank-connector-result-setup` roles to
+the Wallet command/setup and Runtime context verifier closure. The current published workspace bundle
+does not contain those roles, so pull remains unavailable there. A candidate with
+the complete role closure can consume at most one delivery using a closed operator-owned route:
 
 ```json
 {"consumer_group":"zenith-provider-mac","lease_seconds":300,"region":"sfo1","schema":"hub.provider-pull.v1","topic":"zenith-intake-v1"}

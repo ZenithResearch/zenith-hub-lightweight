@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Pinned the complete `workspace-provider-v1` Mac bundle closure to the reviewed Service Management, Process Runtime, Frank, Castalia Wallet and secS provider heads. The profile now includes the intake opener plus connector-result setup/attestation binaries, and the supported software upgrade recognizes an explicit full-provider transition while retaining prior software and workspace data.
+
 ### Fixed
 
 - Refresh the tracked `process_mac.py` source-integrity digest after provider projection supervision changed its reviewed bytes — restores the public source gate without changing the controller or its runtime behavior.
