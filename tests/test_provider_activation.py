@@ -323,6 +323,28 @@ class ProviderActivationTests(unittest.TestCase):
             process_mac.workspace_provider_projection_config(
                 self.root, hashlib.sha256(projection).hexdigest())
 
+    def test_provider_projection_allows_only_numeric_loopback_http_for_local_browser(self):
+        policy = private_file(
+            self.root / "config/provider-requester-policy.json", {"fixture": True})
+        projection_path = self.root / "config/provider-projection.json"
+        base = {
+            "schema": "hub.provider-projection.v1",
+            "public_base_url": "https://matrix-home.example.ts.net/zenith/provider",
+            "requester_policy_sha256": hashlib.sha256(policy).hexdigest(),
+            "port": 8293,
+        }
+        for origin in ("http://127.0.0.1:4337", "http://[::1]:4337"):
+            projection = private_file(projection_path, {**base, "browser_origin": origin})
+            _, value, _ = process_mac.workspace_provider_projection_config(
+                self.root, hashlib.sha256(projection).hexdigest())
+            self.assertEqual(value["browser_origin"], origin)
+        for origin in ("http://localhost:4337", "http://anima.example",
+                       "http://127.0.0.1:4337/path"):
+            projection = private_file(projection_path, {**base, "browser_origin": origin})
+            with self.subTest(origin=origin), self.assertRaises(process_mac.InstallError):
+                process_mac.workspace_provider_projection_config(
+                    self.root, hashlib.sha256(projection).hexdigest())
+
     def test_provider_admission_open_is_reviewed_applied_and_idempotent(self):
         receipt = {"scope": process_mac.WORKSPACE_PROVIDER_SCOPE,
                    "plan_sha256": "f" * 64,

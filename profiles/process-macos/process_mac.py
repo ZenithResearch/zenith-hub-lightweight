@@ -1837,11 +1837,14 @@ def workspace_provider_projection_config(root, expected=None):
             'Invalid provider projection configuration')
     browser = value['browser_origin']
     parsed = urllib.parse.urlsplit(browser) if type(browser) is str else None
-    require(parsed is not None and parsed.scheme == 'https' and parsed.hostname
+    loopback_http = (parsed is not None and parsed.scheme == 'http'
+                     and parsed.hostname in {'127.0.0.1','::1'})
+    require(parsed is not None and parsed.scheme in {'http','https'}
+            and (parsed.scheme == 'https' or loopback_http) and parsed.hostname
             and parsed.username is None and parsed.password is None
             and parsed.path in {'','/'} and not parsed.query and not parsed.fragment
             and not browser.endswith('/'),
-            'Provider projection browser origin must be an exact HTTPS origin')
+            'Provider projection browser origin must be HTTPS or exact numeric-loopback HTTP')
     public = value['public_base_url']
     parsed = urllib.parse.urlsplit(public) if type(public) is str else None
     segments = [] if parsed is None else parsed.path.split('/')[1:]
