@@ -54,6 +54,16 @@ class ProviderActivationTests(unittest.TestCase):
         self.patches.stop()
         self.temp.cleanup()
 
+    def test_base_start_does_not_require_independent_projection(self):
+        report = {"components": {
+            "runtime": {"managed": True, "live": True, "ready": False},
+            "service": {"managed": True, "live": True, "ready": False},
+            "provider-projection": {"managed": False, "live": False, "ready": False},
+        }}
+        self.assertTrue(process_mac.base_components_started_default_deny(report))
+        report["components"]["service"]["live"] = False
+        self.assertFalse(process_mac.base_components_started_default_deny(report))
+
     def test_provider_runtime_plan_binds_one_actor_and_run(self):
         handoff_id = "a" * 64
         run_id = "handoff-" + handoff_id[:48]

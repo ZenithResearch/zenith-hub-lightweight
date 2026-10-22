@@ -2218,6 +2218,16 @@ def check_ports(value):
                 raise InstallError('Component port is occupied; no service was stopped') from e
 
 
+def base_components_started_default_deny(report):
+    components = report.get('components') if type(report) is dict else None
+    return type(components) is dict and all(
+        type(components.get(name)) is dict
+        and components[name].get('managed') is True
+        and components[name].get('live') is True
+        and components[name].get('ready') is False
+        for name in COMPONENTS)
+
+
 def start(root):
     installed(root)
     value = config(root)
@@ -2260,7 +2270,7 @@ def start(root):
                             break
                 time.sleep(.1)
         report=doctor(root)
-        require(all(state['managed'] and state['live'] and not state['ready'] for state in report['components'].values()),
+        require(base_components_started_default_deny(report),
                 'Final component liveness or default-deny readiness differs; stopping this installation')
         return report
     except BaseException:
