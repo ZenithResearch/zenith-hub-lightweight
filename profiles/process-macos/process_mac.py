@@ -48,6 +48,11 @@ WORKSPACE_LIVE_ROLES = {**WORKSPACE_ROLES,
                         'result-owner-setup': 'secs-frank-connector-result-setup'}
 WORKSPACE_PROVIDER_ROLES = {**WORKSPACE_LIVE_ROLES,
                             'provider-intake-opener': 'secs-provider-intake-v1'}
+PROVIDER_QUEUE_PACKAGES = {'h2', 'hpack', 'httpcore2', 'httpx2', 'hyperframe',
+                           'python-multipart', 'truststore', 'vercel-headers',
+                           'vercel-internal-core', 'vercel-oidc', 'vercel-queue'}
+BASE_WHEEL_COUNT = 15
+PROVIDER_WHEEL_COUNT = BASE_WHEEL_COUNT + len(PROVIDER_QUEUE_PACKAGES)
 MAX_NATIVE_BYTES = 64 * 1024 * 1024
 
 
@@ -193,7 +198,12 @@ def check_bundle(bundle, expected):
                 'Bundle content differs from release manifest')
     profile = load(bundle/'profile.json')
     native = native_rows(profile)
-    require(len(profile['wheels']) == 15 and len({r['name'] for r in profile['wheels']}) == 15,
+    wheel_names = {r['name'] for r in profile['wheels']}
+    expected_wheel_count = (PROVIDER_WHEEL_COUNT if profile.get('native_profile') == 'workspace-provider-v1'
+                            else BASE_WHEEL_COUNT)
+    require(len(profile['wheels']) == expected_wheel_count and len(wheel_names) == expected_wheel_count
+            and (profile.get('native_profile') != 'workspace-provider-v1'
+                 or PROVIDER_QUEUE_PACKAGES <= wheel_names),
             'Incomplete Mac dependency closure')
     expected_files = {'profile.json', 'process_mac.py'} | {'wheels/'+r['filename'] for r in profile['wheels']}
     expected_files |= {'native/'+r['filename'] for r in native}
@@ -259,7 +269,7 @@ exit 2
         launcher = launcher.replace('install --bundle', 'install --root "$HOME/Library/Application Support/Zenith/Process-Pilot" --runtime-port 8192 --service-port 8191 --bundle')
     (destination/'Install.command').write_text(launcher)
     (destination/'Install.command').chmod(0o700)
-    result = {'bundle': str(destination), 'bundle_sha256': digest, 'wheel_count': 15}
+    result = {'bundle': str(destination), 'bundle_sha256': digest, 'wheel_count': len(profile['wheels'])}
     if native:
         result['native_count'] = len(native)
     return result
@@ -1275,9 +1285,17 @@ def workspace_upgrade_policy(old,new):
                 and all(a[k] == b[k] for k in protected),
                 'Software upgrade cannot change protected native bytes or provenance')
     a,b={r['name']:r for r in old['wheels']},{r['name']:r for r in new['wheels']}
-    require(set(a) == set(b) and len(a) == 15
-            and {'frank-executor','process-runtime','service-management'} <= set(a),
-            'Software upgrade requires the fixed dependency closure')
+    if profiles[1] == 'workspace-provider-v1':
+        require(len(b) == PROVIDER_WHEEL_COUNT
+                and PROVIDER_QUEUE_PACKAGES <= set(b)
+                and (set(a) == set(b)
+                     or (len(a) == BASE_WHEEL_COUNT and set(b) == set(a) | PROVIDER_QUEUE_PACKAGES))
+                and {'frank-executor','process-runtime','service-management'} <= set(a),
+                'Provider upgrade requires the fixed Queue dependency closure')
+    else:
+        require(set(a) == set(b) and len(a) == BASE_WHEEL_COUNT
+                and {'frank-executor','process-runtime','service-management'} <= set(a),
+                'Software upgrade requires the fixed dependency closure')
     if profiles[1] != 'workspace-provider-v1':
         require(all(a[k] == b[k] for k in a if k != 'frank-executor'),
                 'Software upgrade can change only the Frank wheel')

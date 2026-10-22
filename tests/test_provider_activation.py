@@ -525,11 +525,14 @@ class ProviderActivationTests(unittest.TestCase):
 
 class ProviderReleaseProfileTests(unittest.TestCase):
     def profile(self, native_profile, roles, marker):
+        names = ["frank-executor", "process-runtime", "service-management",
+                 *(f"dependency-{index}" for index in range(12))]
+        if native_profile == "workspace-provider-v1":
+            names.extend(sorted(process_mac.PROVIDER_QUEUE_PACKAGES))
         wheels = [
             {"name": name, "filename": f"{name.replace('-', '_')}-0.1.0-py3-none-any.whl",
              "version": "0.1.0", "bytes": 1, "sha256": marker * 64}
-            for name in ("frank-executor", "process-runtime", "service-management",
-                         *(f"dependency-{index}" for index in range(12)))
+            for name in names
         ]
         components = {
             "frank": {"package": "frank-executor", "version": "0.1.0",
@@ -562,6 +565,10 @@ class ProviderReleaseProfileTests(unittest.TestCase):
         old = self.profile("workspace-live-provider-v1", process_mac.WORKSPACE_LIVE_ROLES, "a")
         new = self.profile("workspace-provider-v1", process_mac.WORKSPACE_PROVIDER_ROLES, "b")
         process_mac.workspace_upgrade_policy(old, new)
+        incomplete = json.loads(json.dumps(new))
+        incomplete["wheels"] = [row for row in incomplete["wheels"] if row["name"] != "vercel-queue"]
+        with self.assertRaises(process_mac.InstallError):
+            process_mac.workspace_upgrade_policy(old, incomplete)
         with self.assertRaises(process_mac.InstallError):
             process_mac.workspace_upgrade_policy(new, old)
 

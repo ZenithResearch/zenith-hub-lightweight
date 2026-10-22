@@ -2,21 +2,21 @@
   "components": {
     "frank": {
       "package": "frank-executor",
-      "source_commit": "bbc2a3e69fd46d4f423cc226237808e79d758e6c",
+      "source_commit": "0a9ca3d66020a799da25e4353d72e83cd2273736",
       "version": "0.1.0",
-      "wheel_sha256": "74e66861010a862a3aba99416030776b05701511b09ea8bdf693535653cb447a"
+      "wheel_sha256": "ea1edb35d90e14e27c99d1acbc354b195e2c08126af05e776a24ad6caf84dde0"
     },
     "process-runtime": {
       "package": "process-runtime",
       "source_commit": "cbb9c2fbf5b9faa8bba300941ad2639591ecec6e",
       "version": "0.1.0",
-      "wheel_sha256": "752bce6e3fbf85e0eb2cc1bb2b25720af5cb4a77a3ed2da8d335f68ef6ee1029"
+      "wheel_sha256": "f534d386f51538f6a982c6e7309e962f11fe4c9997d8071d89e0863656c2a5e0"
     },
     "service-management": {
       "package": "service-management",
-      "source_commit": "1aa13909a65c9615eb5c91cc9f7bd1b986f5ee37",
+      "source_commit": "838520dd679394157ae21517d654cde2124b6b0c",
       "version": "0.1.0",
-      "wheel_sha256": "59b2b91c624e4379b42e7a6f348c4ac2dd39a492a912e051a26dbb7e40ba369e"
+      "wheel_sha256": "2dacf91f60e09401ba015d029178fabdc178f764ceb49e8c1205575df3e61f2a"
     }
   },
   "machine": "arm64",
@@ -30,11 +30,11 @@
       "source_commit": "d6f5b6ddc0f7cb7a892c65bc9d51a7973b498ef9"
     },
     {
-      "bytes": 2332752,
+      "bytes": 2332704,
       "filename": "castalia-wallet-workspace-setup",
       "mode": 320,
       "role": "owner-setup",
-      "sha256": "cba63e1f5b198ea82d5f3486bdd8f5b72e059244c841a2956c900fe6350ae788",
+      "sha256": "9c87f3be4b9f3003ea44579e0d264e3863a7f1da09561f0e16f4a6749de0fca1",
       "source_commit": "d6f5b6ddc0f7cb7a892c65bc9d51a7973b498ef9"
     },
     {
@@ -46,28 +46,28 @@
       "source_commit": "cbb9c2fbf5b9faa8bba300941ad2639591ecec6e"
     },
     {
-      "bytes": 4462800,
+      "bytes": 4462752,
       "filename": "secs-frank-connector-result",
       "mode": 320,
       "role": "result-attester",
-      "sha256": "16c4e1654720abcdf603068d924f4f3f684297a1f6f9d77c2722cd40e450f16b",
-      "source_commit": "7b19ae36f4207564af27f17f0e45ef24aef1e7f9"
+      "sha256": "15614dce5848d4be40149f60a95d33abf0e348f22afd4e02d3a0903777ed488a",
+      "source_commit": "a6cda6d99a8f8674c1264dd4258ddf16f9a048fc"
     },
     {
-      "bytes": 776736,
+      "bytes": 776720,
       "filename": "secs-frank-connector-result-setup",
       "mode": 320,
       "role": "result-owner-setup",
-      "sha256": "8ca27e701b8e5855205fa39345efdec7c10b033f56dc3bb9e0fa212f0f68b1b4",
-      "source_commit": "7b19ae36f4207564af27f17f0e45ef24aef1e7f9"
+      "sha256": "8991281c84f2e8ea3cbc708d665cab52b7c4262516df5a3b5acb384b3f0fe88c",
+      "source_commit": "a6cda6d99a8f8674c1264dd4258ddf16f9a048fc"
     },
     {
-      "bytes": 998864,
+      "bytes": 1016848,
       "filename": "secs-provider-intake-v1",
       "mode": 320,
       "role": "provider-intake-opener",
-      "sha256": "b4832c8821056d21244c4e62e3202ce3c2435c646d7f461857b8063a2de698af",
-      "source_commit": "7b19ae36f4207564af27f17f0e45ef24aef1e7f9"
+      "sha256": "4298276efc5d38eb119a84dfde66e335774bbc839f7f06636eaf94b53c277946",
+      "source_commit": "a6cda6d99a8f8674c1264dd4258ddf16f9a048fc"
     }
   ],
   "native_profile": "workspace-provider-v1",
@@ -100,10 +100,10 @@
       "version": "2026.7.22"
     },
     {
-      "bytes": 156450,
+      "bytes": 159299,
       "filename": "frank_executor-0.1.0-py3-none-any.whl",
       "name": "frank-executor",
-      "sha256": "74e66861010a862a3aba99416030776b05701511b09ea8bdf693535653cb447a",
+      "sha256": "ea1edb35d90e14e27c99d1acbc354b195e2c08126af05e776a24ad6caf84dde0",
       "version": "0.1.0"
     },
     {
@@ -114,6 +114,20 @@
       "version": "0.16.0"
     },
     {
+      "bytes": 62636,
+      "filename": "h2-4.4.1-py3-none-any.whl",
+      "name": "h2",
+      "sha256": "0e25f1462b23c9cb82d9eb02e28bc706dac2a68cb457c6a0d74d63c8a2a5d0e6",
+      "version": "4.4.1"
+    },
+    {
+      "bytes": 34246,
+      "filename": "hpack-4.2.0-py3-none-any.whl",
+      "name": "hpack",
+      "sha256": "858ac0b02280fa582b5080d68db0899c62a80375e0e5413a74970c5e518b6986",
+      "version": "4.2.0"
+    },
+    {
       "bytes": 78784,
       "filename": "httpcore-1.0.9-py3-none-any.whl",
       "name": "httpcore",
@@ -121,11 +135,32 @@
       "version": "1.0.9"
     },
     {
+      "bytes": 85070,
+      "filename": "httpcore2-2.16.0-py3-none-any.whl",
+      "name": "httpcore2",
+      "sha256": "5c4358319f2602d984ad93182c9fee5160f22e9da7babdda870a5e7c4e2dc34f",
+      "version": "2.16.0"
+    },
+    {
       "bytes": 73517,
       "filename": "httpx-0.28.1-py3-none-any.whl",
       "name": "httpx",
       "sha256": "d909fcccc110f8c7faf814ca82a9a4d816bc5a6dbfea25d6591d6985b8ba59ad",
       "version": "0.28.1"
+    },
+    {
+      "bytes": 97880,
+      "filename": "httpx2-2.16.0-py3-none-any.whl",
+      "name": "httpx2",
+      "sha256": "fd2c5d7909e8d86fe92d53020c310ca0e4e431b838c207c5754b9bbf0308d49a",
+      "version": "2.16.0"
+    },
+    {
+      "bytes": 13007,
+      "filename": "hyperframe-6.1.0-py3-none-any.whl",
+      "name": "hyperframe",
+      "sha256": "b03380493a519fce58ea5af42e4a42317bf9bd425596f7a0835ffce80f1a42e5",
+      "version": "6.1.0"
     },
     {
       "bytes": 69583,
@@ -152,8 +187,15 @@
       "bytes": 87317,
       "filename": "process_runtime-0.1.0-py3-none-any.whl",
       "name": "process-runtime",
-      "sha256": "752bce6e3fbf85e0eb2cc1bb2b25720af5cb4a77a3ed2da8d335f68ef6ee1029",
+      "sha256": "f534d386f51538f6a982c6e7309e962f11fe4c9997d8071d89e0863656c2a5e0",
       "version": "0.1.0"
+    },
+    {
+      "bytes": 30042,
+      "filename": "python_multipart-0.0.32-py3-none-any.whl",
+      "name": "python-multipart",
+      "sha256": "ff6d3f776f16878c894e52e107296ffc890e913c611b1a4ec6c44e2821fe2e23",
+      "version": "0.0.32"
     },
     {
       "bytes": 26766,
@@ -170,11 +212,18 @@
       "version": "2026.9.1"
     },
     {
-      "bytes": 96543,
+      "bytes": 99355,
       "filename": "service_management-0.1.0-py3-none-any.whl",
       "name": "service-management",
-      "sha256": "59b2b91c624e4379b42e7a6f348c4ac2dd39a492a912e051a26dbb7e40ba369e",
+      "sha256": "2dacf91f60e09401ba015d029178fabdc178f764ceb49e8c1205575df3e61f2a",
       "version": "0.1.0"
+    },
+    {
+      "bytes": 19017,
+      "filename": "truststore-0.10.5-py3-none-any.whl",
+      "name": "truststore",
+      "sha256": "9aaaedaefaf06d8b206278cf8b5012bc897f485a874503501e12d776df78951c",
+      "version": "0.10.5"
     },
     {
       "bytes": 45571,
@@ -182,6 +231,34 @@
       "name": "typing_extensions",
       "sha256": "481caa481374e813c1b176ada14e97f1f67a4539ce9cfeb3f350d78d6370c2e8",
       "version": "4.16.0"
+    },
+    {
+      "bytes": 3922,
+      "filename": "vercel_headers-0.7.2-py3-none-any.whl",
+      "name": "vercel-headers",
+      "sha256": "26dcb0016b5c553e638385e532cb8557f071e247b46f2575d5737e48718dc8c6",
+      "version": "0.7.2"
+    },
+    {
+      "bytes": 24767,
+      "filename": "vercel_internal_core-0.2.2-py3-none-any.whl",
+      "name": "vercel-internal-core",
+      "sha256": "581b02309ec8d6367134c3ecabba5d8169a902677458e228f544dc88dfa05a6b",
+      "version": "0.2.2"
+    },
+    {
+      "bytes": 16554,
+      "filename": "vercel_oidc-0.10.0-py3-none-any.whl",
+      "name": "vercel-oidc",
+      "sha256": "abc8317317482e542834ab35883e8c4a0f9a1baea554898e3f041ca037f90bec",
+      "version": "0.10.0"
+    },
+    {
+      "bytes": 95468,
+      "filename": "vercel_queue-0.9.2-py3-none-any.whl",
+      "name": "vercel-queue",
+      "sha256": "b9f78efe4182fe636c8074cc494a9ed6a43f6d6ee6c41367a08f9ce25af7596c",
+      "version": "0.9.2"
     }
   ]
 }

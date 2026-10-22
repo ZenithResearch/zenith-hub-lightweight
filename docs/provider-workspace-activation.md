@@ -13,7 +13,7 @@ Neither action configures a queue, stores a Vercel credential, publishes a workf
 
 The provider-capable bundle adds the release-pinned `secs-provider-intake-v1`,
 `secs-frank-connector-result` and `secs-frank-connector-result-setup` roles to
-the Wallet command/setup and Runtime context verifier closure. The current published workspace bundle
+the Wallet command/setup and Runtime context verifier closure. It also includes the complete pinned official Vercel Queue 0.9.2 dependency closure required by the off-platform poller. The current published workspace bundle
 does not contain those roles, so pull remains unavailable there. A candidate with
 the complete role closure can consume at most one delivery using a closed operator-owned route:
 
