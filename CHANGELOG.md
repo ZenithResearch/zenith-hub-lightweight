@@ -2,6 +2,7 @@
 
 ## [Unreleased]
 
+- Added an independently pinned one-item reference Queue pull to the Mac provider controller, so encrypted reference objects can reach the same durable local inbox without reusing the request topic or consumer group.
 - Added the complete pinned Vercel Queue 0.9.2 wheel closure to `workspace-provider-v1`; provider pull can no longer pass bundle verification while omitting the SDK or one of its transitive dependencies.
 - Pinned the complete `workspace-provider-v1` Mac bundle closure to the reviewed Service Management, Process Runtime, Frank, Castalia Wallet and secS provider heads. The profile now includes the intake opener plus connector-result setup/attestation binaries, and the supported software upgrade recognizes an explicit full-provider transition while retaining prior software and workspace data.
 

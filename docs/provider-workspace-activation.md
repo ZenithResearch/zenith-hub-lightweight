@@ -27,11 +27,27 @@ store the Vercel OIDC token separately at
 to Service Management by file path and read into the official SDK in memory;
 it is never placed in the browser request, argv or inherited environment.
 
+References use a separately reviewed configuration at
+`config/provider-reference-pull.json`. It has the same closed schema and
+selects the distinct reference topic and consumer group:
+
+```json
+{"consumer_group":"zenith-provider-mac-reference","lease_seconds":300,"region":"sfo1","schema":"hub.provider-pull.v1","topic":"zenith-reference-v1"}
+```
+
 Review the public route digest, then run:
 
 ```bash
 "$PYTHON" -I -S -B "$ROOT/control.py" workspace-provider-pull-once \
   --root "$ROOT" --provider-config-sha256 EXACT_ROUTE_SHA256
+```
+
+Pull at most one encrypted reference into the same durable local inbox using
+its independent configuration digest:
+
+```bash
+"$PYTHON" -I -S -B "$ROOT/control.py" workspace-provider-pull-references-once \
+  --root "$ROOT" --provider-config-sha256 EXACT_REFERENCE_ROUTE_SHA256
 ```
 
 The fixed command uses the installed opener digest, fixed intake database and a

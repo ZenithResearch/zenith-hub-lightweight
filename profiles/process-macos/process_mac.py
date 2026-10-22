@@ -758,6 +758,7 @@ WORKSPACE_ACTIONS = {'workspace-status', 'workspace-prepare', 'workspace-setup',
                      'workspace-provider-authority-resume', 'workspace-provider-service-prepare',
                      'workspace-provider-service-setup', 'workspace-provider-admit-once',
                      'workspace-provider-pull-once',
+                     'workspace-provider-pull-references-once',
                      'workspace-provider-resume-admission-once', 'workspace-provider-advance-once',
                      'workspace-provider-resume-once', 'workspace-provider-activation-once',
                      'workspace-provider-admission-open-prepare',
@@ -1632,6 +1633,7 @@ def workspace_provider_service_status(root):
 def workspace_provider_worker(root, action, requester_policy_sha256=None, provider_config_sha256=None):
     commands = {
         'workspace-provider-pull-once':'pull-once',
+        'workspace-provider-pull-references-once':'pull-references-once',
         'workspace-provider-activation-once':'activation-brand-package-once',
         'workspace-provider-deliver-handoff-once':'deliver-handoff-once',
         'workspace-provider-admit-once':'admit-once',
@@ -1642,7 +1644,7 @@ def workspace_provider_worker(root, action, requester_policy_sha256=None, provid
     require(action in commands, 'Unsupported provider worker action')
     require(not workspace_holds(root), 'Workspace transition or cleanup must be reconciled')
     rows={row['role']:row for row in native_rows(workspace_profile(root))}
-    pull_actions={'workspace-provider-pull-once'}
+    pull_actions={'workspace-provider-pull-once','workspace-provider-pull-references-once'}
     preview_actions={'workspace-provider-activation-once'}
     delivery_actions={'workspace-provider-deliver-handoff-once'}
     admission_actions={'workspace-provider-admit-once','workspace-provider-resume-admission-once'}
@@ -1658,7 +1660,9 @@ def workspace_provider_worker(root, action, requester_policy_sha256=None, provid
     if action in pull_actions:
         row=rows.get('provider-intake-opener')
         require(row is not None, 'The installed release does not include the provider intake opener')
-        config_file=root/'config/provider-pull.json'
+        config_file=root/'config'/('provider-reference-pull.json'
+                                   if action == 'workspace-provider-pull-references-once'
+                                   else 'provider-pull.json')
         raw=bounded_private(config_file,16384)
         require(type(provider_config_sha256) is str and re.fullmatch('[a-f0-9]{64}',provider_config_sha256)
                 and hashlib.sha256(raw).hexdigest() == provider_config_sha256,
@@ -2020,7 +2024,8 @@ def workspace_action(root, action, raw=None, expected=None, selection=None, *, a
         return workspace_prepare_provider_admission(root,False,selection)
     if action == 'workspace-provider-admission-apply':
         return workspace_apply_provider_admission(root,selection)
-    if action in {'workspace-provider-pull-once','workspace-provider-admit-once','workspace-provider-resume-admission-once',
+    if action in {'workspace-provider-pull-once','workspace-provider-pull-references-once',
+                  'workspace-provider-admit-once','workspace-provider-resume-admission-once',
                   'workspace-provider-activation-once','workspace-provider-advance-once',
                   'workspace-provider-resume-once','workspace-provider-deliver-handoff-once'}:
         return workspace_provider_worker(root,action,requester_policy_sha256,provider_config_sha256)
@@ -2444,7 +2449,8 @@ def main():
                     require(args.action in {'workspace-provider-admit-once','workspace-provider-resume-admission-once'}
                             or args.provider_policy_sha256 is None,
                             'Requester policy pin is accepted only for provider admission')
-                    require(args.action == 'workspace-provider-pull-once'
+                    require(args.action in {'workspace-provider-pull-once',
+                                            'workspace-provider-pull-references-once'}
                             or args.provider_config_sha256 is None,
                             'Provider pull configuration pin is accepted only for provider pull')
                     result = workspace_action(root, args.action, request_raw, args.request_sha256,

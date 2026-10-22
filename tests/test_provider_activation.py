@@ -243,6 +243,39 @@ class ProviderActivationTests(unittest.TestCase):
                 )
         run.assert_not_called()
 
+    def test_provider_reference_pull_uses_separate_pinned_topic(self):
+        self.rows.append({
+            "role": "provider-intake-opener", "filename": "secs-provider-intake-v1",
+            "sha256": "e" * 64,
+        })
+        pull = private_file(
+            self.root / "config/provider-reference-pull.json",
+            {"schema": "hub.provider-pull.v1", "region": "sfo1",
+             "topic": "zenith-reference-v1",
+             "consumer_group": "zenith-provider-mac-reference",
+             "lease_seconds": 300},
+        )
+        token = self.root / "config/provider-vercel-oidc-token"
+        token.write_text("header.payload.signature\n")
+        token.chmod(0o600)
+        result = {"schema": "service.provider-worker-result.v1",
+                  "command": "pull-references-once", "processed": 1,
+                  "results": [{"object_id": "ref-1"}]}
+        with mock.patch.object(process_mac, "workspace_run", return_value=result) as run:
+            observed = process_mac.workspace_provider_worker(
+                self.root, "workspace-provider-pull-references-once",
+                provider_config_sha256=hashlib.sha256(pull).hexdigest(),
+            )
+        self.assertEqual(observed, result)
+        argv = [str(value) for value in run.call_args.args[0]]
+        self.assertIn("pull-references-once", argv)
+        self.assertEqual(argv[argv.index("--topic") + 1], "zenith-reference-v1")
+        self.assertEqual(
+            argv[argv.index("--consumer-group") + 1],
+            "zenith-provider-mac-reference",
+        )
+        self.assertNotIn("header.payload.signature", argv)
+
     def test_provider_activation_preview_uses_only_the_retained_intake(self):
         result = {"schema": "service.provider-worker-result.v1",
                   "command": "activation-brand-package-once", "processed": 1,
