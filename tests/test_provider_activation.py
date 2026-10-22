@@ -248,6 +248,71 @@ class ProviderActivationTests(unittest.TestCase):
         self.assertNotIn("--service-database", argv)
         self.assertNotIn("--runtime-endpoint", argv)
 
+    def test_provider_projection_binds_exact_stores_authority_and_origins(self):
+        policy = private_file(
+            self.root / "config/provider-requester-policy.json",
+            {"schema": "service.castalia-requester-policy.v1", "fixture": True})
+        projection = private_file(self.root / "config/provider-projection.json", {
+            "schema": "hub.provider-projection.v1",
+            "browser_origin": "https://anima.example",
+            "public_base_url": "https://matrix-home.example.ts.net/zenith/provider",
+            "requester_policy_sha256": hashlib.sha256(policy).hexdigest(),
+            "port": 8293,
+        })
+        for name in ("provider-intake.db", "service.db"):
+            target = self.root / "data" / name
+            target.touch(mode=0o600)
+        runtime_config = self.root / "authority/runtime/config"
+        runtime_config.mkdir(mode=0o700, parents=True)
+        private_file(runtime_config / "wallet-command.json", {"runtime": True})
+        receipt = {
+            "scope": process_mac.WORKSPACE_PROVIDER_SCOPE,
+            "permission": {"state": "active"},
+            "configuration_hashes": {"wallet-command.json": "c" * 64},
+        }
+        with mock.patch.object(
+            process_mac, "workspace_provider_service_status",
+            return_value={"state": "configured_native_unqualified",
+                          "permission": {"state": "active"}},
+        ), mock.patch.object(
+            process_mac, "workspace_ready", return_value=receipt,
+        ), mock.patch.object(
+            process_mac, "workspace_permission", return_value={"state": "active"},
+        ), mock.patch.object(
+            process_mac, "workspace_config_directory", return_value=runtime_config,
+        ), mock.patch.object(
+            process_mac, "config",
+            return_value={"mode": "workspace", "runtime_port": 8292,
+                          "service_port": 8291},
+        ):
+            argv, pin = process_mac.workspace_provider_projection_argv(
+                self.root, hashlib.sha256(projection).hexdigest())
+            plist = process_mac.job(self.root, process_mac.PROVIDER_PROJECTION)
+        values = [str(value) for value in argv]
+        self.assertEqual(pin, hashlib.sha256(projection).hexdigest())
+        self.assertEqual(values[values.index("--public-base-url") + 1],
+                         "https://matrix-home.example.ts.net/zenith/provider")
+        self.assertEqual(values[values.index("--runtime-endpoint") + 1],
+                         "http://127.0.0.1:8292")
+        self.assertEqual(values[values.index("--port") + 1], "8293")
+        self.assertNotIn("tailscale", " ".join(values).lower())
+        self.assertIn("_run-provider-projection", plist["ProgramArguments"])
+        self.assertIn(pin, plist["ProgramArguments"])
+
+    def test_provider_projection_rejects_unreviewed_or_insecure_origin(self):
+        policy = private_file(
+            self.root / "config/provider-requester-policy.json", {"fixture": True})
+        projection = private_file(self.root / "config/provider-projection.json", {
+            "schema": "hub.provider-projection.v1",
+            "browser_origin": "https://anima.example",
+            "public_base_url": "http://matrix-home.example.ts.net",
+            "requester_policy_sha256": hashlib.sha256(policy).hexdigest(),
+            "port": 8293,
+        })
+        with self.assertRaises(process_mac.InstallError):
+            process_mac.workspace_provider_projection_config(
+                self.root, hashlib.sha256(projection).hexdigest())
+
     def test_provider_admission_open_is_reviewed_applied_and_idempotent(self):
         receipt = {"scope": process_mac.WORKSPACE_PROVIDER_SCOPE,
                    "plan_sha256": "f" * 64,

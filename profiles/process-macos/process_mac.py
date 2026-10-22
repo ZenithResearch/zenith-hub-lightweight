@@ -21,6 +21,7 @@ import sys
 import time
 import tempfile
 import urllib.error
+import urllib.parse
 import urllib.request
 import venv
 import zipfile
@@ -29,6 +30,9 @@ import uuid
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT = Path.home()/'Library/Application Support/Zenith/Process'
 COMPONENTS = {'runtime': 'process_runtime', 'service': 'service_management'}
+PROVIDER_PROJECTION = 'provider-projection'
+MANAGED_COMPONENTS = {*COMPONENTS, PROVIDER_PROJECTION}
+PROVIDER_PROJECTION_PORT = 8293
 # Packaging is not authority activation. These are fixed opt-in payload roles.
 NATIVE_ROLES = {
     'wallet-command': 'castalia-wallet-service',
@@ -742,7 +746,9 @@ WORKSPACE_ACTIONS = {'workspace-status', 'workspace-prepare', 'workspace-setup',
                      'workspace-provider-admission-close-prepare', 'workspace-provider-admission-apply',
                      'workspace-provider-deliver-handoff-once',
                      'workspace-provider-frank-operation',
-                     'workspace-provider-review-operation'}
+                     'workspace-provider-review-operation',
+                     'workspace-provider-projection-start',
+                     'workspace-provider-projection-stop'}
 WORKSPACE_CONFIGS = {'command-authority.json', 'wallet-command.json',
                      'runtime-policy.json', 'runtime-receiver.json'}
 PROVIDER_FRANK_ACTOR = 'frank-hermes-pilot'
@@ -1766,6 +1772,128 @@ def workspace_provider_actor_operation(root, action, selection):
             'result':result}
 
 
+def workspace_provider_projection_config(root, expected=None):
+    path = root/'config/provider-projection.json'
+    raw = bounded_private(path, 16384)
+    pin = hashlib.sha256(raw).hexdigest()
+    require(expected is None or type(expected) is str
+            and re.fullmatch('[a-f0-9]{64}', expected) and expected == pin,
+            'Provider projection configuration changed after review')
+    value = closed_json(raw)
+    require(type(value) is dict and set(value) == {
+                'schema','browser_origin','public_base_url',
+                'requester_policy_sha256','port'}
+            and value['schema'] == 'hub.provider-projection.v1'
+            and type(value['requester_policy_sha256']) is str
+            and re.fullmatch('[a-f0-9]{64}', value['requester_policy_sha256'])
+            and value['port'] == PROVIDER_PROJECTION_PORT,
+            'Invalid provider projection configuration')
+    browser = value['browser_origin']
+    parsed = urllib.parse.urlsplit(browser) if type(browser) is str else None
+    require(parsed is not None and parsed.scheme == 'https' and parsed.hostname
+            and parsed.username is None and parsed.password is None
+            and parsed.path in {'','/'} and not parsed.query and not parsed.fragment
+            and not browser.endswith('/'),
+            'Provider projection browser origin must be an exact HTTPS origin')
+    public = value['public_base_url']
+    parsed = urllib.parse.urlsplit(public) if type(public) is str else None
+    segments = [] if parsed is None else parsed.path.split('/')[1:]
+    require(parsed is not None and parsed.scheme == 'https' and parsed.hostname
+            and parsed.username is None and parsed.password is None
+            and not parsed.query and not parsed.fragment and not public.endswith('/')
+            and all(segment not in {'','.','..'} for segment in segments),
+            'Provider projection public base must be an exact HTTPS URL with an optional normalized path')
+    policy = root/'config/provider-requester-policy.json'
+    require(hashlib.sha256(bounded_private(policy,262144)).hexdigest()
+            == value['requester_policy_sha256'],
+            'Provider projection requester policy changed after review')
+    return raw, value, pin
+
+
+def workspace_provider_projection_argv(root, expected):
+    _, value, pin = workspace_provider_projection_config(root, expected)
+    require((root/'data/provider-intake.db').is_file()
+            and (root/'data/service.db').is_file(),
+            'Provider projection requires existing local intake and Service stores')
+    service_status = workspace_provider_service_status(root)
+    require(service_status['state'] == 'configured_native_unqualified'
+            and service_status['permission']['state'] == 'active',
+            'Active finite provider Service authority is required')
+    runtime_receipt = workspace_ready(root)
+    require(runtime_receipt.get('scope') == WORKSPACE_PROVIDER_SCOPE
+            and workspace_permission(runtime_receipt)['state'] == 'active',
+            'Active exact Actor/Run Runtime authority is required')
+    rows = {row['role']:row for row in native_rows(workspace_profile(root))}
+    runtime_dir = workspace_config_directory(root,runtime_receipt)
+    return [root/'venv/bin/python','-I','-B','-m',
+            'service_management.provider_projection_server',
+            '--intake-database',root/'data/provider-intake.db',
+            '--service-database',root/'data/service.db',
+            '--requester-policy',root/'config/provider-requester-policy.json',
+            '--browser-origin',value['browser_origin'],
+            '--public-base-url',value['public_base_url'],
+            '--runtime-endpoint','http://127.0.0.1:'+str(config(root)['runtime_port']),
+            '--runtime-wallet-command',root/'native'/rows['wallet-command']['filename'],
+            '--runtime-wallet-command-sha256',rows['wallet-command']['sha256'],
+            '--runtime-wallet-configuration',runtime_dir/'wallet-command.json',
+            '--runtime-wallet-configuration-sha256',
+            runtime_receipt['configuration_hashes']['wallet-command.json'],
+            '--host','127.0.0.1','--port',str(value['port']),'--timeout','5'], pin
+
+
+def workspace_provider_projection(root, action, selection):
+    require(action in {'workspace-provider-projection-start',
+                       'workspace-provider-projection-stop'},
+            'Unsupported provider projection action')
+    if action.endswith('-stop'):
+        if launch_status(root, PROVIDER_PROJECTION):
+            run(['/bin/launchctl','bootout',
+                 f'gui/{os.getuid()}/{label(root,PROVIDER_PROJECTION)}'],root,timeout=40)
+        wait_absent(root,PROVIDER_PROJECTION)
+        return {'schema':'hub.provider-projection-operation.v1','running':False,
+                'stopped':True,'funnel_changed':False}
+    require(selection is not None,
+            'Supply the reviewed provider projection configuration digest')
+    _, pin = workspace_provider_projection_argv(root, selection)
+    require(not launch_status(root,PROVIDER_PROJECTION),
+            'Provider projection is already registered')
+    require(owns_listener(root,'runtime'),
+            'Start the exact workspace Runtime before the provider projection')
+    with socket.socket() as listener:
+        try:
+            listener.bind(('127.0.0.1',PROVIDER_PROJECTION_PORT))
+        except OSError as error:
+            raise InstallError('Provider projection port is occupied; no service was stopped') from error
+    path=root/'jobs'/f'{PROVIDER_PROJECTION}.plist'
+    expected_plist=plistlib.dumps(job(root,PROVIDER_PROJECTION),sort_keys=True)
+    if path.exists():
+        require(private(path).read_bytes() == expected_plist,'Managed provider projection plist changed')
+    else:
+        with path.open('xb') as stream:
+            os.fchmod(stream.fileno(),0o600);stream.write(expected_plist)
+    log=root/'logs'/f'{PROVIDER_PROJECTION}.log'
+    if not log.exists():log.touch(mode=0o600)
+    private(log)
+    run(['/bin/launchctl','bootstrap',f'gui/{os.getuid()}',path],root)
+    deadline=time.monotonic()+15
+    try:
+        while time.monotonic()<deadline:
+            if (launch_status(root,PROVIDER_PROJECTION)
+                    and owns_listener(root,PROVIDER_PROJECTION)
+                    and probe(root,PROVIDER_PROJECTION,'live')):
+                return {'schema':'hub.provider-projection-operation.v1',
+                        'running':True,'selection_sha256':pin,
+                        'port':PROVIDER_PROJECTION_PORT,'funnel_changed':False}
+            time.sleep(.1)
+        raise InstallError('Provider projection did not start; inspect its private log')
+    except BaseException:
+        if launch_status(root,PROVIDER_PROJECTION):
+            run(['/bin/launchctl','bootout',
+                 f'gui/{os.getuid()}/{label(root,PROVIDER_PROJECTION)}'],root,timeout=40)
+        wait_absent(root,PROVIDER_PROJECTION)
+        raise
+
+
 def workspace_report(root):
     workspace_profile(root)
     pending = workspace_holds(root)
@@ -1846,6 +1974,8 @@ def workspace_action(root, action, raw=None, expected=None, selection=None, *, a
         return workspace_provider_worker(root,action,requester_policy_sha256,provider_config_sha256)
     if action in {'workspace-provider-frank-operation','workspace-provider-review-operation'}:
         return workspace_provider_actor_operation(root,action,selection)
+    if action in {'workspace-provider-projection-start','workspace-provider-projection-stop'}:
+        return workspace_provider_projection(root,action,selection)
     if action == 'workspace-prepare':
         require(not any(launch_status(root, name) for name in COMPONENTS), 'Stop workspace before preparing setup')
         return workspace_prepare_plan(root, selection)
@@ -1910,15 +2040,21 @@ def workspace_action(root, action, raw=None, expected=None, selection=None, *, a
 
 
 def label(root, component):
-    require(component in COMPONENTS, 'Unknown component')
+    require(component in MANAGED_COMPONENTS, 'Unknown component')
     identity = hashlib.sha256((str(os.getuid())+':'+str(root)).encode()).hexdigest()[:20]
     return 'ca.zenith.process.'+identity+'.'+component
 
 
 def job(root, component):
+    action = '_run-provider-projection' if component == PROVIDER_PROJECTION else '_run'
+    arguments = [str(root/'venv/bin/python'), '-I', '-S', '-B', str(root/'control.py'),
+                 action, '--root', str(root)]
+    if component == PROVIDER_PROJECTION:
+        arguments += ['--selection-sha256', workspace_provider_projection_config(root)[2]]
+    else:
+        arguments += ['--component', component]
     return {'Label': label(root, component),
-        'ProgramArguments': [str(root/'venv/bin/python'), '-I', '-S', '-B', str(root/'control.py'),
-                             '_run', '--root', str(root), '--component', component],
+        'ProgramArguments': arguments,
         'RunAtLoad': True, 'KeepAlive': False, 'ExitTimeOut': 30,
         'StandardOutPath': str(root/'logs'/f'{component}.log'),
         'StandardErrorPath': str(root/'logs'/f'{component}.log')}
@@ -1963,14 +2099,17 @@ def probe_body(port, route, component):
             if len(raw)>16384:return False
             value = json.loads(raw)
             return (type(value) is dict and response.status == 200 and value.get(route) is True
-                    and value.get('component',value.get('service')) == {'runtime':'process-runtime','service':'service-management'}[component])
+                    and value.get('component',value.get('service')) == {
+                        'runtime':'process-runtime','service':'service-management',
+                        PROVIDER_PROJECTION:'service-management-provider-projection'}[component])
     except (OSError, ValueError):
         return False
 
 
 def probe(root, component, route, timeout=2):
     # A child deadline also bounds slow headers/trickled bodies, not just sockets.
-    port=config(root)[component+'_port']
+    port=(PROVIDER_PROJECTION_PORT if component == PROVIDER_PROJECTION
+          else config(root)[component+'_port'])
     try:
         result=run([root/'venv/bin/python','-I','-S','-B',root/'control.py','_probe',
                     '--root',root,'--component',component,'--runtime-port',str(port),'--route',route],
@@ -1987,7 +2126,8 @@ def owns_listener(root, component):
     status=run(['/bin/launchctl','print',f'gui/{os.getuid()}/{label(root,component)}'],root,check=False)
     pid=re.search(rb'^\s*pid = (\d+)\s*$',status.stdout,re.M)
     if not pid or int(pid[1])!=value['wrapper_pid']:return False
-    port=config(root)[component+'_port']
+    port=(PROVIDER_PROJECTION_PORT if component == PROVIDER_PROJECTION
+          else config(root)[component+'_port'])
     listener=run(['/usr/sbin/lsof','-nP','-a','-p',str(value['child_pid']),
                   '-iTCP@127.0.0.1:'+str(port),'-sTCP:LISTEN','-t'],root,timeout=3,check=False)
     return listener.returncode==0 and listener.stdout.strip()==str(value['child_pid']).encode()
@@ -2001,7 +2141,7 @@ def doctor(root):
     frank = json.loads(run([root/'venv/bin/python', '-I', '-B', '-m', 'frank_executor',
                           'check-config', '--config', root/'config/frank.json'], root).stdout)
     states={}
-    for name in COMPONENTS:
+    for name in MANAGED_COMPONENTS:
         managed=launch_status(root,name) and owns_listener(root,name)
         states[name]={'managed':managed,'live':managed and probe(root,name,'live'),
                       'ready':managed and probe(root,name,'ready')}
@@ -2092,14 +2232,15 @@ def stop(root):
     # Stop remains available even if package or interpreter pins drift.
     root = private(root)
     errors=[]
-    for name in reversed(COMPONENTS):
+    ordered = [PROVIDER_PROJECTION, *reversed(COMPONENTS)]
+    for name in ordered:
         try:
             if launch_status(root, name):
                 run(['/bin/launchctl', 'bootout', f'gui/{os.getuid()}/{label(root, name)}'], root,timeout=40)
         except (InstallError,OSError,subprocess.SubprocessError):errors.append(name)
     require(not errors,'Some owned jobs could not be stopped or inspected; retry stop')
-    for name in COMPONENTS:wait_absent(root,name)
-    for name in COMPONENTS:
+    for name in MANAGED_COMPONENTS:wait_absent(root,name)
+    for name in MANAGED_COMPONENTS:
         marker = root/'logs'/f'{name}-process.json'
         if marker.exists():
             child_pid = load(marker)['child_pid']
@@ -2111,17 +2252,20 @@ def stop(root):
                     break
                 require(time.monotonic() < deadline, 'Child process absence is unresolved after stop')
                 time.sleep(.1)
-    results = {name:load(root/'logs'/f'{name}-shutdown.json') for name in COMPONENTS
+    results = {name:load(root/'logs'/f'{name}-shutdown.json') for name in MANAGED_COMPONENTS
                if (root/'logs'/f'{name}-shutdown.json').exists()}
     return {'stopped': True, 'data_preserved': True, 'shutdown': results}
 
 
-def supervise(root, component):
+def supervise(root, component, selection=None):
     installed(root)
     value = config(root)
-    argv = [root/'venv/bin/python', '-I', '-B', '-m', COMPONENTS[component],
-            '--database', root/'data'/f'{component}.db', '--port', str(value[component+'_port']),
-            '--environment', 'production']
+    if component == PROVIDER_PROJECTION:
+        argv, _ = workspace_provider_projection_argv(root, selection)
+    else:
+        argv = [root/'venv/bin/python', '-I', '-B', '-m', COMPONENTS[component],
+                '--database', root/'data'/f'{component}.db', '--port', str(value[component+'_port']),
+                '--environment', 'production']
     if value['mode'] == 'local_review' and component == 'runtime':
         selection, _ = pilot_inputs(root)
         pilot_complete(root, selection)
@@ -2179,7 +2323,7 @@ def supervise(root, component):
 def main():
     os.umask(0o077)
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('action', choices=['bundle', 'install', 'workspace-software-upgrade', 'doctor', 'status', 'start', 'stop', '_inventory', '_seal', '_probe', '_run', *sorted(PILOT_ACTIONS), *sorted(WORKSPACE_ACTIONS)])
+    parser.add_argument('action', choices=['bundle', 'install', 'workspace-software-upgrade', 'doctor', 'status', 'start', 'stop', '_inventory', '_seal', '_probe', '_run', '_run-provider-projection', *sorted(PILOT_ACTIONS), *sorted(WORKSPACE_ACTIONS)])
     parser.add_argument('--root', type=Path, default=DEFAULT)
     parser.add_argument('--bundle', type=Path)
     parser.add_argument('--bundle-sha256')
@@ -2195,7 +2339,7 @@ def main():
     parser.add_argument('--handoff-id')
     parser.add_argument('--provider-policy-sha256')
     parser.add_argument('--provider-config-sha256')
-    parser.add_argument('--component', choices=COMPONENTS)
+    parser.add_argument('--component', choices=MANAGED_COMPONENTS)
     parser.add_argument('--route',choices=['live','ready'],default='live')
     parser.add_argument('--runtime-port', type=int, default=8092)
     parser.add_argument('--service-port', type=int, default=8091)
@@ -2220,6 +2364,10 @@ def main():
         elif args.action == '_run':
             require(args.component, 'Supply component')
             result = supervise(args.root, args.component)
+        elif args.action == '_run-provider-projection':
+            require(args.selection_sha256 is not None,
+                    'Supply the reviewed provider projection selection pin')
+            result = supervise(args.root, PROVIDER_PROJECTION, args.selection_sha256)
         else:
             root = private(args.root)
             with (root/'operation.lock').open('a') as lock:

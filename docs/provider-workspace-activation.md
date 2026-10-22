@@ -152,9 +152,61 @@ does not require it; exact delivery does. The controller never derives a
 handoff from browser input and never scans forward by choosing a different
 pending outbox record.
 
-Remote Vercel Queue pull/opening, requester-policy publication, background
-supervision and public request/status delivery are still separate release and
-deployment work.
+## Start the read-only provider response surface
+
+The provider projection is a third, independently managed LaunchAgent. It reads
+the existing intake and Service stores and may call the already running local
+Runtime for authorized requester reads. It cannot accept mutations and does not
+change Tailscale configuration. Create `config/provider-projection.json` with
+mode `0600` using exact reviewed values:
+
+```json
+{"browser_origin":"https://anima.example","port":8293,"public_base_url":"https://matrix-home.example.ts.net/zenith/provider","requester_policy_sha256":"EXACT_POLICY_SHA256","schema":"hub.provider-projection.v1"}
+```
+
+`browser_origin` is the one allowed browser origin. `public_base_url` is the
+HTTPS URL returned in artifact, receipt and status links. Its optional path must
+be normalized and have no trailing slash. Review the exact configuration digest,
+start Runtime, then start the projection:
+
+```bash
+PROJECTION="$ROOT/config/provider-projection.json"
+PROJECTION_SHA256="$(shasum -a 256 "$PROJECTION" | awk '{print $1}')"
+"$PYTHON" -I -S -B "$ROOT/control.py" workspace-provider-projection-start \
+  --root "$ROOT" --selection-sha256 "$PROJECTION_SHA256"
+```
+
+The controller binds only `127.0.0.1:8293`, pins both databases, the requester
+policy, the active Service and Runtime authority, and the native Wallet binary.
+Its successful result explicitly reports `funnel_changed: false`.
+
+On the current pilot Mac, the reviewed public route can share the existing
+Funnel HTTPS listener without replacing its root handler:
+
+```bash
+/Applications/Tailscale.app/Contents/MacOS/Tailscale funnel --bg --yes \
+  --https=443 --set-path=/zenith/provider http://127.0.0.1:8293
+```
+
+Treat that as a separate deployment change: first compare
+`tailscale funnel status --json`, confirm `/zenith/provider` is unused and retain
+the previous status as rollback evidence. Public Anima users reach ordinary
+HTTPS and do not join the tailnet. Vercel Queue remains the only intake path;
+this Funnel route serves status, artifacts and receipts only. Remove this one
+mount without resetting unrelated routes:
+
+```bash
+/Applications/Tailscale.app/Contents/MacOS/Tailscale funnel --yes \
+  --https=443 --set-path=/zenith/provider off
+```
+
+Stop the local response surface independently with
+`workspace-provider-projection-stop`. Stopping it never edits Funnel, so remove
+or redirect the public mount separately before a planned extended shutdown.
+
+The public route and listener remain source candidates until their release is
+reviewed, installed and qualified on the pilot Mac. Requester-policy publication
+and continuous queue scheduling remain separate deployment work.
 
 ## Status meaning
 
