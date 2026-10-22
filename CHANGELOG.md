@@ -7,7 +7,7 @@
 
 ### Fixed
 
-- Repin the provider workspace to Service Management's 24-hour Vercel Queue retention fix — prevents the first live request/reference publish from exceeding the current Queue API limit while preserving legacy catalog readability.
+- Repin the provider workspace to Service Management's per-request runtime OIDC binding and current seven-day Vercel Queue limit — prevents stale build-token capture and keeps the required offline mailbox on the documented API range.
 - Allow an exact numeric-loopback HTTP browser origin in the local provider
   projection while retaining HTTPS for every non-loopback origin, and repin the
   workspace bundle to the corresponding Service Management wheel.
