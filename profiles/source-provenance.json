@@ -34,7 +34,7 @@
     "files": [
       {
         "path": "profiles/process-macos/process_mac.py",
-        "sha256": "0e3949236828757b9944507ef7d8ecc51267e2fa09fca65b0ea95ac9a808f633"
+        "sha256": "1f3104385354a2fb7a0b6d2fbce37e178f6697fa9ab22599ca1a77dde93b3e2a"
       }
     ]
   },
@@ -86,9 +86,9 @@
       },
       "service-management": {
         "package": "service-management",
-        "source_commit": "434f3cb04f8e494fb87317647fe5f2a6e5e41515",
+        "source_commit": "0eb69f2cd7b04e4509175bb55c7a8c4d0aec5835",
         "version": "0.1.0",
-        "wheel_sha256": "2dacf91f60e09401ba015d029178fabdc178f764ceb49e8c1205575df3e61f2a"
+        "wheel_sha256": "83e142a910c7d266be8d56c0ddd0de16c700169a18af11c94079ee71c21dd174"
       }
     },
     "native": [
@@ -144,7 +144,7 @@
     "files": [
       {
         "path": "profiles/process-macos/release.workspace.v1.json",
-        "sha256": "a7739193d3002ce01ec36b176dae0d3bd4c33d8e1460de0658f26b06341a6c9f"
+        "sha256": "d3c0034d682697bba168ac56c33cc7d08fbfd69331221739a0974837fc72def3"
       }
     ],
     "wheels": [
@@ -282,10 +282,10 @@
         "version": "2026.9.1"
       },
       {
-        "bytes": 99355,
+        "bytes": 99425,
         "filename": "service_management-0.1.0-py3-none-any.whl",
         "name": "service-management",
-        "sha256": "2dacf91f60e09401ba015d029178fabdc178f764ceb49e8c1205575df3e61f2a",
+        "sha256": "83e142a910c7d266be8d56c0ddd0de16c700169a18af11c94079ee71c21dd174",
         "version": "0.1.0"
       },
       {

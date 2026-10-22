@@ -14,9 +14,9 @@
     },
     "service-management": {
       "package": "service-management",
-      "source_commit": "434f3cb04f8e494fb87317647fe5f2a6e5e41515",
+      "source_commit": "0eb69f2cd7b04e4509175bb55c7a8c4d0aec5835",
       "version": "0.1.0",
-      "wheel_sha256": "2dacf91f60e09401ba015d029178fabdc178f764ceb49e8c1205575df3e61f2a"
+      "wheel_sha256": "83e142a910c7d266be8d56c0ddd0de16c700169a18af11c94079ee71c21dd174"
     }
   },
   "machine": "arm64",
@@ -212,10 +212,10 @@
       "version": "2026.9.1"
     },
     {
-      "bytes": 99355,
+      "bytes": 99425,
       "filename": "service_management-0.1.0-py3-none-any.whl",
       "name": "service-management",
-      "sha256": "2dacf91f60e09401ba015d029178fabdc178f764ceb49e8c1205575df3e61f2a",
+      "sha256": "83e142a910c7d266be8d56c0ddd0de16c700169a18af11c94079ee71c21dd174",
       "version": "0.1.0"
     },
     {

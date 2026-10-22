@@ -7,6 +7,9 @@
 
 ### Fixed
 
+- Allow an exact numeric-loopback HTTP browser origin in the local provider
+  projection while retaining HTTPS for every non-loopback origin, and repin the
+  workspace bundle to the corresponding Service Management wheel.
 - Refresh the tracked `process_mac.py` source-integrity digest after provider projection supervision changed its reviewed bytes — restores the public source gate without changing the controller or its runtime behavior.
 
 ### Added
