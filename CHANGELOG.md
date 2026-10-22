@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- Refresh the tracked `process_mac.py` source-integrity digest after provider projection supervision changed its reviewed bytes — restores the public source gate without changing the controller or its runtime behavior.
+
 ### Added
 
 - Exact stopped-workspace plans for finite provider Service authority and one-handoff/one-Actor/one-derived-Run Runtime authority — closes the source composition gap without enabling a provider, changing custody identity, or accepting browser-selected policy.
