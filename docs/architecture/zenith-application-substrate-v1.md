@@ -37,7 +37,7 @@ set of independently owned components and versioned protocols:
 | --- | --- | --- |
 | Composition | Install, configure, start, stop, update and diagnose the local stack | Hub / lightweight deployer |
 | Connection | Discover resources, join trusted private networks, review peers and manage access | Zenith Transfer |
-| Identity | Create or restore keys, protect custody, issue and attach credentials | Castalia Wallet and the selected local authority |
+| Identity | Create or restore keys, protect custody, issue and attach credentials | Castalia Wallet custody composed by Zenith Transfer, plus the selected authority |
 | Authorization | Verify exact subject, audience, operation, resource, expiry, replay and policy | secS Magik plus receiver policy |
 | Workflow | Import, validate, compile, publish and execute immutable process versions | Process Runtime |
 | Service delivery | Own ServiceRequests, Cases, plans, provider obligations and runtime handoff | Service Management |
@@ -70,6 +70,13 @@ set of independently owned components and versioned protocols:
    use explicit versions. Unknown required versions fail closed.
 10. **Claims follow evidence.** Installation, reachability, authorization,
     persistence, service admission, execution and delivery are reported separately.
+11. **Custody is part of the local product composition.** On a full local node,
+    Zenith Transfer composes Castalia Wallet custody. Applications use the
+    supported Wallet interface; they do not model custody as another substrate
+    connection or copy its private storage.
+12. **Synchronization is an optional sidecar.** Direct application intake targets
+    Service Management's configured intake boundary. Sync is used only for
+    explicit replication, deferred delivery or mailbox ingestion.
 
 ## 4. Logical architecture
 
@@ -439,20 +446,25 @@ Synchronization is delivered in layers:
 
 1. Keep the current Vercel Queue request/reference adapters and read-only response
    projection as the first provider proof.
-2. Extract their stable identity, cursor, acknowledgement and reconciliation
-   behavior behind the transport-neutral ports without changing wire bytes.
-3. Qualify one direct Tailscale peer adapter between two full local stacks for one
-   supported record family and content-addressed objects.
-4. Add one message adapter and one file/object mailbox adapter only when a real
-   application needs them. Matrix is the leading message candidate; a local folder
-   is the smallest storage candidate. Dropbox, Nostr and a hosted mailbox remain
-   replaceable adapters rather than mandatory substrate dependencies.
-5. Add broader record families, reseed, multi-peer operation and application-level
-   conflict resolution after the two-peer path is reliable.
+2. Prove the released Anima-to-provider path through substantive deliverables and
+   authoritative receipts before generalizing the transport implementation.
+3. Extract the Queue path's stable identity, acknowledgement, durable-commit and
+   reconciliation behavior behind transport-neutral ports without changing wire
+   bytes.
+4. Qualify Matrix as the first additional message/mailbox adapter needed by Anima.
+   Matrix transport facts remain separate from Service admission and progress.
+5. Qualify a local folder as the smallest explicit file/object mailbox. It moves
+   immutable manifests and content-addressed payloads rather than mirroring paths.
+6. Pause for an Anima MVP review. The review decides whether direct Tailscale peer
+   synchronization is needed next; it is not an MVP gate and is not pre-scoped to
+   two full stacks, one record family or one object family without a concrete use.
+7. Continue with direct Tailscale synchronization, Dropbox, Nostr, hosted storage,
+   broader record families, reseed, multi-peer operation and application-level
+   conflict handling according to the next proven application need.
 
-Steps three through five are not prerequisites for the first Anima provider
-delivery. The first provider implementation must preserve the adapter boundary so
-it does not hard-code Vercel Queue as the only future transport.
+Steps six and seven are not prerequisites for the first Anima provider delivery.
+The first provider implementation preserves the adapter boundary so it does not
+hard-code Vercel Queue as the only future transport.
 
 ### 8.9 Optional sync core, direct intake and RPC boundary
 
@@ -518,6 +530,21 @@ membership or provider authority. A direct route also receives no ambient
 authority: the receiver verifies the authorization supplied with each exact
 operation. Transport delivery facts remain separate from domain admission.
 
+For an Anima submission, there is no default sync hop:
+
+```text
+Anima client -> configured provider intake -> Service Management
+```
+
+Anima is client-side, so it has no local substrate peer to synchronize. It keeps
+only its bounded draft, prepared request identity and retry material, then reads
+the provider's authoritative projection. When an offline mailbox is selected,
+the provider-side adapter pulls the package and calls the same Service Management
+admission boundary after durable local commit. A full Zenith Transfer installation
+may run the optional sidecar and show whether each configured peer or mailbox is
+current, behind, unavailable or in conflict. That state does not affect direct
+Service intake unless the selected route explicitly depends on the sidecar.
+
 The initial reconciliation key is the stable record identity plus owner/version
 and content digest. Replaying the same identity and digest is idempotent. Reusing
 that identity for different bytes is a conflict and enters quarantine. Source-owned
@@ -574,14 +601,17 @@ but cannot reinterpret a pending outbox receipt as external delivery or executio
 
 ## 11. Identity and enrollment
 
-Anima and other applications may create or restore a Castalia-compatible local
-identity before the local authority is online. Browser custody reuses the existing
-closed `castalia.web-wallet.v1` record and trusted encryption/recovery behavior.
+Anima and other client-side applications connect to a supported Castalia Wallet
+provider and request proofs for exact operations. They do not create a second
+custody store. A full local installation creates or restores Castalia-compatible
+identity through the custody capability composed by Zenith Transfer; a standalone
+browser may connect through the separately supported Wallet extension/provider.
+Both expose the same closed `castalia.web-wallet.v1` behavior where applicable.
 
 The lifecycle is:
 
 ```text
-local encrypted identity
+Zenith Transfer or supported Wallet provider creates/restores encrypted identity
   -> local draft association
   -> separate pending-registration outbox record
   -> local authority verifies and registers the same public key
@@ -594,10 +624,10 @@ queue, Nostr payload, Matrix message or logs. A pending registration must not be
 represented as membership. Email verification, Matrix login, transport signing,
 membership, web sessions and organization authority remain separate states.
 
-Browser custody is origin-bound. Select a canonical trusted Zenith custody origin
-and use explicit cross-origin proof or connection; subdomains do not share
-IndexedDB implicitly. Cookies, when present, contain only opaque server-issued
-session handles.
+Browser Wallet providers remain origin-bound. Use an explicit proof/connection
+ceremony; subdomains do not share IndexedDB implicitly. Anima stores no private
+root key or copied custody record. Cookies, when present, contain only opaque
+server-issued session handles.
 
 ## 12. Storage model
 

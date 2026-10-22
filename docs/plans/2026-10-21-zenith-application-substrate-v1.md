@@ -26,6 +26,12 @@ Anima remains a replaceable HTML/TypeScript/Rust-WASM client. It does not own or
 embed Service Management, Process Runtime, Frank, provider credentials, local
 deployment, or canonical service state.
 
+Anima also does not traverse a local synchronization service by default. It calls
+the configured Service Management intake boundary directly. On a full local node,
+Zenith Transfer composes Castalia Wallet custody and may run a separate optional
+sync/mailbox sidecar. The sidecar reports synchronization state and handles only
+explicit replication or mailbox routes.
+
 The reviewed source chain now includes the workflow, Runtime handoff, Frank input
 hydration and artifact materialization. Production qualification still requires
 merging and releasing those exact sources, deploying the transport and authority,
@@ -229,23 +235,30 @@ Implementation sequence and acceptance:
    acknowledgement and unknown-outcome reconciliation behavior. The extracted
    core has explicit inbox, outbox, object and cursor ports without changing the
    qualified Queue or projection wire contracts.
-2. Treat browser and intermittent applications as clients, not peers. Qualify one
-   pull adapter through Matrix or another real message source, and one explicit
-   file/object mailbox adapter. A local folder is the smallest storage candidate;
-   Dropbox, Nostr and hosted storage remain replaceable options.
-3. Qualify direct Tailscale synchronization between two full local stacks for one
-   declared record family plus content-addressed objects. No arbitrary directory
-   mirroring or last-write-wins behavior.
+2. Treat browser and intermittent applications as clients, not peers. Qualify
+   Matrix as the first real message/mailbox adapter needed by Anima.
+3. Qualify a local folder as the first explicit file/object mailbox. Dropbox,
+   Nostr and hosted storage remain replaceable options.
 4. Require digest/owner/version/authority checks before local commit and advance
    a cursor or remove a mailbox item only after that durable commit.
-5. Add Zenith Transfer installation/configuration after standalone provider
-   delivery passes, then make Daycall consume the same contracts without
-   Anima-specific fields.
+5. Pause for an Anima MVP review after the Queue, released service path, Matrix
+   and local-folder paths pass. Direct Tailscale synchronization is not an Anima
+   MVP gate and is not constrained to an invented two-stack/one-record-family
+   qualification before a real application need selects its scope.
+6. After that review, continue with direct Tailscale synchronization, Zenith
+   Transfer installation/configuration, Daycall conformance and the remaining
+   replaceable adapters in priority order.
 
 The first slice does not mirror directories, merge arbitrary files, make browsers
 serve peer endpoints or require every client to join the tailnet. It synchronizes
 versioned records and content-addressed objects between full substrates and gives
 intermittent clients a pull/mailbox route to the same logical identities.
+
+This lane is not on the direct Anima request path. Anima submits to Service
+Management; an explicitly selected Queue, Matrix or file mailbox adds an adapter
+before the same admission boundary. On full local nodes, Zenith Transfer manages
+the optional sidecar and may project per-adapter `current`, `behind`,
+`unavailable` and `conflict` states without turning them into service progress.
 
 ## 5. Dependency graph
 
@@ -265,9 +278,11 @@ flowchart TD
     X[Enabled Frank actor] --> E
     E --> D[Artifacts and receipts returned]
     F --> D
-    D --> Z[Transport-neutral adapter port]
-    Z --> T[Tailscale full-stack peer sync]
-    Z --> B[Client message or file mailbox adapter]
+    D --> Z[Transport-neutral Queue adapter port]
+    Z --> Mx[Matrix adapter]
+    Mx --> LF[Local-folder mailbox]
+    LF --> V[Anima MVP review]
+    V -. later application need .-> T[Tailscale peer sync]
     D --> Y[Daycall conformance]
 ```
 
@@ -321,8 +336,10 @@ Current assessment: **not started on released artifacts**.
 ### Gate 6 — Reusable substrate
 
 - Clean installer reproduces the result.
-- Zenith Transfer adds the qualified installation/configuration path.
-- Tailscale synchronization and Daycall use the same protocol families.
+- Queue behavior is available through the transport-neutral boundary.
+- Matrix and local-folder adapters pass their bounded Anima acceptance profiles.
+- The team completes an Anima MVP review before selecting the next adapter or
+  direct-peer synchronization scope.
 
 Current assessment: **adapter boundary specified; implementations follow Gate 5**.
 
@@ -344,18 +361,19 @@ Current assessment: **adapter boundary specified; implementations follow Gate 5*
    receipts.
 7. Run authorized/denied, duplicate, offline, restart, unknown-outcome, digest and
    retrieval acceptance, then record exact evidence in Devgraph.
-8. Preserve separate direct-intake, mailbox-pull, secS Magik RPC and peer-sync
-   seams. Extract shared envelope/cursor/reconciliation code only where two proven
-   routes actually need it; do not require all submissions to traverse a sync
-   service.
-9. Qualify direct secS Magik RPC between two full local stacks separately from a
-   two-full-stack Tailscale synchronization path for one record family and
-   immutable objects. Tailscale reachability does not replace secS authorization.
-10. Add one client message adapter and one file/object mailbox only when a real
-    application requires them. WebDAV, Dropbox and arbitrary user connectors stay
-    optional exploration work rather than first-provider dependencies.
-11. Add Zenith Transfer installation and Daycall reuse after the direct/mailbox/RPC/
-    peer boundaries are proven.
+8. Extract the proven Queue behavior behind the transport-neutral boundary while
+   preserving the qualified Queue wire bytes and exact request identities.
+9. Qualify Matrix as Anima's first additional message/mailbox adapter, including
+   encrypted payload or locator handling, durable local commit, deduplication and
+   acknowledgement semantics. Matrix delivery never means Service admission.
+10. Qualify a local-folder mailbox for immutable manifests and content-addressed
+    objects with safe partial-write handling, quarantine and commit-before-remove.
+11. Pause for an Anima MVP review. Direct Tailscale synchronization, Zenith
+    Transfer installation, Daycall reuse, WebDAV, Dropbox, Nostr and hosted
+    storage remain sequenced follow-on work rather than MVP blockers.
+
+The prepared execution checklist for steps two through eleven is
+[Anima MVP provider delivery runbook](2026-10-22-anima-mvp-provider-delivery.md).
 
 The related exploration backlog is canonical in Devgraph:
 
