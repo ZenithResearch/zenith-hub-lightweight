@@ -14,7 +14,7 @@
     },
     "service-management": {
       "package": "service-management",
-      "source_commit": "838520dd679394157ae21517d654cde2124b6b0c",
+      "source_commit": "434f3cb04f8e494fb87317647fe5f2a6e5e41515",
       "version": "0.1.0",
       "wheel_sha256": "2dacf91f60e09401ba015d029178fabdc178f764ceb49e8c1205575df3e61f2a"
     }

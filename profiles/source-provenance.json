@@ -86,7 +86,7 @@
       },
       "service-management": {
         "package": "service-management",
-        "source_commit": "838520dd679394157ae21517d654cde2124b6b0c",
+        "source_commit": "434f3cb04f8e494fb87317647fe5f2a6e5e41515",
         "version": "0.1.0",
         "wheel_sha256": "2dacf91f60e09401ba015d029178fabdc178f764ceb49e8c1205575df3e61f2a"
       }
@@ -144,7 +144,7 @@
     "files": [
       {
         "path": "profiles/process-macos/release.workspace.v1.json",
-        "sha256": "e0b893b160e563804b11a84a7e23d8bf0f5993d699931894cd73db5b4bb772eb"
+        "sha256": "a7739193d3002ce01ec36b176dae0d3bd4c33d8e1460de0658f26b06341a6c9f"
       }
     ],
     "wheels": [
