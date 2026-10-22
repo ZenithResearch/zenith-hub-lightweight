@@ -29,6 +29,9 @@ class ProviderActivationTests(unittest.TestCase):
         self.root.mkdir(mode=0o700)
         for name in ("config", "data", "logs", "authority", "native"):
             (self.root / name).mkdir(mode=0o700)
+        private_file(self.root / "config/workspace-admission.json",
+                     {"schema": "runtime.new-run-admission.v1", "enabled": False,
+                      "composition_digest": "0" * 64})
         self.previous = self.root / "authority/COMPLETE.json"
         self.previous_raw = private_file(self.previous, {"receipt": "existing"})
         self.rows = [
@@ -228,6 +231,99 @@ class ProviderActivationTests(unittest.TestCase):
                     self.root, "workspace-provider-pull-once",
                     provider_config_sha256="d" * 64,
                 )
+        run.assert_not_called()
+
+    def test_provider_activation_preview_uses_only_the_retained_intake(self):
+        result = {"schema": "service.provider-worker-result.v1",
+                  "command": "activation-brand-package-once", "processed": 1,
+                  "results": [{"request_id": "req-1", "stage": "request_admitted",
+                               "activation": {"handoff_id": "a" * 64,
+                                              "run_id": "handoff-" + "a" * 48}}]}
+        with mock.patch.object(process_mac, "workspace_run", return_value=result) as run:
+            observed = process_mac.workspace_provider_worker(
+                self.root, "workspace-provider-activation-once")
+        self.assertEqual(observed, result)
+        argv = [str(value) for value in run.call_args.args[0]]
+        self.assertIn("--intake-database", argv)
+        self.assertNotIn("--service-database", argv)
+        self.assertNotIn("--runtime-endpoint", argv)
+
+    def test_provider_admission_open_is_reviewed_applied_and_idempotent(self):
+        receipt = {"scope": process_mac.WORKSPACE_PROVIDER_SCOPE,
+                   "plan_sha256": "f" * 64,
+                   "not_before": int(time.time()) - 5,
+                   "not_after": int(time.time()) + 3500,
+                   "identity_not_after": int(time.time()) + 86400}
+        private_file(self.root / "config/workspace-admission.json",
+                     {"schema": "runtime.new-run-admission.v1", "enabled": False,
+                      "composition_digest": "0" * 64})
+        with mock.patch.object(process_mac, "workspace_ready", return_value=receipt):
+            proposal = process_mac.workspace_prepare_provider_admission(self.root, True)
+
+            def apply(argv, root):
+                plan = json.loads((self.root / process_mac.WORKSPACE_PROVIDER_ADMISSION_PLAN).read_text())
+                raw = private_file(self.root / "config/workspace-admission.json", plan["policy"])
+                canonical = json.dumps(plan["policy"], sort_keys=True, separators=(",", ":")).encode()
+                return {"schema": "runtime.new-run-admission-result.v1",
+                        "data": {"policy_digest": hashlib.sha256(canonical).hexdigest(),
+                                 "enabled": True, "composition_digest": "f" * 64}}
+
+            with mock.patch.object(process_mac, "workspace_run", side_effect=apply) as run:
+                completed = process_mac.workspace_apply_provider_admission(
+                    self.root, proposal["plan_sha256"])
+                duplicate = process_mac.workspace_apply_provider_admission(
+                    self.root, proposal["plan_sha256"])
+        self.assertTrue(completed["enabled"])
+        self.assertFalse(completed["duplicate"])
+        self.assertTrue(duplicate["duplicate"])
+        self.assertEqual(run.call_count, 1)
+
+    def test_delivery_requires_open_admission_and_exact_receipt_handoff(self):
+        handoff_id = "a" * 64
+        runtime_receipt = {"scope": process_mac.WORKSPACE_PROVIDER_SCOPE,
+                           "plan_sha256": "f" * 64,
+                           "handoff_id": handoff_id,
+                           "run_id": "handoff-" + handoff_id[:48],
+                           "not_before": int(time.time()) - 5,
+                           "not_after": int(time.time()) + 3500,
+                           "identity_not_after": int(time.time()) + 86400,
+                           "configuration_hashes": {"wallet-command.json": "d" * 64}}
+        runtime_dir = self.root / "authority/renewals/2/config"
+        result = {"schema": "service.provider-worker-result.v1",
+                  "command": "deliver-handoff-once", "processed": 1,
+                  "results": [{"state": "started"}]}
+        admission = {"schema": "runtime.new-run-admission.v1", "enabled": True,
+                     "composition_digest": "f" * 64}
+        with mock.patch.object(process_mac, "workspace_ready", return_value=runtime_receipt), \
+                mock.patch.object(process_mac, "workspace_admission",
+                                  return_value=(admission, "e" * 64)), \
+                mock.patch.object(process_mac, "workspace_config_directory",
+                                  return_value=runtime_dir), \
+                mock.patch.object(process_mac, "owns_listener", return_value=True), \
+                mock.patch.object(process_mac, "config", return_value={"runtime_port": 8092}), \
+                mock.patch.object(process_mac, "workspace_run", return_value=result) as run:
+            observed = process_mac.workspace_provider_worker(
+                self.root, "workspace-provider-deliver-handoff-once")
+        self.assertEqual(observed, result)
+        argv = [str(value) for value in run.call_args.args[0]]
+        self.assertNotIn("--intake-database", argv)
+        self.assertEqual(argv[argv.index("--handoff-id") + 1], handoff_id)
+
+    def test_delivery_rejects_closed_runtime_admission_before_dispatch(self):
+        runtime_receipt = {"scope": process_mac.WORKSPACE_PROVIDER_SCOPE,
+                           "plan_sha256": "f" * 64, "handoff_id": "a" * 64,
+                           "not_before": int(time.time()) - 5,
+                           "not_after": int(time.time()) + 3500,
+                           "identity_not_after": int(time.time()) + 86400}
+        closed = {"schema": "runtime.new-run-admission.v1", "enabled": False,
+                  "composition_digest": "f" * 64}
+        with mock.patch.object(process_mac, "workspace_ready", return_value=runtime_receipt), \
+                mock.patch.object(process_mac, "workspace_admission",
+                                  return_value=(closed, "e" * 64)), \
+                mock.patch.object(process_mac, "workspace_run") as run:
+            with self.assertRaises(process_mac.InstallError):
+                process_mac.workspace_provider_worker(
+                    self.root, "workspace-provider-deliver-handoff-once")
         run.assert_not_called()
 
     def test_provider_admission_rejects_changed_policy_before_dispatch(self):

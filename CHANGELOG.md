@@ -9,6 +9,7 @@
 - One-item provider admission and brand-package lifecycle actions with fixed stores, native executable/configuration pins, reviewed requester-policy bytes and an exact process compilation — composes local work without adding a scheduler or remote queue.
 
 - One-item encrypted Queue pull composition using an optional release-pinned secS opener, a reviewed closed route, and an owner-private OIDC token file kept out of argv, environment and browser state.
+- Read-only deterministic activation preview, reviewed Runtime admission open/close transitions, and exact one-handoff delivery composition for the first provider path.
 
 - Fixed local review pilot actions with pinned configuration and persistent cleanup holds — makes reviewed operator actions visible without enabling an unqualified native bundle.
 

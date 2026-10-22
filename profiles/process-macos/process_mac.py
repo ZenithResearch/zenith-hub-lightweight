@@ -737,7 +737,10 @@ WORKSPACE_ACTIONS = {'workspace-status', 'workspace-prepare', 'workspace-setup',
                      'workspace-provider-service-setup', 'workspace-provider-admit-once',
                      'workspace-provider-pull-once',
                      'workspace-provider-resume-admission-once', 'workspace-provider-advance-once',
-                     'workspace-provider-resume-once'}
+                     'workspace-provider-resume-once', 'workspace-provider-activation-once',
+                     'workspace-provider-admission-open-prepare',
+                     'workspace-provider-admission-close-prepare', 'workspace-provider-admission-apply',
+                     'workspace-provider-deliver-handoff-once'}
 WORKSPACE_CONFIGS = {'command-authority.json', 'wallet-command.json',
                      'runtime-policy.json', 'runtime-receiver.json'}
 
@@ -792,6 +795,7 @@ WORKSPACE_RENEW_HOLD = 'logs/workspace-renewal.json'
 WORKSPACE_UPGRADE_HOLD = 'logs/workspace-software-upgrade.json'
 WORKSPACE_PROVIDER_SERVICE_PLAN = 'config/provider-service-plan.json'
 WORKSPACE_PROVIDER_SERVICE_SELECTION = 'config/provider-service-selection.json'
+WORKSPACE_PROVIDER_ADMISSION_PLAN = 'config/provider-admission-plan.json'
 WORKSPACE_PROVIDER_SCOPE = 'finite Frank Hermes pilot for one exact handoff, derived Run and Actor; authoring/catalog retained'
 PROVIDER_PROCESS_ID = 'zenith.anima.brand-package'
 PROVIDER_PROCESS_VERSION = 'zenith.anima.brand-package-v1'
@@ -935,6 +939,8 @@ def workspace_renewal_plan(root, selection):
 def workspace_prepare_renewal(root, expected=None, *, actor_id=None, run_id=None, handoff_id=None):
     require(not workspace_holds(root), 'Workspace renewal or cleanup must be reconciled')
     workspace_stopped(root)
+    require(not workspace_admission(root)[0]['enabled'],
+            'Close Runtime run admission before changing authority')
     receipt = workspace_ready(root)
     previous,pin = workspace_selected(root)
     previous_raw = bounded_private(previous)
@@ -1148,9 +1154,14 @@ def workspace_ready(root, *, own_renewal=False):
     require(closed_json(bounded_private(root/'config/frank-workspace.json')) == workspace_master(root, receipt),
             'Workspace client configuration differs from native setup')
     admission = closed_json(bounded_private(root/'config/workspace-admission.json'))
-    require(admission == {'schema': 'runtime.new-run-admission.v1', 'enabled': False,
-                          'composition_digest': receipt['plan_sha256']},
-            'Workspace authoring requires closed run admission')
+    require(type(admission) is dict and set(admission) == {'schema','enabled','composition_digest'}
+            and admission['schema'] == 'runtime.new-run-admission.v1'
+            and type(admission['enabled']) is bool
+            and type(admission['composition_digest']) is str
+            and re.fullmatch('[a-f0-9]{64}',admission['composition_digest'])
+            and admission['composition_digest'] == receipt['plan_sha256']
+            and (not admission['enabled'] or receipt.get('scope') == WORKSPACE_PROVIDER_SCOPE),
+            'Workspace run admission differs from the selected provider authority')
     return receipt
 
 
@@ -1352,6 +1363,90 @@ def workspace_permission(receipt):
     return result
 
 
+def workspace_admission(root):
+    value=closed_json(bounded_private(root/'config/workspace-admission.json',4096))
+    require(type(value) is dict and set(value) == {'schema','enabled','composition_digest'}
+            and value['schema'] == 'runtime.new-run-admission.v1'
+            and type(value['enabled']) is bool and type(value['composition_digest']) is str
+            and re.fullmatch('[a-f0-9]{64}',value['composition_digest']),
+            'Invalid Runtime admission policy')
+    raw=json.dumps(value,sort_keys=True,separators=(',',':'),allow_nan=False).encode()
+    return value,hashlib.sha256(raw).hexdigest()
+
+
+def workspace_prepare_provider_admission(root, enabled, expected=None):
+    require(type(enabled) is bool, 'Provider admission target must be explicit')
+    workspace_stopped(root)
+    receipt=workspace_ready(root)
+    require(receipt.get('scope') == WORKSPACE_PROVIDER_SCOPE,
+            'Exact provider Runtime authority is required')
+    if enabled:
+        require(workspace_permission(receipt)['state'] == 'active',
+                'Active exact provider Runtime authority is required')
+    current,current_digest=workspace_admission(root)
+    require(current['enabled'] != enabled, 'Runtime admission already has the requested state')
+    plan=root/WORKSPACE_PROVIDER_ADMISSION_PLAN
+    old=bounded_private(plan,4096) if plan.exists() else None
+    require(not plan.is_symlink() and (expected is None if old is None else
+            type(expected) is str and hashlib.sha256(old).hexdigest() == expected),
+            'Provider admission proposal changed after review')
+    value={'schema':'runtime.new-run-admission-apply.v1','expected_digest':current_digest,
+           'policy':{'schema':'runtime.new-run-admission.v1','enabled':enabled,
+                     'composition_digest':receipt['plan_sha256']}}
+    raw=workspace_bytes(value)
+    workspace_store(plan,raw,replace=old is not None)
+    return {'schema':'hub.workspace-provider-admission-proposal.v1',
+            'plan_sha256':hashlib.sha256(raw).hexdigest(),'enabled':enabled,
+            'composition_digest':receipt['plan_sha256'],'expected_policy_sha256':current_digest,
+            'provider_enabled':False}
+
+
+def workspace_apply_provider_admission(root, selection):
+    workspace_stopped(root)
+    receipt=workspace_ready(root)
+    raw=bounded_private(root/WORKSPACE_PROVIDER_ADMISSION_PLAN,4096)
+    require(type(selection) is str and re.fullmatch('[a-f0-9]{64}',selection)
+            and hashlib.sha256(raw).hexdigest() == selection,
+            'Provider admission proposal changed after review')
+    plan=closed_json(raw)
+    require(type(plan) is dict and set(plan) == {'schema','expected_digest','policy'}
+            and plan['schema'] == 'runtime.new-run-admission-apply.v1'
+            and type(plan['expected_digest']) is str and re.fullmatch('[a-f0-9]{64}',plan['expected_digest'])
+            and type(plan['policy']) is dict
+            and plan['policy'] == {'schema':'runtime.new-run-admission.v1',
+                                   'enabled':plan['policy'].get('enabled'),
+                                   'composition_digest':receipt['plan_sha256']}
+            and type(plan['policy']['enabled']) is bool
+            and receipt.get('scope') == WORKSPACE_PROVIDER_SCOPE,
+            'Invalid provider admission proposal')
+    if plan['policy']['enabled']:
+        require(workspace_permission(receipt)['state'] == 'active',
+                'Active exact provider Runtime authority is required')
+    current,current_digest=workspace_admission(root)
+    if current == plan['policy']:
+        return {'schema':'hub.workspace-provider-admission-complete.v1','duplicate':True,
+                'enabled':current['enabled'],'policy_sha256':current_digest,
+                'composition_digest':current['composition_digest'],'provider_enabled':False}
+    require(current_digest == plan['expected_digest'],
+            'Runtime admission policy changed after review')
+    result=workspace_run([root/'venv/bin/python','-I','-B','-m','process_runtime.admission','apply',
+                          '--policy',root/'config/workspace-admission.json',
+                          '--request-file',root/WORKSPACE_PROVIDER_ADMISSION_PLAN],root)
+    require(type(result) is dict and set(result) == {'schema','data'}
+            and result['schema'] == 'runtime.new-run-admission-result.v1'
+            and type(result['data']) is dict
+            and set(result['data']) == {'policy_digest','enabled','composition_digest'}
+            and result['data']['enabled'] == plan['policy']['enabled']
+            and result['data']['composition_digest'] == receipt['plan_sha256'],
+            'Runtime admission result differs from the reviewed proposal')
+    observed,observed_digest=workspace_admission(root)
+    require(observed == plan['policy'] and observed_digest == result['data']['policy_digest'],
+            'Runtime admission policy differs after apply')
+    return {'schema':'hub.workspace-provider-admission-complete.v1','duplicate':False,
+            'enabled':observed['enabled'],'policy_sha256':observed_digest,
+            'composition_digest':observed['composition_digest'],'provider_enabled':False}
+
+
 def workspace_provider_service_plan(root, selection):
     raw = bounded_private(root/WORKSPACE_PROVIDER_SERVICE_PLAN, 16384)
     require(type(selection) is str and re.fullmatch('[a-f0-9]{64}', selection)
@@ -1477,6 +1572,8 @@ def workspace_provider_service_status(root):
 def workspace_provider_worker(root, action, requester_policy_sha256=None, provider_config_sha256=None):
     commands = {
         'workspace-provider-pull-once':'pull-once',
+        'workspace-provider-activation-once':'activation-brand-package-once',
+        'workspace-provider-deliver-handoff-once':'deliver-handoff-once',
         'workspace-provider-admit-once':'admit-once',
         'workspace-provider-resume-admission-once':'resume-admission-once',
         'workspace-provider-advance-once':'advance-brand-package-once',
@@ -1486,14 +1583,18 @@ def workspace_provider_worker(root, action, requester_policy_sha256=None, provid
     require(not workspace_holds(root), 'Workspace transition or cleanup must be reconciled')
     rows={row['role']:row for row in native_rows(workspace_profile(root))}
     pull_actions={'workspace-provider-pull-once'}
+    preview_actions={'workspace-provider-activation-once'}
+    delivery_actions={'workspace-provider-deliver-handoff-once'}
     admission_actions={'workspace-provider-admit-once','workspace-provider-resume-admission-once'}
     lifecycle_actions={'workspace-provider-advance-once','workspace-provider-resume-once'}
     require((action in pull_actions and requester_policy_sha256 is None and provider_config_sha256 is not None)
             or (action in admission_actions and requester_policy_sha256 is not None and provider_config_sha256 is None)
-            or (action in lifecycle_actions and requester_policy_sha256 is None and provider_config_sha256 is None),
+            or (action in preview_actions | lifecycle_actions | delivery_actions
+                and requester_policy_sha256 is None and provider_config_sha256 is None),
             'Provider configuration pins differ from the selected worker action')
-    argv=[root/'venv/bin/python','-I','-B','-m','service_management.provider_worker',commands[action],
-          '--intake-database',root/'data/provider-intake.db']
+    argv=[root/'venv/bin/python','-I','-B','-m','service_management.provider_worker',commands[action]]
+    if action not in delivery_actions:
+        argv += ['--intake-database',root/'data/provider-intake.db']
     if action in pull_actions:
         row=rows.get('provider-intake-opener')
         require(row is not None, 'The installed release does not include the provider intake opener')
@@ -1519,7 +1620,7 @@ def workspace_provider_worker(root, action, requester_policy_sha256=None, provid
                  '--lease-seconds',str(value['lease_seconds']),
                  '--intake-opener',root/'native'/row['filename'],
                  '--intake-opener-sha256',row['sha256'],'--oidc-token-file',token]
-    else:
+    elif action in admission_actions | lifecycle_actions:
         service_status=workspace_provider_service_status(root)
         require(service_status['state'] == 'configured_native_unqualified'
                 and service_status['permission']['state'] == 'active',
@@ -1535,20 +1636,30 @@ def workspace_provider_worker(root, action, requester_policy_sha256=None, provid
           '--wallet-configuration',service_dir/'wallet-command.json',
           '--wallet-configuration-sha256',service_receipt['configuration_hashes']['wallet-command.json'],
           '--limit','1','--timeout','5']
-    if action in lifecycle_actions:
+    elif action in delivery_actions:
+        argv += ['--service-database',root/'data/service.db']
+    if action in lifecycle_actions | delivery_actions:
         runtime_receipt=workspace_ready(root)
         require(runtime_receipt.get('scope') == WORKSPACE_PROVIDER_SCOPE
                 and workspace_permission(runtime_receipt)['state'] == 'active',
                 'Active exact Actor/Run Runtime authority is required')
+        if action in delivery_actions:
+            admission,_=workspace_admission(root)
+            require(admission == {'schema':'runtime.new-run-admission.v1','enabled':True,
+                                  'composition_digest':runtime_receipt['plan_sha256']},
+                    'Runtime new-run admission must be explicitly open for this authority')
         runtime_dir=workspace_config_directory(root,runtime_receipt)
         require(owns_listener(root,'runtime'),'Start the exact workspace Runtime before lifecycle advancement')
         argv += ['--runtime-endpoint','http://127.0.0.1:'+str(config(root)['runtime_port']),
                  '--runtime-wallet-command',root/'native'/rows['wallet-command']['filename'],
                  '--runtime-wallet-command-sha256',rows['wallet-command']['sha256'],
                  '--runtime-wallet-configuration',runtime_dir/'wallet-command.json',
-                 '--runtime-wallet-configuration-sha256',runtime_receipt['configuration_hashes']['wallet-command.json'],
-                 '--process-id',PROVIDER_PROCESS_ID,'--process-version',PROVIDER_PROCESS_VERSION,
-                 '--compilation-hash',PROVIDER_PROCESS_COMPILATION]
+                 '--runtime-wallet-configuration-sha256',runtime_receipt['configuration_hashes']['wallet-command.json']]
+        if action in lifecycle_actions:
+            argv += ['--process-id',PROVIDER_PROCESS_ID,'--process-version',PROVIDER_PROCESS_VERSION,
+                     '--compilation-hash',PROVIDER_PROCESS_COMPILATION]
+        else:
+            argv += ['--handoff-id',runtime_receipt['handoff_id']]
     elif action in admission_actions:
         policy=root/'config/provider-requester-policy.json'
         require(type(requester_policy_sha256) is str and re.fullmatch('[a-f0-9]{64}',requester_policy_sha256)
@@ -1635,8 +1746,15 @@ def workspace_action(root, action, raw=None, expected=None, selection=None, *, a
         return workspace_prepare_provider_service(root,selection)
     if action == 'workspace-provider-service-setup':
         return workspace_provider_service_setup(root,selection)
+    if action == 'workspace-provider-admission-open-prepare':
+        return workspace_prepare_provider_admission(root,True,selection)
+    if action == 'workspace-provider-admission-close-prepare':
+        return workspace_prepare_provider_admission(root,False,selection)
+    if action == 'workspace-provider-admission-apply':
+        return workspace_apply_provider_admission(root,selection)
     if action in {'workspace-provider-pull-once','workspace-provider-admit-once','workspace-provider-resume-admission-once',
-                  'workspace-provider-advance-once','workspace-provider-resume-once'}:
+                  'workspace-provider-activation-once','workspace-provider-advance-once',
+                  'workspace-provider-resume-once','workspace-provider-deliver-handoff-once'}:
         return workspace_provider_worker(root,action,requester_policy_sha256,provider_config_sha256)
     if action == 'workspace-prepare':
         require(not any(launch_status(root, name) for name in COMPONENTS), 'Stop workspace before preparing setup')

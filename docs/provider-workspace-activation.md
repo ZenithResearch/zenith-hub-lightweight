@@ -57,12 +57,20 @@ Review the returned root, generation `1`, permission count `12`, finite window a
 
 The controller verifies the native `COMPLETE.json`, its three configuration digests and the exact first-generation scope before publishing `config/provider-service-selection.json`. If native creation completed but its response was lost, rerunning the same apply selects the retained exact receipt without invoking native creation again.
 
-## Review one Actor/Run Runtime authority
+## Preview and review one Actor/Run Runtime authority
 
-The successful approved Service lifecycle result supplies `activation.handoff_id`
-and `activation.run_id`. The Run must equal `handoff-` plus the first 48 hex
-characters of the 64-hex handoff ID. Do not invent or reuse either identity after
-an uncertain or terminal run.
+After admission, preview the exact future identity without mutating Service or
+Runtime and without issuing authority:
+
+```bash
+"$PYTHON" -I -S -B "$ROOT/control.py" workspace-provider-activation-once --root "$ROOT"
+```
+
+The result supplies `activation.handoff_id` and `activation.run_id`. The Run
+must equal `handoff-` plus the first 48 hex characters of the 64-hex handoff ID.
+Both are deterministically derived from the retained request's future Case and
+immutable plan revision. The later approved lifecycle result must match them.
+Do not invent or reuse either identity after an uncertain or terminal run.
 
 ```bash
 "$PYTHON" -I -S -B "$ROOT/control.py" workspace-provider-authority-prepare \
@@ -82,7 +90,7 @@ An interrupted native transition stays held. Use `workspace-provider-authority-r
 
 ## Run one bounded local worker action
 
-The source candidate composes the Service worker into four explicit, one-item
+The source candidate composes the Service worker into explicit, one-item
 actions. It does not add a scheduler or poll the remote queue. Admission uses the
 fixed local intake and Service databases plus an operator-reviewed requester
 policy. Supply the digest of those exact policy bytes:
@@ -98,9 +106,8 @@ If native admission has an unknown retained outcome, use
 `workspace-provider-resume-admission-once` with the same policy digest. Each
 action processes at most one retained intake row.
 
-After Service has retained the exact Case and Run identity, select finite Runtime
-authority for that Run, start the workspace Runtime, and advance one lifecycle
-command:
+After preview and authority selection, start the workspace Runtime and advance
+one lifecycle command:
 
 ```bash
 "$PYTHON" -I -S -B "$ROOT/control.py" workspace-provider-advance-once --root "$ROOT"
@@ -111,6 +118,39 @@ outcome. Lifecycle dispatch requires the active Service authority, the active
 exact Actor/Run Runtime authority, the controller-owned Runtime listener, and the
 fixed `zenith.anima.brand-package` process version and compilation digest. The
 requester-policy option is rejected for lifecycle actions.
+
+Lifecycle artifact writes occur while new-Run admission remains closed. Once
+the lifecycle returns `approved` with the same activation identity, stop the
+workspace, prepare and review the exact admission transition, then apply it:
+
+```bash
+"$PYTHON" -I -S -B "$ROOT/control.py" workspace-provider-admission-open-prepare --root "$ROOT"
+"$PYTHON" -I -S -B "$ROOT/control.py" workspace-provider-admission-apply \
+  --root "$ROOT" --selection-sha256 REVIEWED_ADMISSION_PLAN_SHA256
+```
+
+Start Runtime and deliver only the retained exact handoff selected by the live
+authority receipt:
+
+```bash
+"$PYTHON" -I -S -B "$ROOT/control.py" workspace-provider-deliver-handoff-once --root "$ROOT"
+```
+
+After Runtime acknowledges the handoff, stop the workspace and close admission.
+Because this replaces the retained admission proposal, the close preparation
+also pins the prior proposal bytes:
+
+```bash
+"$PYTHON" -I -S -B "$ROOT/control.py" workspace-provider-admission-close-prepare \
+  --root "$ROOT" --selection-sha256 PREVIOUS_ADMISSION_PLAN_SHA256
+"$PYTHON" -I -S -B "$ROOT/control.py" workspace-provider-admission-apply \
+  --root "$ROOT" --selection-sha256 REVIEWED_CLOSE_PLAN_SHA256
+```
+
+Admission opens only for the exact selected authority composition. Lifecycle
+does not require it; exact delivery does. The controller never derives a
+handoff from browser input and never scans forward by choosing a different
+pending outbox record.
 
 Remote Vercel Queue pull/opening, requester-policy publication, background
 supervision and public request/status delivery are still separate release and
