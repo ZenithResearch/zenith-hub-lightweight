@@ -179,6 +179,57 @@ class ProviderActivationTests(unittest.TestCase):
         self.assertEqual(argv[argv.index("--service-database") + 1], str(self.root / "data/service.db"))
         self.assertNotIn("--runtime-endpoint", argv)
 
+    def test_provider_pull_dispatches_one_item_with_fixed_route_and_private_token(self):
+        self.rows.append({
+            "role": "provider-intake-opener", "filename": "secs-provider-intake-v1",
+            "sha256": "e" * 64,
+        })
+        pull = private_file(
+            self.root / "config/provider-pull.json",
+            {"schema": "hub.provider-pull.v1", "region": "sfo1",
+             "topic": "zenith-intake-v1", "consumer_group": "zenith-provider-mac",
+             "lease_seconds": 300},
+        )
+        token = self.root / "config/provider-vercel-oidc-token"
+        token.write_text("header.payload.signature\n")
+        token.chmod(0o600)
+        result = {"schema": "service.provider-worker-result.v1", "command": "pull-once",
+                  "processed": 1, "results": [{"request_id": "req-1"}]}
+        with mock.patch.object(process_mac, "workspace_run", return_value=result) as run:
+            observed = process_mac.workspace_provider_worker(
+                self.root, "workspace-provider-pull-once",
+                provider_config_sha256=hashlib.sha256(pull).hexdigest(),
+            )
+        self.assertEqual(observed, result)
+        argv = [str(value) for value in run.call_args.args[0]]
+        self.assertEqual(argv[argv.index("--limit") + 1], "1")
+        self.assertEqual(argv[argv.index("--topic") + 1], "zenith-intake-v1")
+        self.assertEqual(argv[argv.index("--intake-opener-sha256") + 1], "e" * 64)
+        self.assertEqual(argv[argv.index("--oidc-token-file") + 1], str(token))
+        self.assertNotIn("header.payload.signature", argv)
+        self.assertNotIn("--service-database", argv)
+
+    def test_provider_pull_rejects_changed_configuration_before_dispatch(self):
+        self.rows.append({
+            "role": "provider-intake-opener", "filename": "secs-provider-intake-v1",
+            "sha256": "e" * 64,
+        })
+        private_file(
+            self.root / "config/provider-pull.json",
+            {"schema": "hub.provider-pull.v1", "region": "sfo1", "topic": "topic",
+             "consumer_group": "group", "lease_seconds": 300},
+        )
+        token = self.root / "config/provider-vercel-oidc-token"
+        token.write_text("header.payload.signature\n")
+        token.chmod(0o600)
+        with mock.patch.object(process_mac, "workspace_run") as run:
+            with self.assertRaises(process_mac.InstallError):
+                process_mac.workspace_provider_worker(
+                    self.root, "workspace-provider-pull-once",
+                    provider_config_sha256="d" * 64,
+                )
+        run.assert_not_called()
+
     def test_provider_admission_rejects_changed_policy_before_dispatch(self):
         private_file(
             self.root / "config/provider-requester-policy.json",

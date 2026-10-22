@@ -39,6 +39,7 @@ NATIVE_ROLES = {
 WORKSPACE_ROLES = {'wallet-command': 'castalia-wallet-service',
                    'owner-setup': 'castalia-wallet-workspace-setup',
                    'context-verifier': 'process-runtime-secs-check'}
+WORKSPACE_PROVIDER_ROLES = {'provider-intake-opener': 'secs-provider-intake-v1'}
 MAX_NATIVE_BYTES = 64 * 1024 * 1024
 
 
@@ -52,9 +53,12 @@ def native_rows(profile):
             and profile['schema'] == 'hub.process-macos-release.v2'
             and profile['native_profile'] in {'local-review-v1', 'workspace-v1'},
             'Unsupported Mac release profile')
-    roles = WORKSPACE_ROLES if profile['native_profile'] == 'workspace-v1' else NATIVE_ROLES
+    workspace = profile['native_profile'] == 'workspace-v1'
+    required = WORKSPACE_ROLES if workspace else NATIVE_ROLES
+    roles = required | (WORKSPACE_PROVIDER_ROLES if workspace else {})
     rows = profile['native']
-    require(type(rows) is list and len(rows) == len(roles),
+    require(type(rows) is list and (len(rows) == len(required)
+            or workspace and len(rows) == len(roles)),
             'Incomplete native payload closure')
     seen = set()
     for row in rows:
@@ -70,6 +74,8 @@ def native_rows(profile):
                 and type(row['source_commit']) is str and re.fullmatch('[a-f0-9]{40}', row['source_commit']),
                 'Invalid native payload pin')
         seen.add(role)
+    require(set(required) <= seen and (seen == set(required) or seen == set(roles)),
+            'Incomplete native payload closure')
     return rows
 
 
@@ -729,6 +735,7 @@ WORKSPACE_ACTIONS = {'workspace-status', 'workspace-prepare', 'workspace-setup',
                      'workspace-provider-authority-prepare', 'workspace-provider-authority',
                      'workspace-provider-authority-resume', 'workspace-provider-service-prepare',
                      'workspace-provider-service-setup', 'workspace-provider-admit-once',
+                     'workspace-provider-pull-once',
                      'workspace-provider-resume-admission-once', 'workspace-provider-advance-once',
                      'workspace-provider-resume-once'}
 WORKSPACE_CONFIGS = {'command-authority.json', 'wallet-command.json',
@@ -1467,8 +1474,9 @@ def workspace_provider_service_status(root):
             'permission':workspace_permission(receipt)}
 
 
-def workspace_provider_worker(root, action, requester_policy_sha256=None):
+def workspace_provider_worker(root, action, requester_policy_sha256=None, provider_config_sha256=None):
     commands = {
+        'workspace-provider-pull-once':'pull-once',
         'workspace-provider-admit-once':'admit-once',
         'workspace-provider-resume-admission-once':'resume-admission-once',
         'workspace-provider-advance-once':'advance-brand-package-once',
@@ -1476,20 +1484,49 @@ def workspace_provider_worker(root, action, requester_policy_sha256=None):
     }
     require(action in commands, 'Unsupported provider worker action')
     require(not workspace_holds(root), 'Workspace transition or cleanup must be reconciled')
-    service_status=workspace_provider_service_status(root)
-    require(service_status['state'] == 'configured_native_unqualified'
-            and service_status['permission']['state'] == 'active',
-            'Active finite provider Service authority is required')
-    service_receipt=workspace_provider_service_receipt(root)
-    service_dir=root/'authority/provider-service/1/config'
     rows={row['role']:row for row in native_rows(workspace_profile(root))}
+    pull_actions={'workspace-provider-pull-once'}
     admission_actions={'workspace-provider-admit-once','workspace-provider-resume-admission-once'}
     lifecycle_actions={'workspace-provider-advance-once','workspace-provider-resume-once'}
-    require((action in admission_actions and requester_policy_sha256 is not None)
-            or (action in lifecycle_actions and requester_policy_sha256 is None),
-            'Requester policy pin is accepted only for provider admission')
+    require((action in pull_actions and requester_policy_sha256 is None and provider_config_sha256 is not None)
+            or (action in admission_actions and requester_policy_sha256 is not None and provider_config_sha256 is None)
+            or (action in lifecycle_actions and requester_policy_sha256 is None and provider_config_sha256 is None),
+            'Provider configuration pins differ from the selected worker action')
     argv=[root/'venv/bin/python','-I','-B','-m','service_management.provider_worker',commands[action],
-          '--intake-database',root/'data/provider-intake.db','--service-database',root/'data/service.db',
+          '--intake-database',root/'data/provider-intake.db']
+    if action in pull_actions:
+        row=rows.get('provider-intake-opener')
+        require(row is not None, 'The installed release does not include the provider intake opener')
+        config_file=root/'config/provider-pull.json'
+        raw=bounded_private(config_file,16384)
+        require(type(provider_config_sha256) is str and re.fullmatch('[a-f0-9]{64}',provider_config_sha256)
+                and hashlib.sha256(raw).hexdigest() == provider_config_sha256,
+                'Exact reviewed provider pull configuration is required')
+        value=closed_json(raw)
+        require(type(value) is dict and set(value) == {'schema','region','topic','consumer_group','lease_seconds'}
+                and value['schema'] == 'hub.provider-pull.v1'
+                and type(value['region']) is str and re.fullmatch('[a-z0-9]+',value['region'])
+                and type(value['topic']) is str and re.fullmatch('[A-Za-z0-9_-]+',value['topic'])
+                and type(value['consumer_group']) is str and re.fullmatch('[A-Za-z0-9_-]+',value['consumer_group'])
+                and type(value['lease_seconds']) is int and 30 <= value['lease_seconds'] <= 3600,
+                'Invalid provider pull configuration')
+        token=root/'config/provider-vercel-oidc-token'
+        require(token.exists() and not token.is_symlink() and 0 < token.stat().st_size <= 16385,
+                'Owner-private provider transport credential is required')
+        private(token)
+        argv += ['--region',value['region'],'--topic',value['topic'],
+                 '--consumer-group',value['consumer_group'],'--limit','1',
+                 '--lease-seconds',str(value['lease_seconds']),
+                 '--intake-opener',root/'native'/row['filename'],
+                 '--intake-opener-sha256',row['sha256'],'--oidc-token-file',token]
+    else:
+        service_status=workspace_provider_service_status(root)
+        require(service_status['state'] == 'configured_native_unqualified'
+                and service_status['permission']['state'] == 'active',
+                'Active finite provider Service authority is required')
+        service_receipt=workspace_provider_service_receipt(root)
+        service_dir=root/'authority/provider-service/1/config'
+        argv += ['--service-database',root/'data/service.db',
           '--native-verifier',root/'native'/rows['context-verifier']['filename'],
           '--native-verifier-sha256',rows['context-verifier']['sha256'],
           '--receiver-policy',service_dir/'service-receiver.json',
@@ -1512,7 +1549,7 @@ def workspace_provider_worker(root, action, requester_policy_sha256=None):
                  '--runtime-wallet-configuration-sha256',runtime_receipt['configuration_hashes']['wallet-command.json'],
                  '--process-id',PROVIDER_PROCESS_ID,'--process-version',PROVIDER_PROCESS_VERSION,
                  '--compilation-hash',PROVIDER_PROCESS_COMPILATION]
-    else:
+    elif action in admission_actions:
         policy=root/'config/provider-requester-policy.json'
         require(type(requester_policy_sha256) is str and re.fullmatch('[a-f0-9]{64}',requester_policy_sha256)
                 and hashlib.sha256(bounded_private(policy,262144)).hexdigest() == requester_policy_sha256,
@@ -1574,7 +1611,7 @@ def workspace_report(root):
 
 
 def workspace_action(root, action, raw=None, expected=None, selection=None, *, actor_id=None, run_id=None,
-                     handoff_id=None, requester_policy_sha256=None):
+                     handoff_id=None, requester_policy_sha256=None, provider_config_sha256=None):
     installed(root)
     workspace_profile(root)
     if action == 'workspace-stop':
@@ -1598,9 +1635,9 @@ def workspace_action(root, action, raw=None, expected=None, selection=None, *, a
         return workspace_prepare_provider_service(root,selection)
     if action == 'workspace-provider-service-setup':
         return workspace_provider_service_setup(root,selection)
-    if action in {'workspace-provider-admit-once','workspace-provider-resume-admission-once',
+    if action in {'workspace-provider-pull-once','workspace-provider-admit-once','workspace-provider-resume-admission-once',
                   'workspace-provider-advance-once','workspace-provider-resume-once'}:
-        return workspace_provider_worker(root,action,requester_policy_sha256)
+        return workspace_provider_worker(root,action,requester_policy_sha256,provider_config_sha256)
     if action == 'workspace-prepare':
         require(not any(launch_status(root, name) for name in COMPONENTS), 'Stop workspace before preparing setup')
         return workspace_prepare_plan(root, selection)
@@ -1949,6 +1986,7 @@ def main():
     parser.add_argument('--run-id')
     parser.add_argument('--handoff-id')
     parser.add_argument('--provider-policy-sha256')
+    parser.add_argument('--provider-config-sha256')
     parser.add_argument('--component', choices=COMPONENTS)
     parser.add_argument('--route',choices=['live','ready'],default='live')
     parser.add_argument('--runtime-port', type=int, default=8092)
@@ -1988,10 +2026,14 @@ def main():
                     require(args.action in {'workspace-provider-admit-once','workspace-provider-resume-admission-once'}
                             or args.provider_policy_sha256 is None,
                             'Requester policy pin is accepted only for provider admission')
+                    require(args.action == 'workspace-provider-pull-once'
+                            or args.provider_config_sha256 is None,
+                            'Provider pull configuration pin is accepted only for provider pull')
                     result = workspace_action(root, args.action, request_raw, args.request_sha256,
                                               args.selection_sha256, actor_id=args.actor_id, run_id=args.run_id,
                                               handoff_id=args.handoff_id,
-                                              requester_policy_sha256=args.provider_policy_sha256)
+                                              requester_policy_sha256=args.provider_policy_sha256,
+                                              provider_config_sha256=args.provider_config_sha256)
                 elif args.action in PILOT_ACTIONS:
                     require(args.selection_sha256 is not None, 'Supply the reviewed pilot selection pin')
                     result = pilot_action(root, args.action, args.selection_sha256)

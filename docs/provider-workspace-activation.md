@@ -9,6 +9,35 @@ The generic Process Workspace remains the only root. Provider preparation is exp
 
 Neither action configures a queue, stores a Vercel credential, publishes a workflow, registers Frank, starts a service, enables Runtime admission or enables a provider. Those steps require the reviewed provider bundle and their own evidence.
 
+## Pull one encrypted request
+
+The provider-capable bundle may add one release-pinned
+`secs-provider-intake-v1` native role. The current published workspace bundle
+does not contain that role, so pull remains unavailable there. A candidate with
+the role can consume at most one delivery using a closed operator-owned route:
+
+```json
+{"consumer_group":"zenith-provider-mac","lease_seconds":300,"region":"sfo1","schema":"hub.provider-pull.v1","topic":"zenith-intake-v1"}
+```
+
+Store those exact bytes at `config/provider-pull.json` with mode `0600`, and
+store the Vercel OIDC token separately at
+`config/provider-vercel-oidc-token`, also with mode `0600`. The token is passed
+to Service Management by file path and read into the official SDK in memory;
+it is never placed in the browser request, argv or inherited environment.
+
+Review the public route digest, then run:
+
+```bash
+"$PYTHON" -I -S -B "$ROOT/control.py" workspace-provider-pull-once \
+  --root "$ROOT" --provider-config-sha256 EXACT_ROUTE_SHA256
+```
+
+The fixed command uses the installed opener digest, fixed intake database and a
+batch limit of one. Queue acknowledgement still happens only after durable
+local ingestion. Pulling does not create a ServiceRequest or Case and requires
+no Service or Runtime authority.
+
 ## Review and create Service authority
 
 ```bash
