@@ -6,7 +6,7 @@ The configured status distinguishes `active`, `not_yet_valid`, `expired` and `un
 
 ## Upgrade the stopped workspace software when required
 
-An older installation cannot gain the renewal command by editing its release pins. Use a reviewed new offline workspace bundle. The supported upgrade verifies the old installed inventory and permits changes only to the owner setup binary, Frank wheel and controller. Runtime, Service, all other wheels, Wallet command/verifier bytes and their original provenance must match. It preserves `data`, `authority` and `config`, and retains the previous software and release receipts under `software-upgrades/<id>/previous/`.
+An older installation cannot gain the renewal command by editing its release pins. Use a reviewed new offline workspace bundle. Ordinary workspace upgrades retain the narrow existing rule that permits only the reviewed Frank/controller successor. The explicit `workspace-provider-v1` transition instead requires the complete fixed six-role native closure and the same 15 base package identities plus the fixed eleven-package Vercel Queue closure, while allowing the exact release-pinned Wallet, verifier, secS, Runtime, Service and Frank bytes to advance together. It preserves `data`, `authority` and `config`, and retains the previous software and release receipts under `software-upgrades/<id>/previous/`.
 
 Set these values to the owner's exact bundle and manifest SHA256. Run from that bundle's controller using the same pinned Python 3.12 installation:
 

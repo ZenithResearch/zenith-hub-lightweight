@@ -47,6 +47,14 @@ Installation and liveness do not mean the environment can receive useful request
 Native authority, Matrix request intake, a qualified live provider and the first
 end-to-end workflow remain separate checkpoints.
 
+The unreleased `workspace-provider-v1` profile is the reviewed provider release
+candidate. It pins the exact Service Management, Process Runtime, Frank,
+Castalia Wallet and secS source heads and includes six native tools for Wallet
+command/setup, Runtime context verification, encrypted intake opening and
+connector-result setup/attestation. Its presence in source does not publish,
+install or activate those bytes; use the provider activation runbook only with
+the separately verified bundle digest.
+
 A hosted copy is a frontend only: local operations are disabled unless explicitly
 launched as the local operator on an Apple silicon Mac. Do not expose or proxy the
 operator server beyond loopback. No browser token, native key, command string,

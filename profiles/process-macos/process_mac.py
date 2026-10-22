@@ -21,14 +21,18 @@ import sys
 import time
 import tempfile
 import urllib.error
+import urllib.parse
 import urllib.request
 import venv
 import zipfile
 import uuid
 
-ROOT = Path(__file__).resolve().parents[1]
+PROFILE_ROOT = Path(__file__).resolve().parent
 DEFAULT = Path.home()/'Library/Application Support/Zenith/Process'
 COMPONENTS = {'runtime': 'process_runtime', 'service': 'service_management'}
+PROVIDER_PROJECTION = 'provider-projection'
+MANAGED_COMPONENTS = {*COMPONENTS, PROVIDER_PROJECTION}
+PROVIDER_PROJECTION_PORT = 8293
 # Packaging is not authority activation. These are fixed opt-in payload roles.
 NATIVE_ROLES = {
     'wallet-command': 'castalia-wallet-service',
@@ -39,6 +43,16 @@ NATIVE_ROLES = {
 WORKSPACE_ROLES = {'wallet-command': 'castalia-wallet-service',
                    'owner-setup': 'castalia-wallet-workspace-setup',
                    'context-verifier': 'process-runtime-secs-check'}
+WORKSPACE_LIVE_ROLES = {**WORKSPACE_ROLES,
+                        'result-attester': 'secs-frank-connector-result',
+                        'result-owner-setup': 'secs-frank-connector-result-setup'}
+WORKSPACE_PROVIDER_ROLES = {**WORKSPACE_LIVE_ROLES,
+                            'provider-intake-opener': 'secs-provider-intake-v1'}
+PROVIDER_QUEUE_PACKAGES = {'h2', 'hpack', 'httpcore2', 'httpx2', 'hyperframe',
+                           'python-multipart', 'truststore', 'vercel-headers',
+                           'vercel-internal-core', 'vercel-oidc', 'vercel-queue'}
+BASE_WHEEL_COUNT = 15
+PROVIDER_WHEEL_COUNT = BASE_WHEEL_COUNT + len(PROVIDER_QUEUE_PACKAGES)
 MAX_NATIVE_BYTES = 64 * 1024 * 1024
 
 
@@ -50,11 +64,16 @@ def native_rows(profile):
     require(set(profile) == {'schema', 'platform', 'machine', 'python', 'components',
                             'wheels', 'native_profile', 'native'}
             and profile['schema'] == 'hub.process-macos-release.v2'
-            and profile['native_profile'] in {'local-review-v1', 'workspace-v1'},
+            and profile['native_profile'] in {'local-review-v1', 'workspace-v1',
+                                              'workspace-live-provider-v1',
+                                              'workspace-provider-v1'},
             'Unsupported Mac release profile')
-    roles = WORKSPACE_ROLES if profile['native_profile'] == 'workspace-v1' else NATIVE_ROLES
+    required = ({'workspace-v1': WORKSPACE_ROLES,
+                 'workspace-live-provider-v1': WORKSPACE_LIVE_ROLES,
+                 'workspace-provider-v1': WORKSPACE_PROVIDER_ROLES}
+                .get(profile['native_profile'], NATIVE_ROLES))
     rows = profile['native']
-    require(type(rows) is list and len(rows) == len(roles),
+    require(type(rows) is list and len(rows) == len(required),
             'Incomplete native payload closure')
     seen = set()
     for row in rows:
@@ -62,14 +81,15 @@ def native_rows(profile):
                                                   'source_commit', 'mode'},
                 'Invalid native payload record')
         role = row['role']
-        require(type(role) is str and role in roles and role not in seen
-                and row['filename'] == roles[role]
+        require(type(role) is str and role in required and role not in seen
+                and row['filename'] == required[role]
                 and type(row['bytes']) is int and 0 < row['bytes'] <= MAX_NATIVE_BYTES
                 and type(row['mode']) is int and row['mode'] == 0o500
                 and type(row['sha256']) is str and re.fullmatch('[a-f0-9]{64}', row['sha256'])
                 and type(row['source_commit']) is str and re.fullmatch('[a-f0-9]{40}', row['source_commit']),
                 'Invalid native payload pin')
         seen.add(role)
+    require(seen == set(required), 'Incomplete native payload closure')
     return rows
 
 
@@ -178,7 +198,12 @@ def check_bundle(bundle, expected):
                 'Bundle content differs from release manifest')
     profile = load(bundle/'profile.json')
     native = native_rows(profile)
-    require(len(profile['wheels']) == 15 and len({r['name'] for r in profile['wheels']}) == 15,
+    wheel_names = {r['name'] for r in profile['wheels']}
+    expected_wheel_count = (PROVIDER_WHEEL_COUNT if profile.get('native_profile') == 'workspace-provider-v1'
+                            else BASE_WHEEL_COUNT)
+    require(len(profile['wheels']) == expected_wheel_count and len(wheel_names) == expected_wheel_count
+            and (profile.get('native_profile') != 'workspace-provider-v1'
+                 or PROVIDER_QUEUE_PACKAGES <= wheel_names),
             'Incomplete Mac dependency closure')
     expected_files = {'profile.json', 'process_mac.py'} | {'wheels/'+r['filename'] for r in profile['wheels']}
     expected_files |= {'native/'+r['filename'] for r in native}
@@ -195,9 +220,9 @@ def check_bundle(bundle, expected):
 def bundle(wheelhouse, destination, *, profile_name='installation', nativehouse=None):
     wheelhouse, destination = Path(wheelhouse).resolve(), Path(destination).absolute()
     require(profile_name in {'installation', 'local-review', 'workspace'}, 'Unsupported bundle profile')
-    profile = load(ROOT/'config'/('process-macos-release.v1.json' if profile_name == 'installation'
-                                 else 'process-macos-workspace-release.v1.json' if profile_name == 'workspace'
-                                 else 'process-macos-pilot-release.v1.json'))
+    profile = load(PROFILE_ROOT/('release.v1.json' if profile_name == 'installation'
+                                else 'release.workspace.v1.json' if profile_name == 'workspace'
+                                else 'release.local-review.v1.json'))
     require((profile_name == 'installation') == (profile.get('schema') == 'hub.process-macos-release.v1'),
             'Bundle profile selection differs from release')
     native = native_rows(profile)
@@ -244,7 +269,7 @@ exit 2
         launcher = launcher.replace('install --bundle', 'install --root "$HOME/Library/Application Support/Zenith/Process-Pilot" --runtime-port 8192 --service-port 8191 --bundle')
     (destination/'Install.command').write_text(launcher)
     (destination/'Install.command').chmod(0o700)
-    result = {'bundle': str(destination), 'bundle_sha256': digest, 'wheel_count': 15}
+    result = {'bundle': str(destination), 'bundle_sha256': digest, 'wheel_count': len(profile['wheels'])}
     if native:
         result['native_count'] = len(native)
     return result
@@ -311,7 +336,9 @@ def install(source, root, expected, runtime_port=8092, service_port=8091):
     require(not root.exists(), 'Installation already exists; data is never overwritten')
     require(type(runtime_port) is int and type(service_port) is int and runtime_port != service_port
             and all(1024 <= p <= 65535 for p in (runtime_port, service_port)), 'Invalid or duplicate ports')
-    mode = {'local-review-v1': 'local_review', 'workspace-v1': 'workspace'}.get(profile.get('native_profile'), 'installation_only')
+    mode = {'local-review-v1': 'local_review', 'workspace-v1': 'workspace',
+            'workspace-live-provider-v1': 'workspace',
+            'workspace-provider-v1': 'workspace'}.get(profile.get('native_profile'), 'installation_only')
     if mode == 'workspace':
         require(root.name == 'Process-Workspace' and runtime_port == 8292 and service_port == 8291,
                 'Workspace requires a separate Process-Workspace installation on ports 8292/8291')
@@ -378,7 +405,8 @@ def config(root):
                 and value['runtime_port'] == 8192 and value['service_port'] == 8191,
                 'Local-review mode requires its isolated pinned release and ports')
     if value['mode'] == 'workspace':
-        require(load(root/'profile.json').get('native_profile') == 'workspace-v1'
+        require(load(root/'profile.json').get('native_profile') in {
+                    'workspace-v1', 'workspace-live-provider-v1', 'workspace-provider-v1'}
                 and root.name == 'Process-Workspace' and value['runtime_port'] == 8292
                 and value['service_port'] == 8291, 'Workspace target differs from isolated release')
     frank = load(private(root/'config/frank.json'))
@@ -725,9 +753,28 @@ def pilot_action(root, action, expected):
 
 # Generic authoring has no SOP, run, executor or provider activation.
 WORKSPACE_ACTIONS = {'workspace-status', 'workspace-prepare', 'workspace-setup', 'workspace-start',
-                     'workspace-stop', 'workspace-command', 'workspace-renew-prepare', 'workspace-renew', 'workspace-renew-resume'}
+                     'workspace-stop', 'workspace-command', 'workspace-renew-prepare', 'workspace-renew', 'workspace-renew-resume',
+                     'workspace-provider-authority-prepare', 'workspace-provider-authority',
+                     'workspace-provider-authority-resume', 'workspace-provider-service-prepare',
+                     'workspace-provider-service-setup', 'workspace-provider-admit-once',
+                     'workspace-provider-pull-once',
+                     'workspace-provider-pull-references-once',
+                     'workspace-provider-resume-admission-once', 'workspace-provider-advance-once',
+                     'workspace-provider-resume-once', 'workspace-provider-activation-once',
+                     'workspace-provider-admission-open-prepare',
+                     'workspace-provider-admission-close-prepare', 'workspace-provider-admission-apply',
+                     'workspace-provider-deliver-handoff-once',
+                     'workspace-provider-frank-operation',
+                     'workspace-provider-review-operation',
+                     'workspace-provider-projection-start',
+                     'workspace-provider-projection-stop'}
 WORKSPACE_CONFIGS = {'command-authority.json', 'wallet-command.json',
                      'runtime-policy.json', 'runtime-receiver.json'}
+PROVIDER_FRANK_ACTOR = 'frank-hermes-pilot'
+PROVIDER_REVIEW_ACTOR = 'zenith-brand-reviewer'
+PROVIDER_FRANK_STEPS = {'qualify-intake', 'research-market', 'research-visual',
+                        'develop-strategy', 'develop-system', 'roundtable-review',
+                        'package-deliverables'}
 
 
 def workspace_profile(root):
@@ -778,6 +825,13 @@ WORKSPACE_SELECTION = 'config/workspace-native-selection.json'
 WORKSPACE_RENEW_PLAN = 'config/workspace-renewal-plan.json'
 WORKSPACE_RENEW_HOLD = 'logs/workspace-renewal.json'
 WORKSPACE_UPGRADE_HOLD = 'logs/workspace-software-upgrade.json'
+WORKSPACE_PROVIDER_SERVICE_PLAN = 'config/provider-service-plan.json'
+WORKSPACE_PROVIDER_SERVICE_SELECTION = 'config/provider-service-selection.json'
+WORKSPACE_PROVIDER_ADMISSION_PLAN = 'config/provider-admission-plan.json'
+WORKSPACE_PROVIDER_SCOPE = 'finite Frank Hermes pilot for one exact handoff, derived Run and Actor; authoring/catalog retained'
+PROVIDER_PROCESS_ID = 'zenith.anima.brand-package'
+PROVIDER_PROCESS_VERSION = 'zenith.anima.brand-package-v1'
+PROVIDER_PROCESS_COMPILATION = '1b4848c714775871a7b1cee4b04d73e43994e30838ec5a312ea10993d0b07ee2'
 
 
 def workspace_sync(directory):
@@ -888,9 +942,17 @@ def workspace_renewal_plan(root, selection):
     require(type(selection) is str and re.fullmatch('[a-f0-9]{64}',selection)
             and hashlib.sha256(raw).hexdigest() == selection, 'Workspace renewal plan changed after review')
     value = closed_json(raw)
-    require(type(value) is dict and set(value) == {'schema','workspace_root','previous_complete','not_before','not_after','wallet_command_sha256','verifier_sha256'}
-            and value['schema'] == 'castalia.wallet-workspace-renewal.v1' and value['workspace_root'] == str(root),
+    ordinary = {'schema','workspace_root','previous_complete','not_before','not_after','wallet_command_sha256','verifier_sha256'}
+    live = ordinary | {'actor_id','run_id','handoff_id'}
+    require(type(value) is dict and set(value) == (live if value.get('schema') == 'castalia.wallet-workspace-live-provider-authority.v1' else ordinary)
+            and value['schema'] in {'castalia.wallet-workspace-renewal.v1','castalia.wallet-workspace-live-provider-authority.v1'}
+            and value['workspace_root'] == str(root),
             'Invalid workspace renewal proposal')
+    if value['schema'] == 'castalia.wallet-workspace-live-provider-authority.v1':
+        require(type(value['actor_id']) is str and re.fullmatch('[a-zA-Z0-9._:-]{1,128}',value['actor_id'])
+                and type(value['handoff_id']) is str and re.fullmatch('[a-f0-9]{64}',value['handoff_id'])
+                and value['run_id'] == 'handoff-'+value['handoff_id'][:48],
+                'Invalid provider Actor, handoff or derived Run identity')
     previous = value['previous_complete']
     require(type(previous) is dict and set(previous) == {'path','sha256'}
             and type(previous['path']) is str and type(previous['sha256']) is str
@@ -906,9 +968,11 @@ def workspace_renewal_plan(root, selection):
     return raw,value
 
 
-def workspace_prepare_renewal(root, expected=None):
+def workspace_prepare_renewal(root, expected=None, *, actor_id=None, run_id=None, handoff_id=None):
     require(not workspace_holds(root), 'Workspace renewal or cleanup must be reconciled')
     workspace_stopped(root)
+    require(not workspace_admission(root)[0]['enabled'],
+            'Close Runtime run admission before changing authority')
     receipt = workspace_ready(root)
     previous,pin = workspace_selected(root)
     previous_raw = bounded_private(previous)
@@ -922,17 +986,24 @@ def workspace_prepare_renewal(root, expected=None):
     identity_end = receipt.get('identity_not_after',receipt.get('holder',{}).get('not_after'))
     require(type(identity_end) is int and end <= identity_end, 'Machine identity cannot cover the proposed permission window; identity is retained')
     rows={row['role']:row for row in native_rows(workspace_profile(root))}
-    value={'schema':'castalia.wallet-workspace-renewal.v1','workspace_root':str(root),
+    provider = actor_id is not None or run_id is not None or handoff_id is not None
+    require(not provider or (type(actor_id) is str and re.fullmatch('[a-zA-Z0-9._:-]{1,128}',actor_id)
+            and type(handoff_id) is str and re.fullmatch('[a-f0-9]{64}',handoff_id)
+            and run_id == 'handoff-'+handoff_id[:48]),
+            'Provider authority requires an exact Actor, handoff and derived Run')
+    value={'schema':'castalia.wallet-workspace-live-provider-authority.v1' if provider else 'castalia.wallet-workspace-renewal.v1','workspace_root':str(root),
            'previous_complete':{'path':str(previous),'sha256':hashlib.sha256(previous_raw).hexdigest()},
            'not_before':str(start),'not_after':str(end),
            'wallet_command_sha256':rows['wallet-command']['sha256'],'verifier_sha256':rows['context-verifier']['sha256']}
+    if provider:value.update(actor_id=actor_id,run_id=run_id,handoff_id=handoff_id)
     raw=workspace_bytes(value);workspace_store(plan,raw,replace=old is not None)
     return {'schema':'hub.workspace-renewal-proposal.v1','plan_sha256':hashlib.sha256(raw).hexdigest(),
             'not_before':value['not_before'],'not_after':value['not_after'],'identity_not_after':str(identity_end),
-            'same_identity':True,'authority_changed':False}
+            'same_identity':True,'authority_changed':provider,
+            **({'actor_id':actor_id,'run_id':run_id,'handoff_id':handoff_id,'permission_count':23} if provider else {})}
 
 
-def workspace_renewal_identity(old,new):
+def workspace_renewal_identity(old,new,plan):
     immutable=['schema','store_id','subject_id','purpose','application','key_generation','key_id','public_key_hex','public_key_sha256','created_at','key_created_at','not_before','not_after','state','revoked_at']
     a,b=old.get('holder'),new.get('holder')
     require(type(a) is dict and type(b) is dict and all(k in a and k in b and a[k] == b[k] for k in immutable)
@@ -940,8 +1011,14 @@ def workspace_renewal_identity(old,new):
             and b.get('state_revision') == a['state_revision']+1
             and new.get('command_issuer') == old.get('command_issuer')
             and new.get('identity_not_after',b.get('not_after')) == old.get('identity_not_after',a.get('not_after'))
-            and new.get('journal_capacity') == old.get('journal_capacity')
-            and new.get('scope') == old.get('scope'), 'Renewal changed identity, issuer, scope or capacity')
+            and new.get('journal_capacity') == old.get('journal_capacity'), 'Renewal changed identity, issuer or capacity')
+    if plan['schema'] == 'castalia.wallet-workspace-live-provider-authority.v1':
+        require(new.get('scope') == WORKSPACE_PROVIDER_SCOPE
+                and new.get('actor_id') == plan['actor_id'] and new.get('run_id') == plan['run_id']
+                and new.get('handoff_id') == plan['handoff_id'],
+                'Provider renewal changed the exact Actor, handoff, derived Run or fixed scope')
+    else:
+        require(new.get('scope') == old.get('scope'), 'Renewal changed authority scope')
 
 
 def workspace_frank(root, action, master, pin, input_path=None, input_pin=None):
@@ -1024,7 +1101,7 @@ def workspace_renew(root, selection, *, resume=False):
         require(new.get('native_generation') == generation and new.get('plan_sha256') == selection
                 and new.get('previous_complete') == plan['previous_complete']
                 and new.get('not_before') == int(plan['not_before']) and new.get('not_after') == int(plan['not_after']), 'Native renewal binding changed')
-        workspace_renewal_identity(old,new)
+        workspace_renewal_identity(old,new,plan)
         workspace_receipt(root,old_path,plan['previous_complete']['sha256'])
         workspace_store(operation_dir/'native-result.json',workspace_bytes(output))
         next_master=workspace_bytes(workspace_master(root,new))
@@ -1109,9 +1186,14 @@ def workspace_ready(root, *, own_renewal=False):
     require(closed_json(bounded_private(root/'config/frank-workspace.json')) == workspace_master(root, receipt),
             'Workspace client configuration differs from native setup')
     admission = closed_json(bounded_private(root/'config/workspace-admission.json'))
-    require(admission == {'schema': 'runtime.new-run-admission.v1', 'enabled': False,
-                          'composition_digest': receipt['plan_sha256']},
-            'Workspace authoring requires closed run admission')
+    require(type(admission) is dict and set(admission) == {'schema','enabled','composition_digest'}
+            and admission['schema'] == 'runtime.new-run-admission.v1'
+            and type(admission['enabled']) is bool
+            and type(admission['composition_digest']) is str
+            and re.fullmatch('[a-f0-9]{64}',admission['composition_digest'])
+            and admission['composition_digest'] == receipt['plan_sha256']
+            and (not admission['enabled'] or receipt.get('scope') == WORKSPACE_PROVIDER_SCOPE),
+            'Workspace run admission differs from the selected provider authority')
     return receipt
 
 
@@ -1182,21 +1264,50 @@ def workspace_run(argv, root, *, native_renewal=False):
 
 
 def workspace_upgrade_policy(old,new):
-    require(old.get('native_profile') == new.get('native_profile') == 'workspace-v1'
+    profiles = (old.get('native_profile'), new.get('native_profile'))
+    require(profiles in {('workspace-v1', 'workspace-v1'),
+                         ('workspace-v1', 'workspace-live-provider-v1'),
+                         ('workspace-live-provider-v1', 'workspace-live-provider-v1'),
+                         ('workspace-v1', 'workspace-provider-v1'),
+                         ('workspace-live-provider-v1', 'workspace-provider-v1'),
+                         ('workspace-provider-v1', 'workspace-provider-v1')}
             and all(old.get(k) == new.get(k) for k in ['schema','platform','machine','python']),
             'Software upgrade requires the same isolated workspace release profile')
     a,b={r['role']:r for r in native_rows(old)},{r['role']:r for r in native_rows(new)}
-    require(all(a[k] == b[k] for k in ['wallet-command','context-verifier']),
-            'Software upgrade cannot change Wallet command or verifier bytes or provenance')
+    if profiles[1] == 'workspace-provider-v1':
+        require(set(b) == set(WORKSPACE_PROVIDER_ROLES)
+                and set(a).issubset(set(b))
+                and all(a[k]['filename'] == b[k]['filename'] for k in a),
+                'Provider upgrade requires the complete fixed native role closure')
+    else:
+        protected = (WORKSPACE_LIVE_ROLES if profiles[0] == 'workspace-live-provider-v1'
+                     else WORKSPACE_ROLES)
+        require(set(protected).issubset(a) and set(protected).issubset(b)
+                and all(a[k] == b[k] for k in protected),
+                'Software upgrade cannot change protected native bytes or provenance')
     a,b={r['name']:r for r in old['wheels']},{r['name']:r for r in new['wheels']}
-    require(set(a) == set(b) and len(a) == 15 and 'frank-executor' in a
-            and all(a[k] == b[k] for k in a if k != 'frank-executor'),
-            'Software upgrade can change only the Frank wheel')
+    if profiles[1] == 'workspace-provider-v1':
+        require(len(b) == PROVIDER_WHEEL_COUNT
+                and PROVIDER_QUEUE_PACKAGES <= set(b)
+                and (set(a) == set(b)
+                     or (len(a) == BASE_WHEEL_COUNT and set(b) == set(a) | PROVIDER_QUEUE_PACKAGES))
+                and {'frank-executor','process-runtime','service-management'} <= set(a),
+                'Provider upgrade requires the fixed Queue dependency closure')
+    else:
+        require(set(a) == set(b) and len(a) == BASE_WHEEL_COUNT
+                and {'frank-executor','process-runtime','service-management'} <= set(a),
+                'Software upgrade requires the fixed dependency closure')
+    if profiles[1] != 'workspace-provider-v1':
+        require(all(a[k] == b[k] for k in a if k != 'frank-executor'),
+                'Software upgrade can change only the Frank wheel')
     a,b=old.get('components'),new.get('components')
-    require(type(a) is dict and type(b) is dict and set(a) == set(b) and 'frank' in a
-            and all(a[k] == b[k] for k in a if k != 'frank')
-            and a['frank'].get('package') == b['frank'].get('package') == 'frank-executor',
-            'Software upgrade cannot change Runtime, Service or component closure')
+    require(type(a) is dict and type(b) is dict and set(a) == set(b)
+            and set(a) == {'frank','process-runtime','service-management'}
+            and all(a[k].get('package') == b[k].get('package') for k in a),
+            'Software upgrade cannot change component identities')
+    if profiles[1] != 'workspace-provider-v1':
+        require(all(a[k] == b[k] for k in a if k != 'frank'),
+                'Software upgrade cannot change Runtime or Service closure')
 
 
 def workspace_software_upgrade(source,root,expected):
@@ -1313,6 +1424,532 @@ def workspace_permission(receipt):
     return result
 
 
+def workspace_admission(root):
+    value=closed_json(bounded_private(root/'config/workspace-admission.json',4096))
+    require(type(value) is dict and set(value) == {'schema','enabled','composition_digest'}
+            and value['schema'] == 'runtime.new-run-admission.v1'
+            and type(value['enabled']) is bool and type(value['composition_digest']) is str
+            and re.fullmatch('[a-f0-9]{64}',value['composition_digest']),
+            'Invalid Runtime admission policy')
+    raw=json.dumps(value,sort_keys=True,separators=(',',':'),allow_nan=False).encode()
+    return value,hashlib.sha256(raw).hexdigest()
+
+
+def workspace_prepare_provider_admission(root, enabled, expected=None):
+    require(type(enabled) is bool, 'Provider admission target must be explicit')
+    workspace_stopped(root)
+    receipt=workspace_ready(root)
+    require(receipt.get('scope') == WORKSPACE_PROVIDER_SCOPE,
+            'Exact provider Runtime authority is required')
+    if enabled:
+        require(workspace_permission(receipt)['state'] == 'active',
+                'Active exact provider Runtime authority is required')
+    current,current_digest=workspace_admission(root)
+    require(current['enabled'] != enabled, 'Runtime admission already has the requested state')
+    plan=root/WORKSPACE_PROVIDER_ADMISSION_PLAN
+    old=bounded_private(plan,4096) if plan.exists() else None
+    require(not plan.is_symlink() and (expected is None if old is None else
+            type(expected) is str and hashlib.sha256(old).hexdigest() == expected),
+            'Provider admission proposal changed after review')
+    value={'schema':'runtime.new-run-admission-apply.v1','expected_digest':current_digest,
+           'policy':{'schema':'runtime.new-run-admission.v1','enabled':enabled,
+                     'composition_digest':receipt['plan_sha256']}}
+    raw=workspace_bytes(value)
+    workspace_store(plan,raw,replace=old is not None)
+    return {'schema':'hub.workspace-provider-admission-proposal.v1',
+            'plan_sha256':hashlib.sha256(raw).hexdigest(),'enabled':enabled,
+            'composition_digest':receipt['plan_sha256'],'expected_policy_sha256':current_digest,
+            'provider_enabled':False}
+
+
+def workspace_apply_provider_admission(root, selection):
+    workspace_stopped(root)
+    receipt=workspace_ready(root)
+    raw=bounded_private(root/WORKSPACE_PROVIDER_ADMISSION_PLAN,4096)
+    require(type(selection) is str and re.fullmatch('[a-f0-9]{64}',selection)
+            and hashlib.sha256(raw).hexdigest() == selection,
+            'Provider admission proposal changed after review')
+    plan=closed_json(raw)
+    require(type(plan) is dict and set(plan) == {'schema','expected_digest','policy'}
+            and plan['schema'] == 'runtime.new-run-admission-apply.v1'
+            and type(plan['expected_digest']) is str and re.fullmatch('[a-f0-9]{64}',plan['expected_digest'])
+            and type(plan['policy']) is dict
+            and plan['policy'] == {'schema':'runtime.new-run-admission.v1',
+                                   'enabled':plan['policy'].get('enabled'),
+                                   'composition_digest':receipt['plan_sha256']}
+            and type(plan['policy']['enabled']) is bool
+            and receipt.get('scope') == WORKSPACE_PROVIDER_SCOPE,
+            'Invalid provider admission proposal')
+    if plan['policy']['enabled']:
+        require(workspace_permission(receipt)['state'] == 'active',
+                'Active exact provider Runtime authority is required')
+    current,current_digest=workspace_admission(root)
+    if current == plan['policy']:
+        return {'schema':'hub.workspace-provider-admission-complete.v1','duplicate':True,
+                'enabled':current['enabled'],'policy_sha256':current_digest,
+                'composition_digest':current['composition_digest'],'provider_enabled':False}
+    require(current_digest == plan['expected_digest'],
+            'Runtime admission policy changed after review')
+    result=workspace_run([root/'venv/bin/python','-I','-B','-m','process_runtime.admission','apply',
+                          '--policy',root/'config/workspace-admission.json',
+                          '--request-file',root/WORKSPACE_PROVIDER_ADMISSION_PLAN],root)
+    require(type(result) is dict and set(result) == {'schema','data'}
+            and result['schema'] == 'runtime.new-run-admission-result.v1'
+            and type(result['data']) is dict
+            and set(result['data']) == {'policy_digest','enabled','composition_digest'}
+            and result['data']['enabled'] == plan['policy']['enabled']
+            and result['data']['composition_digest'] == receipt['plan_sha256'],
+            'Runtime admission result differs from the reviewed proposal')
+    observed,observed_digest=workspace_admission(root)
+    require(observed == plan['policy'] and observed_digest == result['data']['policy_digest'],
+            'Runtime admission policy differs after apply')
+    return {'schema':'hub.workspace-provider-admission-complete.v1','duplicate':False,
+            'enabled':observed['enabled'],'policy_sha256':observed_digest,
+            'composition_digest':observed['composition_digest'],'provider_enabled':False}
+
+
+def workspace_provider_service_plan(root, selection):
+    raw = bounded_private(root/WORKSPACE_PROVIDER_SERVICE_PLAN, 16384)
+    require(type(selection) is str and re.fullmatch('[a-f0-9]{64}', selection)
+            and hashlib.sha256(raw).hexdigest() == selection,
+            'Provider Service plan changed after review')
+    value = closed_json(raw)
+    fields = {'schema','workspace_root','generation','not_before','not_after',
+              'wallet_command_sha256','verifier_sha256'}
+    require(type(value) is dict and set(value) == fields
+            and value['schema'] == 'castalia.wallet-provider-service-authority.v1'
+            and value['workspace_root'] == str(root) and value['generation'] == '1',
+            'Invalid first provider Service plan')
+    for key in ('not_before','not_after'):
+        require(type(value[key]) is str and re.fullmatch('[1-9][0-9]{0,15}',value[key])
+                and int(value[key]) <= 9007199254740991, 'Invalid provider Service authority time')
+    require(int(value['not_before']) < int(value['not_after'])
+            and int(value['not_after'])-int(value['not_before']) <= 3600,
+            'Provider Service authority exceeds one hour')
+    rows = {row['role']: row for row in native_rows(workspace_profile(root))}
+    require(value['wallet_command_sha256'] == rows['wallet-command']['sha256']
+            and value['verifier_sha256'] == rows['context-verifier']['sha256'],
+            'Provider Service executable pins changed')
+    return raw,value
+
+
+def workspace_prepare_provider_service(root, expected=None):
+    require(not workspace_holds(root), 'Workspace transition or cleanup must be reconciled')
+    workspace_stopped(root);workspace_ready(root)
+    selection = root/WORKSPACE_PROVIDER_SERVICE_SELECTION
+    require(not selection.exists() and not selection.is_symlink(),
+            'The first provider Service authority is already selected')
+    base = root/'authority/provider-service/1'
+    require(not base.exists() and not base.is_symlink(),
+            'Partial provider Service authority is retained for recovery')
+    plan = root/WORKSPACE_PROVIDER_SERVICE_PLAN
+    old = bounded_private(plan,16384) if plan.exists() or plan.is_symlink() else None
+    require((hashlib.sha256(old).hexdigest() if old is not None else None) == expected,
+            'Provider Service proposal changed after review')
+    if old is not None:
+        workspace_store(root/'config'/('provider-service-proposal-history-'+expected+'.json'),old)
+    at=int(time.time());rows={row['role']:row for row in native_rows(workspace_profile(root))}
+    value={'schema':'castalia.wallet-provider-service-authority.v1','workspace_root':str(root),
+           'generation':'1','not_before':str(at-5),'not_after':str(at+3590),
+           'wallet_command_sha256':rows['wallet-command']['sha256'],
+           'verifier_sha256':rows['context-verifier']['sha256']}
+    raw=workspace_bytes(value);workspace_store(plan,raw,replace=old is not None)
+    return {'schema':'hub.workspace-provider-service-proposal.v1',
+            'plan_sha256':hashlib.sha256(raw).hexdigest(),'generation':'1',
+            'not_before':value['not_before'],'not_after':value['not_after'],
+            'permission_count':12,'authority_created':False,'provider_enabled':False}
+
+
+def workspace_provider_service_receipt(root, expected=None):
+    path=root/'authority/provider-service/1/COMPLETE.json';raw=bounded_private(path)
+    require(expected is None or hashlib.sha256(raw).hexdigest() == expected,
+            'Selected provider Service receipt changed')
+    receipt=closed_json(raw)
+    require(type(receipt) is dict
+            and receipt.get('schema') == 'castalia.wallet-provider-service-authority-complete.v1'
+            and receipt.get('root') == str(root) and receipt.get('generation') == 1
+            and receipt.get('activation') is False and receipt.get('service_started') is False
+            and receipt.get('scope') == 'finite local provider lifecycle authority in one isolated Service Management store'
+            and set(receipt.get('configuration_hashes',{})) == {'command-authority.json','wallet-command.json','service-receiver.json'},
+            'Provider Service receipt differs from the fixed authority profile')
+    plan_raw=bounded_private(root/WORKSPACE_PROVIDER_SERVICE_PLAN,16384)
+    require(receipt.get('plan_sha256') == hashlib.sha256(plan_raw).hexdigest(),
+            'Provider Service receipt differs from the reviewed plan')
+    config_dir=path.parent/'config'
+    for name,digest in receipt['configuration_hashes'].items():
+        require(type(digest) is str and re.fullmatch('[a-f0-9]{64}',digest)
+                and hashlib.sha256(bounded_private(config_dir/name)).hexdigest() == digest,
+                'Provider Service configuration changed')
+    return receipt
+
+
+def workspace_provider_service_setup(root, selection):
+    workspace_stopped(root);workspace_ready(root)
+    raw,plan=workspace_provider_service_plan(root,selection)
+    selected=root/WORKSPACE_PROVIDER_SERVICE_SELECTION
+    if selected.exists() or selected.is_symlink():
+        value=closed_json(bounded_private(selected,4096))
+        require(type(value) is dict and set(value) == {'schema','generation','complete_sha256'}
+                and value['schema'] == 'hub.workspace-provider-service-selection.v1'
+                and value['generation'] == 1,'Invalid provider Service selection')
+        receipt=workspace_provider_service_receipt(root,value['complete_sha256'])
+        return {'schema':'hub.workspace-provider-service-complete.v1','duplicate':True,
+                'plan_sha256':selection,'complete_sha256':value['complete_sha256'],
+                'generation':1,'provider_enabled':False,'receipt':receipt['schema']}
+    complete=root/'authority/provider-service/1/COMPLETE.json'
+    base=complete.parent
+    require(not base.exists() or complete.is_file(),
+            'Partial provider Service authority is retained; do not replay native creation')
+    if not complete.exists() and not complete.is_symlink():
+        output=workspace_run([root/'native/castalia-wallet-workspace-setup','create-provider-service',
+                              '--plan',root/WORKSPACE_PROVIDER_SERVICE_PLAN,'--plan-sha256',selection],root)
+        require(type(output) is dict
+                and output == {'schema':'castalia.wallet-provider-service-authority-output.v1',
+                               'status':'configured_not_activated','root':str(root),'generation':1},
+                'Provider Service native output differs from the reviewed plan')
+    receipt=workspace_provider_service_receipt(root)
+    pin=hashlib.sha256(bounded_private(complete)).hexdigest()
+    workspace_store(selected,workspace_bytes({'schema':'hub.workspace-provider-service-selection.v1',
+                    'generation':1,'complete_sha256':pin}))
+    return {'schema':'hub.workspace-provider-service-complete.v1','duplicate':False,
+            'plan_sha256':selection,'complete_sha256':pin,'generation':1,
+            'provider_enabled':False,'receipt':receipt['schema']}
+
+
+def workspace_provider_service_status(root):
+    selected=root/WORKSPACE_PROVIDER_SERVICE_SELECTION
+    if not selected.exists() and not selected.is_symlink():
+        return {'state':'proposal_ready' if (root/WORKSPACE_PROVIDER_SERVICE_PLAN).exists() else 'absent',
+                'generation':None,'permission':None}
+    value=closed_json(bounded_private(selected,4096))
+    require(type(value) is dict and set(value) == {'schema','generation','complete_sha256'}
+            and value['schema'] == 'hub.workspace-provider-service-selection.v1'
+            and value['generation'] == 1,'Invalid provider Service selection')
+    receipt=workspace_provider_service_receipt(root,value['complete_sha256'])
+    return {'state':'configured_native_unqualified','generation':1,
+            'permission':workspace_permission(receipt)}
+
+
+def workspace_provider_worker(root, action, requester_policy_sha256=None, provider_config_sha256=None):
+    commands = {
+        'workspace-provider-pull-once':'pull-once',
+        'workspace-provider-pull-references-once':'pull-references-once',
+        'workspace-provider-activation-once':'activation-brand-package-once',
+        'workspace-provider-deliver-handoff-once':'deliver-handoff-once',
+        'workspace-provider-admit-once':'admit-once',
+        'workspace-provider-resume-admission-once':'resume-admission-once',
+        'workspace-provider-advance-once':'advance-brand-package-once',
+        'workspace-provider-resume-once':'resume-brand-package-once',
+    }
+    require(action in commands, 'Unsupported provider worker action')
+    require(not workspace_holds(root), 'Workspace transition or cleanup must be reconciled')
+    rows={row['role']:row for row in native_rows(workspace_profile(root))}
+    pull_actions={'workspace-provider-pull-once','workspace-provider-pull-references-once'}
+    preview_actions={'workspace-provider-activation-once'}
+    delivery_actions={'workspace-provider-deliver-handoff-once'}
+    admission_actions={'workspace-provider-admit-once','workspace-provider-resume-admission-once'}
+    lifecycle_actions={'workspace-provider-advance-once','workspace-provider-resume-once'}
+    require((action in pull_actions and requester_policy_sha256 is None and provider_config_sha256 is not None)
+            or (action in admission_actions and requester_policy_sha256 is not None and provider_config_sha256 is None)
+            or (action in preview_actions | lifecycle_actions | delivery_actions
+                and requester_policy_sha256 is None and provider_config_sha256 is None),
+            'Provider configuration pins differ from the selected worker action')
+    argv=[root/'venv/bin/python','-I','-B','-m','service_management.provider_worker',commands[action]]
+    if action not in delivery_actions:
+        argv += ['--intake-database',root/'data/provider-intake.db']
+    if action in pull_actions:
+        row=rows.get('provider-intake-opener')
+        require(row is not None, 'The installed release does not include the provider intake opener')
+        config_file=root/'config'/('provider-reference-pull.json'
+                                   if action == 'workspace-provider-pull-references-once'
+                                   else 'provider-pull.json')
+        raw=bounded_private(config_file,16384)
+        require(type(provider_config_sha256) is str and re.fullmatch('[a-f0-9]{64}',provider_config_sha256)
+                and hashlib.sha256(raw).hexdigest() == provider_config_sha256,
+                'Exact reviewed provider pull configuration is required')
+        value=closed_json(raw)
+        require(type(value) is dict and set(value) == {'schema','region','topic','consumer_group','lease_seconds'}
+                and value['schema'] == 'hub.provider-pull.v1'
+                and type(value['region']) is str and re.fullmatch('[a-z0-9]+',value['region'])
+                and type(value['topic']) is str and re.fullmatch('[A-Za-z0-9_-]+',value['topic'])
+                and type(value['consumer_group']) is str and re.fullmatch('[A-Za-z0-9_-]+',value['consumer_group'])
+                and type(value['lease_seconds']) is int and 30 <= value['lease_seconds'] <= 3600,
+                'Invalid provider pull configuration')
+        token=root/'config/provider-vercel-oidc-token'
+        require(token.exists() and not token.is_symlink() and 0 < token.stat().st_size <= 16385,
+                'Owner-private provider transport credential is required')
+        private(token)
+        argv += ['--region',value['region'],'--topic',value['topic'],
+                 '--consumer-group',value['consumer_group'],'--limit','1',
+                 '--lease-seconds',str(value['lease_seconds']),
+                 '--intake-opener',root/'native'/row['filename'],
+                 '--intake-opener-sha256',row['sha256'],'--oidc-token-file',token]
+    elif action in admission_actions | lifecycle_actions:
+        service_status=workspace_provider_service_status(root)
+        require(service_status['state'] == 'configured_native_unqualified'
+                and service_status['permission']['state'] == 'active',
+                'Active finite provider Service authority is required')
+        service_receipt=workspace_provider_service_receipt(root)
+        service_dir=root/'authority/provider-service/1/config'
+        argv += ['--service-database',root/'data/service.db',
+          '--native-verifier',root/'native'/rows['context-verifier']['filename'],
+          '--native-verifier-sha256',rows['context-verifier']['sha256'],
+          '--receiver-policy',service_dir/'service-receiver.json',
+          '--wallet-command',root/'native'/rows['wallet-command']['filename'],
+          '--wallet-command-sha256',rows['wallet-command']['sha256'],
+          '--wallet-configuration',service_dir/'wallet-command.json',
+          '--wallet-configuration-sha256',service_receipt['configuration_hashes']['wallet-command.json'],
+          '--limit','1','--timeout','5']
+    elif action in delivery_actions:
+        argv += ['--service-database',root/'data/service.db']
+    if action in lifecycle_actions | delivery_actions:
+        runtime_receipt=workspace_ready(root)
+        require(runtime_receipt.get('scope') == WORKSPACE_PROVIDER_SCOPE
+                and workspace_permission(runtime_receipt)['state'] == 'active',
+                'Active exact Actor/Run Runtime authority is required')
+        if action in delivery_actions:
+            admission,_=workspace_admission(root)
+            require(admission == {'schema':'runtime.new-run-admission.v1','enabled':True,
+                                  'composition_digest':runtime_receipt['plan_sha256']},
+                    'Runtime new-run admission must be explicitly open for this authority')
+        runtime_dir=workspace_config_directory(root,runtime_receipt)
+        require(owns_listener(root,'runtime'),'Start the exact workspace Runtime before lifecycle advancement')
+        argv += ['--runtime-endpoint','http://127.0.0.1:'+str(config(root)['runtime_port']),
+                 '--runtime-wallet-command',root/'native'/rows['wallet-command']['filename'],
+                 '--runtime-wallet-command-sha256',rows['wallet-command']['sha256'],
+                 '--runtime-wallet-configuration',runtime_dir/'wallet-command.json',
+                 '--runtime-wallet-configuration-sha256',runtime_receipt['configuration_hashes']['wallet-command.json']]
+        if action in lifecycle_actions:
+            argv += ['--process-id',PROVIDER_PROCESS_ID,'--process-version',PROVIDER_PROCESS_VERSION,
+                     '--compilation-hash',PROVIDER_PROCESS_COMPILATION]
+        else:
+            argv += ['--handoff-id',runtime_receipt['handoff_id']]
+    elif action in admission_actions:
+        policy=root/'config/provider-requester-policy.json'
+        require(type(requester_policy_sha256) is str and re.fullmatch('[a-f0-9]{64}',requester_policy_sha256)
+                and hashlib.sha256(bounded_private(policy,262144)).hexdigest() == requester_policy_sha256,
+                'Exact reviewed requester policy is required')
+        argv += ['--requester-policy',policy]
+    result=workspace_run(argv,root)
+    require(type(result) is dict and set(result) in (
+                {'schema','command','processed','results'},
+                {'schema','command','processed','results','error','recovery'})
+            and result.get('schema') == 'service.provider-worker-result.v1'
+            and result.get('command') == commands[action]
+            and type(result.get('processed')) is int and 0 <= result['processed'] <= 1
+            and type(result.get('results')) is list and len(result['results']) == result['processed'],
+            'Provider worker result differs from the fixed command')
+    return result
+
+
+def workspace_provider_actor_operation(root, action, selection):
+    """Run one exact reviewed automated or human provider operation."""
+    reviewer = action == 'workspace-provider-review-operation'
+    require(reviewer or action == 'workspace-provider-frank-operation',
+            'Unsupported provider Actor operation')
+    plan_name = 'provider-review-operation.json' if reviewer else 'provider-frank-operation.json'
+    plan_path = root/'config'/plan_name
+    raw = bounded_private(plan_path, 65536)
+    require(type(selection) is str and re.fullmatch('[a-f0-9]{64}', selection)
+            and hashlib.sha256(raw).hexdigest() == selection,
+            'Exact reviewed provider Actor operation is required')
+    plan = closed_json(raw)
+    expected = ({'schema','action','config_sha256','run_id','request_id','decision_sha256'}
+                if reviewer else
+                {'schema','action','config_sha256','run_id','step_id','request_id','effect_key'})
+    require(type(plan) is dict and set(plan) == expected,
+            'Invalid provider Actor operation shape')
+    schema = ('hub.provider-review-operation.v1' if reviewer
+              else 'hub.provider-frank-operation.v1')
+    allowed = ({'register','work','claim','decide'} if reviewer
+               else {'check-config','register','work','execute','resume','renew'})
+    require(plan['schema'] == schema and plan['action'] in allowed
+            and type(plan['run_id']) is str and re.fullmatch('[A-Za-z0-9][A-Za-z0-9._:-]{0,127}',plan['run_id'])
+            and type(plan['config_sha256']) is str and re.fullmatch('[a-f0-9]{64}',plan['config_sha256']),
+            'Invalid provider Actor operation')
+    receipt = workspace_ready(root)
+    actor = PROVIDER_REVIEW_ACTOR if reviewer else PROVIDER_FRANK_ACTOR
+    require(receipt.get('scope') == WORKSPACE_PROVIDER_SCOPE
+            and receipt.get('actor_id') == actor
+            and receipt.get('run_id') == plan['run_id']
+            and workspace_permission(receipt)['state'] == 'active',
+            'Active exact Actor/Run Runtime authority is required')
+    require(owns_listener(root,'runtime'), 'Start the exact workspace Runtime before Actor execution')
+    config_name = 'brand-approval.json' if reviewer else 'frank-live-provider.json'
+    selected_config = root/'config'/config_name
+    require(hashlib.sha256(bounded_private(selected_config,65536)).hexdigest() == plan['config_sha256'],
+            'Provider Actor configuration changed after review')
+    module = ('frank_executor.brand_approval_cli' if reviewer
+              else 'frank_executor.live_provider_cli')
+    argv = [root/'venv/bin/python','-I','-B','-m',module,plan['action'],
+            '--config',selected_config,'--config-sha256',plan['config_sha256']]
+    if reviewer:
+        request_id, decision_pin = plan['request_id'], plan['decision_sha256']
+        require((plan['action'] == 'claim' and type(request_id) is str
+                 and re.fullmatch('[A-Za-z0-9][A-Za-z0-9._:-]{0,127}',request_id)
+                 and decision_pin is None)
+                or (plan['action'] == 'decide' and request_id is None
+                    and type(decision_pin) is str and re.fullmatch('[a-f0-9]{64}',decision_pin))
+                or (plan['action'] in {'register','work'} and request_id is None
+                    and decision_pin is None),
+                'Review operation arguments differ from its fixed action')
+        if plan['action'] == 'claim':
+            argv += ['--request-id',request_id]
+        elif plan['action'] == 'decide':
+            decision = root/'config/brand-approval-decision.json'
+            require(hashlib.sha256(bounded_private(decision,1024*1024+65536)).hexdigest() == decision_pin,
+                    'Approval decision changed after review')
+            argv += ['--decision',decision,'--decision-sha256',decision_pin]
+    else:
+        step_id, request_id, effect_key = plan['step_id'], plan['request_id'], plan['effect_key']
+        require((plan['action'] == 'execute' and step_id in PROVIDER_FRANK_STEPS
+                 and type(request_id) is str and re.fullmatch('[A-Za-z0-9][A-Za-z0-9._:-]{0,127}',request_id)
+                 and effect_key is None)
+                or (plan['action'] in {'resume','renew'} and step_id is None
+                    and request_id is None and type(effect_key) is str
+                    and re.fullmatch('[A-Za-z0-9][A-Za-z0-9._:-]{0,127}',effect_key))
+                or (plan['action'] in {'check-config','register','work'}
+                    and step_id is None and request_id is None and effect_key is None),
+                'Frank operation arguments differ from its fixed action')
+        if plan['action'] == 'execute':
+            argv += ['--run-id',plan['run_id'],'--step-id',step_id,'--operation','compute',
+                     '--scope','zenith.anima.brand-package','--request-id',request_id]
+        elif plan['action'] in {'resume','renew'}:
+            argv += ['--effect-key',effect_key]
+    result = workspace_run(argv,root)
+    require(type(result) is dict, 'Provider Actor returned an unsupported result')
+    return {'schema':'hub.provider-actor-operation-result.v1','actor_id':actor,
+            'run_id':plan['run_id'],'action':plan['action'],'plan_sha256':selection,
+            'result':result}
+
+
+def workspace_provider_projection_config(root, expected=None):
+    path = root/'config/provider-projection.json'
+    raw = bounded_private(path, 16384)
+    pin = hashlib.sha256(raw).hexdigest()
+    require(expected is None or type(expected) is str
+            and re.fullmatch('[a-f0-9]{64}', expected) and expected == pin,
+            'Provider projection configuration changed after review')
+    value = closed_json(raw)
+    require(type(value) is dict and set(value) == {
+                'schema','browser_origin','public_base_url',
+                'requester_policy_sha256','port'}
+            and value['schema'] == 'hub.provider-projection.v1'
+            and type(value['requester_policy_sha256']) is str
+            and re.fullmatch('[a-f0-9]{64}', value['requester_policy_sha256'])
+            and value['port'] == PROVIDER_PROJECTION_PORT,
+            'Invalid provider projection configuration')
+    browser = value['browser_origin']
+    parsed = urllib.parse.urlsplit(browser) if type(browser) is str else None
+    loopback_http = (parsed is not None and parsed.scheme == 'http'
+                     and parsed.hostname in {'127.0.0.1','::1'})
+    require(parsed is not None and parsed.scheme in {'http','https'}
+            and (parsed.scheme == 'https' or loopback_http) and parsed.hostname
+            and parsed.username is None and parsed.password is None
+            and parsed.path in {'','/'} and not parsed.query and not parsed.fragment
+            and not browser.endswith('/'),
+            'Provider projection browser origin must be HTTPS or exact numeric-loopback HTTP')
+    public = value['public_base_url']
+    parsed = urllib.parse.urlsplit(public) if type(public) is str else None
+    segments = [] if parsed is None else parsed.path.split('/')[1:]
+    require(parsed is not None and parsed.scheme == 'https' and parsed.hostname
+            and parsed.username is None and parsed.password is None
+            and not parsed.query and not parsed.fragment and not public.endswith('/')
+            and all(segment not in {'','.','..'}
+                    and re.fullmatch('[A-Za-z0-9._~-]+',segment)
+                    for segment in segments),
+            'Provider projection public base must be an exact HTTPS URL with an optional normalized path')
+    policy = root/'config/provider-requester-policy.json'
+    require(hashlib.sha256(bounded_private(policy,262144)).hexdigest()
+            == value['requester_policy_sha256'],
+            'Provider projection requester policy changed after review')
+    return raw, value, pin
+
+
+def workspace_provider_projection_argv(root, expected):
+    _, value, pin = workspace_provider_projection_config(root, expected)
+    require((root/'data/provider-intake.db').is_file()
+            and (root/'data/service.db').is_file(),
+            'Provider projection requires existing local intake and Service stores')
+    service_status = workspace_provider_service_status(root)
+    require(service_status['state'] == 'configured_native_unqualified'
+            and service_status['permission']['state'] == 'active',
+            'Active finite provider Service authority is required')
+    runtime_receipt = workspace_ready(root)
+    require(runtime_receipt.get('scope') == WORKSPACE_PROVIDER_SCOPE
+            and workspace_permission(runtime_receipt)['state'] == 'active',
+            'Active exact Actor/Run Runtime authority is required')
+    rows = {row['role']:row for row in native_rows(workspace_profile(root))}
+    runtime_dir = workspace_config_directory(root,runtime_receipt)
+    return [root/'venv/bin/python','-I','-B','-m',
+            'service_management.provider_projection_server',
+            '--intake-database',root/'data/provider-intake.db',
+            '--service-database',root/'data/service.db',
+            '--requester-policy',root/'config/provider-requester-policy.json',
+            '--browser-origin',value['browser_origin'],
+            '--public-base-url',value['public_base_url'],
+            '--runtime-endpoint','http://127.0.0.1:'+str(config(root)['runtime_port']),
+            '--runtime-wallet-command',root/'native'/rows['wallet-command']['filename'],
+            '--runtime-wallet-command-sha256',rows['wallet-command']['sha256'],
+            '--runtime-wallet-configuration',runtime_dir/'wallet-command.json',
+            '--runtime-wallet-configuration-sha256',
+            runtime_receipt['configuration_hashes']['wallet-command.json'],
+            '--host','127.0.0.1','--port',str(value['port']),'--timeout','5'], pin
+
+
+def workspace_provider_projection(root, action, selection):
+    require(action in {'workspace-provider-projection-start',
+                       'workspace-provider-projection-stop'},
+            'Unsupported provider projection action')
+    if action.endswith('-stop'):
+        if launch_status(root, PROVIDER_PROJECTION):
+            run(['/bin/launchctl','bootout',
+                 f'gui/{os.getuid()}/{label(root,PROVIDER_PROJECTION)}'],root,timeout=40)
+        wait_absent(root,PROVIDER_PROJECTION)
+        return {'schema':'hub.provider-projection-operation.v1','running':False,
+                'stopped':True,'funnel_changed':False}
+    require(selection is not None,
+            'Supply the reviewed provider projection configuration digest')
+    _, pin = workspace_provider_projection_argv(root, selection)
+    require(not launch_status(root,PROVIDER_PROJECTION),
+            'Provider projection is already registered')
+    require(owns_listener(root,'runtime'),
+            'Start the exact workspace Runtime before the provider projection')
+    with socket.socket() as listener:
+        try:
+            listener.bind(('127.0.0.1',PROVIDER_PROJECTION_PORT))
+        except OSError as error:
+            raise InstallError('Provider projection port is occupied; no service was stopped') from error
+    path=root/'jobs'/f'{PROVIDER_PROJECTION}.plist'
+    expected_plist=plistlib.dumps(job(root,PROVIDER_PROJECTION),sort_keys=True)
+    if path.exists():
+        require(private(path).read_bytes() == expected_plist,'Managed provider projection plist changed')
+    else:
+        with path.open('xb') as stream:
+            os.fchmod(stream.fileno(),0o600);stream.write(expected_plist)
+    log=root/'logs'/f'{PROVIDER_PROJECTION}.log'
+    if not log.exists():log.touch(mode=0o600)
+    private(log)
+    run(['/bin/launchctl','bootstrap',f'gui/{os.getuid()}',path],root)
+    deadline=time.monotonic()+15
+    try:
+        while time.monotonic()<deadline:
+            if (launch_status(root,PROVIDER_PROJECTION)
+                    and owns_listener(root,PROVIDER_PROJECTION)
+                    and probe(root,PROVIDER_PROJECTION,'live')):
+                return {'schema':'hub.provider-projection-operation.v1',
+                        'running':True,'selection_sha256':pin,
+                        'port':PROVIDER_PROJECTION_PORT,'funnel_changed':False}
+            time.sleep(.1)
+        raise InstallError('Provider projection did not start; inspect its private log')
+    except BaseException:
+        if launch_status(root,PROVIDER_PROJECTION):
+            run(['/bin/launchctl','bootout',
+                 f'gui/{os.getuid()}/{label(root,PROVIDER_PROJECTION)}'],root,timeout=40)
+        wait_absent(root,PROVIDER_PROJECTION)
+        raise
+
+
 def workspace_report(root):
     workspace_profile(root)
     pending = workspace_holds(root)
@@ -1325,6 +1962,10 @@ def workspace_report(root):
             receipt = workspace_ready(root)
             result.update(setup='configured', authority='configured_native_unqualified',
                           permission=workspace_permission(receipt))
+            if receipt.get('scope') == WORKSPACE_PROVIDER_SCOPE:
+                result.update(provider_authority={'state':'configured_native_unqualified',
+                              'actor_id':receipt.get('actor_id'),'run_id':receipt.get('run_id'),
+                              'handoff_id':receipt.get('handoff_id'),'permission_count':23})
         except (InstallError, OSError, ValueError, KeyError, TypeError):
             result.update(setup='partial', authority='unavailable')
     elif (root/'config/workspace-setup-plan.json').exists():
@@ -1345,10 +1986,15 @@ def workspace_report(root):
                 and not (root/'data/frank-workspace-cleanup.json').exists(),plan_sha256=pin)
         except (InstallError,OSError,ValueError,KeyError,TypeError):
             pass
+    try:
+        result['provider_service_authority']=workspace_provider_service_status(root)
+    except (InstallError,OSError,ValueError,KeyError,TypeError):
+        result['provider_service_authority']={'state':'unavailable','generation':None,'permission':None}
     return result
 
 
-def workspace_action(root, action, raw=None, expected=None, selection=None):
+def workspace_action(root, action, raw=None, expected=None, selection=None, *, actor_id=None, run_id=None,
+                     handoff_id=None, requester_policy_sha256=None, provider_config_sha256=None):
     installed(root)
     workspace_profile(root)
     if action == 'workspace-stop':
@@ -1361,6 +2007,32 @@ def workspace_action(root, action, raw=None, expected=None, selection=None):
         return workspace_prepare_renewal(root,selection)
     if action in {'workspace-renew','workspace-renew-resume'}:
         return workspace_renew(root,selection,resume=action=='workspace-renew-resume')
+    if action == 'workspace-provider-authority-prepare':
+        return workspace_prepare_renewal(root,selection,actor_id=actor_id,run_id=run_id,handoff_id=handoff_id)
+    if action in {'workspace-provider-authority','workspace-provider-authority-resume'}:
+        raw_plan,plan=workspace_renewal_plan(root,selection)
+        require(plan['schema'] == 'castalia.wallet-workspace-live-provider-authority.v1',
+                'Provider authority requires the reviewed live-provider plan')
+        return workspace_renew(root,selection,resume=action.endswith('-resume'))
+    if action == 'workspace-provider-service-prepare':
+        return workspace_prepare_provider_service(root,selection)
+    if action == 'workspace-provider-service-setup':
+        return workspace_provider_service_setup(root,selection)
+    if action == 'workspace-provider-admission-open-prepare':
+        return workspace_prepare_provider_admission(root,True,selection)
+    if action == 'workspace-provider-admission-close-prepare':
+        return workspace_prepare_provider_admission(root,False,selection)
+    if action == 'workspace-provider-admission-apply':
+        return workspace_apply_provider_admission(root,selection)
+    if action in {'workspace-provider-pull-once','workspace-provider-pull-references-once',
+                  'workspace-provider-admit-once','workspace-provider-resume-admission-once',
+                  'workspace-provider-activation-once','workspace-provider-advance-once',
+                  'workspace-provider-resume-once','workspace-provider-deliver-handoff-once'}:
+        return workspace_provider_worker(root,action,requester_policy_sha256,provider_config_sha256)
+    if action in {'workspace-provider-frank-operation','workspace-provider-review-operation'}:
+        return workspace_provider_actor_operation(root,action,selection)
+    if action in {'workspace-provider-projection-start','workspace-provider-projection-stop'}:
+        return workspace_provider_projection(root,action,selection)
     if action == 'workspace-prepare':
         require(not any(launch_status(root, name) for name in COMPONENTS), 'Stop workspace before preparing setup')
         return workspace_prepare_plan(root, selection)
@@ -1425,15 +2097,21 @@ def workspace_action(root, action, raw=None, expected=None, selection=None):
 
 
 def label(root, component):
-    require(component in COMPONENTS, 'Unknown component')
+    require(component in MANAGED_COMPONENTS, 'Unknown component')
     identity = hashlib.sha256((str(os.getuid())+':'+str(root)).encode()).hexdigest()[:20]
     return 'ca.zenith.process.'+identity+'.'+component
 
 
 def job(root, component):
+    action = '_run-provider-projection' if component == PROVIDER_PROJECTION else '_run'
+    arguments = [str(root/'venv/bin/python'), '-I', '-S', '-B', str(root/'control.py'),
+                 action, '--root', str(root)]
+    if component == PROVIDER_PROJECTION:
+        arguments += ['--selection-sha256', workspace_provider_projection_config(root)[2]]
+    else:
+        arguments += ['--component', component]
     return {'Label': label(root, component),
-        'ProgramArguments': [str(root/'venv/bin/python'), '-I', '-S', '-B', str(root/'control.py'),
-                             '_run', '--root', str(root), '--component', component],
+        'ProgramArguments': arguments,
         'RunAtLoad': True, 'KeepAlive': False, 'ExitTimeOut': 30,
         'StandardOutPath': str(root/'logs'/f'{component}.log'),
         'StandardErrorPath': str(root/'logs'/f'{component}.log')}
@@ -1478,14 +2156,17 @@ def probe_body(port, route, component):
             if len(raw)>16384:return False
             value = json.loads(raw)
             return (type(value) is dict and response.status == 200 and value.get(route) is True
-                    and value.get('component',value.get('service')) == {'runtime':'process-runtime','service':'service-management'}[component])
+                    and value.get('component',value.get('service')) == {
+                        'runtime':'process-runtime','service':'service-management',
+                        PROVIDER_PROJECTION:'service-management-provider-projection'}[component])
     except (OSError, ValueError):
         return False
 
 
 def probe(root, component, route, timeout=2):
     # A child deadline also bounds slow headers/trickled bodies, not just sockets.
-    port=config(root)[component+'_port']
+    port=(PROVIDER_PROJECTION_PORT if component == PROVIDER_PROJECTION
+          else config(root)[component+'_port'])
     try:
         result=run([root/'venv/bin/python','-I','-S','-B',root/'control.py','_probe',
                     '--root',root,'--component',component,'--runtime-port',str(port),'--route',route],
@@ -1502,7 +2183,8 @@ def owns_listener(root, component):
     status=run(['/bin/launchctl','print',f'gui/{os.getuid()}/{label(root,component)}'],root,check=False)
     pid=re.search(rb'^\s*pid = (\d+)\s*$',status.stdout,re.M)
     if not pid or int(pid[1])!=value['wrapper_pid']:return False
-    port=config(root)[component+'_port']
+    port=(PROVIDER_PROJECTION_PORT if component == PROVIDER_PROJECTION
+          else config(root)[component+'_port'])
     listener=run(['/usr/sbin/lsof','-nP','-a','-p',str(value['child_pid']),
                   '-iTCP@127.0.0.1:'+str(port),'-sTCP:LISTEN','-t'],root,timeout=3,check=False)
     return listener.returncode==0 and listener.stdout.strip()==str(value['child_pid']).encode()
@@ -1516,7 +2198,7 @@ def doctor(root):
     frank = json.loads(run([root/'venv/bin/python', '-I', '-B', '-m', 'frank_executor',
                           'check-config', '--config', root/'config/frank.json'], root).stdout)
     states={}
-    for name in COMPONENTS:
+    for name in MANAGED_COMPONENTS:
         managed=launch_status(root,name) and owns_listener(root,name)
         states[name]={'managed':managed,'live':managed and probe(root,name,'live'),
                       'ready':managed and probe(root,name,'ready')}
@@ -1542,6 +2224,16 @@ def check_ports(value):
                 s.bind(('127.0.0.1', value[name+'_port']))
             except OSError as e:
                 raise InstallError('Component port is occupied; no service was stopped') from e
+
+
+def base_components_started_default_deny(report):
+    components = report.get('components') if type(report) is dict else None
+    return type(components) is dict and all(
+        type(components.get(name)) is dict
+        and components[name].get('managed') is True
+        and components[name].get('live') is True
+        and components[name].get('ready') is False
+        for name in COMPONENTS)
 
 
 def start(root):
@@ -1586,7 +2278,7 @@ def start(root):
                             break
                 time.sleep(.1)
         report=doctor(root)
-        require(all(state['managed'] and state['live'] and not state['ready'] for state in report['components'].values()),
+        require(base_components_started_default_deny(report),
                 'Final component liveness or default-deny readiness differs; stopping this installation')
         return report
     except BaseException:
@@ -1607,14 +2299,15 @@ def stop(root):
     # Stop remains available even if package or interpreter pins drift.
     root = private(root)
     errors=[]
-    for name in reversed(COMPONENTS):
+    ordered = [PROVIDER_PROJECTION, *reversed(COMPONENTS)]
+    for name in ordered:
         try:
             if launch_status(root, name):
                 run(['/bin/launchctl', 'bootout', f'gui/{os.getuid()}/{label(root, name)}'], root,timeout=40)
         except (InstallError,OSError,subprocess.SubprocessError):errors.append(name)
     require(not errors,'Some owned jobs could not be stopped or inspected; retry stop')
-    for name in COMPONENTS:wait_absent(root,name)
-    for name in COMPONENTS:
+    for name in MANAGED_COMPONENTS:wait_absent(root,name)
+    for name in MANAGED_COMPONENTS:
         marker = root/'logs'/f'{name}-process.json'
         if marker.exists():
             child_pid = load(marker)['child_pid']
@@ -1626,17 +2319,20 @@ def stop(root):
                     break
                 require(time.monotonic() < deadline, 'Child process absence is unresolved after stop')
                 time.sleep(.1)
-    results = {name:load(root/'logs'/f'{name}-shutdown.json') for name in COMPONENTS
+    results = {name:load(root/'logs'/f'{name}-shutdown.json') for name in MANAGED_COMPONENTS
                if (root/'logs'/f'{name}-shutdown.json').exists()}
     return {'stopped': True, 'data_preserved': True, 'shutdown': results}
 
 
-def supervise(root, component):
+def supervise(root, component, selection=None):
     installed(root)
     value = config(root)
-    argv = [root/'venv/bin/python', '-I', '-B', '-m', COMPONENTS[component],
-            '--database', root/'data'/f'{component}.db', '--port', str(value[component+'_port']),
-            '--environment', 'production']
+    if component == PROVIDER_PROJECTION:
+        argv, _ = workspace_provider_projection_argv(root, selection)
+    else:
+        argv = [root/'venv/bin/python', '-I', '-B', '-m', COMPONENTS[component],
+                '--database', root/'data'/f'{component}.db', '--port', str(value[component+'_port']),
+                '--environment', 'production']
     if value['mode'] == 'local_review' and component == 'runtime':
         selection, _ = pilot_inputs(root)
         pilot_complete(root, selection)
@@ -1694,7 +2390,7 @@ def supervise(root, component):
 def main():
     os.umask(0o077)
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('action', choices=['bundle', 'install', 'workspace-software-upgrade', 'doctor', 'status', 'start', 'stop', '_inventory', '_seal', '_probe', '_run', *sorted(PILOT_ACTIONS), *sorted(WORKSPACE_ACTIONS)])
+    parser.add_argument('action', choices=['bundle', 'install', 'workspace-software-upgrade', 'doctor', 'status', 'start', 'stop', '_inventory', '_seal', '_probe', '_run', '_run-provider-projection', *sorted(PILOT_ACTIONS), *sorted(WORKSPACE_ACTIONS)])
     parser.add_argument('--root', type=Path, default=DEFAULT)
     parser.add_argument('--bundle', type=Path)
     parser.add_argument('--bundle-sha256')
@@ -1705,7 +2401,12 @@ def main():
     parser.add_argument('--selection-sha256')
     parser.add_argument('--request-stdin', action='store_true')
     parser.add_argument('--request-sha256')
-    parser.add_argument('--component', choices=COMPONENTS)
+    parser.add_argument('--actor-id')
+    parser.add_argument('--run-id')
+    parser.add_argument('--handoff-id')
+    parser.add_argument('--provider-policy-sha256')
+    parser.add_argument('--provider-config-sha256')
+    parser.add_argument('--component', choices=MANAGED_COMPONENTS)
     parser.add_argument('--route',choices=['live','ready'],default='live')
     parser.add_argument('--runtime-port', type=int, default=8092)
     parser.add_argument('--service-port', type=int, default=8091)
@@ -1730,6 +2431,10 @@ def main():
         elif args.action == '_run':
             require(args.component, 'Supply component')
             result = supervise(args.root, args.component)
+        elif args.action == '_run-provider-projection':
+            require(args.selection_sha256 is not None,
+                    'Supply the reviewed provider projection selection pin')
+            result = supervise(args.root, PROVIDER_PROJECTION, args.selection_sha256)
         else:
             root = private(args.root)
             with (root/'operation.lock').open('a') as lock:
@@ -1738,7 +2443,21 @@ def main():
                     require(args.bundle and args.bundle_sha256, 'Supply the exact supported workspace upgrade bundle and digest')
                     result = workspace_software_upgrade(args.bundle,root,args.bundle_sha256)
                 elif args.action in WORKSPACE_ACTIONS:
-                    result = workspace_action(root, args.action, request_raw, args.request_sha256, args.selection_sha256)
+                    require(args.action == 'workspace-provider-authority-prepare'
+                            or args.actor_id is None and args.run_id is None and args.handoff_id is None,
+                            'Actor, handoff and Run are accepted only while preparing provider authority')
+                    require(args.action in {'workspace-provider-admit-once','workspace-provider-resume-admission-once'}
+                            or args.provider_policy_sha256 is None,
+                            'Requester policy pin is accepted only for provider admission')
+                    require(args.action in {'workspace-provider-pull-once',
+                                            'workspace-provider-pull-references-once'}
+                            or args.provider_config_sha256 is None,
+                            'Provider pull configuration pin is accepted only for provider pull')
+                    result = workspace_action(root, args.action, request_raw, args.request_sha256,
+                                              args.selection_sha256, actor_id=args.actor_id, run_id=args.run_id,
+                                              handoff_id=args.handoff_id,
+                                              requester_policy_sha256=args.provider_policy_sha256,
+                                              provider_config_sha256=args.provider_config_sha256)
                 elif args.action in PILOT_ACTIONS:
                     require(args.selection_sha256 is not None, 'Supply the reviewed pilot selection pin')
                     result = pilot_action(root, args.action, args.selection_sha256)

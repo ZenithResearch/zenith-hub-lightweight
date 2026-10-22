@@ -26,12 +26,15 @@
     ]
   },
   {
-    "repository": "hub",
-    "commit": "5e742355be8c4eb9a128b3638284bf45c1c9c45d",
+    "repository": "https://github.com/ZenithResearch/zenith-hub-lightweight",
+    "derived_from": {
+      "repository": "hub",
+      "commit": "5e742355be8c4eb9a128b3638284bf45c1c9c45d"
+    },
     "files": [
       {
         "path": "profiles/process-macos/process_mac.py",
-        "sha256": "26ba418c22466cb10a9170e6ef07537bfd8883712ae347469dce66d69806673a"
+        "sha256": "359e7383590efd7707a1975dfa74c40882b998ff6dc31670a07ebd868c717a12"
       }
     ]
   },
@@ -67,58 +70,267 @@
   },
   {
     "repository": "component workspace closure",
-    "profile": "workspace-v1",
+    "profile": "workspace-provider-v1",
     "components": {
       "frank": {
         "package": "frank-executor",
-        "source_commit": "bb5d41e92fbfc5b1155f7e2ef40e795ad79a4187",
+        "source_commit": "0a9ca3d66020a799da25e4353d72e83cd2273736",
         "version": "0.1.0",
-        "wheel_sha256": "aa9bf9cf7ecf83117be293f5913f59d77bab016d58568d95ce53fbe39027b7ce"
+        "wheel_sha256": "ea1edb35d90e14e27c99d1acbc354b195e2c08126af05e776a24ad6caf84dde0"
       },
       "process-runtime": {
         "package": "process-runtime",
-        "source_commit": "200179067b48ba9f2e6b3ebab8c6d7ce7164dc27",
+        "source_commit": "cbb9c2fbf5b9faa8bba300941ad2639591ecec6e",
         "version": "0.1.0",
-        "wheel_sha256": "acf3af9efd252f0150a2ab70561c699748bdc8c6801c7c6235f67004d02e470d"
+        "wheel_sha256": "f534d386f51538f6a982c6e7309e962f11fe4c9997d8071d89e0863656c2a5e0"
       },
       "service-management": {
         "package": "service-management",
-        "source_commit": "baa9cfaecbac1ca93d9668d67e399554a08eb03d",
+        "source_commit": "a0b203475c19f775b7a6401ab9188a6f3a3247d9",
         "version": "0.1.0",
-        "wheel_sha256": "a9a785d06d12ed8b0192427e23b4f12020fe96f15690ec5694d3c0eca1403bef"
+        "wheel_sha256": "b3db6ad0e68e9650f1072ff1464800a631bcb1a9ed5fb1b3c152da54a8472d28"
       }
     },
     "native": [
       {
-        "bytes": 11677088,
+        "bytes": 5753744,
         "filename": "castalia-wallet-service",
         "mode": 320,
         "role": "wallet-command",
-        "sha256": "67ae3e7ebc2b9270d05dcc3008357848563229c4970be5e31bed771c3cf81cb1",
-        "source_commit": "10cbcc2a412cac1bf7fd96583ad27991db466e20"
+        "sha256": "f93c3d070fe57148eb815378ce149e7ba775a007b6d2756438c8f95e785195bd",
+        "source_commit": "d6f5b6ddc0f7cb7a892c65bc9d51a7973b498ef9"
       },
       {
-        "bytes": 5408544,
+        "bytes": 2332704,
         "filename": "castalia-wallet-workspace-setup",
         "mode": 320,
         "role": "owner-setup",
-        "sha256": "b84bd112b56713af5eb87850e90de4db5852b1c6c1032a7f3d5b7a692a6ad741",
-        "source_commit": "eb7b21305d9058d993f9a60aa9d4add2c34eb839"
+        "sha256": "9c87f3be4b9f3003ea44579e0d264e3863a7f1da09561f0e16f4a6749de0fca1",
+        "source_commit": "d6f5b6ddc0f7cb7a892c65bc9d51a7973b498ef9"
       },
       {
-        "bytes": 702960,
+        "bytes": 766080,
         "filename": "process-runtime-secs-check",
         "mode": 320,
         "role": "context-verifier",
-        "sha256": "b044785f3b9b45e9858ecee108a997d3c577a8262f4284e40e42e6b506b8e280",
-        "source_commit": "c69261fea3cd7a21033a7ffcd681c5e460f3e3b6"
+        "sha256": "4417af4d9e0ff81f7887c530d0b36b2195a46baf9a5f44b509f5102e95fd163d",
+        "source_commit": "cbb9c2fbf5b9faa8bba300941ad2639591ecec6e"
+      },
+      {
+        "bytes": 4462752,
+        "filename": "secs-frank-connector-result",
+        "mode": 320,
+        "role": "result-attester",
+        "sha256": "15614dce5848d4be40149f60a95d33abf0e348f22afd4e02d3a0903777ed488a",
+        "source_commit": "a6cda6d99a8f8674c1264dd4258ddf16f9a048fc"
+      },
+      {
+        "bytes": 776720,
+        "filename": "secs-frank-connector-result-setup",
+        "mode": 320,
+        "role": "result-owner-setup",
+        "sha256": "8991281c84f2e8ea3cbc708d665cab52b7c4262516df5a3b5acb384b3f0fe88c",
+        "source_commit": "a6cda6d99a8f8674c1264dd4258ddf16f9a048fc"
+      },
+      {
+        "bytes": 1016848,
+        "filename": "secs-provider-intake-v1",
+        "mode": 320,
+        "role": "provider-intake-opener",
+        "sha256": "4298276efc5d38eb119a84dfde66e335774bbc839f7f06636eaf94b53c277946",
+        "source_commit": "a6cda6d99a8f8674c1264dd4258ddf16f9a048fc"
       }
     ],
     "files": [
       {
         "path": "profiles/process-macos/release.workspace.v1.json",
-        "sha256": "3579719b359fe5618ff02dcd3b1bc0d2a8dfac65f6da0880a20e7e2ba0c31d20"
+        "sha256": "83a33af7507ae0a9b4768147bbffb44cf9c8a6a8018c4af367f75b08dc7d924f"
       }
-    ]
+    ],
+    "wheels": [
+      {
+        "bytes": 132079,
+        "filename": "anyio-4.15.1-py3-none-any.whl",
+        "name": "anyio",
+        "sha256": "6152fdbbf9a77fdec97731721bebf7c4c44f7c29b424b0065826173efc7ed101",
+        "version": "4.15.1"
+      },
+      {
+        "bytes": 67548,
+        "filename": "attrs-26.1.0-py3-none-any.whl",
+        "name": "attrs",
+        "sha256": "c647aa4a12dfbad9333ca4e71fe62ddc36f4e63b2d260a37a8b83d2f043ac309",
+        "version": "26.1.0"
+      },
+      {
+        "bytes": 136983,
+        "filename": "certifi-2026.7.22-py3-none-any.whl",
+        "name": "certifi",
+        "sha256": "62f22742b58a1a33014a2b6b706588a8d7e2a88ae7bd1a6ebe8c992928483775",
+        "version": "2026.7.22"
+      },
+      {
+        "bytes": 159299,
+        "filename": "frank_executor-0.1.0-py3-none-any.whl",
+        "name": "frank-executor",
+        "sha256": "ea1edb35d90e14e27c99d1acbc354b195e2c08126af05e776a24ad6caf84dde0",
+        "version": "0.1.0"
+      },
+      {
+        "bytes": 37515,
+        "filename": "h11-0.16.0-py3-none-any.whl",
+        "name": "h11",
+        "sha256": "63cf8bbe7522de3bf65932fda1d9c2772064ffb3dae62d55932da54b31cb6c86",
+        "version": "0.16.0"
+      },
+      {
+        "bytes": 62636,
+        "filename": "h2-4.4.1-py3-none-any.whl",
+        "name": "h2",
+        "sha256": "0e25f1462b23c9cb82d9eb02e28bc706dac2a68cb457c6a0d74d63c8a2a5d0e6",
+        "version": "4.4.1"
+      },
+      {
+        "bytes": 34246,
+        "filename": "hpack-4.2.0-py3-none-any.whl",
+        "name": "hpack",
+        "sha256": "858ac0b02280fa582b5080d68db0899c62a80375e0e5413a74970c5e518b6986",
+        "version": "4.2.0"
+      },
+      {
+        "bytes": 78784,
+        "filename": "httpcore-1.0.9-py3-none-any.whl",
+        "name": "httpcore",
+        "sha256": "2d400746a40668fc9dec9810239072b40b4484b640a8c38fd654a024c7a1bf55",
+        "version": "1.0.9"
+      },
+      {
+        "bytes": 85070,
+        "filename": "httpcore2-2.16.0-py3-none-any.whl",
+        "name": "httpcore2",
+        "sha256": "5c4358319f2602d984ad93182c9fee5160f22e9da7babdda870a5e7c4e2dc34f",
+        "version": "2.16.0"
+      },
+      {
+        "bytes": 73517,
+        "filename": "httpx-0.28.1-py3-none-any.whl",
+        "name": "httpx",
+        "sha256": "d909fcccc110f8c7faf814ca82a9a4d816bc5a6dbfea25d6591d6985b8ba59ad",
+        "version": "0.28.1"
+      },
+      {
+        "bytes": 97880,
+        "filename": "httpx2-2.16.0-py3-none-any.whl",
+        "name": "httpx2",
+        "sha256": "fd2c5d7909e8d86fe92d53020c310ca0e4e431b838c207c5754b9bbf0308d49a",
+        "version": "2.16.0"
+      },
+      {
+        "bytes": 13007,
+        "filename": "hyperframe-6.1.0-py3-none-any.whl",
+        "name": "hyperframe",
+        "sha256": "b03380493a519fce58ea5af42e4a42317bf9bd425596f7a0835ffce80f1a42e5",
+        "version": "6.1.0"
+      },
+      {
+        "bytes": 69583,
+        "filename": "idna-3.20-py3-none-any.whl",
+        "name": "idna",
+        "sha256": "ab7ae7122974553370f0bdb919e1a960b2cd1bc1ef0276416d896db81c14582c",
+        "version": "3.20"
+      },
+      {
+        "bytes": 90630,
+        "filename": "jsonschema-4.26.0-py3-none-any.whl",
+        "name": "jsonschema",
+        "sha256": "d489f15263b8d200f8387e64b4c3a75f06629559fb73deb8fdfb525f2dab50ce",
+        "version": "4.26.0"
+      },
+      {
+        "bytes": 18437,
+        "filename": "jsonschema_specifications-2025.9.1-py3-none-any.whl",
+        "name": "jsonschema-specifications",
+        "sha256": "98802fee3a11ee76ecaca44429fda8a41bff98b00a0f2838151b113f210cc6fe",
+        "version": "2025.9.1"
+      },
+      {
+        "bytes": 87317,
+        "filename": "process_runtime-0.1.0-py3-none-any.whl",
+        "name": "process-runtime",
+        "sha256": "f534d386f51538f6a982c6e7309e962f11fe4c9997d8071d89e0863656c2a5e0",
+        "version": "0.1.0"
+      },
+      {
+        "bytes": 30042,
+        "filename": "python_multipart-0.0.32-py3-none-any.whl",
+        "name": "python-multipart",
+        "sha256": "ff6d3f776f16878c894e52e107296ffc890e913c611b1a4ec6c44e2821fe2e23",
+        "version": "0.0.32"
+      },
+      {
+        "bytes": 26766,
+        "filename": "referencing-0.37.0-py3-none-any.whl",
+        "name": "referencing",
+        "sha256": "381329a9f99628c9069361716891d34ad94af76e461dcb0335825aecc7692231",
+        "version": "0.37.0"
+      },
+      {
+        "bytes": 341380,
+        "filename": "rpds_py-2026.9.1-cp312-cp312-macosx_11_0_arm64.whl",
+        "name": "rpds-py",
+        "sha256": "e21c1429e205828ea886a2293a4a2c8e01f4c25d9893ca330e97a6cf73f52e7b",
+        "version": "2026.9.1"
+      },
+      {
+        "bytes": 99409,
+        "filename": "service_management-0.1.0-py3-none-any.whl",
+        "name": "service-management",
+        "sha256": "b3db6ad0e68e9650f1072ff1464800a631bcb1a9ed5fb1b3c152da54a8472d28",
+        "version": "0.1.0"
+      },
+      {
+        "bytes": 19017,
+        "filename": "truststore-0.10.5-py3-none-any.whl",
+        "name": "truststore",
+        "sha256": "9aaaedaefaf06d8b206278cf8b5012bc897f485a874503501e12d776df78951c",
+        "version": "0.10.5"
+      },
+      {
+        "bytes": 45571,
+        "filename": "typing_extensions-4.16.0-py3-none-any.whl",
+        "name": "typing_extensions",
+        "sha256": "481caa481374e813c1b176ada14e97f1f67a4539ce9cfeb3f350d78d6370c2e8",
+        "version": "4.16.0"
+      },
+      {
+        "bytes": 3922,
+        "filename": "vercel_headers-0.7.2-py3-none-any.whl",
+        "name": "vercel-headers",
+        "sha256": "26dcb0016b5c553e638385e532cb8557f071e247b46f2575d5737e48718dc8c6",
+        "version": "0.7.2"
+      },
+      {
+        "bytes": 24767,
+        "filename": "vercel_internal_core-0.2.2-py3-none-any.whl",
+        "name": "vercel-internal-core",
+        "sha256": "581b02309ec8d6367134c3ecabba5d8169a902677458e228f544dc88dfa05a6b",
+        "version": "0.2.2"
+      },
+      {
+        "bytes": 16554,
+        "filename": "vercel_oidc-0.10.0-py3-none-any.whl",
+        "name": "vercel-oidc",
+        "sha256": "abc8317317482e542834ab35883e8c4a0f9a1baea554898e3f041ca037f90bec",
+        "version": "0.10.0"
+      },
+      {
+        "bytes": 95468,
+        "filename": "vercel_queue-0.9.2-py3-none-any.whl",
+        "name": "vercel-queue",
+        "sha256": "b9f78efe4182fe636c8074cc494a9ed6a43f6d6ee6c41367a08f9ce25af7596c",
+        "version": "0.9.2"
+      }
+    ],
+    "build": "SOURCE_DATE_EPOCH=1767225600; Python 3.12; setuptools 84.0.0; two matching component-wheel builds; pinned Apple-silicon Queue wheel closure; reproducible native builds"
   }
 ]
