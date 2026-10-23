@@ -593,7 +593,7 @@ class ProviderReleaseProfileTests(unittest.TestCase):
         names = ["frank-executor", "process-runtime", "service-management",
                  *(f"dependency-{index}" for index in range(12))]
         if native_profile == "workspace-provider-v1":
-            names.extend(sorted(process_mac.PROVIDER_QUEUE_PACKAGES))
+            names.extend(sorted(process_mac.PROVIDER_RUNTIME_PACKAGES))
         wheels = [
             {"name": name, "filename": f"{name.replace('-', '_')}-0.1.0-py3-none-any.whl",
              "version": "0.1.0", "bytes": 1, "sha256": marker * 64}
@@ -634,6 +634,18 @@ class ProviderReleaseProfileTests(unittest.TestCase):
         incomplete["wheels"] = [row for row in incomplete["wheels"] if row["name"] != "vercel-queue"]
         with self.assertRaises(process_mac.InstallError):
             process_mac.workspace_upgrade_policy(old, incomplete)
+        current_provider = json.loads(json.dumps(new))
+        current_provider["wheels"] = [
+            row for row in current_provider["wheels"]
+            if row["name"] not in process_mac.PROVIDER_CRYPTO_PACKAGES
+        ]
+        process_mac.workspace_upgrade_policy(current_provider, new)
+        missing_verifier = json.loads(json.dumps(new))
+        missing_verifier["wheels"] = [
+            row for row in missing_verifier["wheels"] if row["name"] != "cryptography"
+        ]
+        with self.assertRaises(process_mac.InstallError):
+            process_mac.workspace_upgrade_policy(current_provider, missing_verifier)
         with self.assertRaises(process_mac.InstallError):
             process_mac.workspace_upgrade_policy(new, old)
 

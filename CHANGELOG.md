@@ -4,6 +4,10 @@
 
 ### Fixed
 
+- Add the pinned Castalia verifier and its Apple-silicon dependency closure to
+  `workspace-provider-v1`, and permit the verified 26-wheel provider release to
+  upgrade to it — local Queue admission can now authenticate membership evidence.
+
 - Repin the provider workspace to Service Management's deployment-validated
   provider catalog route — the local Anima client can verify the production
   HTTPS gateway before enabling encrypted submission.
