@@ -34,7 +34,7 @@
     "files": [
       {
         "path": "profiles/process-macos/process_mac.py",
-        "sha256": "29d690343ab2feda01deb6c04fa11b0016a8d3684b735e5f84df173abd8ab9a9"
+        "sha256": "8c0b662191bbb55daf653943645ee83ce95157e6dd79a805e0cd84eddf157f24"
       }
     ]
   },
