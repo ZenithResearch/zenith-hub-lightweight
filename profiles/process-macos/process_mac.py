@@ -1563,8 +1563,11 @@ def workspace_provider_service_plan(root, selection):
               'wallet_command_sha256','verifier_sha256'}
     require(type(value) is dict and set(value) == fields
             and value['schema'] == 'castalia.wallet-provider-service-authority.v1'
-            and value['workspace_root'] == str(root) and value['generation'] == '1',
-            'Invalid first provider Service plan')
+            and value['workspace_root'] == str(root)
+            and type(value['generation']) is str
+            and re.fullmatch('[1-9][0-9]?',value['generation'])
+            and 1 <= int(value['generation']) <= 64,
+            'Invalid provider Service plan')
     for key in ('not_before','not_after'):
         require(type(value[key]) is str and re.fullmatch('[1-9][0-9]{0,15}',value[key])
                 and int(value[key]) <= 9007199254740991, 'Invalid provider Service authority time')
@@ -1578,13 +1581,29 @@ def workspace_provider_service_plan(root, selection):
     return raw,value
 
 
+def workspace_provider_service_selection(root):
+    path=root/WORKSPACE_PROVIDER_SERVICE_SELECTION
+    if not path.exists() and not path.is_symlink():
+        return None
+    value=closed_json(bounded_private(path,4096))
+    require(type(value) is dict and set(value) == {'schema','generation','complete_sha256'}
+            and value['schema'] == 'hub.workspace-provider-service-selection.v1'
+            and type(value['generation']) is int and 1 <= value['generation'] <= 64
+            and type(value['complete_sha256']) is str
+            and re.fullmatch('[a-f0-9]{64}',value['complete_sha256']),
+            'Invalid provider Service selection')
+    return value
+
+
 def workspace_prepare_provider_service(root, expected=None):
     require(not workspace_holds(root), 'Workspace transition or cleanup must be reconciled')
     workspace_stopped(root);workspace_ready(root)
-    selection = root/WORKSPACE_PROVIDER_SERVICE_SELECTION
-    require(not selection.exists() and not selection.is_symlink(),
-            'The first provider Service authority is already selected')
-    base = root/'authority/provider-service/1'
+    current=workspace_provider_service_selection(root)
+    if current is not None:
+        workspace_provider_service_receipt(root,current['complete_sha256'],current['generation'])
+    generation=1 if current is None else current['generation']+1
+    require(generation <= 64, 'Provider Service authority generation limit reached')
+    base = root/'authority/provider-service'/str(generation)
     require(not base.exists() and not base.is_symlink(),
             'Partial provider Service authority is retained for recovery')
     plan = root/WORKSPACE_PROVIDER_SERVICE_PLAN
@@ -1595,30 +1614,42 @@ def workspace_prepare_provider_service(root, expected=None):
         workspace_store(root/'config'/('provider-service-proposal-history-'+expected+'.json'),old)
     at=int(time.time());rows={row['role']:row for row in native_rows(workspace_profile(root))}
     value={'schema':'castalia.wallet-provider-service-authority.v1','workspace_root':str(root),
-           'generation':'1','not_before':str(at-5),'not_after':str(at+3590),
+           'generation':str(generation),'not_before':str(at-5),'not_after':str(at+3590),
            'wallet_command_sha256':rows['wallet-command']['sha256'],
            'verifier_sha256':rows['context-verifier']['sha256']}
     raw=workspace_bytes(value);workspace_store(plan,raw,replace=old is not None)
     return {'schema':'hub.workspace-provider-service-proposal.v1',
-            'plan_sha256':hashlib.sha256(raw).hexdigest(),'generation':'1',
+            'plan_sha256':hashlib.sha256(raw).hexdigest(),'generation':value['generation'],
             'not_before':value['not_before'],'not_after':value['not_after'],
             'permission_count':12,'authority_created':False,'provider_enabled':False}
 
 
-def workspace_provider_service_receipt(root, expected=None):
-    path=root/'authority/provider-service/1/COMPLETE.json';raw=bounded_private(path)
+def workspace_provider_service_receipt(root, expected=None, generation=None):
+    selected=workspace_provider_service_selection(root) if generation is None else None
+    if selected is not None:
+        generation=selected['generation']
+        expected=selected['complete_sha256'] if expected is None else expected
+    require(type(generation) is int and 1 <= generation <= 64,
+            'Provider Service generation is not selected')
+    path=root/'authority/provider-service'/str(generation)/'COMPLETE.json';raw=bounded_private(path)
     require(expected is None or hashlib.sha256(raw).hexdigest() == expected,
             'Selected provider Service receipt changed')
     receipt=closed_json(raw)
     require(type(receipt) is dict
             and receipt.get('schema') == 'castalia.wallet-provider-service-authority-complete.v1'
-            and receipt.get('root') == str(root) and receipt.get('generation') == 1
+            and receipt.get('root') == str(root) and receipt.get('generation') == generation
             and receipt.get('activation') is False and receipt.get('service_started') is False
             and receipt.get('scope') == 'finite local provider lifecycle authority in one isolated Service Management store'
             and set(receipt.get('configuration_hashes',{})) == {'command-authority.json','wallet-command.json','service-receiver.json'},
             'Provider Service receipt differs from the fixed authority profile')
-    plan_raw=bounded_private(root/WORKSPACE_PROVIDER_SERVICE_PLAN,16384)
-    require(receipt.get('plan_sha256') == hashlib.sha256(plan_raw).hexdigest(),
+    plan_pin=receipt.get('plan_sha256')
+    require(type(plan_pin) is str and re.fullmatch('[a-f0-9]{64}',plan_pin),
+            'Provider Service receipt has an invalid plan pin')
+    plan_path=root/WORKSPACE_PROVIDER_SERVICE_PLAN
+    plan_raw=bounded_private(plan_path,16384)
+    if hashlib.sha256(plan_raw).hexdigest() != plan_pin:
+        plan_raw=bounded_private(root/'config'/('provider-service-proposal-history-'+plan_pin+'.json'),16384)
+    require(plan_pin == hashlib.sha256(plan_raw).hexdigest(),
             'Provider Service receipt differs from the reviewed plan')
     config_dir=path.parent/'config'
     for name,digest in receipt['configuration_hashes'].items():
@@ -1631,17 +1662,20 @@ def workspace_provider_service_receipt(root, expected=None):
 def workspace_provider_service_setup(root, selection):
     workspace_stopped(root);workspace_ready(root)
     raw,plan=workspace_provider_service_plan(root,selection)
+    generation=int(plan['generation'])
     selected=root/WORKSPACE_PROVIDER_SERVICE_SELECTION
-    if selected.exists() or selected.is_symlink():
-        value=closed_json(bounded_private(selected,4096))
-        require(type(value) is dict and set(value) == {'schema','generation','complete_sha256'}
-                and value['schema'] == 'hub.workspace-provider-service-selection.v1'
-                and value['generation'] == 1,'Invalid provider Service selection')
-        receipt=workspace_provider_service_receipt(root,value['complete_sha256'])
+    current=workspace_provider_service_selection(root)
+    if current is not None and current['generation'] == generation:
+        receipt=workspace_provider_service_receipt(root,current['complete_sha256'],generation)
         return {'schema':'hub.workspace-provider-service-complete.v1','duplicate':True,
-                'plan_sha256':selection,'complete_sha256':value['complete_sha256'],
-                'generation':1,'provider_enabled':False,'receipt':receipt['schema']}
-    complete=root/'authority/provider-service/1/COMPLETE.json'
+                'plan_sha256':selection,'complete_sha256':current['complete_sha256'],
+                'generation':generation,'provider_enabled':False,'receipt':receipt['schema']}
+    require((current is None and generation == 1)
+            or (current is not None and generation == current['generation']+1),
+            'Provider Service plan is not the next selected generation')
+    if current is not None:
+        workspace_provider_service_receipt(root,current['complete_sha256'],current['generation'])
+    complete=root/'authority/provider-service'/str(generation)/'COMPLETE.json'
     base=complete.parent
     require(not base.exists() or complete.is_file(),
             'Partial provider Service authority is retained; do not replay native creation')
@@ -1650,28 +1684,24 @@ def workspace_provider_service_setup(root, selection):
                               '--plan',root/WORKSPACE_PROVIDER_SERVICE_PLAN,'--plan-sha256',selection],root)
         require(type(output) is dict
                 and output == {'schema':'castalia.wallet-provider-service-authority-output.v1',
-                               'status':'configured_not_activated','root':str(root),'generation':1},
+                               'status':'configured_not_activated','root':str(root),'generation':generation},
                 'Provider Service native output differs from the reviewed plan')
-    receipt=workspace_provider_service_receipt(root)
+    receipt=workspace_provider_service_receipt(root,generation=generation)
     pin=hashlib.sha256(bounded_private(complete)).hexdigest()
     workspace_store(selected,workspace_bytes({'schema':'hub.workspace-provider-service-selection.v1',
-                    'generation':1,'complete_sha256':pin}))
+                    'generation':generation,'complete_sha256':pin}),replace=current is not None)
     return {'schema':'hub.workspace-provider-service-complete.v1','duplicate':False,
-            'plan_sha256':selection,'complete_sha256':pin,'generation':1,
+            'plan_sha256':selection,'complete_sha256':pin,'generation':generation,
             'provider_enabled':False,'receipt':receipt['schema']}
 
 
 def workspace_provider_service_status(root):
-    selected=root/WORKSPACE_PROVIDER_SERVICE_SELECTION
-    if not selected.exists() and not selected.is_symlink():
+    value=workspace_provider_service_selection(root)
+    if value is None:
         return {'state':'proposal_ready' if (root/WORKSPACE_PROVIDER_SERVICE_PLAN).exists() else 'absent',
                 'generation':None,'permission':None}
-    value=closed_json(bounded_private(selected,4096))
-    require(type(value) is dict and set(value) == {'schema','generation','complete_sha256'}
-            and value['schema'] == 'hub.workspace-provider-service-selection.v1'
-            and value['generation'] == 1,'Invalid provider Service selection')
-    receipt=workspace_provider_service_receipt(root,value['complete_sha256'])
-    return {'state':'configured_native_unqualified','generation':1,
+    receipt=workspace_provider_service_receipt(root,value['complete_sha256'],value['generation'])
+    return {'state':'configured_native_unqualified','generation':value['generation'],
             'permission':workspace_permission(receipt)}
 
 
@@ -1734,8 +1764,9 @@ def workspace_provider_worker(root, action, requester_policy_sha256=None, provid
         require(service_status['state'] == 'configured_native_unqualified'
                 and service_status['permission']['state'] == 'active',
                 'Active finite provider Service authority is required')
-        service_receipt=workspace_provider_service_receipt(root)
-        service_dir=root/'authority/provider-service/1/config'
+        service_receipt=workspace_provider_service_receipt(
+            root,generation=service_status['generation'])
+        service_dir=root/'authority/provider-service'/str(service_status['generation'])/'config'
         argv += ['--service-database',root/'data/service.db',
           '--native-verifier',root/'native'/rows['context-verifier']['filename'],
           '--native-verifier-sha256',rows['context-verifier']['sha256'],
