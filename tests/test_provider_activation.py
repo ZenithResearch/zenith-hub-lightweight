@@ -637,6 +637,57 @@ class ProviderReleaseProfileTests(unittest.TestCase):
         with self.assertRaises(process_mac.InstallError):
             process_mac.workspace_upgrade_policy(new, old)
 
+    def test_provider_upgrade_reconciles_only_client_executable_pin_and_restores_readiness(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory).resolve() / "Process-Workspace"
+            for name in ("config", "data", "logs", "authority", "native", "software-upgrades/upgrade/previous"):
+                (root / name).mkdir(mode=0o700, parents=True, exist_ok=True)
+            private_file(root / "config/local.json", {
+                "schema": "hub.process-macos-config.v1", "mode": "workspace",
+                "runtime_port": 8292, "service_port": 8291,
+            })
+            private_file(root / "config/frank.json", {
+                "schema": "frank.config.v1", "environment": "production",
+                "runtime_endpoint": "http://127.0.0.1:8292",
+                "journal": str(root / "data/frank.db"),
+                "allow_local_dev_untrusted": False,
+                "integrations": {"schema": "frank.integrations.v1", "integrations": [], "actors": []},
+            })
+            old = {"native_profile": "workspace-live-provider-v1"}
+            new = {"native_profile": "workspace-provider-v1"}
+            private_file(root / "profile.json", new)
+            receipt = {"plan_sha256": "c" * 64,
+                       "configuration_hashes": {"wallet-command.json": "d" * 64}}
+            old_row = [{"role": "wallet-command", "filename": "castalia-wallet-service",
+                        "sha256": "a" * 64}]
+            new_row = [{"role": "wallet-command", "filename": "castalia-wallet-service",
+                        "sha256": "b" * 64}]
+            with mock.patch.object(process_mac, "native_rows", side_effect=[old_row, new_row]):
+                old_master = process_mac.workspace_master_for_profile(root, receipt, old)
+            private_file(root / "config/frank-workspace.json", old_master)
+            private_file(root / "config/workspace-admission.json", {
+                "schema": "runtime.new-run-admission.v1", "enabled": False,
+                "composition_digest": receipt["plan_sha256"],
+            })
+            previous = root / "software-upgrades/upgrade/previous"
+            with mock.patch.object(process_mac, "native_rows", side_effect=[old_row, new_row]):
+                result = process_mac.workspace_upgrade_client_configuration(
+                    root, receipt, old, new, previous
+                )
+            self.assertTrue(result["configuration_migrated"])
+            self.assertEqual((previous / "frank-workspace.json").read_bytes(),
+                             process_mac.workspace_bytes(old_master))
+            migrated = json.loads((root / "config/frank-workspace.json").read_bytes())
+            self.assertEqual(migrated["wallet"]["executable_sha256"], "b" * 64)
+            self.assertEqual(migrated["wallet"]["configuration_sha256"], "d" * 64)
+            private_file(root / process_mac.WORKSPACE_UPGRADE_HOLD,
+                         {"schema": "hub.workspace-software-upgrade-operation.v1"})
+            with mock.patch.object(process_mac, "native_rows", return_value=new_row), \
+                    mock.patch.object(process_mac, "workspace_complete", return_value=receipt):
+                self.assertEqual(process_mac.workspace_ready(root, own_upgrade=True), receipt)
+                with self.assertRaises(process_mac.InstallError):
+                    process_mac.workspace_ready(root)
+
 
 if __name__ == "__main__":
     unittest.main()

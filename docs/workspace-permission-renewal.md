@@ -6,7 +6,7 @@ The configured status distinguishes `active`, `not_yet_valid`, `expired` and `un
 
 ## Upgrade the stopped workspace software when required
 
-An older installation cannot gain the renewal command by editing its release pins. Use a reviewed new offline workspace bundle. Ordinary workspace upgrades retain the narrow existing rule that permits only the reviewed Frank/controller successor. The explicit `workspace-provider-v1` transition instead requires the complete fixed six-role native closure and the same 15 base package identities plus the fixed eleven-package Vercel Queue closure, while allowing the exact release-pinned Wallet, verifier, secS, Runtime, Service and Frank bytes to advance together. It preserves `data`, `authority` and `config`, and retains the previous software and release receipts under `software-upgrades/<id>/previous/`.
+An older installation cannot gain the renewal command by editing its release pins. Use a reviewed new offline workspace bundle. Ordinary workspace upgrades retain the narrow existing rule that permits only the reviewed Frank/controller successor. The explicit `workspace-provider-v1` transition instead requires the complete fixed six-role native closure and the same 15 base package identities plus the fixed eleven-package Vercel Queue closure, while allowing the exact release-pinned Wallet, verifier, secS, Runtime, Service and Frank bytes to advance together. It preserves `data`, `authority` and every operator configuration value. When the verified bundle changes the Wallet executable, the upgrade atomically replaces only Frank's executable digest with the new release pin, retains the exact prior client configuration under `software-upgrades/<id>/previous/`, and proves workspace readiness before releasing the hold. Previous software and release receipts remain in that operation directory as well.
 
 Set these values to the owner's exact bundle and manifest SHA256. Run from that bundle's controller using the same pinned Python 3.12 installation:
 
@@ -20,7 +20,7 @@ WORKSPACE_BUNDLE_SHA=the_exact_64_character_bundle_manifest_sha256
   --root "$WORKSPACE_ROOT" --bundle "$WORKSPACE_BUNDLE" --bundle-sha256 "$WORKSPACE_BUNDLE_SHA"
 ```
 
-Success returns `hub.workspace-software-upgrade-complete.v1` with the exact new bundle digest and `data_preserved:true`, `authority_preserved:true`, `external_effects:false`. The new installed receipt is published after the offline software inventory is verified. The original release and software are retained. This command does not renew authority or start services.
+Success returns `hub.workspace-software-upgrade-complete.v1` with the exact new bundle digest, prior and current client-configuration digests, `configuration_migrated`, `data_preserved:true`, `authority_preserved:true`, and `external_effects:false`. The new installed receipt is published after the offline software inventory and reconciled client pin both pass readiness. The original release, software, and client configuration are retained. This command does not renew authority or start services.
 
 An interrupted upgrade retains `logs/workspace-software-upgrade.json` and its previous/candidate software. Normal actions report that reconciliation is required. There is no automatic rollback or upgrade resume; retain the complete installation for owner reconciliation. Never delete the hold, overwrite release pins, copy another workspace's custody, or rerun setup to get around it.
 
