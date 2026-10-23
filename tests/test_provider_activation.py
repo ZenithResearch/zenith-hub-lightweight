@@ -600,6 +600,34 @@ class ProviderReleaseProfileTests(unittest.TestCase):
         self.assertEqual(len(profile["wheels"]), process_mac.PROVIDER_WHEEL_COUNT)
         process_mac.native_rows(profile)
 
+    def test_previous_provider_closure_is_valid_only_for_upgrade_preflight(self):
+        profile = self.profile("workspace-provider-v1", process_mac.WORKSPACE_PROVIDER_ROLES, "a")
+        profile["wheels"] = [
+            row for row in profile["wheels"]
+            if row["name"] not in process_mac.PROVIDER_CRYPTO_PACKAGES
+        ]
+        wheel_names = {row["name"] for row in profile["wheels"]}
+
+        self.assertEqual(
+            len(profile["wheels"]),
+            process_mac.BASE_WHEEL_COUNT + len(process_mac.PROVIDER_QUEUE_PACKAGES),
+        )
+        self.assertTrue(process_mac.PROVIDER_QUEUE_PACKAGES <= wheel_names)
+        self.assertFalse(process_mac.PROVIDER_CRYPTO_PACKAGES & wheel_names)
+        self.assertFalse(process_mac.valid_wheel_closure(profile, wheel_names))
+        self.assertTrue(process_mac.valid_wheel_closure(
+            profile, wheel_names, allow_previous_provider=True
+        ))
+        incomplete = json.loads(json.dumps(profile))
+        incomplete["wheels"] = [
+            row for row in incomplete["wheels"] if row["name"] != "vercel-queue"
+        ]
+        self.assertFalse(process_mac.valid_wheel_closure(
+            incomplete, {row["name"] for row in incomplete["wheels"]},
+            allow_previous_provider=True,
+        ))
+
+
     def profile(self, native_profile, roles, marker):
         names = ["frank-executor", "process-runtime", "service-management",
                  *(f"dependency-{index}" for index in range(12))]

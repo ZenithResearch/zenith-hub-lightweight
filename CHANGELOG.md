@@ -4,6 +4,10 @@
 
 ### Fixed
 
+- Permit only the exact signed 26-wheel provider predecessor during the
+  pre-mutation software-upgrade check — the released workspace can advance to
+  the 29-wheel verifier closure while fresh and completed bundles stay strict.
+
 - Keep build-provenance prose out of the closed runtime profile and assert the
   checked-in profile through the bundle validator — prevents valid provenance
   metadata from becoming an unsupported installer field.

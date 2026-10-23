@@ -184,7 +184,22 @@ def run(argv, root, timeout=30, *, check=True):
         return subprocess.CompletedProcess(argv,child.returncode,stdout,stderr)
 
 
-def check_bundle(bundle, expected):
+def valid_wheel_closure(profile, wheel_names, *, allow_previous_provider=False):
+    if profile.get('native_profile') != 'workspace-provider-v1':
+        return (len(profile['wheels']) == BASE_WHEEL_COUNT
+                and len(wheel_names) == BASE_WHEEL_COUNT)
+    current = (len(profile['wheels']) == PROVIDER_WHEEL_COUNT
+               and len(wheel_names) == PROVIDER_WHEEL_COUNT
+               and PROVIDER_RUNTIME_PACKAGES <= wheel_names)
+    previous = (allow_previous_provider
+                and len(profile['wheels']) == BASE_WHEEL_COUNT + len(PROVIDER_QUEUE_PACKAGES)
+                and len(wheel_names) == BASE_WHEEL_COUNT + len(PROVIDER_QUEUE_PACKAGES)
+                and PROVIDER_QUEUE_PACKAGES <= wheel_names
+                and not PROVIDER_CRYPTO_PACKAGES & wheel_names)
+    return current or previous
+
+
+def check_bundle(bundle, expected, *, allow_previous_provider=False):
     bundle = Path(bundle).resolve()
     require(re.fullmatch('[a-f0-9]{64}', expected or '') and sha(bundle/'bundle.json') == expected,
             'Bundle manifest digest differs from the supplied release pin')
@@ -201,11 +216,8 @@ def check_bundle(bundle, expected):
     profile = load(bundle/'profile.json')
     native = native_rows(profile)
     wheel_names = {r['name'] for r in profile['wheels']}
-    expected_wheel_count = (PROVIDER_WHEEL_COUNT if profile.get('native_profile') == 'workspace-provider-v1'
-                            else BASE_WHEEL_COUNT)
-    require(len(profile['wheels']) == expected_wheel_count and len(wheel_names) == expected_wheel_count
-            and (profile.get('native_profile') != 'workspace-provider-v1'
-                 or PROVIDER_RUNTIME_PACKAGES <= wheel_names),
+    require(valid_wheel_closure(profile, wheel_names,
+                                allow_previous_provider=allow_previous_provider),
             'Incomplete Mac dependency closure')
     expected_files = {'profile.json', 'process_mac.py'} | {'wheels/'+r['filename'] for r in profile['wheels']}
     expected_files |= {'native/'+r['filename'] for r in native}
@@ -312,7 +324,7 @@ def inventory(root, *, seal=False):
     return result
 
 
-def installed(root, *, own_upgrade=False):
+def installed(root, *, own_upgrade=False, allow_previous_provider=False):
     root = private(root)
     require(own_upgrade or (not (root/'logs/workspace-software-upgrade.json').exists() and not (root/'logs/workspace-software-upgrade.json').is_symlink()),
             'Workspace software upgrade requires reconciliation; retained backups are never rolled back automatically')
@@ -322,7 +334,8 @@ def installed(root, *, own_upgrade=False):
             'Installation was relocated; reinstall at its final path')
     require(sha(Path(sys._base_executable).resolve()) == receipt['python_sha256'],
             'Python changed; reinstall with the current interpreter')
-    check_bundle(root, receipt['bundle_sha256'])
+    check_bundle(root, receipt['bundle_sha256'],
+                 allow_previous_provider=allow_previous_provider)
     require(sha(root/'control.py') == receipt['control_sha256'], 'Installed controller changed')
     require(sha(root/'installed-files.json') == receipt['installed_files_sha256'], 'Installed inventory changed')
     run([root/'venv/bin/python', '-I', '-S', '-B', root/'control.py', '_inventory', '--root', root], root)
@@ -1345,7 +1358,7 @@ def workspace_software_upgrade(source,root,expected):
     new=check_bundle(source,expected);host(new)
     require(sha(__file__) == load(Path(source)/'bundle.json')['files']['process_mac.py'],
             'Use the controller delivered in this exact upgrade bundle')
-    previous=installed(root);old=workspace_profile(root)
+    previous=installed(root,allow_previous_provider=True);old=workspace_profile(root)
     workspace_upgrade_policy(old,new)
     workspace_stopped(root)
     require(not workspace_holds(root), 'Reconcile workspace renewal or cleanup before software upgrade')
