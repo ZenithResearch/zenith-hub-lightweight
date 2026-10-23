@@ -126,6 +126,70 @@ class ProviderActivationTests(unittest.TestCase):
         self.assertEqual(status["state"], "configured_native_unqualified")
         self.assertEqual(status["generation"], 1)
 
+    def test_provider_service_authority_rotates_to_next_create_only_generation(self):
+        calls = []
+
+        def native(argv, root):
+            plan = json.loads(
+                (self.root / "config/provider-service-plan.json").read_text()
+            )
+            generation = int(plan["generation"])
+            calls.append(generation)
+            config = self.root / f"authority/provider-service/{generation}/config"
+            values = {
+                "command-authority.json": {"generation": generation, "command": True},
+                "wallet-command.json": {"generation": generation, "wallet": True},
+                "service-receiver.json": {"generation": generation, "receiver": True},
+            }
+            hashes = {}
+            for name, value in values.items():
+                hashes[name] = hashlib.sha256(private_file(config / name, value)).hexdigest()
+            plan_pin = hashlib.sha256(
+                (self.root / "config/provider-service-plan.json").read_bytes()
+            ).hexdigest()
+            receipt = {
+                "schema": "castalia.wallet-provider-service-authority-complete.v1",
+                "plan_sha256": plan_pin,
+                "root": str(self.root),
+                "generation": generation,
+                "configuration_hashes": hashes,
+                "not_before": int(time.time()) - 5,
+                "not_after": int(time.time()) + 3500,
+                "scope": "finite local provider lifecycle authority in one isolated Service Management store",
+                "activation": False,
+                "service_started": False,
+            }
+            private_file(
+                self.root / f"authority/provider-service/{generation}/COMPLETE.json",
+                receipt,
+            )
+            return {
+                "schema": "castalia.wallet-provider-service-authority-output.v1",
+                "status": "configured_not_activated",
+                "root": str(self.root),
+                "generation": generation,
+            }
+
+        with mock.patch.object(process_mac, "workspace_run", side_effect=native):
+            first = process_mac.workspace_prepare_provider_service(self.root)
+            process_mac.workspace_provider_service_setup(self.root, first["plan_sha256"])
+            second = process_mac.workspace_prepare_provider_service(
+                self.root, first["plan_sha256"]
+            )
+            rotated = process_mac.workspace_provider_service_setup(
+                self.root, second["plan_sha256"]
+            )
+
+        self.assertEqual(second["generation"], "2")
+        self.assertEqual(rotated["generation"], 2)
+        self.assertEqual(calls, [1, 2])
+        self.assertTrue(
+            (self.root / "authority/provider-service/1/COMPLETE.json").is_file()
+        )
+        status = process_mac.workspace_provider_service_status(self.root)
+        self.assertEqual(status["generation"], 2)
+        self.assertEqual(status["permission"]["state"], "active")
+
     def test_partial_provider_service_authority_is_never_replayed(self):
         proposal = process_mac.workspace_prepare_provider_service(self.root)
         (self.root / "authority/provider-service/1").mkdir(mode=0o700, parents=True)
@@ -177,7 +241,8 @@ class ProviderActivationTests(unittest.TestCase):
         with mock.patch.object(
             process_mac,
             "workspace_provider_service_status",
-            return_value={"state": "configured_native_unqualified", "permission": {"state": "active"}},
+            return_value={"state": "configured_native_unqualified", "generation": 2,
+                          "permission": {"state": "active"}},
         ), mock.patch.object(
             process_mac, "workspace_provider_service_receipt", return_value=service_receipt
         ), mock.patch.object(process_mac, "workspace_run", return_value=result) as run:
@@ -190,6 +255,10 @@ class ProviderActivationTests(unittest.TestCase):
         self.assertEqual(argv[argv.index("--limit") + 1], "1")
         self.assertEqual(argv[argv.index("--intake-database") + 1], str(self.root / "data/provider-intake.db"))
         self.assertEqual(argv[argv.index("--service-database") + 1], str(self.root / "data/service.db"))
+        self.assertEqual(
+            argv[argv.index("--receiver-policy") + 1],
+            str(self.root / "authority/provider-service/2/config/service-receiver.json"),
+        )
         self.assertNotIn("--runtime-endpoint", argv)
 
     def test_provider_pull_dispatches_one_item_with_fixed_route_and_private_token(self):
@@ -315,7 +384,7 @@ class ProviderActivationTests(unittest.TestCase):
         }
         with mock.patch.object(
             process_mac, "workspace_provider_service_status",
-            return_value={"state": "configured_native_unqualified",
+            return_value={"state": "configured_native_unqualified", "generation": 1,
                           "permission": {"state": "active"}},
         ), mock.patch.object(
             process_mac, "workspace_ready", return_value=receipt,
@@ -464,7 +533,8 @@ class ProviderActivationTests(unittest.TestCase):
         with mock.patch.object(
             process_mac,
             "workspace_provider_service_status",
-            return_value={"state": "configured_native_unqualified", "permission": {"state": "active"}},
+            return_value={"state": "configured_native_unqualified", "generation": 1,
+                          "permission": {"state": "active"}},
         ), mock.patch.object(
             process_mac,
             "workspace_provider_service_receipt",
@@ -500,7 +570,8 @@ class ProviderActivationTests(unittest.TestCase):
         with mock.patch.object(
             process_mac,
             "workspace_provider_service_status",
-            return_value={"state": "configured_native_unqualified", "permission": {"state": "active"}},
+            return_value={"state": "configured_native_unqualified", "generation": 1,
+                          "permission": {"state": "active"}},
         ), mock.patch.object(
             process_mac, "workspace_provider_service_receipt", return_value=service_receipt
         ), mock.patch.object(
