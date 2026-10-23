@@ -909,8 +909,10 @@ def workspace_config_directory(root, receipt):
     return root/'authority/renewals'/str(receipt['native_generation'])/'config' if receipt.get('schema') == 'castalia.wallet-workspace-renewal-complete.v1' else root/'authority/config'
 
 
-def workspace_holds(root, *, own_renewal=False, resume_generation=None):
-    paths = [root/'logs/workspace-operation.json',root/'data/frank-workspace-cleanup.json',root/WORKSPACE_UPGRADE_HOLD]
+def workspace_holds(root, *, own_renewal=False, own_upgrade=False, resume_generation=None):
+    paths = [root/'logs/workspace-operation.json',root/'data/frank-workspace-cleanup.json']
+    if not own_upgrade:
+        paths.append(root/WORKSPACE_UPGRADE_HOLD)
     if not own_renewal:
         paths.append(root/WORKSPACE_RENEW_HOLD)
     paths.extend(root/'authority/native'/name for name in ['wallet-transition.json','wallet-transition','.wallet-transition.tmp'])
@@ -1169,8 +1171,8 @@ def workspace_complete(root):
     return workspace_receipt(root,selected,pin)
 
 
-def workspace_master(root, receipt):
-    row = next(r for r in native_rows(load(root/'profile.json')) if r['role'] == 'wallet-command')
+def workspace_master_for_profile(root, receipt, profile):
+    row = next(r for r in native_rows(profile) if r['role'] == 'wallet-command')
     return {'schema': 'frank.workspace.v1',
             'runtime_endpoint': 'http://127.0.0.1:'+str(config(root)['runtime_port']),
             'journal': str(root/'data/frank-workspace.db'),
@@ -1180,8 +1182,12 @@ def workspace_master(root, receipt):
                        'configuration_sha256': receipt['configuration_hashes']['wallet-command.json']}}
 
 
-def workspace_ready(root, *, own_renewal=False):
-    require(not workspace_holds(root,own_renewal=own_renewal), 'Workspace renewal, software upgrade or cleanup is unresolved')
+def workspace_master(root, receipt):
+    return workspace_master_for_profile(root, receipt, load(root/'profile.json'))
+
+
+def workspace_ready(root, *, own_renewal=False, own_upgrade=False):
+    require(not workspace_holds(root,own_renewal=own_renewal,own_upgrade=own_upgrade), 'Workspace renewal, software upgrade or cleanup is unresolved')
     receipt = workspace_complete(root)
     require(closed_json(bounded_private(root/'config/frank-workspace.json')) == workspace_master(root, receipt),
             'Workspace client configuration differs from native setup')
@@ -1310,6 +1316,21 @@ def workspace_upgrade_policy(old,new):
                 'Software upgrade cannot change Runtime or Service closure')
 
 
+def workspace_upgrade_client_configuration(root, receipt, old_profile, new_profile, previous_dir):
+    path=root/'config/frank-workspace.json'
+    previous_raw=bounded_private(path)
+    require(closed_json(previous_raw) == workspace_master_for_profile(root,receipt,old_profile),
+            'Retained workspace client configuration differs from the previous native setup')
+    backup=previous_dir/'frank-workspace.json'
+    workspace_store(backup,previous_raw)
+    next_raw=workspace_bytes(workspace_master_for_profile(root,receipt,new_profile))
+    if next_raw != previous_raw:
+        workspace_store(path,next_raw,replace=True)
+    return {'previous_configuration_sha256':hashlib.sha256(previous_raw).hexdigest(),
+            'configuration_sha256':hashlib.sha256(next_raw).hexdigest(),
+            'configuration_migrated':next_raw != previous_raw}
+
+
 def workspace_software_upgrade(source,root,expected):
     # Invoke the exact new bundle controller. Existing installed pins are
     # verified before the first mutation; no native owner action is run here.
@@ -1386,9 +1407,13 @@ def workspace_software_upgrade(source,root,expected):
         with path.open('rb') as stream:os.fsync(stream.fileno())
     workspace_sync(root)
     check_bundle(root,expected)
+    configuration=workspace_upgrade_client_configuration(root,current,old,new,old_dir)
+    unchanged={name:pin for name,pin in preserved.items() if name != 'config/frank-workspace.json'}
     require(hashlib.sha256(bounded_private(selected)).hexdigest() == authority_pin
-            and all(hashlib.sha256(bounded_private(root/name)).hexdigest() == pin for name,pin in preserved.items())
+            and all(hashlib.sha256(bounded_private(root/name)).hexdigest() == pin for name,pin in unchanged.items())
             and workspace_complete(root) == current, 'Workspace authority or configuration changed during software upgrade')
+    require(workspace_ready(root,own_upgrade=True) == current,
+            'Upgraded workspace is not ready with the retained native authority')
     next_receipt={**previous,'bundle_sha256':expected,'control_sha256':sha(root/'control.py'),
                   'installed_files_sha256':sha(root/'installed-files.json'),'authority_qualified':False}
     next_raw=workspace_bytes(next_receipt)
@@ -1396,6 +1421,7 @@ def workspace_software_upgrade(source,root,expected):
              'previous_installed_sha256':operation['previous_installed_sha256'],
              'installed_sha256':hashlib.sha256(next_raw).hexdigest(),'bundle_sha256':expected,
              'previous_bundle_sha256':previous['bundle_sha256'],'preserved_configuration':preserved,
+             **configuration,
              'selected_complete':operation['selected_complete'],'data_preserved':True,'authority_preserved':True,
              'authority_qualified':False,'external_effects':False}
     workspace_store(operation_dir/'COMPLETE.json',workspace_bytes(receipt))
