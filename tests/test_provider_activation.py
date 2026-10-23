@@ -411,6 +411,39 @@ class ProviderActivationTests(unittest.TestCase):
         self.assertIn("_run-provider-projection", plist["ProgramArguments"])
         self.assertIn(pin, plist["ProgramArguments"])
 
+    def test_provider_projection_bootstrap_carries_no_runtime_authority(self):
+        policy = private_file(
+            self.root / "config/provider-requester-policy.json", {"fixture": True})
+        projection = private_file(self.root / "config/provider-projection.json", {
+            "schema": "hub.provider-projection.v1",
+            "browser_origin": "http://127.0.0.1:4337",
+            "public_base_url": "https://matrix-home.example.ts.net/zenith/provider",
+            "requester_policy_sha256": hashlib.sha256(policy).hexdigest(),
+            "port": 8293,
+        })
+        for name in ("provider-intake.db", "service.db"):
+            (self.root / "data" / name).touch(mode=0o600)
+        expired = {"scope": process_mac.WORKSPACE_PROVIDER_SCOPE,
+                   "not_before": 1, "not_after": 2, "identity_not_after": 3}
+        with mock.patch.object(
+            process_mac, "workspace_provider_service_status",
+            return_value={"state": "configured_native_unqualified",
+                          "permission": {"state": "active"}},
+        ), mock.patch.object(
+            process_mac, "workspace_ready", return_value=expired,
+        ), mock.patch.object(
+            process_mac, "workspace_permission", return_value={"state": "expired"},
+        ), mock.patch.object(
+            process_mac, "workspace_config_directory"
+        ) as runtime_config:
+            argv, _ = process_mac.workspace_provider_projection_argv(
+                self.root, hashlib.sha256(projection).hexdigest())
+        values = [str(value) for value in argv]
+        self.assertIn("--runtime-unavailable", values)
+        self.assertNotIn("--runtime-endpoint", values)
+        self.assertNotIn("--runtime-wallet-command", values)
+        runtime_config.assert_not_called()
+
     def test_provider_projection_rejects_unreviewed_or_insecure_origin(self):
         policy = private_file(
             self.root / "config/provider-requester-policy.json", {"fixture": True})

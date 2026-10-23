@@ -183,8 +183,14 @@ mode `0600` using exact reviewed values:
 
 `browser_origin` is the one allowed browser origin. `public_base_url` is the
 HTTPS URL returned in artifact, receipt and status links. Its optional path must
-be normalized and have no trailing slash. Review the exact configuration digest,
-start Runtime, then start the projection:
+be normalized and have no trailing slash. Before the first admitted request
+yields an exact Runtime authority, the start action launches a bootstrap read
+surface with no Runtime endpoint or Runtime Wallet configuration. It reports
+authorized transport and Service-owned state while `/ready` keeps
+`runtime_authority` false. This grants no execution or Runtime query authority.
+After the owner selects the exact Actor and Run, restart the projection to bind
+the complete Runtime query tuple. Review the exact configuration digest, then
+start the projection:
 
 ```bash
 PROJECTION="$ROOT/config/provider-projection.json"
@@ -194,7 +200,8 @@ PROJECTION_SHA256="$(shasum -a 256 "$PROJECTION" | awk '{print $1}')"
 ```
 
 The controller binds only `127.0.0.1:8293`, pins both databases, the requester
-policy, the active Service and Runtime authority, and the native Wallet binary.
+policy and active Service authority. It adds the Runtime authority and native
+Wallet binary only when that exact authority is active.
 Its successful result explicitly reports `funnel_changed: false`.
 
 On the current pilot Mac, the reviewed public route can share the existing

@@ -1952,25 +1952,28 @@ def workspace_provider_projection_argv(root, expected):
             and service_status['permission']['state'] == 'active',
             'Active finite provider Service authority is required')
     runtime_receipt = workspace_ready(root)
-    require(runtime_receipt.get('scope') == WORKSPACE_PROVIDER_SCOPE
-            and workspace_permission(runtime_receipt)['state'] == 'active',
-            'Active exact Actor/Run Runtime authority is required')
-    rows = {row['role']:row for row in native_rows(workspace_profile(root))}
-    runtime_dir = workspace_config_directory(root,runtime_receipt)
-    return [root/'venv/bin/python','-I','-B','-m',
+    runtime_active = (runtime_receipt.get('scope') == WORKSPACE_PROVIDER_SCOPE
+                      and workspace_permission(runtime_receipt)['state'] == 'active')
+    argv = [root/'venv/bin/python','-I','-B','-m',
             'service_management.provider_projection_server',
             '--intake-database',root/'data/provider-intake.db',
             '--service-database',root/'data/service.db',
             '--requester-policy',root/'config/provider-requester-policy.json',
             '--browser-origin',value['browser_origin'],
             '--public-base-url',value['public_base_url'],
-            '--runtime-endpoint','http://127.0.0.1:'+str(config(root)['runtime_port']),
-            '--runtime-wallet-command',root/'native'/rows['wallet-command']['filename'],
-            '--runtime-wallet-command-sha256',rows['wallet-command']['sha256'],
-            '--runtime-wallet-configuration',runtime_dir/'wallet-command.json',
-            '--runtime-wallet-configuration-sha256',
-            runtime_receipt['configuration_hashes']['wallet-command.json'],
-            '--host','127.0.0.1','--port',str(value['port']),'--timeout','5'], pin
+            '--host','127.0.0.1','--port',str(value['port']),'--timeout','5']
+    if not runtime_active:
+        argv += ['--runtime-unavailable']
+        return argv, pin
+    rows = {row['role']:row for row in native_rows(workspace_profile(root))}
+    runtime_dir = workspace_config_directory(root,runtime_receipt)
+    argv += ['--runtime-endpoint','http://127.0.0.1:'+str(config(root)['runtime_port']),
+             '--runtime-wallet-command',root/'native'/rows['wallet-command']['filename'],
+             '--runtime-wallet-command-sha256',rows['wallet-command']['sha256'],
+             '--runtime-wallet-configuration',runtime_dir/'wallet-command.json',
+             '--runtime-wallet-configuration-sha256',
+             runtime_receipt['configuration_hashes']['wallet-command.json']]
+    return argv, pin
 
 
 def workspace_provider_projection(root, action, selection):
@@ -1986,11 +1989,12 @@ def workspace_provider_projection(root, action, selection):
                 'stopped':True,'funnel_changed':False}
     require(selection is not None,
             'Supply the reviewed provider projection configuration digest')
-    _, pin = workspace_provider_projection_argv(root, selection)
+    projection_argv, pin = workspace_provider_projection_argv(root, selection)
     require(not launch_status(root,PROVIDER_PROJECTION),
             'Provider projection is already registered')
-    require(owns_listener(root,'runtime'),
-            'Start the exact workspace Runtime before the provider projection')
+    if '--runtime-unavailable' not in projection_argv:
+        require(owns_listener(root,'runtime'),
+                'Start the exact workspace Runtime before the active provider projection')
     with socket.socket() as listener:
         try:
             listener.bind(('127.0.0.1',PROVIDER_PROJECTION_PORT))
