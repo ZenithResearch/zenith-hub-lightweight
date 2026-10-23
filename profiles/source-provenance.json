@@ -74,9 +74,9 @@
     "components": {
       "frank": {
         "package": "frank-executor",
-        "source_commit": "0a9ca3d66020a799da25e4353d72e83cd2273736",
+        "source_commit": "331833d81a5a84bad104b1e5a516466a8be08037",
         "version": "0.1.0",
-        "wheel_sha256": "ea1edb35d90e14e27c99d1acbc354b195e2c08126af05e776a24ad6caf84dde0"
+        "wheel_sha256": "bdd7fa647e67ef3cffb10fd98d8c1721879d8a6a1c9ccc87eabc7c07bbd15c70"
       },
       "process-runtime": {
         "package": "process-runtime",
@@ -86,9 +86,9 @@
       },
       "service-management": {
         "package": "service-management",
-        "source_commit": "94d0a42afeeab469f8070a5f21ab372faf015930",
+        "source_commit": "29c5cebaf89601d8bba761398a07ad818d151843",
         "version": "0.1.0",
-        "wheel_sha256": "7e8ef11b6e32c66c4c08ff1ac8221846d8590911c6b52e1131a77622a49af3a8"
+        "wheel_sha256": "04bf5da5faa893ff3d3b98c2e15b92b4368b4b10031c51130a8d5e6438f8ee2c"
       }
     },
     "native": [
@@ -144,7 +144,7 @@
     "files": [
       {
         "path": "profiles/process-macos/release.workspace.v1.json",
-        "sha256": "0f302dc84a7bb5764510888a1d72d352ca05b9ccc7901ae1fe50adf40e844b86"
+        "sha256": "cefd2a25bc01ba31edc8e0bd99a48b8ffd2cecaa8e5070012ceae95d5692ca3e"
       }
     ],
     "wheels": [
@@ -184,10 +184,10 @@
         "version": "50.0.1"
       },
       {
-        "bytes": 159299,
+        "bytes": 159881,
         "filename": "frank_executor-0.1.0-py3-none-any.whl",
         "name": "frank-executor",
-        "sha256": "ea1edb35d90e14e27c99d1acbc354b195e2c08126af05e776a24ad6caf84dde0",
+        "sha256": "bdd7fa647e67ef3cffb10fd98d8c1721879d8a6a1c9ccc87eabc7c07bbd15c70",
         "version": "0.1.0"
       },
       {
@@ -303,10 +303,10 @@
         "version": "2026.9.1"
       },
       {
-        "bytes": 100713,
+        "bytes": 100915,
         "filename": "service_management-0.1.0-py3-none-any.whl",
         "name": "service-management",
-        "sha256": "7e8ef11b6e32c66c4c08ff1ac8221846d8590911c6b52e1131a77622a49af3a8",
+        "sha256": "04bf5da5faa893ff3d3b98c2e15b92b4368b4b10031c51130a8d5e6438f8ee2c",
         "version": "0.1.0"
       },
       {
