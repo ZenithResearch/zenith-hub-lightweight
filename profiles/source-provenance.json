@@ -144,7 +144,7 @@
     "files": [
       {
         "path": "profiles/process-macos/release.workspace.v1.json",
-        "sha256": "b09eaebb7868dafae7adc87696f4a7fcd0274e03ee8c70d263072250c2dbcfeb"
+        "sha256": "0f302dc84a7bb5764510888a1d72d352ca05b9ccc7901ae1fe50adf40e844b86"
       }
     ],
     "wheels": [

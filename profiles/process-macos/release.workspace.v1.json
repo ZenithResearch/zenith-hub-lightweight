@@ -281,6 +281,5 @@
       "sha256": "b9f78efe4182fe636c8074cc494a9ed6a43f6d6ee6c41367a08f9ce25af7596c",
       "version": "0.9.2"
     }
-  ],
-  "build": "SOURCE_DATE_EPOCH=1767225600; Python 3.12; setuptools 84.0.0; two matching component-wheel builds; pinned Apple-silicon provider runtime dependency closure; reproducible native builds"
+  ]
 }
