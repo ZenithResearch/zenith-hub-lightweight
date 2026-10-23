@@ -4,6 +4,10 @@
 
 ### Fixed
 
+- Keep build-provenance prose out of the closed runtime profile and assert the
+  checked-in profile through the bundle validator — prevents valid provenance
+  metadata from becoming an unsupported installer field.
+
 - Add the pinned Castalia verifier and its Apple-silicon dependency closure to
   `workspace-provider-v1`, and permit the verified 26-wheel provider release to
   upgrade to it — local Queue admission can now authenticate membership evidence.

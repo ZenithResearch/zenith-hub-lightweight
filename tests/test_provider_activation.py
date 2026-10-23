@@ -589,6 +589,17 @@ class ProviderActivationTests(unittest.TestCase):
 
 
 class ProviderReleaseProfileTests(unittest.TestCase):
+    def test_checked_in_provider_profile_matches_closed_runtime_schema(self):
+        profile = json.loads((SOURCE.parent / "release.workspace.v1.json").read_text())
+
+        self.assertEqual(
+            set(profile),
+            {"schema", "platform", "machine", "python", "components", "wheels",
+             "native_profile", "native"},
+        )
+        self.assertEqual(len(profile["wheels"]), process_mac.PROVIDER_WHEEL_COUNT)
+        process_mac.native_rows(profile)
+
     def profile(self, native_profile, roles, marker):
         names = ["frank-executor", "process-runtime", "service-management",
                  *(f"dependency-{index}" for index in range(12))]
