@@ -21,11 +21,13 @@ the complete role closure can consume at most one delivery using a closed operat
 {"consumer_group":"zenith-provider-mac","lease_seconds":300,"region":"sfo1","schema":"hub.provider-pull.v1","topic":"zenith-intake-v1"}
 ```
 
-Store those exact bytes at `config/provider-pull.json` with mode `0600`, and
-store the Vercel OIDC token separately at
-`config/provider-vercel-oidc-token`, also with mode `0600`. The token is passed
-to Service Management by file path and read into the official SDK in memory;
-it is never placed in the browser request, argv or inherited environment.
+Store those exact bytes at `config/provider-pull.json` with mode `0600`. For a
+one-shot pull, prefer launching the controller through a bounded Vercel wrapper
+that supplies only `VERCEL_OIDC_TOKEN`; the controller forwards that one value
+to the official SDK process and drops every unrelated inherited variable. The
+existing `config/provider-vercel-oidc-token` mode-`0600` path remains available
+for an operator who explicitly selects file custody. In either mode, the token
+is never placed in the browser request or argv and grants no Zenith authority.
 
 References use a separately reviewed configuration at
 `config/provider-reference-pull.json`. It has the same closed schema and

@@ -222,6 +222,36 @@ class ProviderActivationTests(unittest.TestCase):
         self.assertNotIn("header.payload.signature", argv)
         self.assertNotIn("--service-database", argv)
 
+    def test_provider_pull_can_forward_only_ephemeral_sdk_oidc_environment(self):
+        self.rows.append({
+            "role": "provider-intake-opener", "filename": "secs-provider-intake-v1",
+            "sha256": "e" * 64,
+        })
+        pull = private_file(
+            self.root / "config/provider-pull.json",
+            {"schema": "hub.provider-pull.v1", "region": "sfo1",
+             "topic": "zenith-intake-v1", "consumer_group": "zenith-provider-mac",
+             "lease_seconds": 300},
+        )
+        result = {"schema": "service.provider-worker-result.v1", "command": "pull-once",
+                  "processed": 0, "results": []}
+        with mock.patch.dict(process_mac.os.environ,
+                             {"VERCEL_OIDC_TOKEN": "header.payload.signature",
+                              "UNRELATED_SECRET": "must-not-pass"}, clear=False):
+            with mock.patch.object(process_mac, "workspace_run", return_value=result) as run:
+                observed = process_mac.workspace_provider_worker(
+                    self.root, "workspace-provider-pull-once",
+                    provider_config_sha256=hashlib.sha256(pull).hexdigest(),
+                )
+            child_environment = process_mac.environment(self.root, transport_oidc=True)
+        self.assertEqual(observed, result)
+        argv = [str(value) for value in run.call_args.args[0]]
+        self.assertNotIn("--oidc-token-file", argv)
+        self.assertNotIn("header.payload.signature", argv)
+        self.assertTrue(run.call_args.kwargs["transport_oidc"])
+        self.assertEqual(child_environment["VERCEL_OIDC_TOKEN"], "header.payload.signature")
+        self.assertNotIn("UNRELATED_SECRET", child_environment)
+
     def test_provider_pull_rejects_changed_configuration_before_dispatch(self):
         self.rows.append({
             "role": "provider-intake-opener", "filename": "secs-provider-intake-v1",

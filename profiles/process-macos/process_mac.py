@@ -150,10 +150,17 @@ def host(profile):
     require(os.getuid() != 0, 'Run as your normal Mac account, without sudo')
 
 
-def environment(root):
-    return {'PATH': os.defpath, 'HOME': str(root/'home'), 'LANG': 'C.UTF-8',
-            'PYTHONNOUSERSITE': '1', 'PYTHONDONTWRITEBYTECODE': '1',
-            'PIP_CONFIG_FILE': os.devnull, 'PIP_DISABLE_PIP_VERSION_CHECK': '1'}
+def environment(root, *, transport_oidc=False):
+    value = {'PATH': os.defpath, 'HOME': str(root/'home'), 'LANG': 'C.UTF-8',
+             'PYTHONNOUSERSITE': '1', 'PYTHONDONTWRITEBYTECODE': '1',
+             'PIP_CONFIG_FILE': os.devnull, 'PIP_DISABLE_PIP_VERSION_CHECK': '1'}
+    if transport_oidc:
+        token = os.environ.get('VERCEL_OIDC_TOKEN')
+        require(type(token) is str and 0 < len(token) <= 16384
+                and '\x00' not in token and token.count('.') == 2,
+                'A bounded Vercel Queue transport credential is required')
+        value['VERCEL_OIDC_TOKEN'] = token
+    return value
 
 
 def run(argv, root, timeout=30, *, check=True):
@@ -1197,7 +1204,7 @@ def workspace_ready(root, *, own_renewal=False):
     return receipt
 
 
-def workspace_run(argv, root, *, native_renewal=False):
+def workspace_run(argv, root, *, native_renewal=False, transport_oidc=False):
     if native_renewal:
         operation = closed_json(bounded_private(root/WORKSPACE_RENEW_HOLD))
         require(len(argv) == 6 and argv[0] == root/'native/castalia-wallet-workspace-setup'
@@ -1221,7 +1228,8 @@ def workspace_run(argv, root, *, native_renewal=False):
     resolved = False
     with tempfile.TemporaryFile(dir=root/'logs') as out, tempfile.TemporaryFile(dir=root/'logs') as err:
         try:
-            child = subprocess.Popen([str(x) for x in argv], cwd=root, env=environment(root),
+            child = subprocess.Popen([str(x) for x in argv], cwd=root,
+                                     env=environment(root, transport_oidc=transport_oidc),
                                      stdin=subprocess.DEVNULL, stdout=out, stderr=err)
             deadline = time.monotonic()+90
             reason = None
@@ -1676,14 +1684,21 @@ def workspace_provider_worker(root, action, requester_policy_sha256=None, provid
                 and type(value['lease_seconds']) is int and 30 <= value['lease_seconds'] <= 3600,
                 'Invalid provider pull configuration')
         token=root/'config/provider-vercel-oidc-token'
-        require(token.exists() and not token.is_symlink() and 0 < token.stat().st_size <= 16385,
-                'Owner-private provider transport credential is required')
-        private(token)
+        token_file = token.exists() or token.is_symlink()
+        if token_file:
+            require(not token.is_symlink() and 0 < token.stat().st_size <= 16385,
+                    'Owner-private provider transport credential is required')
+            private(token)
+        else:
+            require(type(os.environ.get('VERCEL_OIDC_TOKEN')) is str,
+                    'Owner-private provider transport credential is required')
         argv += ['--region',value['region'],'--topic',value['topic'],
                  '--consumer-group',value['consumer_group'],'--limit','1',
                  '--lease-seconds',str(value['lease_seconds']),
                  '--intake-opener',root/'native'/row['filename'],
-                 '--intake-opener-sha256',row['sha256'],'--oidc-token-file',token]
+                 '--intake-opener-sha256',row['sha256']]
+        if token_file:
+            argv += ['--oidc-token-file',token]
     elif action in admission_actions | lifecycle_actions:
         service_status=workspace_provider_service_status(root)
         require(service_status['state'] == 'configured_native_unqualified'
@@ -1730,7 +1745,8 @@ def workspace_provider_worker(root, action, requester_policy_sha256=None, provid
                 and hashlib.sha256(bounded_private(policy,262144)).hexdigest() == requester_policy_sha256,
                 'Exact reviewed requester policy is required')
         argv += ['--requester-policy',policy]
-    result=workspace_run(argv,root)
+    result=workspace_run(argv,root,
+                         transport_oidc=action in pull_actions and not token_file)
     require(type(result) is dict and set(result) in (
                 {'schema','command','processed','results'},
                 {'schema','command','processed','results','error','recovery'})
