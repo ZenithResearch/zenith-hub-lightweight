@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+- Allow the provider projection to bootstrap with active Service read authority
+  and no Runtime authority, then select the exact Runtime query tuple only after
+  a request yields its handoff and Run IDs.
+
 ### Fixed
 
 - Permit only the exact signed 26-wheel provider predecessor during the
