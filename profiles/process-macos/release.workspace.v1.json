@@ -14,9 +14,9 @@
     },
     "service-management": {
       "package": "service-management",
-      "source_commit": "a421b4d0bab32669a8a6cbe459b3d80539c61bad",
+      "source_commit": "94d0a42afeeab469f8070a5f21ab372faf015930",
       "version": "0.1.0",
-      "wheel_sha256": "590c93d2ff5524c605e5e303321f0aa0d5d1c34a04fb42d762794bf0d9219eef"
+      "wheel_sha256": "7e8ef11b6e32c66c4c08ff1ac8221846d8590911c6b52e1131a77622a49af3a8"
     }
   },
   "machine": "arm64",
@@ -98,6 +98,20 @@
       "name": "certifi",
       "sha256": "62f22742b58a1a33014a2b6b706588a8d7e2a88ae7bd1a6ebe8c992928483775",
       "version": "2026.7.22"
+    },
+    {
+      "bytes": 184719,
+      "filename": "cffi-2.1.1-cp312-cp312-macosx_11_0_arm64.whl",
+      "name": "cffi",
+      "sha256": "f81b3b8f3d4e343550fa4baa0e479bba9f2d29ce9c2e9b51d1ce1718d7442fcf",
+      "version": "2.1.1"
+    },
+    {
+      "bytes": 4010153,
+      "filename": "cryptography-50.0.1-cp311-abi3-macosx_11_0_arm64.whl",
+      "name": "cryptography",
+      "sha256": "b8f852c65863251b9e3a1b8c150ce21e59b522dbb6a7d4bc80e680d38388e986",
+      "version": "50.0.1"
     },
     {
       "bytes": 159299,
@@ -191,6 +205,13 @@
       "version": "0.1.0"
     },
     {
+      "bytes": 62600,
+      "filename": "pycparser-3.12-py3-none-any.whl",
+      "name": "pycparser",
+      "sha256": "a076f3f489b39b43ed13563a1dafe42447445bec2e294154ec5c57fcdda4c85e",
+      "version": "3.12"
+    },
+    {
       "bytes": 30042,
       "filename": "python_multipart-0.0.32-py3-none-any.whl",
       "name": "python-multipart",
@@ -212,10 +233,10 @@
       "version": "2026.9.1"
     },
     {
-      "bytes": 100747,
+      "bytes": 100713,
       "filename": "service_management-0.1.0-py3-none-any.whl",
       "name": "service-management",
-      "sha256": "590c93d2ff5524c605e5e303321f0aa0d5d1c34a04fb42d762794bf0d9219eef",
+      "sha256": "7e8ef11b6e32c66c4c08ff1ac8221846d8590911c6b52e1131a77622a49af3a8",
       "version": "0.1.0"
     },
     {
@@ -260,5 +281,6 @@
       "sha256": "b9f78efe4182fe636c8074cc494a9ed6a43f6d6ee6c41367a08f9ce25af7596c",
       "version": "0.9.2"
     }
-  ]
+  ],
+  "build": "SOURCE_DATE_EPOCH=1767225600; Python 3.12; setuptools 84.0.0; two matching component-wheel builds; pinned Apple-silicon provider runtime dependency closure; reproducible native builds"
 }

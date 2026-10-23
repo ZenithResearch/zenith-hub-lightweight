@@ -51,8 +51,10 @@ WORKSPACE_PROVIDER_ROLES = {**WORKSPACE_LIVE_ROLES,
 PROVIDER_QUEUE_PACKAGES = {'h2', 'hpack', 'httpcore2', 'httpx2', 'hyperframe',
                            'python-multipart', 'truststore', 'vercel-headers',
                            'vercel-internal-core', 'vercel-oidc', 'vercel-queue'}
+PROVIDER_CRYPTO_PACKAGES = {'cffi', 'cryptography', 'pycparser'}
+PROVIDER_RUNTIME_PACKAGES = PROVIDER_QUEUE_PACKAGES | PROVIDER_CRYPTO_PACKAGES
 BASE_WHEEL_COUNT = 15
-PROVIDER_WHEEL_COUNT = BASE_WHEEL_COUNT + len(PROVIDER_QUEUE_PACKAGES)
+PROVIDER_WHEEL_COUNT = BASE_WHEEL_COUNT + len(PROVIDER_RUNTIME_PACKAGES)
 MAX_NATIVE_BYTES = 64 * 1024 * 1024
 
 
@@ -203,7 +205,7 @@ def check_bundle(bundle, expected):
                             else BASE_WHEEL_COUNT)
     require(len(profile['wheels']) == expected_wheel_count and len(wheel_names) == expected_wheel_count
             and (profile.get('native_profile') != 'workspace-provider-v1'
-                 or PROVIDER_QUEUE_PACKAGES <= wheel_names),
+                 or PROVIDER_RUNTIME_PACKAGES <= wheel_names),
             'Incomplete Mac dependency closure')
     expected_files = {'profile.json', 'process_mac.py'} | {'wheels/'+r['filename'] for r in profile['wheels']}
     expected_files |= {'native/'+r['filename'] for r in native}
@@ -1294,11 +1296,15 @@ def workspace_upgrade_policy(old,new):
     a,b={r['name']:r for r in old['wheels']},{r['name']:r for r in new['wheels']}
     if profiles[1] == 'workspace-provider-v1':
         require(len(b) == PROVIDER_WHEEL_COUNT
-                and PROVIDER_QUEUE_PACKAGES <= set(b)
+                and PROVIDER_RUNTIME_PACKAGES <= set(b)
                 and (set(a) == set(b)
-                     or (len(a) == BASE_WHEEL_COUNT and set(b) == set(a) | PROVIDER_QUEUE_PACKAGES))
+                     or (len(a) == BASE_WHEEL_COUNT
+                         and set(b) == set(a) | PROVIDER_RUNTIME_PACKAGES)
+                     or (len(a) == BASE_WHEEL_COUNT + len(PROVIDER_QUEUE_PACKAGES)
+                         and PROVIDER_QUEUE_PACKAGES <= set(a)
+                         and set(b) == set(a) | PROVIDER_CRYPTO_PACKAGES))
                 and {'frank-executor','process-runtime','service-management'} <= set(a),
-                'Provider upgrade requires the fixed Queue dependency closure')
+                'Provider upgrade requires the fixed runtime dependency closure')
     else:
         require(set(a) == set(b) and len(a) == BASE_WHEEL_COUNT
                 and {'frank-executor','process-runtime','service-management'} <= set(a),
