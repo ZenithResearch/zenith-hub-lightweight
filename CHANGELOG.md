@@ -4,6 +4,10 @@
 
 ### Fixed
 
+- Repin the provider workspace to Service Management's deployment-validated
+  provider catalog route — the local Anima client can verify the production
+  HTTPS gateway before enabling encrypted submission.
+
 - Reconcile Frank's Wallet executable pin during verified provider-profile upgrades while retaining the prior configuration as recovery evidence — upgraded workspaces can pass readiness and renew native authority without accepting stale executable bytes.
 
 - Added an independently pinned one-item reference Queue pull to the Mac provider controller, so encrypted reference objects can reach the same durable local inbox without reusing the request topic or consumer group.
