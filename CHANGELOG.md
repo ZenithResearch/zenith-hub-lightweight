@@ -4,6 +4,8 @@
 
 ### Fixed
 
+- Resolve the packaged Devgraph ontology inspector by its canonical module and exclude generated Python bytecode — keeps the container profile portable and its source review clean.
+
 - Create the optional static-assets directory before copying the standalone image — supports the Hub source tree when it contains no `public` files.
 
 - Supply Node’s Linux C++ runtime in the Python-based container and label the Docker profile accurately — prevents startup failure and misleading Mac instructions.

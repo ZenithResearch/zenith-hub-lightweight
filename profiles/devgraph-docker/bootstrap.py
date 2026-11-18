@@ -5,7 +5,7 @@ Root is used only by the one-shot initializer for its new named volumes.
 """
 import argparse,os,pathlib,secrets,stat,subprocess,sys,time,uuid
 from devgraph.local_host import LocalHostConfig, provision_local_read_credential, local_read_credential_paths
-from devgraph.ontology import ontology_sources
+from devgraph.ontology_sources import ontology_sources
 from devgraph.ops.migrate import apply_migrations,load_manifest
 from devgraph.runtime import MANIFEST_PATH
 from devgraph.storage.neo4j import Neo4jConfig,Neo4jGraphStorage,Neo4jMigrationStore

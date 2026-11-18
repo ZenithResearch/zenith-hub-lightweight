@@ -1,6 +1,6 @@
 """Verify the isolated API, real read capability and default-deny Work writes."""
 import json,pathlib,urllib.error,urllib.request
-from devgraph.ontology import ontology_sources
+from devgraph.ontology_sources import ontology_sources
 assert ontology_sources()['closureVerified']
 opener=urllib.request.build_opener(urllib.request.ProxyHandler({}))
 origin='http://127.0.0.1:8080'
