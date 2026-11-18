@@ -14,6 +14,8 @@
 
 ### Added
 
+- Separate the Devgraph API and database networks, with no network on credential initialization — gives Hub a narrow API connection without publishing Bolt or sharing database credentials.
+
 - Add an isolated persistent Devgraph Docker profile with independent volumes, owner-private read credentials and canonical migrations — supports a separate organization instance without replacing the personal Mac host or widening Work authority.
 
 - Add an isolated Docker development profile on the merged Service and Runtime sources with normalized Zenith imports — enables a reproducible Lightweight Hub demo without changing native launchers or live data.

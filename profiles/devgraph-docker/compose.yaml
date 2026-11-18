@@ -7,6 +7,7 @@ services:
       dockerfile: profiles/devgraph-docker/Dockerfile
       additional_contexts:
         devgraph_sources: ./context
+    network_mode: none
     user: "0:0"
     command: ["python", "-B", "/opt/devgraph/bootstrap.py", "initialize"]
     volumes:
@@ -18,6 +19,7 @@ services:
     depends_on:
       devgraph-init:
         condition: service_completed_successfully
+    networks: [devgraph-db]
     environment:
       NEO4J_AUTH_FILE: /db-auth/neo4j.auth
       NEO4J_server_memory_heap_initial__size: 256m
@@ -33,6 +35,7 @@ services:
       neo4j:
         condition: service_started
     init: true
+    networks: [devgraph-api, devgraph-db]
     ports:
       - "127.0.0.1:4220:8080"
     volumes:
@@ -50,3 +53,8 @@ volumes:
   graph-auth:
   graph-database:
   graph-logs:
+
+networks:
+  devgraph-api:
+  devgraph-db:
+    internal: true
