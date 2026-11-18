@@ -2,7 +2,8 @@
 import { randomBytes } from "node:crypto";
 import { OperatorError } from "./pilot-controller.mjs";
 export function createContainerController({ env = process.env, fetcher = fetch } = {}) {
-  const enabled = env.ZENITH_CONTAINER_DEMO === "1";
+  const native = env.ZENITH_NATIVE_DEMO === "1";
+  const enabled = env.ZENITH_CONTAINER_DEMO === "1" || native;
   const origin = env.ZENITH_OPERATOR_ORIGIN || "http://127.0.0.1:4218";
   const expected = new URL(origin);
   if (expected.origin !== origin || expected.protocol !== "http:" || expected.hostname !== "127.0.0.1" || expected.port !== "4218")
@@ -26,10 +27,10 @@ export function createContainerController({ env = process.env, fetcher = fetch }
     enabled,
     async get(request) {
       admit(request);
-      return { schema: "zenith.deployer.v1", mode: "local", profile: "process-docker-demo-v1", target: "Docker · isolated demo volume", csrf, busy: false,
+      return { schema: "zenith.deployer.v1", mode: "local", profile: native ? "process-native-demo-v1" : "process-docker-demo-v1", target: native ? "Native · isolated demo data" : "Docker · isolated demo volume", csrf, busy: false,
         actions: [], release_digest: null,
         status: { installed: true, authority: "pending", pilot_ready: false, external_effects: false, actor_count: 0,
-          components: await Promise.all([health("service",8091), health("runtime",8092)]) } };
+          components: await Promise.all([health("service",native ? 18091 : 8091), health("runtime",native ? 18092 : 8092)]) } };
     },
     admitMutation() { throw new OperatorError("compose_managed_read_only", 403); },
     async post() { throw new OperatorError("compose_managed_read_only", 403); },

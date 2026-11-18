@@ -155,6 +155,7 @@ export function DeployerPage() {
     }
   }
   const docker = snapshot?.profile === "process-docker-demo-v1";
+  const native = snapshot?.profile === "process-native-demo-v1";
   const s = snapshot?.status;
   const known = snapshot?.mode === "local";
   const pilot = snapshot?.profile === "local-review-v1";
@@ -189,8 +190,8 @@ export function DeployerPage() {
   });
   const checkpoints: DeploymentItem[] = [
     {
-      name: docker ? "Start Docker demo" : "Install this Mac",
-      detail: docker ? "Pinned sources; separate demo data. Managed by Compose." : "One pinned bundle; private component data.",
+      name: native ? "Native demo services" : docker ? "Start Docker demo" : "Install this Mac",
+      detail: native ? "Separate native processes with persistent demo data." : docker ? "Pinned sources; separate demo data. Managed by Compose." : "One pinned bundle; private component data.",
       state: s?.installed ? "ready" : "pending",
       label: s?.installed ? "Installed" : "Pending",
     },
@@ -222,9 +223,9 @@ export function DeployerPage() {
   return (
     <DeploymentMonitor
       title="Your local environment"
-      subtitle={docker ? "An isolated development stack. Native authority and external providers are not connected." : pilot ? "One owner-selected local review on this Mac. External effects stay disabled."
+      subtitle={native ? "Local services for the synthetic SAI walkthrough." : docker ? "An isolated development stack. Native authority and external providers are not connected." : pilot ? "One owner-selected local review on this Mac. External effects stay disabled."
         : "Set up one Mac to receive requests and execute approved work."}
-      profile={docker ? "Process demo · Docker" : pilot ? "Local review · Apple silicon" : "Process pilot · Apple silicon"}
+      profile={native ? "Process demo · Native" : docker ? "Process demo · Docker" : pilot ? "Local review · Apple silicon" : "Process pilot · Apple silicon"}
       connection={known ? "Local controller" : "Controller not connected"}
       items={items}
       checkpoints={checkpoints}

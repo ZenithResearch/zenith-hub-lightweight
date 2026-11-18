@@ -7,11 +7,13 @@ class NoRedirect(request.HTTPRedirectHandler):
     def redirect_request(self,*args,**kwargs):return None
 
 class Connection:
-    def __init__(self,*,enabled=None,endpoint='http://devgraph:8080',credential_file='/run/devgraph-reader/devgraph.read',opener=None):
+    def __init__(self,*,enabled=None,endpoint='http://devgraph:8080',credential_file='/run/devgraph-reader/devgraph.read',opener=None,timeout=3):
         self.enabled=os.environ.get('ZENITH_DEVGRAPH_ENABLED')=='1' if enabled is None else enabled
         url=urlsplit(endpoint)
         if url.scheme!='http' or url.hostname not in {'devgraph','127.0.0.1'} or url.username or url.password or url.path or url.query or url.fragment or not url.port:
             raise ValueError('Expected a private Devgraph API origin')
+        if type(timeout) not in (int,float) or not .1<=timeout<=15:raise ValueError("Invalid bounded reader timeout")
+        self.timeout=timeout
         self.endpoint=endpoint;self.path=pathlib.Path(credential_file)
         self.opener=opener or request.build_opener(request.ProxyHandler({}),NoRedirect())
     def credential(self):
@@ -27,7 +29,7 @@ class Connection:
     def read(self,path,token=None):
         headers={'Accept':'application/json'}
         if token:headers['Authorization']='Bearer '+token
-        with self.opener.open(request.Request(self.endpoint+path,headers=headers),timeout=3) as response:
+        with self.opener.open(request.Request(self.endpoint+path,headers=headers),timeout=self.timeout) as response:
             raw=response.read(1_048_577)
             if len(raw)>1_048_576:raise ValueError('Oversize API response')
             return json.loads(raw)

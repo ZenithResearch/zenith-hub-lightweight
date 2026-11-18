@@ -25,3 +25,8 @@ test("container mode is opt-in and accepts only its fixed internal URL",async()=
  assert.throws(()=>normalizeNextRequest(request("http://evil.invalid"),origin,true),/wrong_host/);
  assert.throws(()=>normalizeNextRequest(request("http://0.0.0.0:4218","evil.invalid"),origin,true),/wrong_host/);
 });
+
+test("native demo reports its own profile and isolated ports",async()=>{
+ const urls=[]; const c=createContainerController({env:{ZENITH_NATIVE_DEMO:"1"},fetcher:async(url)=>{urls.push(url);return Response.json({ready:true});}});
+ const v=await c.get(request());assert.equal(v.profile,"process-native-demo-v1");assert.deepEqual(urls.sort(),["http://127.0.0.1:18091/ready","http://127.0.0.1:18092/ready"]);assert.deepEqual(v.actions,[]);
+});

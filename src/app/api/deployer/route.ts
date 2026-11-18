@@ -5,7 +5,8 @@ import { readAction, normalizeNextRequest } from "@/lib/operator-http.mjs";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 const containerDemo = process.env.ZENITH_CONTAINER_DEMO === "1";
-const controller = containerDemo ? createContainerController() : process.env.ZENITH_PROCESS_PROFILE === "workspace" ? null : createController();
+const nativeDemo = process.env.ZENITH_NATIVE_DEMO === "1";
+const controller = containerDemo || nativeDemo ? createContainerController() : process.env.ZENITH_PROCESS_PROFILE === "workspace" ? null : createController();
 const headers = {
   "Cache-Control": "no-store",
   "X-Content-Type-Options": "nosniff",

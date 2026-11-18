@@ -4,6 +4,8 @@
 
 ### Fixed
 
+- Allow an explicitly bounded reader timeout for native storage — prevents healthy persistent hosts being reported unavailable during slower canonical readiness checks.
+
 - Supply the canonical idempotency header in the read-authority denial check and compare credential digests across restart — tests authorization and persistence rather than an incomplete HTTP request.
 
 - Clear initializer supplementary groups before provisioning the API credential and write an explicit newline for database auth — keeps generated secret metadata and process identity consistent.
@@ -17,6 +19,8 @@
 - Update Next.js to the patched 16.4.6 release — clears the existing moderate cache-isolation advisories before adding a deployable container.
 
 ### Added
+
+- Support an explicitly selected native demo profile on isolated Service/Runtime ports — launches the same Hub health surface without a Docker build or changes to existing Mac installations.
 
 - Qualify the reusable Hub read adapter against the persistent Devgraph API — verifies the same server-side connection code used by private organization demos.
 

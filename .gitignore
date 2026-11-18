@@ -16,3 +16,6 @@ profiles/devgraph-docker/context/
 
 **/__pycache__/
 *.pyc
+
+.native-sources/
+.native-npm-cache/
