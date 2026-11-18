@@ -7,6 +7,7 @@ origin='http://127.0.0.1:8080'
 def call(path,token=None,body=None):
     headers={'Content-Type':'application/json'}
     if token:headers['Authorization']='Bearer '+token
+    if body is not None:headers['Idempotency-Key']='read-only-denial-smoke'
     req=urllib.request.Request(origin+path,data=json.dumps(body).encode() if body is not None else None,headers=headers)
     try:
         with opener.open(req,timeout=8) as response:return response.status,json.load(response)

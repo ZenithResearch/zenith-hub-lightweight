@@ -61,9 +61,12 @@ jobs:
       - run: docker compose -f profiles/devgraph-docker/compose.yaml exec -T devgraph python /opt/devgraph/smoke.py
       - name: Preserve credentials and schema across restart
         run: |
+          reader_digest_before=$(docker compose -f profiles/devgraph-docker/compose.yaml exec -T devgraph python -c "import hashlib,pathlib; print(hashlib.sha256(pathlib.Path('/state/devgraph/credentials/devgraph.read').read_bytes()).hexdigest())")
           docker compose -f profiles/devgraph-docker/compose.yaml restart devgraph
           docker compose -f profiles/devgraph-docker/compose.yaml up --wait --wait-timeout 120
           docker compose -f profiles/devgraph-docker/compose.yaml exec -T devgraph python /opt/devgraph/smoke.py
+          reader_digest_after=$(docker compose -f profiles/devgraph-docker/compose.yaml exec -T devgraph python -c "import hashlib,pathlib; print(hashlib.sha256(pathlib.Path('/state/devgraph/credentials/devgraph.read').read_bytes()).hexdigest())")
+          test "$reader_digest_before" = "$reader_digest_after"
       - if: always()
         run: docker compose -f profiles/devgraph-docker/compose.yaml logs --tail=80
       - if: always()

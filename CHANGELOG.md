@@ -4,6 +4,8 @@
 
 ### Fixed
 
+- Supply the canonical idempotency header in the read-authority denial check and compare credential digests across restart — tests authorization and persistence rather than an incomplete HTTP request.
+
 - Clear initializer supplementary groups before provisioning the API credential and write an explicit newline for database auth — keeps generated secret metadata and process identity consistent.
 
 - Resolve the packaged Devgraph ontology inspector by its canonical module and exclude generated Python bytecode — keeps the container profile portable and its source review clean.
