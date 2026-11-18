@@ -7,6 +7,7 @@ ENV NEXT_TELEMETRY_DISABLED=1
 RUN npm run check:source && npm run test:deployer && npm run build
 
 FROM python:3.12.12-slim-bookworm AS application
+RUN apt-get update && apt-get install -y --no-install-recommends libstdc++6 && rm -rf /var/lib/apt/lists/*
 WORKDIR /build
 COPY --from=sources service.tar runtime.tar sources.json ./
 RUN mkdir service runtime && tar -xf service.tar -C service && tar -xf runtime.tar -C runtime \
@@ -15,6 +16,7 @@ RUN mkdir service runtime && tar -xf service.tar -C service && tar -xf runtime.t
 RUN groupadd --gid 10001 demo && useradd --uid 10001 --gid demo --create-home demo \
  && mkdir /data /opt/hub && chown demo:demo /data /opt/hub
 COPY --from=ui /usr/local/bin/node /usr/local/bin/node
+RUN node --version
 COPY --from=ui /build/.next/standalone /opt/hub/
 COPY --from=ui /build/.next/static /opt/hub/.next/static/
 COPY --from=ui /build/public /opt/hub/public/

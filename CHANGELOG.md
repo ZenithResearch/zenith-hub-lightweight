@@ -4,6 +4,8 @@
 
 ### Fixed
 
+- Supply Node’s Linux C++ runtime in the Python-based container and label the Docker profile accurately — prevents startup failure and misleading Mac instructions.
+
 - Update Next.js to the patched 16.4.6 release — clears the existing moderate cache-isolation advisories before adding a deployable container.
 
 ### Added

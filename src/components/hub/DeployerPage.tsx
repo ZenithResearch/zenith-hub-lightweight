@@ -222,9 +222,9 @@ export function DeployerPage() {
   return (
     <DeploymentMonitor
       title="Your local environment"
-      subtitle={pilot ? "One owner-selected local review on this Mac. External effects stay disabled."
+      subtitle={docker ? "An isolated development stack. Native authority and external providers are not connected." : pilot ? "One owner-selected local review on this Mac. External effects stay disabled."
         : "Set up one Mac to receive requests and execute approved work."}
-      profile={pilot ? "Local review · Apple silicon" : "Process pilot · Apple silicon"}
+      profile={docker ? "Process demo · Docker" : pilot ? "Local review · Apple silicon" : "Process pilot · Apple silicon"}
       connection={known ? "Local controller" : "Controller not connected"}
       items={items}
       checkpoints={checkpoints}
