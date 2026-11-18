@@ -56,7 +56,7 @@ def initialize(state,reader_root,auth_root):
         private_file(password_path,password,UID)
     private_file(auth_path,b'neo4j/'+password,7474)
     # Credential provisioning runs with the API's actual UID, not root metadata.
-    def drop():os.setgid(UID);os.setuid(UID)
+    def drop():os.setgroups([]);os.setgid(UID);os.setuid(UID)
     subprocess.run([sys.executable,__file__,'reader','--state',str(state),'--reader',str(reader_root)],check=True,preexec_fn=drop)
     print('Separate Devgraph credentials initialized; read-only capability; existing values preserved',flush=True)
 

@@ -4,6 +4,8 @@
 
 ### Fixed
 
+- Clear initializer supplementary groups before provisioning the API credential and write an explicit newline for database auth — keeps generated secret metadata and process identity consistent.
+
 - Resolve the packaged Devgraph ontology inspector by its canonical module and exclude generated Python bytecode — keeps the container profile portable and its source review clean.
 
 - Create the optional static-assets directory before copying the standalone image — supports the Hub source tree when it contains no `public` files.
