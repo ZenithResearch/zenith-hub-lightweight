@@ -4,6 +4,8 @@
 
 ### Fixed
 
+- Create the optional static-assets directory before copying the standalone image — supports the Hub source tree when it contains no `public` files.
+
 - Supply Node’s Linux C++ runtime in the Python-based container and label the Docker profile accurately — prevents startup failure and misleading Mac instructions.
 
 - Update Next.js to the patched 16.4.6 release — clears the existing moderate cache-isolation advisories before adding a deployable container.

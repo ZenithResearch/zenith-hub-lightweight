@@ -4,7 +4,7 @@ COPY package.json package-lock.json ./
 RUN npm ci --ignore-scripts
 COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
-RUN npm run check:source && npm run test:deployer && npm run build
+RUN mkdir -p public && npm run check:source && npm run test:deployer && npm run build
 
 FROM python:3.12.12-slim-bookworm AS application
 RUN apt-get update && apt-get install -y --no-install-recommends libstdc++6 && rm -rf /var/lib/apt/lists/*
