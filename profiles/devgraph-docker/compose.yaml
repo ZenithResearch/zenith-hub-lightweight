@@ -1,0 +1,52 @@
+name: zenith-isolated-devgraph
+services:
+  devgraph-init:
+    image: zenith-isolated-devgraph:local
+    build:
+      context: ../..
+      dockerfile: profiles/devgraph-docker/Dockerfile
+      additional_contexts:
+        devgraph_sources: ./context
+    user: "0:0"
+    command: ["python", "-B", "/opt/devgraph/bootstrap.py", "initialize"]
+    volumes:
+      - graph-state:/state
+      - graph-reader:/reader
+      - graph-auth:/db-auth
+  neo4j:
+    image: neo4j:5.26.29-community
+    depends_on:
+      devgraph-init:
+        condition: service_completed_successfully
+    environment:
+      NEO4J_AUTH_FILE: /db-auth/neo4j.auth
+      NEO4J_server_memory_heap_initial__size: 256m
+      NEO4J_server_memory_heap_max__size: 512m
+      NEO4J_server_memory_pagecache_size: 256m
+    volumes:
+      - graph-database:/data
+      - graph-logs:/logs
+      - graph-auth:/db-auth:ro
+  devgraph:
+    image: zenith-isolated-devgraph:local
+    depends_on:
+      neo4j:
+        condition: service_started
+    init: true
+    ports:
+      - "127.0.0.1:4220:8080"
+    volumes:
+      - graph-state:/state
+    healthcheck:
+      test: ["CMD", "python", "-c", "import json,urllib.request; assert json.load(urllib.request.urlopen('http://127.0.0.1:8080/ready',timeout=3))['ready']"]
+      interval: 5s
+      timeout: 5s
+      start_period: 120s
+      retries: 5
+    stop_grace_period: 20s
+volumes:
+  graph-state:
+  graph-reader:
+  graph-auth:
+  graph-database:
+  graph-logs:
