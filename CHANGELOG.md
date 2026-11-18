@@ -2,6 +2,15 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- Update Next.js to the patched 16.4.6 release — clears the existing moderate cache-isolation advisories before adding a deployable container.
+
+### Added
+
+- Add an isolated Docker development profile on the merged Service and Runtime sources with normalized Zenith imports — enables a reproducible Lightweight Hub demo without changing native launchers or live data.
+
+
 - Allow the provider projection to bootstrap with active Service read authority
   and no Runtime authority, then select the exact Runtime query tuple only after
   a request yields its handoff and Run IDs.

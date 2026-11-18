@@ -154,6 +154,7 @@ export function DeployerPage() {
       setBusy(false);
     }
   }
+  const docker = snapshot?.profile === "process-docker-demo-v1";
   const s = snapshot?.status;
   const known = snapshot?.mode === "local";
   const pilot = snapshot?.profile === "local-review-v1";
@@ -188,8 +189,8 @@ export function DeployerPage() {
   });
   const checkpoints: DeploymentItem[] = [
     {
-      name: "Install this Mac",
-      detail: "One pinned bundle; private component data.",
+      name: docker ? "Start Docker demo" : "Install this Mac",
+      detail: docker ? "Pinned sources; separate demo data. Managed by Compose." : "One pinned bundle; private component data.",
       state: s?.installed ? "ready" : "pending",
       label: s?.installed ? "Installed" : "Pending",
     },

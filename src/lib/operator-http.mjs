@@ -54,18 +54,21 @@ export async function readAction(
 export function normalizeNextRequest(
   request,
   origin = process.env.ZENITH_OPERATOR_ORIGIN || "http://127.0.0.1:4208",
+  containerDemo = false,
 ) {
   const expected = new URL(origin),
     actual = new URL(request.url),
     internal = new URL(origin);
   internal.hostname = "localhost";
+  const permitted = [expected.origin, internal.origin];
+  if (containerDemo && expected.port === "4218") permitted.push("http://0.0.0.0:4218");
   if (
     expected.origin !== origin ||
     expected.protocol !== "http:" ||
     expected.hostname !== "127.0.0.1" ||
     !expected.port ||
     request.headers.get("host") !== expected.host ||
-    ![expected.origin, internal.origin].includes(actual.origin)
+    !permitted.includes(actual.origin)
   )
     throw new OperatorError("wrong_host", 403);
   actual.protocol = expected.protocol;
