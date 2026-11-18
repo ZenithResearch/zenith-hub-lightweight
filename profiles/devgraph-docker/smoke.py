@@ -21,3 +21,9 @@ status,_=call('/work/Task',credential,{'id':'must-not-exist','title':'Read autho
 assert status==403,status
 assert call('/work/Task?limit=10',credential)[1]['items']==[]
 print('Verified persistent Devgraph readiness, normalized ontology, authenticated reads and write denial; no Work data inserted')
+
+from devgraph_connection import Connection
+state=Connection(enabled=True,endpoint=origin,credential_file="/state/devgraph/credentials/devgraph.read").status()
+assert state["connected"] and state["readOnly"] and all(not page for page in state["work"].values())
+assert credential not in json.dumps(state)
+print("Verified trusted Hub backend reader against the real persistent API; credentials omitted from its response")

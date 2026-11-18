@@ -18,6 +18,8 @@
 
 ### Added
 
+- Qualify the reusable Hub read adapter against the persistent Devgraph API — verifies the same server-side connection code used by private organization demos.
+
 - Separate the Devgraph API and database networks, with no network on credential initialization — gives Hub a narrow API connection without publishing Bolt or sharing database credentials.
 
 - Add an isolated persistent Devgraph Docker profile with independent volumes, owner-private read credentials and canonical migrations — supports a separate organization instance without replacing the personal Mac host or widening Work authority.
