@@ -48,7 +48,7 @@ try {
   assert.equal(await canonical(document),await canonical(value));
   const recognized=await read('operation=list');assert.equal(recognized.items.length,2);
   assert.ok(value.some(node=>node['@id']==='urn:hub:example:catalog'));
-  const denied=await fetch(origin+'/api/objects',{method:'POST',headers:{Origin:'https://invalid.example','Content-Type':'application/json'},body:'{}'});
+  const denied=await fetch(origin+'/api/objects',{method:'POST',headers:{Origin:'https://invalid.example','Content-Type':'application/json'},body:'malformed JSON'});
   assert.equal(denied.status,403);
   console.log(JSON.stringify({passed:true,builtOperator:true,standalone,semanticRoundTrip:true,objectCount:2,exportMediaType:'application/ld+json',crossOriginRejected:true}));
 } catch(error) {console.error(logs);throw error;}

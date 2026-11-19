@@ -19,6 +19,8 @@ test('host/origin/CSRF and closed action shapes guard all mutations', async t =>
   const c = createObjectController({env, storeFactory: registry => {opened++; return new ObjectStore({memory: true, registry});}});
   t.after(() => c.close());
   const session = await c.get(request());
+  assert.throws(() => c.admitMutation(request('', {origin: 'https://invalid.example'})), {code: 'wrong_origin'});
+  assert.equal(opened, 0);
   const body = {schema: 'zenith.hub-object-action.v1', operation: 'import', document: doc, importKey: 'test'};
   for (const headers of [{host: 'attacker.invalid'}, {origin: 'https://attacker.invalid'}, {'x-zenith-csrf': 'bad'}, {'sec-fetch-site': 'cross-site'}])
     await assert.rejects(c.post(request('', headers), body));

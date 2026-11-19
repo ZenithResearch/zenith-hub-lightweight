@@ -43,3 +43,15 @@ test('owner-registered expanded-node profiles validate actual JSON-LD nodes usin
   await store.importDocument({'@id':'urn:artifact','@type':Z+'Artifact','http://www.w3.org/2000/01/rdf-schema#label':'Valid'},{importKey:'valid'});
   assert.equal(store.list().items.length,1);
 });
+
+test('explicit pinned context resources work independently of filename extensions', async t => {
+  const {root, file, config} = await fixture(t), url = 'urn:hub:registered-context';
+  const content = JSON.stringify({'@context': {core: Z}});
+  await writeFile(path.join(root, 'aliases.context'), content);
+  config.resources.push({url, path: 'aliases.context', sha256: sha256(content)});
+  await writeFile(file, JSON.stringify(config));
+  const registry = await loadOntologyRegistry(file), store = new ObjectStore({memory: true, registry});
+  t.after(() => store.close());
+  await store.importDocument({'@context': url, '@id': 'urn:registered', '@type': 'core:Artifact'}, {importKey: 'registered'});
+  assert.deepEqual((await store.get('urn:registered')).types, [Z + 'Artifact']);
+});

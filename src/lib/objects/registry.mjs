@@ -54,7 +54,7 @@ export async function loadOntologyRegistry(file) {
       if (asset.document?.$id && asset.document?.$schema) register(asset.document.$id, asset.document, sha256(asset.bytes));
       if (name.endsWith('.jsonld')) {
         const declaration = manifest.ontologyDocuments.find(v => v.path === name);
-        if (!declaration) reject('invalid_ontology_registry', 503);
+        if (!declaration) continue; // Context-only assets are registered explicitly in resources.
         register(declaration.versionIri, asset.document, sha256(asset.bytes));
         register(declaration.ontologyId, asset.document, sha256(asset.bytes));
         ontologyDocuments.push({document: asset.document, package: manifest.ontologyId, version: manifest.version});
@@ -73,9 +73,16 @@ export async function loadOntologyRegistry(file) {
   };
   const types = new Map();
   for (const resource of ontologyDocuments) {
-    for (const node of await jsonld.expand(resource.document, {documentLoader: loader, safe: true, base: null})) {
-      if (node['@type']?.includes(OWL_CLASS)) types.set(node['@id'], {package: resource.package, version: resource.version});
-    }
+    const expanded = await jsonld.expand(resource.document, {documentLoader: loader, safe: true, base: null});
+    const visit = value => {
+      if (!value || typeof value !== 'object') return;
+      if (!Array.isArray(value) && absoluteIRI(value['@id']) && Array.isArray(value['@type']) &&
+          value['@type'].some(type => [OWL_CLASS, 'http://www.w3.org/2000/01/rdf-schema#Class'].includes(type))) {
+        types.set(value['@id'], {package: resource.package, version: resource.version});
+      }
+      for (const child of Object.values(value)) visit(child);
+    };
+    visit(expanded);
   }
   const ajv = new Ajv2020({allErrors: true, strictSchema: true, strictTypes: false, allowUnionTypes: true, validateFormats: true});
   addFormats(ajv);

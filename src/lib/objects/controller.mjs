@@ -25,6 +25,7 @@ export function createObjectController({env = process.env, registryFile = path.j
     return storePromise;
   }
   return {
+    admitMutation(request) {admit(request, true);},
     async get(request) {
       admit(request);
       const parameters = new URL(request.url).searchParams;

@@ -20,7 +20,11 @@ export async function GET(request: Request) {
   } catch (error) {return rejected(error);}
 }
 export async function POST(request: Request) {
-  try {return Response.json(await controller.post(normalizeNextRequest(request),
-    await readAction(request, {limit: 1100000, deadline: 5000})), {headers});}
+  try {
+    const effective = normalizeNextRequest(request);
+    controller.admitMutation(effective);
+    return Response.json(await controller.post(effective,
+      await readAction(request, {limit: 1100000, deadline: 5000})), {headers});
+  }
   catch (error) {return rejected(error, true);}
 }

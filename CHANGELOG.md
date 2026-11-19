@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Fixed
+- Check object mutation origin and CSRF before reading the body, and accept explicitly pinned context assets independently of their filename — rejected requests remain inert and registered packages can keep their own resource layouts.
+
+
 ### Added
 - Add an opt-in Hub-owned SQLite JSON-LD object store with pinned ontology/schema resources, revision-checked transactions and owner import/export interfaces — local object relationships can persist without adopting provider databases or creating duplicate ontology classes.
 - Verify semantic import/export across persistent restart and a fresh store with RDFC-1.0 — context, ordering and blank-node representation changes cannot silently change the RDF dataset.
