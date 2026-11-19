@@ -16,8 +16,58 @@ jobs:
           cache: npm
       - run: npm ci --ignore-scripts
       - run: npm run check:source
-      - run: python3 -m unittest tests/test_provider_activation.py
+      - run: python3 -m unittest tests/test_provider_activation.py tests/test_native_profile.py
       - run: npm run test:deployer
       - run: npm run typecheck
       - run: npm run build
       - run: npm audit --audit-level=moderate
+
+  docker-demo:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/checkout@v6
+        with:
+          repository: ZenithResearch/service-management
+          ref: bc084f2a875f7af333d7f01db01c94a9f93c1672
+          path: .demo-sources/service
+      - uses: actions/checkout@v6
+        with:
+          repository: ZenithResearch/process-runtime
+          ref: 2efdf9672a279ae924c095cc357d15ccad754bf1
+          path: .demo-sources/runtime
+      - run: python3 profiles/process-docker/prepare.py --service-source .demo-sources/service --runtime-source .demo-sources/runtime
+      - run: docker compose -f profiles/process-docker/compose.yaml up --build --wait --wait-timeout 240
+      - name: Verify image imports and public Runtime SDK
+        run: |
+          docker compose -f profiles/process-docker/compose.yaml exec -T hub python -I -c "from service_management.zenith_projection import ontology_sources as service; from process_runtime.ontology import ontology_sources as runtime; from process_runtime_client import RuntimeClient, LocalDevAuthority, command_envelope; assert service()['closureVerified'] and runtime()['closureVerified']; c=RuntimeClient('http://127.0.0.1:8092',authority=LocalDevAuthority(environment='test')); c.execute(command_envelope('actor.register',request_id='container-smoke',expected_version=None,payload={'actor_id':'container-smoke','capabilities':[],'resources':[]})); assert c.query({'schema':'runtime.query.v1','operation':'work.list','payload':{'actor_id':'container-smoke','limit':1}})['data']['work']==[]"
+          curl --fail --silent http://127.0.0.1:4218/api/deployer | python3 -c "import sys,json; v=json.load(sys.stdin); assert v['profile']=='process-docker-demo-v1'; assert all(c['ready'] for c in v['status']['components']); assert not v['status']['external_effects'] and not v['actions']"
+      - if: always()
+        run: docker compose -f profiles/process-docker/compose.yaml logs --tail=80
+      - if: always()
+        run: docker compose -f profiles/process-docker/compose.yaml down
+
+  docker-devgraph:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/checkout@v6
+        with:
+          repository: ZenithResearch/devgraph
+          ref: 51fb962f8d3c08904b32e8d04235315edf4d9797
+          path: .demo-sources/devgraph
+      - run: python3 profiles/devgraph-docker/prepare.py --source .demo-sources/devgraph
+      - run: docker compose -f profiles/devgraph-docker/compose.yaml up --build --wait --wait-timeout 240
+      - run: docker compose -f profiles/devgraph-docker/compose.yaml exec -T devgraph python /opt/devgraph/smoke.py
+      - name: Preserve credentials and schema across restart
+        run: |
+          reader_digest_before=$(docker compose -f profiles/devgraph-docker/compose.yaml exec -T devgraph python -c "import hashlib,pathlib; print(hashlib.sha256(pathlib.Path('/state/devgraph/credentials/devgraph.read').read_bytes()).hexdigest())")
+          docker compose -f profiles/devgraph-docker/compose.yaml restart devgraph
+          docker compose -f profiles/devgraph-docker/compose.yaml up --wait --wait-timeout 120
+          docker compose -f profiles/devgraph-docker/compose.yaml exec -T devgraph python /opt/devgraph/smoke.py
+          reader_digest_after=$(docker compose -f profiles/devgraph-docker/compose.yaml exec -T devgraph python -c "import hashlib,pathlib; print(hashlib.sha256(pathlib.Path('/state/devgraph/credentials/devgraph.read').read_bytes()).hexdigest())")
+          test "$reader_digest_before" = "$reader_digest_after"
+      - if: always()
+        run: docker compose -f profiles/devgraph-docker/compose.yaml logs --tail=80
+      - if: always()
+        run: docker compose -f profiles/devgraph-docker/compose.yaml down

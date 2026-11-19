@@ -1,9 +1,12 @@
 // This route performs local operations only when explicitly launched as an operator.
 import { createController, OperatorError } from "@/lib/pilot-controller.mjs";
+import { createContainerController } from "@/lib/container-controller.mjs";
 import { readAction, normalizeNextRequest } from "@/lib/operator-http.mjs";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
-const controller = process.env.ZENITH_PROCESS_PROFILE === "workspace" ? null : createController();
+const containerDemo = process.env.ZENITH_CONTAINER_DEMO === "1";
+const nativeDemo = process.env.ZENITH_NATIVE_DEMO === "1";
+const controller = containerDemo || nativeDemo ? createContainerController() : process.env.ZENITH_PROCESS_PROFILE === "workspace" ? null : createController();
 const headers = {
   "Cache-Control": "no-store",
   "X-Content-Type-Options": "nosniff",
@@ -13,7 +16,7 @@ export async function GET(request: Request) {
     if (!controller) return Response.json({schema:"zenith.deployer.v1",mode:"disabled",profile:"workspace",reason:"Use the workspace page."},{headers});
     return Response.json(
       await controller.get(
-        controller.enabled ? normalizeNextRequest(request) : request,
+        controller.enabled ? normalizeNextRequest(request, undefined, containerDemo) : request,
       ),
       { headers },
     );
@@ -24,7 +27,7 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     if (!controller) return Response.json({error:"workspace_profile_selected"},{status:403,headers});
-    const effective = normalizeNextRequest(request);
+    const effective = normalizeNextRequest(request, undefined, containerDemo);
     controller.admitMutation(effective);
     const body = await readAction(request);
     return Response.json(await controller.post(effective, body), { headers });

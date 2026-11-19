@@ -7,3 +7,15 @@ dist/
 .env.*.local
 *.log
 *.tsbuildinfo
+
+profiles/process-docker/context/
+
+.demo-sources/
+
+profiles/devgraph-docker/context/
+
+**/__pycache__/
+*.pyc
+
+.native-sources/
+.native-npm-cache/

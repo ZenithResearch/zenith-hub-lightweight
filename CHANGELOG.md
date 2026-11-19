@@ -2,6 +2,37 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- Allow an explicitly bounded reader timeout for native storage — prevents healthy persistent hosts being reported unavailable during slower canonical readiness checks.
+
+- Supply the canonical idempotency header in the read-authority denial check and compare credential digests across restart — tests authorization and persistence rather than an incomplete HTTP request.
+
+- Clear initializer supplementary groups before provisioning the API credential and write an explicit newline for database auth — keeps generated secret metadata and process identity consistent.
+
+- Resolve the packaged Devgraph ontology inspector by its canonical module and exclude generated Python bytecode — keeps the container profile portable and its source review clean.
+
+- Create the optional static-assets directory before copying the standalone image — supports the Hub source tree when it contains no `public` files.
+
+- Supply Node’s Linux C++ runtime in the Python-based container and label the Docker profile accurately — prevents startup failure and misleading Mac instructions.
+
+- Update Next.js to the patched 16.4.6 release — clears the existing moderate cache-isolation advisories before adding a deployable container.
+
+### Added
+
+- Publish a native demo source manifest with exact component commits — lets organization demos bootstrap from a clean Hub release instead of borrowing developer checkouts.
+
+- Support an explicitly selected native demo profile on isolated Service/Runtime ports — launches the same Hub health surface without a Docker build or changes to existing Mac installations.
+
+- Qualify the reusable Hub read adapter against the persistent Devgraph API — verifies the same server-side connection code used by private organization demos.
+
+- Separate the Devgraph API and database networks, with no network on credential initialization — gives Hub a narrow API connection without publishing Bolt or sharing database credentials.
+
+- Add an isolated persistent Devgraph Docker profile with independent volumes, owner-private read credentials and canonical migrations — supports a separate organization instance without replacing the personal Mac host or widening Work authority.
+
+- Add an isolated Docker development profile on the merged Service and Runtime sources with normalized Zenith imports — enables a reproducible Lightweight Hub demo without changing native launchers or live data.
+
+
 - Allow the provider projection to bootstrap with active Service read authority
   and no Runtime authority, then select the exact Runtime query tuple only after
   a request yields its handoff and Run IDs.
