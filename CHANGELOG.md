@@ -20,6 +20,9 @@
 
 ### Added
 
+- Register existing Devgraph APIs as external Hub resources with private credential references, cached health and connect/disconnect controls — reuses independently running instances without making Hub own their processes.
+- Let organization readers reload the same registered resource binding — connection selection and disabling stay consistent across Hub and the consuming application.
+
 - Publish a native demo source manifest with exact component commits — lets organization demos bootstrap from a clean Hub release instead of borrowing developer checkouts.
 
 - Support an explicitly selected native demo profile on isolated Service/Runtime ports — launches the same Hub health surface without a Docker build or changes to existing Mac installations.
