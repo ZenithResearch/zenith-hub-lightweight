@@ -20,6 +20,8 @@
 
 ### Added
 
+- Publish a native demo source manifest with exact component commits — lets organization demos bootstrap from a clean Hub release instead of borrowing developer checkouts.
+
 - Support an explicitly selected native demo profile on isolated Service/Runtime ports — launches the same Hub health surface without a Docker build or changes to existing Mac installations.
 
 - Qualify the reusable Hub read adapter against the persistent Devgraph API — verifies the same server-side connection code used by private organization demos.

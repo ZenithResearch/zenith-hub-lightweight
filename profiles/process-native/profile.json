@@ -1,0 +1,25 @@
+{
+  "schema": "zenith.native-demo-profile.v1",
+  "nodeMajor": 24,
+  "pythonVersion": "3.12",
+  "zenithVersion": "0.1.0",
+  "environment": "test",
+  "authority": "local-dev-untrusted",
+  "ports": {
+    "hub": 4218,
+    "service": 18091,
+    "runtime": 18092
+  },
+  "components": {
+    "service": {
+      "repository": "ZenithResearch/service-management",
+      "commit": "bc084f2a875f7af333d7f01db01c94a9f93c1672",
+      "package": "service-management"
+    },
+    "runtime": {
+      "repository": "ZenithResearch/process-runtime",
+      "commit": "2efdf9672a279ae924c095cc357d15ccad754bf1",
+      "package": "process-runtime"
+    }
+  }
+}
