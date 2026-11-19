@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+### Added
+- Add an opt-in Hub-owned SQLite JSON-LD object store with pinned ontology/schema resources, revision-checked transactions and owner import/export interfaces — local object relationships can persist without adopting provider databases or creating duplicate ontology classes.
+- Verify semantic import/export across persistent restart and a fresh store with RDFC-1.0 — context, ordering and blank-node representation changes cannot silently change the RDF dataset.
+
+
 ### Changed
 - Prepare the pinned normalized Mac installer only after reviewed install apply — opening the released Hub now starts genuine onboarding without an external stack bootstrap or stale component pins.
 
