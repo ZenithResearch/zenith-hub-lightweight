@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:zenith:hub-resources:v1",
+  "title": "Hub resource bindings",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "revision",
+    "resources"
+  ],
+  "properties": {
+    "schema": {
+      "const": "zenith.hub-resources.v1"
+    },
+    "revision": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 9007199254740991
+    },
+    "resources": {
+      "type": "array",
+      "maxItems": 8,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "kind",
+          "label",
+          "endpoint",
+          "credentialFile",
+          "lifecycle",
+          "enabled"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9-]{0,63}$"
+          },
+          "kind": {
+            "const": "devgraph"
+          },
+          "label": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80
+          },
+          "endpoint": {
+            "type": "string",
+            "format": "uri",
+            "description": "An explicit numeric-loopback HTTP API origin.",
+            "pattern": "^http://127\\.0\\.0\\.1:[1-9][0-9]{0,4}$"
+          },
+          "credentialFile": {
+            "type": "string",
+            "description": "Owner-private server-side credential file reference. Never projected to browsers.",
+            "pattern": "^/"
+          },
+          "lifecycle": {
+            "const": "external"
+          },
+          "enabled": {
+            "type": "boolean"
+          }
+        }
+      }
+    }
+  }
+}

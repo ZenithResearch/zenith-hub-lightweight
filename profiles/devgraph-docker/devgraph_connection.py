@@ -6,6 +6,50 @@ from urllib.parse import urlsplit
 class NoRedirect(request.HTTPRedirectHandler):
     def redirect_request(self,*args,**kwargs):return None
 
+def private_json(path):
+    fd=os.open(path,os.O_RDONLY|os.O_NOFOLLOW)
+    try:
+        info=os.fstat(fd)
+        if not stat.S_ISREG(info.st_mode) or info.st_uid!=os.geteuid() or info.st_nlink!=1 or stat.S_IMODE(info.st_mode)!=0o600:
+            raise ValueError("Unsafe resource registry")
+        raw=os.read(fd,65537)
+        if len(raw)>65536:raise ValueError("Oversize resource registry")
+    finally:os.close(fd)
+    value=json.loads(raw)
+    if not isinstance(value,dict) or set(value)!={"schema","revision","resources"} or value["schema"]!="zenith.hub-resources.v1" or type(value["revision"]) is not int or not 1<=value["revision"]<=9007199254740991 or not isinstance(value["resources"],list) or len(value["resources"])>8:
+        raise ValueError("Invalid resource registry")
+    ids=set()
+    for item in value["resources"]:
+        if not isinstance(item,dict) or set(item)!={"id","kind","label","endpoint","credentialFile","lifecycle","enabled"}:
+            raise ValueError("Invalid resource binding")
+        if not isinstance(item["id"],str) or re.fullmatch(r"[a-z][a-z0-9-]{0,63}",item["id"]) is None or item["id"] in ids or item["kind"]!="devgraph" or not isinstance(item["label"],str) or not item["label"].strip() or len(item["label"])>80 or any(ord(c)<32 for c in item["label"]) or item["lifecycle"]!="external" or type(item["enabled"]) is not bool or not isinstance(item["credentialFile"],str) or not pathlib.Path(item["credentialFile"]).is_absolute():
+            raise ValueError("Invalid resource binding")
+        if not isinstance(item["endpoint"],str):raise ValueError("Invalid resource endpoint")
+        url=urlsplit(item["endpoint"])
+        if url.scheme!="http" or url.hostname!="127.0.0.1" or not url.port or item["endpoint"]!="http://127.0.0.1:"+str(url.port):
+            raise ValueError("Invalid existing resource origin")
+        ids.add(item["id"])
+    return value
+
+class RegisteredConnection:
+    """Reload a registered binding on each poll; disabling it stops future API polls."""
+    def __init__(self,config,resource_id,*,enabled=True,timeout=15,opener=None):
+        self.path=pathlib.Path(config);self.resource_id=resource_id
+        self.enabled=enabled;self.timeout=timeout;self.opener=opener
+    def status(self):
+        result={"connected":False,"readOnly":True,"writeAuthority":"not_configured","work":None,
+                "state":"not_configured","resourceId":self.resource_id,"lifecycle":"external"}
+        if not self.enabled:return result
+        try:
+            config=private_json(self.path)
+            item=next((v for v in config["resources"] if v["id"]==self.resource_id),None)
+            if item is None:return dict(result,state="resource_not_registered")
+            public={"resourceId":item["id"],"label":item["label"],"endpoint":item["endpoint"],"lifecycle":"external"}
+            if not item["enabled"]:return dict(result,**public,state="disconnected")
+            value=Connection(enabled=True,endpoint=item["endpoint"],credential_file=item["credentialFile"],timeout=self.timeout,opener=self.opener).status()
+            return dict(value,**public)
+        except (OSError,ValueError,TypeError,KeyError,OverflowError):return dict(result,state="resource_configuration_unavailable")
+
 class Connection:
     def __init__(self,*,enabled=None,endpoint='http://devgraph:8080',credential_file='/run/devgraph-reader/devgraph.read',opener=None,timeout=3):
         self.enabled=os.environ.get('ZENITH_DEVGRAPH_ENABLED')=='1' if enabled is None else enabled

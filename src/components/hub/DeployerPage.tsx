@@ -4,12 +4,16 @@ import {
   DeploymentMonitor,
   type DeploymentItem,
 } from "@/vendor/zenith-ui/DeploymentMonitor/DeploymentMonitor";
+type HubResource = {id:string;label:string;kind:string;endpoint:string;enabled:boolean;
+  state:string;connected:boolean;ready:boolean;lifecycle:string;readOnly:boolean};
 type Status = {
   installed: boolean;
   authority: string;
   pilot_ready: boolean;
   external_effects: boolean;
   actor_count: number | null;
+  resources?: HubResource[];
+  resourceRegistry?: string;
   pilot?: { setup: string; cleanup_unresolved: boolean; workflow: {
     observed_at: number | null; run_state: string; recoverable: boolean; export_available: boolean;
   } | null } | null;
@@ -102,6 +106,23 @@ export function DeployerPage() {
         setMessage("Status refreshed.");
         return;
       }
+      if (id === "resource-refresh" || id.startsWith("resource-toggle:")) {
+        const r = await fetch("/api/resources", {cache:"no-store"});
+        const current = await r.json();
+        if (!r.ok || current.schema !== "zenith.hub-resource-snapshot.v1") throw Error("resource_unavailable");
+        const resource = current.resources.find((v:HubResource) => "resource-toggle:" + v.id === id);
+        if (id !== "resource-refresh" && !resource) throw Error("resource_not_registered");
+        const body = id === "resource-refresh"
+          ? {schema:"zenith.hub-resource-action.v1",operation:"refresh"}
+          : {schema:"zenith.hub-resource-action.v1",operation:"set-enabled",
+             resourceId:resource.id,enabled:!resource.enabled,expectedRevision:current.revision};
+        const changed = await fetch("/api/resources", {method:"POST",
+          headers:{"Content-Type":"application/json","X-Zenith-CSRF":current.csrf},
+          body:JSON.stringify(body)});
+        const value = await changed.json();
+        if (!changed.ok) throw Error(value.error || "resource_action_rejected");
+        await refresh();setMessage("Resource connection updated. Provider lifecycle remains external.");return;
+      }
       const body =
         id === "apply"
           ? {
@@ -188,6 +209,17 @@ export function DeployerPage() {
       : s?.pilot?.setup === "configured" ? "Configured · bounded actions" : "Setup pending"
       : s?.actor_count === 0 ? "No enabled actors" : "Not qualified",
   });
+  for (const resource of s?.resources || []) items.push({
+    name:resource.label,
+    detail:"Existing Devgraph API · " + resource.endpoint + " · read-only connection.",
+    state:resource.connected ? "ready" : resource.enabled ? "blocked" : "unknown",
+    label:resource.connected ? "Connected · external resource"
+      : !resource.enabled ? "Disconnected" : resource.state.replaceAll("_"," "),
+  });
+  if (s?.resourceRegistry === "configuration_unavailable") items.push({
+    name:"Hub resources",detail:"Check the owner-side resource registration.",
+    state:"blocked",label:"Configuration unavailable",
+  });
   const checkpoints: DeploymentItem[] = [
     {
       name: native ? "Native demo services" : docker ? "Start Docker demo" : "Install this Mac",
@@ -251,6 +283,11 @@ export function DeployerPage() {
           label: "Stop",
           disabled: !snapshot?.actions?.includes("stop"),
         },
+        ...(s?.resources?.length ? [
+          {id:"resource-refresh",label:"Refresh resources"},
+          ...s.resources.map(resource => ({id:"resource-toggle:" + resource.id,
+            label:(resource.enabled ? "Disconnect " : "Connect ") + resource.label})),
+        ] : []),
         ...(pilot ? [
           {id:"pilot-setup", label:"Set up native identity"},
           {id:"pilot-initialize", label:"Initialize selected review"},

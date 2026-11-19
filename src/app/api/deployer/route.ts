@@ -1,5 +1,6 @@
 // This route performs local operations only when explicitly launched as an operator.
 import { createController, OperatorError } from "@/lib/pilot-controller.mjs";
+import { resourceController } from "@/lib/resource-controller.mjs";
 import { createContainerController } from "@/lib/container-controller.mjs";
 import { readAction, normalizeNextRequest } from "@/lib/operator-http.mjs";
 export const runtime = "nodejs";
@@ -14,12 +15,15 @@ const headers = {
 export async function GET(request: Request) {
   try {
     if (!controller) return Response.json({schema:"zenith.deployer.v1",mode:"disabled",profile:"workspace",reason:"Use the workspace page."},{headers});
-    return Response.json(
-      await controller.get(
-        controller.enabled ? normalizeNextRequest(request, undefined, containerDemo) : request,
-      ),
-      { headers },
+    const value = await controller.get(
+      controller.enabled ? normalizeNextRequest(request, undefined, containerDemo) : request,
     );
+    if (value && typeof value === "object" && "mode" in value && value.mode === "local" &&
+        "status" in value && value.status && typeof value.status === "object" && resourceController.enabled) {
+      const resources = await resourceController.snapshot();
+      Object.assign(value.status,{resources:resources.resources,resourceRegistry:resources.registryState});
+    }
+    return Response.json(value, { headers });
   } catch (error) {
     return rejected(error);
   }
