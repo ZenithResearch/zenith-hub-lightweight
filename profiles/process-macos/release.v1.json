@@ -2,23 +2,24 @@
   "components": {
     "frank": {
       "package": "frank-executor",
-      "source_commit": "fc92945a7dc8f8853bc922b5b5e2a9e9da63a0fe",
+      "source_commit": "331833d81a5a84bad104b1e5a516466a8be08037",
       "version": "0.1.0",
-      "wheel_sha256": "d16b9b5cd1eb90e8bfd4b8885781e0fc8ac431ee7af6a1b8ace915e3904258b0"
+      "wheel_sha256": "bdd7fa647e67ef3cffb10fd98d8c1721879d8a6a1c9ccc87eabc7c07bbd15c70"
     },
     "process-runtime": {
       "package": "process-runtime",
-      "source_commit": "200179067b48ba9f2e6b3ebab8c6d7ce7164dc27",
+      "source_commit": "2efdf9672a279ae924c095cc357d15ccad754bf1",
       "version": "0.1.0",
-      "wheel_sha256": "acf3af9efd252f0150a2ab70561c699748bdc8c6801c7c6235f67004d02e470d"
+      "wheel_sha256": "c9e90298209a87864105986b688310de65fd776591f921a5abb1edf709f8f874"
     },
     "service-management": {
       "package": "service-management",
-      "source_commit": "baa9cfaecbac1ca93d9668d67e399554a08eb03d",
+      "source_commit": "bc084f2a875f7af333d7f01db01c94a9f93c1672",
       "version": "0.1.0",
-      "wheel_sha256": "a9a785d06d12ed8b0192427e23b4f12020fe96f15690ec5694d3c0eca1403bef"
+      "wheel_sha256": "67e1a73ead9b78cda93db95bef3a58239605f93b84f051c4841eedde00df48f4"
     }
   },
+  "installation_profile": "normalized-zenith-v1",
   "machine": "arm64",
   "platform": "darwin",
   "python": [
@@ -28,11 +29,11 @@
   "schema": "hub.process-macos-release.v1",
   "wheels": [
     {
-      "bytes": 132079,
-      "filename": "anyio-4.15.1-py3-none-any.whl",
+      "bytes": 134521,
+      "filename": "anyio-4.16.0-py3-none-any.whl",
       "name": "anyio",
-      "sha256": "6152fdbbf9a77fdec97731721bebf7c4c44f7c29b424b0065826173efc7ed101",
-      "version": "4.15.1"
+      "sha256": "c66ae634e0b8228396b801741beb3294326d4b6102f7bba4041c0dfb58c29026",
+      "version": "4.16.0"
     },
     {
       "bytes": 67548,
@@ -49,10 +50,24 @@
       "version": "2026.7.22"
     },
     {
-      "bytes": 92119,
+      "bytes": 184719,
+      "filename": "cffi-2.1.1-cp312-cp312-macosx_11_0_arm64.whl",
+      "name": "cffi",
+      "sha256": "f81b3b8f3d4e343550fa4baa0e479bba9f2d29ce9c2e9b51d1ce1718d7442fcf",
+      "version": "2.1.1"
+    },
+    {
+      "bytes": 4010153,
+      "filename": "cryptography-50.0.1-cp311-abi3-macosx_11_0_arm64.whl",
+      "name": "cryptography",
+      "sha256": "b8f852c65863251b9e3a1b8c150ce21e59b522dbb6a7d4bc80e680d38388e986",
+      "version": "50.0.1"
+    },
+    {
+      "bytes": 159881,
       "filename": "frank_executor-0.1.0-py3-none-any.whl",
       "name": "frank-executor",
-      "sha256": "d16b9b5cd1eb90e8bfd4b8885781e0fc8ac431ee7af6a1b8ace915e3904258b0",
+      "sha256": "bdd7fa647e67ef3cffb10fd98d8c1721879d8a6a1c9ccc87eabc7c07bbd15c70",
       "version": "0.1.0"
     },
     {
@@ -63,6 +78,20 @@
       "version": "0.16.0"
     },
     {
+      "bytes": 62636,
+      "filename": "h2-4.4.1-py3-none-any.whl",
+      "name": "h2",
+      "sha256": "0e25f1462b23c9cb82d9eb02e28bc706dac2a68cb457c6a0d74d63c8a2a5d0e6",
+      "version": "4.4.1"
+    },
+    {
+      "bytes": 34246,
+      "filename": "hpack-4.2.0-py3-none-any.whl",
+      "name": "hpack",
+      "sha256": "858ac0b02280fa582b5080d68db0899c62a80375e0e5413a74970c5e518b6986",
+      "version": "4.2.0"
+    },
+    {
       "bytes": 78784,
       "filename": "httpcore-1.0.9-py3-none-any.whl",
       "name": "httpcore",
@@ -70,11 +99,32 @@
       "version": "1.0.9"
     },
     {
+      "bytes": 85551,
+      "filename": "httpcore2-2.16.2-py3-none-any.whl",
+      "name": "httpcore2",
+      "sha256": "16051ae2a42f776007543f32de9349a317b23d2cbb4e1456b4bac0e88b87419a",
+      "version": "2.16.2"
+    },
+    {
       "bytes": 73517,
       "filename": "httpx-0.28.1-py3-none-any.whl",
       "name": "httpx",
       "sha256": "d909fcccc110f8c7faf814ca82a9a4d816bc5a6dbfea25d6591d6985b8ba59ad",
       "version": "0.28.1"
+    },
+    {
+      "bytes": 97893,
+      "filename": "httpx2-2.16.2-py3-none-any.whl",
+      "name": "httpx2",
+      "sha256": "f05c13aade4c45dbf1c9060647a1058f0acad62398fad96e741269edb33d46f5",
+      "version": "2.16.2"
+    },
+    {
+      "bytes": 13007,
+      "filename": "hyperframe-6.1.0-py3-none-any.whl",
+      "name": "hyperframe",
+      "sha256": "b03380493a519fce58ea5af42e4a42317bf9bd425596f7a0835ffce80f1a42e5",
+      "version": "6.1.0"
     },
     {
       "bytes": 69583,
@@ -98,11 +148,25 @@
       "version": "2025.9.1"
     },
     {
-      "bytes": 82341,
+      "bytes": 95678,
       "filename": "process_runtime-0.1.0-py3-none-any.whl",
       "name": "process-runtime",
-      "sha256": "acf3af9efd252f0150a2ab70561c699748bdc8c6801c7c6235f67004d02e470d",
+      "sha256": "c9e90298209a87864105986b688310de65fd776591f921a5abb1edf709f8f874",
       "version": "0.1.0"
+    },
+    {
+      "bytes": 62600,
+      "filename": "pycparser-3.12-py3-none-any.whl",
+      "name": "pycparser",
+      "sha256": "a076f3f489b39b43ed13563a1dafe42447445bec2e294154ec5c57fcdda4c85e",
+      "version": "3.12"
+    },
+    {
+      "bytes": 32585,
+      "filename": "python_multipart-0.0.34-py3-none-any.whl",
+      "name": "python-multipart",
+      "sha256": "ebacd224bd686eee2f9aa1066a657affe07435a185834e05e5235e2e59173e91",
+      "version": "0.0.34"
     },
     {
       "bytes": 26766,
@@ -119,11 +183,18 @@
       "version": "2026.9.1"
     },
     {
-      "bytes": 46549,
+      "bytes": 116475,
       "filename": "service_management-0.1.0-py3-none-any.whl",
       "name": "service-management",
-      "sha256": "a9a785d06d12ed8b0192427e23b4f12020fe96f15690ec5694d3c0eca1403bef",
+      "sha256": "67e1a73ead9b78cda93db95bef3a58239605f93b84f051c4841eedde00df48f4",
       "version": "0.1.0"
+    },
+    {
+      "bytes": 19017,
+      "filename": "truststore-0.10.5-py3-none-any.whl",
+      "name": "truststore",
+      "sha256": "9aaaedaefaf06d8b206278cf8b5012bc897f485a874503501e12d776df78951c",
+      "version": "0.10.5"
     },
     {
       "bytes": 45571,
@@ -131,6 +202,34 @@
       "name": "typing_extensions",
       "sha256": "481caa481374e813c1b176ada14e97f1f67a4539ce9cfeb3f350d78d6370c2e8",
       "version": "4.16.0"
+    },
+    {
+      "bytes": 3920,
+      "filename": "vercel_headers-0.8.0-py3-none-any.whl",
+      "name": "vercel-headers",
+      "sha256": "b565d966a4aff1a85410eed5f47e1edfa4c83a6d6b1870477d43bd78d16f16d5",
+      "version": "0.8.0"
+    },
+    {
+      "bytes": 24767,
+      "filename": "vercel_internal_core-0.2.2-py3-none-any.whl",
+      "name": "vercel-internal-core",
+      "sha256": "581b02309ec8d6367134c3ecabba5d8169a902677458e228f544dc88dfa05a6b",
+      "version": "0.2.2"
+    },
+    {
+      "bytes": 17044,
+      "filename": "vercel_oidc-0.12.0-py3-none-any.whl",
+      "name": "vercel-oidc",
+      "sha256": "727e0af59f988b96964a1d5fcbde314b6ef8c139aa976113917f478e6033e660",
+      "version": "0.12.0"
+    },
+    {
+      "bytes": 95468,
+      "filename": "vercel_queue-0.9.2-py3-none-any.whl",
+      "name": "vercel-queue",
+      "sha256": "b9f78efe4182fe636c8074cc494a9ed6a43f6d6ee6c41367a08f9ce25af7596c",
+      "version": "0.9.2"
     }
   ]
 }

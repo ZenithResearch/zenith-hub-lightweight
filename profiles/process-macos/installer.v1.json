@@ -1,0 +1,8 @@
+{
+  "schema": "hub.released-installer.v1",
+  "url": "https://github.com/ZenithResearch/zenith-hub-lightweight/releases/download/hub-onboarding-2026.11.19/Zenith-Process-Mac-Apple-Silicon-normalized-20261119.zip",
+  "archiveSha256": "2deb4ce62d0faf5c3e8f7da0821237df1c3bfdd96732a7d684c58a4ae97058ed",
+  "archiveBytes": 6169801,
+  "bundleSha256": "d9359193f9b07ad54c49d80adc6fe922d9dc19f6fe30e2a9803859049c002edb",
+  "profileSha256": "bed5667e2fc46c1c33af61ade705d2fea56f1f0f02df3b573a95cd78c3d25775"
+}

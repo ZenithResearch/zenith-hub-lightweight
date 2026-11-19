@@ -16,7 +16,7 @@ jobs:
           cache: npm
       - run: npm ci --ignore-scripts
       - run: npm run check:source
-      - run: python3 -m unittest tests/test_provider_activation.py tests/test_native_profile.py tests/test_resource_reader.py
+      - run: python3 -m unittest tests/test_provider_activation.py tests/test_native_profile.py tests/test_resource_reader.py tests/test_installer_bundle.py
       - run: npm run test:deployer
       - run: npm run typecheck
       - run: npm run build

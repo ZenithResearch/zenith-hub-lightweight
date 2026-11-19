@@ -185,6 +185,13 @@ def run(argv, root, timeout=30, *, check=True):
 
 
 def valid_wheel_closure(profile, wheel_names, *, allow_previous_provider=False):
+    if profile.get('installation_profile') == 'normalized-zenith-v1':
+        base = {'anyio', 'attrs', 'certifi', 'frank-executor', 'h11', 'httpcore', 'httpx',
+                'idna', 'jsonschema', 'jsonschema-specifications', 'process-runtime',
+                'referencing', 'rpds-py', 'service-management', 'typing_extensions'}
+        expected = base | PROVIDER_RUNTIME_PACKAGES
+        return (profile.get('schema') == 'hub.process-macos-release.v1'
+                and len(profile['wheels']) == len(expected) and wheel_names == expected)
     if profile.get('native_profile') != 'workspace-provider-v1':
         return (len(profile['wheels']) == BASE_WHEEL_COUNT
                 and len(wheel_names) == BASE_WHEEL_COUNT)

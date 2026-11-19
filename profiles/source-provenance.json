@@ -34,37 +34,37 @@
     "files": [
       {
         "path": "profiles/process-macos/process_mac.py",
-        "sha256": "c60927d454ddb4ba55c964c80d59335c20ef1e1b57ad7754530c5c5fd8a41d1f"
+        "sha256": "b52ac410351d1974ec2cb7f2ef6f6fe81c1fce5758d2dcb81b1273ce42cfc344"
       }
     ]
   },
   {
-    "repository": "public component baselines",
+    "repository": "normalized public component baselines",
     "build": "SOURCE_DATE_EPOCH=1767225600; Python 3.12; setuptools 84.0.0; two matching builds per component",
     "components": {
       "frank": {
         "package": "frank-executor",
-        "source_commit": "fc92945a7dc8f8853bc922b5b5e2a9e9da63a0fe",
         "version": "0.1.0",
-        "wheel_sha256": "d16b9b5cd1eb90e8bfd4b8885781e0fc8ac431ee7af6a1b8ace915e3904258b0"
+        "source_commit": "331833d81a5a84bad104b1e5a516466a8be08037",
+        "wheel_sha256": "bdd7fa647e67ef3cffb10fd98d8c1721879d8a6a1c9ccc87eabc7c07bbd15c70"
       },
       "process-runtime": {
         "package": "process-runtime",
-        "source_commit": "200179067b48ba9f2e6b3ebab8c6d7ce7164dc27",
         "version": "0.1.0",
-        "wheel_sha256": "acf3af9efd252f0150a2ab70561c699748bdc8c6801c7c6235f67004d02e470d"
+        "source_commit": "2efdf9672a279ae924c095cc357d15ccad754bf1",
+        "wheel_sha256": "c9e90298209a87864105986b688310de65fd776591f921a5abb1edf709f8f874"
       },
       "service-management": {
         "package": "service-management",
-        "source_commit": "baa9cfaecbac1ca93d9668d67e399554a08eb03d",
         "version": "0.1.0",
-        "wheel_sha256": "a9a785d06d12ed8b0192427e23b4f12020fe96f15690ec5694d3c0eca1403bef"
+        "source_commit": "bc084f2a875f7af333d7f01db01c94a9f93c1672",
+        "wheel_sha256": "67e1a73ead9b78cda93db95bef3a58239605f93b84f051c4841eedde00df48f4"
       }
     },
     "files": [
       {
         "path": "profiles/process-macos/release.v1.json",
-        "sha256": "5eee43e9375732cee7efaf25bb67091dbb5bd588c82f0892841d2ed9079d441a"
+        "sha256": "bed5667e2fc46c1c33af61ade705d2fea56f1f0f02df3b573a95cd78c3d25775"
       }
     ]
   },

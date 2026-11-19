@@ -8,8 +8,11 @@ import {
   rename,
   symlink,
   copyFile,
+  readFile,
+  access,
 } from "node:fs/promises";
 import os from "node:os";
+import {createHash} from "node:crypto";
 import path from "node:path";
 import { createController } from "../../src/lib/pilot-controller.mjs";
 import {
@@ -340,4 +343,55 @@ test("unresolved cleanup during status blocks both future polls and mutations", 
     { code: "operation_in_progress" },
   );
   assert.equal(calls, 1);
+});
+
+async function releasedFixture(t) {
+  const f=await fixture(t);
+  delete f.env.ZENITH_PROCESS_BUNDLE;
+  const descriptor=path.join(path.dirname(f.root),'installer.json');
+  const profile=await readFile('profiles/process-macos/release.v1.json');
+  const value={schema:'hub.released-installer.v1',
+    url:'https://github.com/ZenithResearch/zenith-hub-lightweight/releases/download/test/installer.zip',
+    archiveSha256:'a'.repeat(64),archiveBytes:100,bundleSha256:'b'.repeat(64),
+    profileSha256:createHash('sha256').update(profile).digest('hex')};
+  await writeFile(descriptor,JSON.stringify(value));
+  const c=createController({env:f.env,platform:'darwin',arch:'arm64',installerDescriptor:descriptor,
+    run:async(exe,args,options)=>{
+      f.calls.push({exe,args,options});
+      if(args[3].endsWith('installer_bundle.py'))return {stdout:JSON.stringify({
+        schema:'hub.prepared-installer.v1',bundle:path.join(os.homedir(),'Library/Caches/Zenith/Hub/installers',value.bundleSha256),
+        bundleSha256:value.bundleSha256})};
+      if(args[4]==='install')await mkdir(f.root);
+      return {stdout:JSON.stringify({installed:true,components:{}})};
+    }});
+  const snapshot=await c.get(request());
+  const post=body=>c.post(request({origin,'content-type':'application/json','x-zenith-csrf':snapshot.csrf},'POST'),
+    {schema:'zenith.deployer-action.v1',...body});
+  return {...f,c,post,descriptor,value,snapshot};
+}
+test('released installer is only fetched after reviewed install apply',async(t)=>{
+  const f=await releasedFixture(t);
+  assert.equal(f.snapshot.status.installed,false);
+  assert.deepEqual(f.snapshot.actions,['install']);
+  assert.equal(f.calls.length,0);
+  const {plan}=await f.post({operation:'plan',action:'install'});
+  assert.equal(plan.release_digest,f.value.bundleSha256);
+  assert.equal(f.calls.length,0);
+  await assert.rejects(access(f.root));
+  await f.post({operation:'apply',plan_id:plan.id});
+  assert.ok(f.calls[0].args[3].endsWith('installer_bundle.py'));
+  assert.equal(f.calls[1].args[4],'install');
+  assert.equal(f.calls[2].args[4],'status');
+  assert.ok(f.calls.every(c=>c.options.shell===false));
+});
+test('changed or removed released installer invalidates pending install',async(t)=>{
+  for(const change of ['digest','removed','origin']){
+    const f=await releasedFixture(t);
+    const {plan}=await f.post({operation:'plan',action:'install'});
+    if(change==='removed')await rm(f.descriptor);
+    else await writeFile(f.descriptor,JSON.stringify({...f.value,...(change==='digest'?
+      {bundleSha256:'c'.repeat(64)}:{url:'https://evil.example/installer.zip'})}));
+    await assert.rejects(f.post({operation:'apply',plan_id:plan.id}));
+    assert.equal(f.calls.length,0);
+  }
 });
