@@ -1,0 +1,19 @@
+{
+  "@context": "https://zenith-research.ca/ontology/normalized/v0.1.0/modules/core.jsonld",
+  "@graph": [
+    {
+      "@id": "urn:hub:example:catalog",
+      "@type": "zn:Collection",
+      "label": "Local configuration artifacts",
+      "zn:HAS_ARTIFACT": [
+        {"@id": "urn:hub:example:runtime-configuration"},
+        {"@id": "https://example.org/configuration/not-imported"}
+      ]
+    },
+    {
+      "@id": "urn:hub:example:runtime-configuration",
+      "@type": "zn:Artifact",
+      "label": {"@value": "Runtime configuration description", "@language": "en"}
+    }
+  ]
+}

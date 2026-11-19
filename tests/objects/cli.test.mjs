@@ -1,0 +1,24 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {execFile} from 'node:child_process';
+import {promisify} from 'node:util';
+import {mkdtemp,realpath,rm,readFile} from 'node:fs/promises';
+import path from 'node:path';
+import os from 'node:os';
+import jsonld from 'jsonld';
+const exec=promisify(execFile);
+test('owner CLI persists across processes and a second store reimports its exclusive export',async t=>{
+  const root=await realpath(await mkdtemp(path.join(os.tmpdir(),'hub-object-cli-')));t.after(()=>rm(root,{recursive:true,force:true}));
+  const first=path.join(root,'first'),second=path.join(root,'second'),exported=path.join(root,'export.jsonld');
+  const cli=async(...args)=>JSON.parse((await exec(process.execPath,['scripts/objects.mjs',...args])).stdout||'null');
+  await cli('init','--data-dir',first);
+  const imported=await cli('import','--data-dir',first,'--input','examples/objects/connected.jsonld','--import-key','cli-1');
+  assert.equal(imported.created.length,2);
+  assert.equal((await cli('list','--data-dir',first)).items.length,2);
+  await cli('export','--data-dir',first,'--output',exported);
+  await assert.rejects(cli('export','--data-dir',first,'--output',exported));
+  await cli('import','--data-dir',second,'--input',exported,'--import-key','cli-2');
+  const final=await cli('export','--data-dir',second);
+  const canonical=d=>jsonld.canonize(d,{algorithm:'RDFC-1.0',safe:true});
+  assert.equal(await canonical(JSON.parse(await readFile(exported,'utf8'))),await canonical(final));
+});

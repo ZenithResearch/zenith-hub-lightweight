@@ -94,3 +94,12 @@ visibility does not grant a new open-source license. See [NOTICE.md](NOTICE.md).
 The roadmap is a separate read-only observer with synthetic public examples;
 SDK generalization remains tracked separately from this deployer. Wallet source is public with its own verification and disclosure evidence; it is
 not installed or enrolled by this bundle.
+
+## Local typed object storage
+
+Hub can optionally persist JSON-LD/RDF objects in its own SQLite database, separate
+from connection configuration and provider data. The owner CLI supports imports,
+exports and revision-checked updates. See [the storage contract and walkthrough](docs/object-store.md).
+Run `npm run test:objects` and `node scripts/objects-roundtrip.mjs` for the isolated
+semantic round-trip acceptance checks. The feature requires explicit owner data
+directory configuration; opening onboarding does not initialize an object store.

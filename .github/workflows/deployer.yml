@@ -18,8 +18,11 @@ jobs:
       - run: npm run check:source
       - run: python3 -m unittest tests/test_provider_activation.py tests/test_native_profile.py tests/test_resource_reader.py tests/test_installer_bundle.py
       - run: npm run test:deployer
+      - run: npm run test:objects
       - run: npm run typecheck
       - run: npm run build
+      - run: node scripts/check-object-api.mjs
+      - run: node scripts/check-object-api.mjs --standalone
       - run: npm audit --audit-level=moderate
 
   docker-demo:
