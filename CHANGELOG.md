@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Changed
+- Prepare the pinned normalized Mac installer only after reviewed install apply — opening the released Hub now starts genuine onboarding without an external stack bootstrap or stale component pins.
+
+
 ### Fixed
 
 - Allow an explicitly bounded reader timeout for native storage — prevents healthy persistent hosts being reported unavailable during slower canonical readiness checks.

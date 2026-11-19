@@ -39,6 +39,7 @@ export function createController({
   arch = process.arch,
   run = executeOwned,
   clock = Date.now,
+  installerDescriptor = path.join(process.cwd(),"profiles/process-macos/installer.v1.json"),
 } = {}) {
   const origin = env.ZENITH_OPERATOR_ORIGIN || "http://127.0.0.1:4208";
   const url = new URL(origin);
@@ -62,9 +63,35 @@ export function createController({
   );
   const python = env.ZENITH_PROCESS_PYTHON || "/opt/homebrew/bin/python3.12";
   if (!path.isAbsolute(python)) fail("invalid_interpreter");
-  const bundle = env.ZENITH_PROCESS_BUNDLE
+  const configuredBundle = env.ZENITH_PROCESS_BUNDLE
     ? path.resolve(/* turbopackIgnore: true */ env.ZENITH_PROCESS_BUNDLE)
     : null;
+  const installerCache = path.join(os.homedir(),"Library/Caches/Zenith/Hub/installers");
+  let remoteInstaller = null;
+  let bundle = configuredBundle;
+  async function installer() {
+    if (configuredBundle || pilot) return null;
+    let value;
+    try { value = JSON.parse(await readFile(installerDescriptor,"utf8")); }
+    catch (e) {
+      if (e.code === "ENOENT") { remoteInstaller=null; bundle=null; return null; }
+      fail("invalid_installer_release",409);
+    }
+    const keys=["schema","url","archiveSha256","archiveBytes","bundleSha256","profileSha256"];
+    closed(value,keys);
+    if (value.schema!=="hub.released-installer.v1" ||
+        typeof value.url!=="string" ||
+        !/^https:\/\/github\.com\/ZenithResearch\/zenith-hub-lightweight\/releases\/download\/[A-Za-z0-9._-]+\/[A-Za-z0-9._-]+\.zip$/.test(value.url) ||
+        !["archiveSha256","bundleSha256","profileSha256"].every(k=>/^[a-f0-9]{64}$/.test(value[k])) ||
+        !Number.isSafeInteger(value.archiveBytes) || value.archiveBytes<1 || value.archiveBytes>67108864)
+      fail("invalid_installer_release",409);
+    const pinned=await readFile(path.join(process.cwd(),"profiles/process-macos/release.v1.json"));
+    if(createHash("sha256").update(pinned).digest("hex")!==value.profileSha256)
+      fail("unrecognized_release",409);
+    remoteInstaller=value;
+    bundle=path.join(installerCache,value.bundleSha256);
+    return value;
+  }
   const ports = {
     runtime: Number(env.ZENITH_RUNTIME_PORT || (pilot ? 8192 : 8092)),
     service: Number(env.ZENITH_SERVICE_PORT || (pilot ? 8191 : 8091)),
@@ -115,6 +142,8 @@ export function createController({
     }
   }
   async function release() {
+    const remote=await installer();
+    if(remote)return remote.bundleSha256;
     if (!bundle) return null;
     const m = await lstat(bundle);
     if (!m.isDirectory() || m.isSymbolicLink()) fail("unsafe_bundle");
@@ -185,6 +214,21 @@ export function createController({
       args.push("--selection-sha256", binding.selection);
     if (action === "install") {
       if (!bundle || !digest) fail("bundle_not_configured");
+      if (remoteInstaller) {
+        try {
+          const prepared=await run(python,["-I","-S","-B",
+            path.join(process.cwd(),"profiles/process-macos/installer_bundle.py"),
+            "--descriptor",installerDescriptor,"--cache",installerCache],
+            {timeout:240000,maxBuffer:262144,env:{HOME:os.homedir(),
+              PATH:"/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin",TMPDIR:os.tmpdir()},shell:false});
+          const value=JSON.parse(prepared.stdout);
+          if(value.schema!=="hub.prepared-installer.v1" || value.bundle!==bundle || value.bundleSha256!==digest)
+            fail("installer_release_changed",409);
+        } catch (e) {
+          if(e.code==="OPERATOR_CLEANUP_UNRESOLVED") {blocked=true;fail("controller_cleanup_unresolved",503);}
+          fail("installer_download_rejected",422);
+        }
+      }
       args.push(
         "--bundle",
         bundle,

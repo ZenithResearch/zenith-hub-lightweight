@@ -8,6 +8,15 @@ ROOT = Path(__file__).parents[1]
 
 
 class NativeProfileTests(unittest.TestCase):
+    def test_installation_profile_uses_normalized_components_without_native_activation(self):
+        profile=json.loads((ROOT/'profiles/process-macos/release.v1.json').read_text())
+        native=json.loads((ROOT/'profiles/process-native/profile.json').read_text())
+        self.assertEqual(profile['installation_profile'],'normalized-zenith-v1')
+        self.assertEqual(len(profile['wheels']),29)
+        self.assertNotIn('native',profile)
+        for name,row in native['components'].items():
+            self.assertEqual(profile['components'][row['package']]['source_commit'],row['commit'])
+
     def test_component_pins_match_the_container_profile(self):
         profile = json.loads((ROOT / "profiles/process-native/profile.json").read_text())
         tree = ast.parse((ROOT / "profiles/process-docker/prepare.py").read_text())

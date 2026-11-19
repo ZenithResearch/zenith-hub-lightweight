@@ -26,12 +26,17 @@ installation at `~/Library/Application Support/Zenith/Process`. All configuratio
 for this UI lives in the ignored `.env.operator.local`; use absolute paths.
 `npm run operator` runs the same loopback bridge in development mode.
 
-To install a new Mac, set `ZENITH_PROCESS_BUNDLE` to the extracted, reviewed offline
-Mac bundle and `ZENITH_PROCESS_ROOT` to its final, absent destination. Click
-**Install base stack**, review the destination and manifest digest, then apply.
-The server requires the exact repository-pinned release profile and the Python
-controller checks every bundle payload. Existing data is never overwritten.
-Download the [Apple-silicon base installer](https://github.com/ZenithResearch/zenith-hub-lightweight/releases/tag/mac-base-2026.10.16) and verify its ZIP with the release’s `SHA256SUMS`. The release includes the offline wheel closure and exact public component commit/hash pins. This is a base-installation prerelease; native authority remains pending.
+To install a new Mac, launch Hub and choose **Install base stack**. Hub first
+shows the destination and pinned manifest digest. Only **Apply** downloads the
+released installer, verifies its archive and full wheel closure, and installs it.
+Opening Hub or reviewing an install does not install or start any components.
+The default installer uses normalized Zenith Service and Runtime projections.
+
+The [onboarding release](https://github.com/ZenithResearch/zenith-hub-lightweight/releases/tag/hub-onboarding-2026.11.19)
+also carries the offline Apple-silicon ZIP and SHA256SUMS. An explicitly configured
+`ZENITH_PROCESS_BUNDLE` continues to use a reviewed local bundle instead.
+Installation leaves native authority pending; starting the installed components
+is a separate reviewed action.
 
 Use **Run doctor**, **Start**, **Stop** and **Refresh status** to manage that one
 installation. Status refreshes every 15 seconds while the tab is visible.
