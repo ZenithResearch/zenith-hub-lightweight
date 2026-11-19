@@ -5,7 +5,7 @@ import {ObjectStore} from '../src/lib/objects/store.mjs';
 import {loadOntologyRegistry} from '../src/lib/objects/registry.mjs';
 const readText = async file => new TextDecoder('utf-8', {fatal: true}).decode(await readFile(file));
 const [operation, ...raw] = process.argv.slice(2), flags = {};
-const allowed = new Set(['--data-dir', '--registry', '--input', '--output', '--import-key', '--expected-revisions', '--projections', '--source', '--id', '--type', '--graph', '--depth', '--limit']);
+const allowed = new Set(['--data-dir', '--registry', '--input', '--output', '--import-key', '--expected-revisions', '--projections', '--source', '--id', '--type', '--graph', '--depth', '--limit', '--after']);
 let store;
 try {
   for (let i = 0; i < raw.length; i += 2) {
@@ -13,18 +13,24 @@ try {
     flags[raw[i]] = raw[i + 1];
   }
   if (!['init','registry','import','export','get','list','relationships','connected','rebuild-indexes'].includes(operation)) throw Error('Unknown object operation');
+  const operationFlags = {init: [], registry: [], list: ['--type','--after','--limit'],
+    get: ['--id'], relationships: ['--id','--limit'], connected: ['--id','--depth','--limit'],
+    'rebuild-indexes': [], import: ['--input','--import-key','--expected-revisions','--projections','--source'],
+    export: ['--id','--graph']};
+  const permitted = ['--data-dir','--registry','--output', ...operationFlags[operation]];
+  if (Object.keys(flags).some(key => !permitted.includes(key))) throw Error('Flag does not apply to this operation');
   if (flags['--id'] && flags['--graph']) throw Error('Select objects or a graph, not both');
   const directory = flags['--data-dir'] || process.env.ZENITH_HUB_DATA_DIR;
-  if (!directory) throw Error('Select an absolute --data-dir owned by Hub');
+  if (!directory && operation !== 'registry') throw Error('Select an absolute --data-dir owned by Hub');
   const registry = await loadOntologyRegistry(flags['--registry'] || process.env.ZENITH_HUB_ONTOLOGY_REGISTRY_FILE || path.join(process.cwd(), 'profiles/object-store/registry.json'));
-  store = new ObjectStore({dataDir: directory, registry});
+  if (operation !== 'registry') store = new ObjectStore({dataDir: directory, registry});
   let value;
   if (operation === 'init') value = {initialized: true, database: path.join(directory, 'objects.sqlite'), registry: registry.describe()};
   else if (operation === 'registry') value = registry.describe();
-  else if (operation === 'list') value = store.list({...(flags['--type'] ? {type: flags['--type']} : {}), limit: Number(flags['--limit'] || 100)});
+  else if (operation === 'list') value = store.list({...(flags['--type'] ? {type: flags['--type']} : {}), after: flags['--after'] || '', limit: Number(flags['--limit'] ?? 100)});
   else if (operation === 'get') value = await store.get(flags['--id']);
-  else if (operation === 'relationships') value = store.relationships({id: flags['--id']});
-  else if (operation === 'connected') value = store.connected({id: flags['--id'], depth: Number(flags['--depth'] || 1)});
+  else if (operation === 'relationships') value = store.relationships({id: flags['--id'], limit: Number(flags['--limit'] ?? 1000)});
+  else if (operation === 'connected') value = store.connected({id: flags['--id'], depth: Number(flags['--depth'] ?? 1), limit: Number(flags['--limit'] ?? 100)});
   else if (operation === 'rebuild-indexes') value = store.rebuildIndexes();
   else if (operation === 'import') {
     if (!flags['--input'] || !flags['--import-key']) throw Error('Import requires --input and --import-key');

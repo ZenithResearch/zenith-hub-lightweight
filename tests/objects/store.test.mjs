@@ -265,3 +265,11 @@ test('several descriptions of one IRI in a document union assertions rather than
   assert.equal(exported[0][L + 'label'].length, 2);
   assert.equal(await canonical(doc), await canonical(exported));
 });
+
+test('empty dataset exports reimport as semantic no-ops while empty named graph declarations reject', async t => {
+  const {s, open} = await fixture(t), exported = await s.exportDocument(), fresh = open('empty');
+  const result = await fresh.importDocument(exported, {importKey: 'empty'});
+  assert.deepEqual(result.created, []); assert.deepEqual(result.updated, []);
+  assert.equal(await canonical(exported), await canonical(await fresh.exportDocument()));
+  await assert.rejects(s.importDocument([artifact('urn:a'), {'@id': 'urn:empty-graph', '@graph': []}], {importKey: 'empty-graph'}), {code: 'empty_named_graph_unsupported'});
+});

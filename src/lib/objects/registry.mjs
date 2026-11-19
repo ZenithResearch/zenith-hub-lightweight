@@ -38,11 +38,14 @@ export async function loadOntologyRegistry(file) {
   closed(config, ['schema', 'packages', 'resources', 'profiles']);
   if (config.schema !== 'zenith.hub-ontology-registry.v1' ||
       !['packages', 'resources', 'profiles'].every(k => Array.isArray(config[k]))) reject('invalid_ontology_registry', 503);
-  const documents = {}, hashes = {}, schemas = new Map(), packages = [], ontologyDocuments = [];
+  const documents = {}, hashes = {}, schemas = new Map(), schemaHashes = new Map(), packages = [], ontologyDocuments = [];
   function register(url, document, hash) {
     if (!absoluteIRI(url) || Object.hasOwn(documents, url) && hashes[url] !== hash) reject('ontology_resource_collision', 503);
     documents[url] = document; hashes[url] = hash;
-    if (document.$schema && document.$id) schemas.set(document.$id, document);
+    if (document.$schema && document.$id) {
+      if (!absoluteIRI(document.$id) || schemaHashes.has(document.$id) && schemaHashes.get(document.$id) !== hash) reject('schema_identity_collision', 503);
+      schemas.set(document.$id, document); schemaHashes.set(document.$id, hash);
+    }
   }
   for (const entry of config.packages) {
     const base = path.resolve(path.dirname(file), entry.directory);

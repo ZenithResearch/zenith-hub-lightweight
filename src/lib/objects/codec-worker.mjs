@@ -45,7 +45,6 @@ async function interpret() {
   checkExpanded(expanded);
   const quads = await jsonld.toRDF(expanded, options);
   if (quads.length > 10000) fail('dataset_too_large');
-  if (!quads.length) fail('empty_dataset');
   for (const q of quads) for (const term of [q.subject, q.predicate, q.object, q.graph]) {
     if (term.termType === 'NamedNode' && !/^[A-Za-z][A-Za-z0-9+.-]*:/.test(term.value)) fail('relative_iri_unsupported');
   }

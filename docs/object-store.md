@@ -69,7 +69,8 @@ same node. Anonymous-only imports require distinct import keys for distinct
 occurrences; replaying a key reuses its original result.
 
 Exports use **expanded JSON-LD with full IRIs**, explicit literal datatypes and
-language tags. They need no remote context to be interpreted. Input context
+language tags. They need no remote context to be interpreted. An empty dataset exports/imports as a no-op; it creates no object assertions.
+Input context
 syntax, term aliases and property ordering are not preserved byte-for-byte;
 the RDF dataset they express is preserved. Pinned context URLs/hashes are kept
 as provenance. Inline context declarations are interpreted as document content.

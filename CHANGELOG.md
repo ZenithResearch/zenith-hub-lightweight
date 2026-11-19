@@ -3,6 +3,10 @@
 ## [Unreleased]
 
 ### Fixed
+- Preserve empty RDF datasets as no-op imports and reject conflicting schema identities or inapplicable CLI flags — valid exports remain reimportable without ambiguous validation or silently ignored owner intent.
+
+
+### Fixed
 - Check object mutation origin and CSRF before reading the body, and accept explicitly pinned context assets independently of their filename — rejected requests remain inert and registered packages can keep their own resource layouts.
 
 

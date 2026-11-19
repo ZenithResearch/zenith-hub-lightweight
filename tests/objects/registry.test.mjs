@@ -55,3 +55,13 @@ test('explicit pinned context resources work independently of filename extension
   await store.importDocument({'@context': url, '@id': 'urn:registered', '@type': 'core:Artifact'}, {importKey: 'registered'});
   assert.deepEqual((await store.get('urn:registered')).types, [Z + 'Artifact']);
 });
+
+test('different pinned resources cannot silently replace a schema with the same identity', async t => {
+  const {root, file, config} = await fixture(t);
+  const content = JSON.stringify({$schema: 'https://json-schema.org/draft/2020-12/schema',
+    $id: config.profiles[0].id.split('#')[0], type: 'object'});
+  await writeFile(path.join(root, 'collision.json'), content);
+  config.resources.push({url: 'urn:schema:alias', path: 'collision.json', sha256: sha256(content)});
+  await writeFile(file, JSON.stringify(config));
+  await assert.rejects(loadOntologyRegistry(file), {code: 'schema_identity_collision'});
+});
