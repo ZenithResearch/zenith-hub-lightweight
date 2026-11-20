@@ -4,6 +4,7 @@ import {constants, openSync, closeSync, mkdirSync, lstatSync, existsSync} from '
 import path from 'node:path';
 import {randomUUID} from 'node:crypto';
 import rdf from 'rdf-canonize';
+import {exportBundle,importBundle} from './bundle.mjs';
 import {processDataset} from './codec.mjs';
 import {absoluteIRI, closed, reject, RDF_TYPE, sha256} from './registry.mjs';
 const APPLICATION_ID = 0x5a484f42;
@@ -47,12 +48,13 @@ export class ObjectStore {
       const application = this.db.prepare('PRAGMA application_id').get().application_id;
       const version = this.db.prepare('PRAGMA user_version').get().user_version;
       const tables = this.db.prepare("SELECT name FROM sqlite_master WHERE name NOT LIKE 'sqlite_%'").all();
-      if ((application !== APPLICATION_ID && (application !== 0 || tables.length)) || version > 1) reject('not_a_supported_hub_database', 503);
+      if ((application !== APPLICATION_ID && (application !== 0 || tables.length)) || version > 2) reject('not_a_supported_hub_database', 503);
       this.db.exec('PRAGMA foreign_keys=ON; PRAGMA journal_mode=WAL; PRAGMA synchronous=FULL;');
       this.db.exec(`BEGIN IMMEDIATE;
         CREATE TABLE IF NOT EXISTS units(id TEXT PRIMARY KEY, nquads TEXT NOT NULL, semantic_sha256 TEXT NOT NULL);
         CREATE TABLE IF NOT EXISTS objects(id TEXT PRIMARY KEY, unit_id TEXT NOT NULL REFERENCES units(id),
           revision INTEGER NOT NULL CHECK(revision>0), updated_at TEXT NOT NULL, last_import TEXT NOT NULL, profiles TEXT NOT NULL);
+        CREATE TABLE IF NOT EXISTS admissions(object_id TEXT PRIMARY KEY REFERENCES objects(id) ON DELETE CASCADE, policy TEXT NOT NULL);
         CREATE TABLE IF NOT EXISTS object_types(object_id TEXT NOT NULL REFERENCES objects(id) ON DELETE CASCADE,
           type TEXT NOT NULL, PRIMARY KEY(object_id,type));
         CREATE TABLE IF NOT EXISTS object_links(unit_id TEXT NOT NULL REFERENCES units(id) ON DELETE CASCADE,
@@ -63,10 +65,13 @@ export class ObjectStore {
         CREATE INDEX IF NOT EXISTS object_type_lookup ON object_types(type,object_id);
         CREATE INDEX IF NOT EXISTS object_link_source ON object_links(subject,predicate);
         CREATE INDEX IF NOT EXISTS object_link_target ON object_links(target,predicate);
-        PRAGMA application_id=${APPLICATION_ID}; PRAGMA user_version=1; COMMIT;`);
+        PRAGMA application_id=${APPLICATION_ID}; PRAGMA user_version=2; COMMIT;`);
     } catch (error) {this.db.close(); throw error;}
   }
   close() {this.db.close();}
+  admission(id) {return this.db.prepare('SELECT policy FROM admissions WHERE object_id=?').get(id)?.policy || 'observation';}
+  exportBundle(selection) {return exportBundle(this,selection);}
+  importBundle(bundle,options) {return importBundle(this,bundle,options);}
   row(id) {return this.db.prepare('SELECT * FROM objects WHERE id=?').get(id);}
   unit(id) {return this.db.prepare('SELECT * FROM units WHERE id=?').get(id);}
   index(unit) {
@@ -95,13 +100,16 @@ export class ObjectStore {
     } catch (error) {this.db.exec('ROLLBACK'); throw error;}
   }
   async importDocument(document, options = {}) {
-    closed(options, ['importKey'], ['expectedRevisions', 'source', 'projections', 'intent', 'objectId']);
-    const {importKey, source = null, expectedRevisions = {}, projections = {}, intent = 'import', objectId} = options;
+    closed(options, ['importKey'], ['expectedRevisions', 'source', 'projections', 'intent', 'objectId','admission','admissions']);
+    const {importKey, source = null, expectedRevisions = {}, projections = {}, intent = 'import', objectId, admission, admissions = {}} = options;
     if (typeof importKey !== 'string' || !/^[A-Za-z0-9][A-Za-z0-9:._-]{0,127}$/.test(importKey) ||
         source !== null && (typeof source !== 'string' || source.length > 512) ||
         !['import', 'create', 'update'].includes(intent) ||
         !expectedRevisions || Array.isArray(expectedRevisions) || typeof expectedRevisions !== 'object' ||
         !projections || Array.isArray(projections) || typeof projections !== 'object') reject('invalid_import_options', 400);
+    if(admission!==undefined&&admission!=='observation'&&!this.registry.policies.has(admission))reject('unknown_admission_policy');
+    if(!admissions||typeof admissions!=='object'||Array.isArray(admissions))reject('invalid_admission_map');
+    for(const mode of Object.values(admissions))if(mode!=='observation'&&!this.registry.policies.has(mode))reject('unknown_admission_policy');
     for (const [id, version] of Object.entries(expectedRevisions)) {
       if (!absoluteIRI(id) || !Number.isSafeInteger(version) || version < 0) reject('invalid_expected_revision', 400);
     }
@@ -119,7 +127,7 @@ export class ObjectStore {
     if (new Set(ids).size !== ids.length) reject('invalid_subject_partition');
     if (intent !== 'import' && (!absoluteIRI(objectId) || ids.length !== 1 || ids[0] !== objectId)) reject('object_identity_mismatch');
     if (intent === 'update' && !Object.hasOwn(expectedRevisions, objectId)) reject('expected_revision_required', 409);
-    for (const id of [...Object.keys(expectedRevisions), ...Object.keys(projections)]) if (!ids.includes(id)) reject('unknown_import_object', 400);
+    for (const id of [...Object.keys(expectedRevisions), ...Object.keys(projections), ...Object.keys(admissions)]) if (!ids.includes(id)) reject('unknown_import_object', 400);
     const validatedProfiles = new Set();
     for (const f of fragments) {
       for (const q of f.quads) if (q.predicate.value === RDF_TYPE &&
@@ -128,13 +136,16 @@ export class ObjectStore {
       const nodes = f.nodes;
       const visit = list => {for (const node of list) {
         this.registry.validateNode(node);
-        for (const profile of this.registry.profiles.values()) if (profile.representation === 'expanded-node' && node['@type']?.some(t => profile.appliesTo.includes(t))) validatedProfiles.add(profile.id);
+        for (const profile of this.registry.profiles.values()) if (profile.representation === 'expanded-node' && !profile.admissionOnly && this.registry.matches(profile,node['@type']||[])) validatedProfiles.add(profile.id);
         if (node['@graph']) visit(node['@graph']);
       }};
       visit(nodes);
     }
     const semanticSha256 = sha256(interpreted.nquads), contentSha256 = sha256(content);
-    const requestDigest = sha256(semanticSha256 + sortedJSON({source, expectedRevisions, projections, intent, objectId: objectId || null}));
+    const identityOptions={source, expectedRevisions, projections, intent, objectId: objectId || null};
+    if(options.admission!==undefined)identityOptions.admission=admission;
+    if(options.admissions!==undefined)identityOptions.admissions=admissions;
+    const requestDigest = sha256(semanticSha256 + sortedJSON(identityOptions));
     this.db.exec('BEGIN IMMEDIATE');
     try {
       const previous = this.db.prepare('SELECT * FROM imports WHERE import_key=?').get(importKey);
@@ -143,16 +154,25 @@ export class ObjectStore {
         this.db.exec('COMMIT');
         return {...JSON.parse(previous.result), replayed: true};
       }
-      const existing = new Map(ids.map(id => [id, this.row(id)]));
+      const existing = new Map(ids.map(id => {const row=this.row(id);return [id,row?{...row,admission:this.admission(id)}:undefined];}));
       for (const [id, expected] of Object.entries(expectedRevisions)) if ((existing.get(id)?.revision || 0) !== expected) reject('stale_revision', 409, {id, expected, actual: existing.get(id)?.revision || 0});
       if (intent === 'create' && existing.get(objectId)) reject('object_already_exists', 409);
       if (intent === 'update' && !existing.get(objectId)) reject('object_not_found', 404);
-      const changed = [], unchanged = [], replaced = new Set(), metadataChanged = new Set(), bindings = new Map();
+      const changed = [], unchanged = [], replaced = new Set(), metadataChanged = new Set(), bindings = new Map(), admitted = new Map(), invocation = {};
       for (const f of fragments) {
         for (const id of f.ids) {
           const old = existing.get(id);
           const value = Object.hasOwn(projections, id) ? projections[id] : JSON.parse(old?.profiles || '[]');
-          this.registry.validateProjections(id, assertedTypes(f.quads, id), value);
+          const mode=old?.admission && old.admission!=='observation' ? old.admission : admissions[id] || admission || 'observation';
+          this.registry.validateProjections(id, assertedTypes(f.quads, id), value, mode);
+          invocation[id]=this.registry.contractStatus(id,value);
+          admitted.set(id,mode);
+          if(old && mode!==old.admission)metadataChanged.add(id);
+          if(mode!=='observation') {
+            const node=f.recordNodes.find(n=>n['@id']===id);
+            this.registry.validateNode(node,mode);
+            for(const p of this.registry.profiles.values())if(p.representation==='expanded-node'&&(!p.admissionOnly||p.admissionOnly===mode)&&this.registry.matches(p,node?.['@type']||[]))validatedProfiles.add(p.id);
+          }
           bindings.set(id, value);
           for (const binding of value) validatedProfiles.add(binding.profile);
           if (old && sortedJSON(value) !== sortedJSON(JSON.parse(old.profiles))) metadataChanged.add(id);
@@ -181,7 +201,7 @@ export class ObjectStore {
         anonymousUnitsCreated: changed.filter(f => !f.ids.length).length, revisions: {},
         contentSha256, semanticSha256, semanticAlgorithm: 'RDFC-1.0', validation: {jsonld: 'interpreted',
           schemaProfiles: [...validatedProfiles].sort(),
-          owlReasoning: false, invocationConformance: 'not-assessed'}};
+          owlReasoning: false, invocationConformance: 'not-assessed'},admissions:Object.fromEntries(admitted),invocation};
       this.db.prepare('INSERT INTO imports VALUES(?,?,?,?,?,?)').run(importKey, requestDigest, contentSha256,
         semanticSha256, JSON.stringify(provenance), '{}');
       for (const owner of replaced) {
@@ -199,14 +219,31 @@ export class ObjectStore {
         this.db.prepare('UPDATE objects SET revision=revision+1, updated_at=?, last_import=?, profiles=? WHERE id=?')
           .run(now, importKey, JSON.stringify(bindings.get(id)), id);
       }
+      for(const id of ids) {
+        const mode=admitted.get(id);
+        if(mode!=='observation')this.db.prepare('INSERT INTO admissions VALUES(?,?) ON CONFLICT(object_id) DO UPDATE SET policy=excluded.policy').run(id,mode);
+      }
+      const typeLookup=id=>this.db.prepare('SELECT type FROM object_types WHERE object_id=?').all(id).map(row=>row.type);
+      for(const unit of this.db.prepare("SELECT DISTINCT u.* FROM units u JOIN objects o ON o.unit_id=u.id JOIN admissions a ON a.object_id=o.id").all()) {
+        const admittedIds=new Set(this.db.prepare('SELECT object_id FROM admissions WHERE object_id IN (SELECT id FROM objects WHERE unit_id=?)').all(unit.id).map(r=>r.object_id));
+        this.registry.validateRelationships(NQuads.parse(unit.nquads).filter(q=>admittedIds.has(q.subject.value)),typeLookup);
+      }
       for (const id of ids) result.revisions[id] = this.row(id).revision;
       this.db.prepare('UPDATE imports SET result=? WHERE import_key=?').run(JSON.stringify(result), importKey);
       this.db.exec('COMMIT');
       return result;
     } catch (error) {this.db.exec('ROLLBACK'); throw error;}
   }
-  list({type, after = '', limit = 100} = {}) {
+  list({type, after = '', limit = 100, includeSubclasses = false} = {}) {
+    if(typeof includeSubclasses!=='boolean')reject('invalid_list_query',400);
     if (!Number.isSafeInteger(limit) || limit < 1 || limit > 1000 || typeof after !== 'string' || type !== undefined && !absoluteIRI(type)) reject('invalid_list_query', 400);
+    if(typeof includeSubclasses!=='boolean')reject('invalid_list_query',400);
+    if(type && includeSubclasses) {
+      const expanded=this.registry.moduleGraph.descendants(type);
+      if(!expanded.length)return {items:[],next:null,typeExpansion:'bounded-rdfs-subClassOf'};
+      const rows=this.db.prepare('SELECT DISTINCT o.id,o.revision FROM objects o JOIN object_types t ON t.object_id=o.id WHERE t.type IN ('+expanded.map(()=>'?').join(',')+') AND o.id>? ORDER BY o.id LIMIT ?').all(...expanded,after,limit+1);
+      return {items:rows.slice(0,limit),next:rows.length>limit?rows[limit-1].id:null,typeExpansion:'bounded-rdfs-subClassOf'};
+    }
     const rows = type ? this.db.prepare('SELECT o.id,o.revision FROM objects o JOIN object_types t ON t.object_id=o.id WHERE t.type=? AND o.id>? ORDER BY o.id LIMIT ?').all(type, after, limit + 1)
       : this.db.prepare('SELECT id,revision FROM objects WHERE id>? ORDER BY id LIMIT ?').all(after, limit + 1);
     return {items: rows.slice(0, limit), next: rows.length > limit ? rows[limit - 1].id : null};
@@ -280,7 +317,7 @@ export class ObjectStore {
     const types = this.db.prepare('SELECT type FROM object_types WHERE object_id=? ORDER BY type').all(id).map(r => r.type);
     const peers = this.db.prepare('SELECT id,revision FROM objects WHERE unit_id=? ORDER BY id').all(record.unit_id);
     const provenance = JSON.parse(this.db.prepare('SELECT provenance FROM imports WHERE import_key=?').get(record.last_import).provenance);
-    return {id, revision: record.revision, types, atomicUnit: peers, updatedAt: record.updated_at,
+    return {id, revision: record.revision, admission:this.admission(id),invocation:this.registry.contractStatus(id,JSON.parse(record.profiles)), types, atomicUnit: peers, updatedAt: record.updated_at,
       projections: JSON.parse(record.profiles), provenance,
       validation: {typeRecognition: types.length ? 'asserted-types' : 'untyped-description', types: types.map(type => ({type, recognized: this.registry.types.has(type), ...this.registry.types.get(type)})), invocationConformance: 'not-assessed'},
       document: await this.exportDocument({ids: [id]})};

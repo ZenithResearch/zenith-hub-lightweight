@@ -1,0 +1,93 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2220" height="1570" viewBox="0 0 2220 1570"><defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10" fill="#788a83"/></marker></defs><style>text{font-family:Arial,sans-serif;fill:#283832} .label{font-size:16px;font-weight:600}.small{font-size:12px;fill:#64746b} .edge{fill:none;stroke:#83938a;stroke-width:1.5;marker-end:url(#arrow)} .dashed{stroke-dasharray:5 4}</style><rect width="100%" height="100%" fill="white"/><text x="38" y="42" style="font-size:25px;font-weight:600">Class inheritance — Core + proposed Hub Infrastructure</text><text x="38" y="70" class="small">Parent → subclass. Grey: existing normalized Zenith 0.1.0. Green: proposed infrastructure. Dashed owl:Thing edge: implicit universal root, not a stored assertion.</text>
+<rect x="1005" y="105" width="220" height="64" rx="14" fill="#efedf5" stroke="#cdd6cf"/><text x="1115" y="135" text-anchor="middle" class="label">owl:Thing</text><text x="1115" y="156" text-anchor="middle" class="small">existing OWL foundation</text>
+<rect x="25" y="218" width="350" height="1265" fill="none" stroke="#e4e9e5"/><text x="200" y="244" text-anchor="middle" class="label">Participant identities</text>
+<rect x="390" y="218" width="350" height="1265" fill="none" stroke="#e4e9e5"/><text x="565" y="244" text-anchor="middle" class="label">Information and evidence</text>
+<rect x="755" y="218" width="350" height="1265" fill="none" stroke="#e4e9e5"/><text x="930" y="244" text-anchor="middle" class="label">Logical collections</text>
+<rect x="1120" y="218" width="350" height="1265" fill="none" stroke="#e4e9e5"/><text x="1295" y="244" text-anchor="middle" class="label">Work</text>
+<rect x="1485" y="218" width="350" height="1265" fill="none" stroke="#e4e9e5"/><text x="1660" y="244" text-anchor="middle" class="label">Other Core foundations</text>
+<rect x="1850" y="218" width="350" height="1265" fill="none" stroke="#e4e9e5"/><text x="2025" y="244" text-anchor="middle" class="label">Infrastructure foundations</text>
+<path d="M1115 169V190H37V313H59" class="edge"/>
+<path d="M59 313H48V414H71" class="edge"/>
+<path d="M59 313H48V515H71" class="edge"/>
+<path d="M59 313H48V616H71" class="edge"/>
+<path d="M71 616H52V717H83" class="edge"/>
+<path d="M59 313H48V818H71" class="edge"/>
+<path d="M1115 169V190H402V313H424" class="edge"/>
+<path d="M424 313H413V414H436" class="edge"/>
+<path d="M424 313H413V515H436" class="edge"/>
+<path d="M424 313H413V616H436" class="edge"/>
+<path d="M436 616H417V717H448" class="edge"/>
+<path d="M424 313H413V818H436" class="edge"/>
+<path d="M424 313H413V919H436" class="edge"/>
+<path d="M1115 169V190H767V313H789" class="edge"/>
+<path d="M789 313H778V414H801" class="edge"/>
+<path d="M789 313H778V515H801" class="edge"/>
+<path d="M789 313H778V616H801" class="edge"/>
+<path d="M801 616H782V717H813" class="edge"/>
+<path d="M789 313H778V818H801" class="edge"/>
+<path d="M1115 169V190H1132V313H1154" class="edge"/>
+<path d="M1154 313H1143V414H1166" class="edge"/>
+<path d="M1154 313H1143V515H1166" class="edge"/>
+<path d="M1154 313H1143V616H1166" class="edge"/>
+<path d="M1154 313H1143V717H1166" class="edge"/>
+<path d="M1154 313H1143V818H1166" class="edge"/>
+<path d="M1115 169V190H1497V313H1519" class="edge"/>
+<path d="M1115 169V190H1497V414H1519" class="edge dashed"/>
+<path d="M1115 169V190H1497V515H1519" class="edge"/>
+<path d="M1115 169V190H1497V616H1519" class="edge"/>
+<path d="M1115 169V190H1497V717H1519" class="edge"/>
+<path d="M1115 169V190H1497V818H1519" class="edge"/>
+<path d="M1115 169V190H1497V919H1519" class="edge"/>
+<path d="M1115 169V190H1497V1020H1519" class="edge"/>
+<path d="M1115 169V190H1497V1121H1519" class="edge"/>
+<path d="M1115 169V190H1497V1222H1519" class="edge"/>
+<path d="M1115 169V190H1497V1323H1519" class="edge"/>
+<path d="M1115 169V190H1497V1424H1519" class="edge"/>
+<path d="M1115 169V190H1862V313H1884" class="edge"/>
+<path d="M1115 169V190H1862V414H1884" class="edge"/>
+<path d="M1115 169V190H1862V515H1884" class="edge"/>
+<path d="M1115 169V190H1862V616H1884" class="edge"/>
+<path d="M1115 169V190H1862V717H1884" class="edge"/>
+<rect x="59" y="280" width="270" height="66" rx="14" fill="#f1f3f2" stroke="#cdd6cf"/><text x="194" y="311" text-anchor="middle" class="label">zn:Entity</text><text x="194" y="332" text-anchor="middle" class="small">normalized Zenith · existing</text>
+<rect x="71" y="381" width="258" height="66" rx="14" fill="#f1f3f2" stroke="#cdd6cf"/><text x="200" y="412" text-anchor="middle" class="label">zn:Person</text><text x="200" y="433" text-anchor="middle" class="small">normalized Zenith · existing</text>
+<rect x="71" y="482" width="258" height="66" rx="14" fill="#f1f3f2" stroke="#cdd6cf"/><text x="200" y="513" text-anchor="middle" class="label">zn:Organization</text><text x="200" y="534" text-anchor="middle" class="small">normalized Zenith · existing</text>
+<rect x="71" y="583" width="258" height="66" rx="14" fill="#f1f3f2" stroke="#cdd6cf"/><text x="200" y="614" text-anchor="middle" class="label">zn:Agent</text><text x="200" y="635" text-anchor="middle" class="small">normalized Zenith · existing</text>
+<rect x="83" y="684" width="246" height="66" rx="14" fill="#e3f2e7" stroke="#cdd6cf"/><text x="206" y="715" text-anchor="middle" class="label">infra:ServiceInstance</text><text x="206" y="736" text-anchor="middle" class="small">Hub / infrastructure · proposed</text>
+<rect x="71" y="785" width="258" height="66" rx="14" fill="#e3f2e7" stroke="#cdd6cf"/><text x="200" y="816" text-anchor="middle" class="label">infra:Machine</text><text x="200" y="837" text-anchor="middle" class="small">Hub / infrastructure · proposed</text>
+<rect x="424" y="280" width="270" height="66" rx="14" fill="#f1f3f2" stroke="#cdd6cf"/><text x="559" y="311" text-anchor="middle" class="label">zn:Artifact</text><text x="559" y="332" text-anchor="middle" class="small">normalized Zenith · existing</text>
+<rect x="436" y="381" width="258" height="66" rx="14" fill="#f1f3f2" stroke="#cdd6cf"/><text x="565" y="412" text-anchor="middle" class="label">zn:Receipt</text><text x="565" y="433" text-anchor="middle" class="small">normalized Zenith · existing</text>
+<rect x="436" y="482" width="258" height="66" rx="14" fill="#f1f3f2" stroke="#cdd6cf"/><text x="565" y="513" text-anchor="middle" class="label">zn:CasePlan</text><text x="565" y="534" text-anchor="middle" class="small">normalized Zenith · existing</text>
+<rect x="436" y="583" width="258" height="66" rx="14" fill="#f1f3f2" stroke="#cdd6cf"/><text x="565" y="614" text-anchor="middle" class="label">zn:ContactInformation</text><text x="565" y="635" text-anchor="middle" class="small">normalized Zenith · existing</text>
+<rect x="448" y="684" width="246" height="66" rx="14" fill="#f1f3f2" stroke="#cdd6cf"/><text x="571" y="715" text-anchor="middle" class="label">zn:DirectoryEntry</text><text x="571" y="736" text-anchor="middle" class="small">normalized Zenith · existing</text>
+<rect x="436" y="785" width="258" height="66" rx="14" fill="#f1f3f2" stroke="#cdd6cf"/><text x="565" y="816" text-anchor="middle" class="label">zn:Handoff</text><text x="565" y="837" text-anchor="middle" class="small">normalized Zenith · existing</text>
+<rect x="436" y="886" width="258" height="66" rx="14" fill="#f1f3f2" stroke="#cdd6cf"/><text x="565" y="917" text-anchor="middle" class="label">zn:Request</text><text x="565" y="938" text-anchor="middle" class="small">normalized Zenith · existing</text>
+<rect x="789" y="280" width="270" height="66" rx="14" fill="#f1f3f2" stroke="#cdd6cf"/><text x="924" y="311" text-anchor="middle" class="label">zn:Collection</text><text x="924" y="332" text-anchor="middle" class="small">normalized Zenith · existing</text>
+<rect x="801" y="381" width="258" height="66" rx="14" fill="#f1f3f2" stroke="#cdd6cf"/><text x="930" y="412" text-anchor="middle" class="label">zn:Directory</text><text x="930" y="433" text-anchor="middle" class="small">normalized Zenith · existing</text>
+<rect x="801" y="482" width="258" height="66" rx="14" fill="#f1f3f2" stroke="#cdd6cf"/><text x="930" y="513" text-anchor="middle" class="label">zn:Inbox</text><text x="930" y="534" text-anchor="middle" class="small">normalized Zenith · existing</text>
+<rect x="801" y="583" width="258" height="66" rx="14" fill="#f1f3f2" stroke="#cdd6cf"/><text x="930" y="614" text-anchor="middle" class="label">zn:Outbox</text><text x="930" y="635" text-anchor="middle" class="small">normalized Zenith · existing</text>
+<rect x="813" y="684" width="246" height="66" rx="14" fill="#f1f3f2" stroke="#cdd6cf"/><text x="936" y="715" text-anchor="middle" class="label">zn:EncryptedOutbox</text><text x="936" y="736" text-anchor="middle" class="small">normalized Zenith · existing</text>
+<rect x="801" y="785" width="258" height="66" rx="14" fill="#f1f3f2" stroke="#cdd6cf"/><text x="930" y="816" text-anchor="middle" class="label">zn:StatusSet</text><text x="930" y="837" text-anchor="middle" class="small">normalized Zenith · existing</text>
+<rect x="1154" y="280" width="270" height="66" rx="14" fill="#f1f3f2" stroke="#cdd6cf"/><text x="1289" y="311" text-anchor="middle" class="label">zn:Todo</text><text x="1289" y="332" text-anchor="middle" class="small">normalized Zenith · existing</text>
+<rect x="1166" y="381" width="258" height="66" rx="14" fill="#f1f3f2" stroke="#cdd6cf"/><text x="1295" y="412" text-anchor="middle" class="label">zn:Initiative</text><text x="1295" y="433" text-anchor="middle" class="small">normalized Zenith · existing</text>
+<rect x="1166" y="482" width="258" height="66" rx="14" fill="#f1f3f2" stroke="#cdd6cf"/><text x="1295" y="513" text-anchor="middle" class="label">zn:Issue</text><text x="1295" y="534" text-anchor="middle" class="small">normalized Zenith · existing</text>
+<rect x="1166" y="583" width="258" height="66" rx="14" fill="#f1f3f2" stroke="#cdd6cf"/><text x="1295" y="614" text-anchor="middle" class="label">zn:Project</text><text x="1295" y="635" text-anchor="middle" class="small">normalized Zenith · existing</text>
+<rect x="1166" y="684" width="258" height="66" rx="14" fill="#f1f3f2" stroke="#cdd6cf"/><text x="1295" y="715" text-anchor="middle" class="label">zn:Proposal</text><text x="1295" y="736" text-anchor="middle" class="small">normalized Zenith · existing</text>
+<rect x="1166" y="785" width="258" height="66" rx="14" fill="#f1f3f2" stroke="#cdd6cf"/><text x="1295" y="816" text-anchor="middle" class="label">zn:Task</text><text x="1295" y="837" text-anchor="middle" class="small">normalized Zenith · existing</text>
+<rect x="1519" y="280" width="270" height="66" rx="14" fill="#f1f3f2" stroke="#cdd6cf"/><text x="1654" y="311" text-anchor="middle" class="label">zn:AcceptanceCriterion</text><text x="1654" y="332" text-anchor="middle" class="small">normalized Zenith · existing</text>
+<rect x="1519" y="381" width="270" height="66" rx="14" fill="#f1f3f2" stroke="#cdd6cf"/><text x="1654" y="412" text-anchor="middle" class="label">zn:Actor</text><text x="1654" y="433" text-anchor="middle" class="small">normalized Zenith · existing</text>
+<rect x="1519" y="482" width="270" height="66" rx="14" fill="#f1f3f2" stroke="#cdd6cf"/><text x="1654" y="513" text-anchor="middle" class="label">zn:Arena</text><text x="1654" y="534" text-anchor="middle" class="small">normalized Zenith · existing</text>
+<rect x="1519" y="583" width="270" height="66" rx="14" fill="#f1f3f2" stroke="#cdd6cf"/><text x="1654" y="614" text-anchor="middle" class="label">zn:Blocker</text><text x="1654" y="635" text-anchor="middle" class="small">normalized Zenith · existing</text>
+<rect x="1519" y="684" width="270" height="66" rx="14" fill="#f1f3f2" stroke="#cdd6cf"/><text x="1654" y="715" text-anchor="middle" class="label">zn:Case</text><text x="1654" y="736" text-anchor="middle" class="small">normalized Zenith · existing</text>
+<rect x="1519" y="785" width="270" height="66" rx="14" fill="#f1f3f2" stroke="#cdd6cf"/><text x="1654" y="816" text-anchor="middle" class="label">zn:Decision</text><text x="1654" y="837" text-anchor="middle" class="small">normalized Zenith · existing</text>
+<rect x="1519" y="886" width="270" height="66" rx="14" fill="#f1f3f2" stroke="#cdd6cf"/><text x="1654" y="917" text-anchor="middle" class="label">zn:Domain</text><text x="1654" y="938" text-anchor="middle" class="small">normalized Zenith · existing</text>
+<rect x="1519" y="987" width="270" height="66" rx="14" fill="#f1f3f2" stroke="#cdd6cf"/><text x="1654" y="1018" text-anchor="middle" class="label">zn:Event</text><text x="1654" y="1039" text-anchor="middle" class="small">normalized Zenith · existing</text>
+<rect x="1519" y="1088" width="270" height="66" rx="14" fill="#f1f3f2" stroke="#cdd6cf"/><text x="1654" y="1119" text-anchor="middle" class="label">zn:ExternalLink</text><text x="1654" y="1140" text-anchor="middle" class="small">normalized Zenith · existing</text>
+<rect x="1519" y="1189" width="270" height="66" rx="14" fill="#f1f3f2" stroke="#cdd6cf"/><text x="1654" y="1220" text-anchor="middle" class="label">zn:Milestone</text><text x="1654" y="1241" text-anchor="middle" class="small">normalized Zenith · existing</text>
+<rect x="1519" y="1290" width="270" height="66" rx="14" fill="#f1f3f2" stroke="#cdd6cf"/><text x="1654" y="1321" text-anchor="middle" class="label">zn:Requirement</text><text x="1654" y="1342" text-anchor="middle" class="small">normalized Zenith · existing</text>
+<rect x="1519" y="1391" width="270" height="66" rx="14" fill="#f1f3f2" stroke="#cdd6cf"/><text x="1654" y="1422" text-anchor="middle" class="label">zn:StatusValue</text><text x="1654" y="1443" text-anchor="middle" class="small">normalized Zenith · existing</text>
+<rect x="1884" y="280" width="270" height="66" rx="14" fill="#e3f2e7" stroke="#cdd6cf"/><text x="2019" y="311" text-anchor="middle" class="label">infra:Deployment</text><text x="2019" y="332" text-anchor="middle" class="small">Hub / infrastructure · proposed</text>
+<rect x="1884" y="381" width="270" height="66" rx="14" fill="#e3f2e7" stroke="#cdd6cf"/><text x="2019" y="412" text-anchor="middle" class="label">infra:Network</text><text x="2019" y="433" text-anchor="middle" class="small">Hub / infrastructure · proposed</text>
+<rect x="1884" y="482" width="270" height="66" rx="14" fill="#e3f2e7" stroke="#cdd6cf"/><text x="2019" y="513" text-anchor="middle" class="label">infra:NetworkInterface</text><text x="2019" y="534" text-anchor="middle" class="small">Hub / infrastructure · proposed</text>
+<rect x="1884" y="583" width="270" height="66" rx="14" fill="#e3f2e7" stroke="#cdd6cf"/><text x="2019" y="614" text-anchor="middle" class="label">infra:StorageVolume</text><text x="2019" y="635" text-anchor="middle" class="small">Hub / infrastructure · proposed</text>
+<rect x="1884" y="684" width="270" height="66" rx="14" fill="#e3f2e7" stroke="#cdd6cf"/><text x="2019" y="715" text-anchor="middle" class="label">infra:DNSZone</text><text x="2019" y="736" text-anchor="middle" class="small">Hub / infrastructure · proposed</text>
+<text x="38" y="1517" class="small">Core Actor declares owl:equivalentClass Entity. That equivalence is preserved upstream and is not expanded by the rdfs:subClassOf query.</text><text x="38" y="1542" class="small">Entity descendants inherit Addressable/Invocable conformance; Core EntityProjection and implementation bindings remain separate schema structures.</text></svg>
