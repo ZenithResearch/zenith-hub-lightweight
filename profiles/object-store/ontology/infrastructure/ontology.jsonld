@@ -1,0 +1,148 @@
+{
+  "@context": {
+    "infra": "https://zenith-research.ca/ontology/hub/infrastructure/terms/",
+    "zn": "https://zenith-research.ca/ontology/terms/",
+    "owl": "http://www.w3.org/2002/07/owl#",
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+    "label": "rdfs:label",
+    "comment": "rdfs:comment",
+    "subClassOf": {
+      "@id": "rdfs:subClassOf",
+      "@type": "@id"
+    },
+    "imports": {
+      "@id": "owl:imports",
+      "@type": "@id"
+    },
+    "versionIRI": {
+      "@id": "owl:versionIRI",
+      "@type": "@id"
+    },
+    "versionInfo": "owl:versionInfo"
+  },
+  "@graph": [
+    {
+      "@id": "https://zenith-research.ca/ontology/hub/infrastructure",
+      "@type": "owl:Ontology",
+      "versionIRI": "https://zenith-research.ca/ontology/hub/infrastructure/v0.1.0/ontology.jsonld",
+      "versionInfo": "0.1.0",
+      "imports": [
+        "https://zenith-research.ca/ontology/normalized/v0.1.0/modules/core.jsonld"
+      ]
+    },
+    {
+      "@id": "infra:Machine",
+      "@type": "owl:Class",
+      "label": "Machine",
+      "comment": "An identifiable physical or virtual compute host participating in an environment. The host is distinct from its description and any management Agent.",
+      "subClassOf": "zn:Entity"
+    },
+    {
+      "@id": "infra:ServiceInstance",
+      "@type": "owl:Class",
+      "label": "ServiceInstance",
+      "comment": "An identifiable operational software service, with an identity and lifecycle independent of its software/configuration artifacts. An API is a binding unless it identifies an independently operated service.",
+      "subClassOf": "zn:Agent"
+    },
+    {
+      "@id": "infra:Deployment",
+      "@type": "owl:Class",
+      "label": "Deployment",
+      "comment": "A particular placement and configuration of an identified ServiceInstance on compute hosts; distinct from the manifest describing that placement.",
+      "subClassOf": "owl:Thing"
+    },
+    {
+      "@id": "infra:Network",
+      "@type": "owl:Class",
+      "label": "Network",
+      "comment": "A logical connectivity domain to which interfaces can attach, independently of its address/route bindings.",
+      "subClassOf": "owl:Thing"
+    },
+    {
+      "@id": "infra:NetworkInterface",
+      "@type": "owl:Class",
+      "label": "NetworkInterface",
+      "comment": "An identifiable attachment of a host or service to one Network; distinct from its IP addresses and routes.",
+      "subClassOf": "owl:Thing"
+    },
+    {
+      "@id": "infra:StorageVolume",
+      "@type": "owl:Class",
+      "label": "StorageVolume",
+      "comment": "An identifiable physical or logical storage volume used for persistence, distinct from its mount path, bucket or stored content.",
+      "subClassOf": "owl:Thing"
+    },
+    {
+      "@id": "infra:DNSZone",
+      "@type": "owl:Class",
+      "label": "DNSZone",
+      "comment": "An administrative DNS namespace and authority boundary, distinct from DNS server software and individual DNS records.",
+      "subClassOf": "owl:Thing"
+    },
+    {
+      "@id": "infra:hostedBy",
+      "@type": "owl:ObjectProperty",
+      "label": "hostedBy",
+      "comment": "The subject is placed on, or its maintained content is hosted by, this compute host or operational service. It does not establish ownership, health or authority. Admission constraints are in the pinned schemas/manifest, not intersecting global rdfs:domain/range assertions."
+    },
+    {
+      "@id": "infra:realizes",
+      "@type": "owl:ObjectProperty",
+      "label": "realizes",
+      "comment": "Identifies the operational service whose particular placement/configuration this Deployment represents. Admission constraints are in the pinned schemas/manifest, not intersecting global rdfs:domain/range assertions."
+    },
+    {
+      "@id": "infra:managedBy",
+      "@type": "owl:ObjectProperty",
+      "label": "managedBy",
+      "comment": "Identifies a participant responsible for management. This descriptive relationship grants no permission or credential. Admission constraints are in the pinned schemas/manifest, not intersecting global rdfs:domain/range assertions."
+    },
+    {
+      "@id": "infra:attachedTo",
+      "@type": "owl:ObjectProperty",
+      "label": "attachedTo",
+      "comment": "Identifies the connectivity domain of this attachment. Admission constraints are in the pinned schemas/manifest, not intersecting global rdfs:domain/range assertions."
+    },
+    {
+      "@id": "infra:usesInterface",
+      "@type": "owl:ObjectProperty",
+      "label": "usesInterface",
+      "comment": "Identifies an interface used by the subject, independently of addresses, routes and endpoints. Admission constraints are in the pinned schemas/manifest, not intersecting global rdfs:domain/range assertions."
+    },
+    {
+      "@id": "infra:usesStorage",
+      "@type": "owl:ObjectProperty",
+      "label": "usesStorage",
+      "comment": "Identifies a volume used for persistence; it does not make the subject identical to that volume. Admission constraints are in the pinned schemas/manifest, not intersecting global rdfs:domain/range assertions."
+    },
+    {
+      "@id": "infra:hasMember",
+      "@type": "owl:ObjectProperty",
+      "label": "hasMember",
+      "comment": "Explicit membership of a maintained resource or data collection. Mere reference does not imply membership; there is no Resource superclass. Admission constraints are in the pinned schemas/manifest, not intersecting global rdfs:domain/range assertions."
+    },
+    {
+      "@id": "infra:usesDNSZone",
+      "@type": "owl:ObjectProperty",
+      "label": "usesDNSZone",
+      "comment": "Identifies an administrative DNS boundary used by a network or service, independently of DNS bindings and configuration. Admission constraints are in the pinned schemas/manifest, not intersecting global rdfs:domain/range assertions."
+    },
+    {
+      "@id": "infra:dnsName",
+      "@type": "owl:DatatypeProperty",
+      "label": "DNS namespace name",
+      "comment": "The DNS namespace identifying the administrative zone. Addresses, resolver endpoints and record contents remain bindings/artifacts."
+    },
+    {
+      "@id": "urn:zenith:hub:domain:infrastructure",
+      "@type": "zn:Domain",
+      "label": "Infrastructure",
+      "zn:sourceModuleRef": {
+        "@id": "https://zenith-research.ca/ontology/hub/infrastructure/v0.1.0/ontology.jsonld"
+      },
+      "zn:vocabularyRef": {
+        "@id": "https://zenith-research.ca/ontology/hub/infrastructure"
+      }
+    }
+  ]
+}

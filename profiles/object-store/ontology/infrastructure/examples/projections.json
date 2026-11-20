@@ -1,0 +1,310 @@
+{
+  "urn:hub:infrastructure:example:machine": [
+    {
+      "profile": "https://zenith-research.ca/ontology/normalized/v0.1.0/schemas/core.schema.json#/$defs/EntityProjection",
+      "value": {
+        "id": "urn:hub:infrastructure:example:machine",
+        "types": [
+          "https://zenith-research.ca/ontology/hub/infrastructure/terms/Machine"
+        ],
+        "invocationContract": {
+          "id": "urn:hub:infrastructure:example:contract",
+          "sha256": "4e37005cafe2c6bb024cf5445f709ac3775ce86c6f90385e02cc23581c6fba2c",
+          "byteLength": 912,
+          "mediaType": "application/json"
+        }
+      }
+    },
+    {
+      "profile": "https://zenith-research.ca/ontology/hub/infrastructure/v0.1.0/schemas/infrastructure.schema.json#/$defs/ImplementationBinding",
+      "value": {
+        "id": "urn:hub:infrastructure:example:machine",
+        "types": [
+          "https://zenith-research.ca/ontology/hub/infrastructure/terms/Machine"
+        ],
+        "kind": "physical-machine",
+        "manager": "urn:hub:infrastructure:example:manager",
+        "addresses": [
+          "192.0.2.10"
+        ],
+        "tailscale": {
+          "node": "synthetic-host",
+          "routes": [
+            "192.0.2.0/24"
+          ]
+        },
+        "secS": {
+          "receiver": "urn:hub:infrastructure:example:manager",
+          "opcodes": {
+            "urn:zenith:hub:operation:inspect": 42
+          }
+        }
+      }
+    }
+  ],
+  "urn:hub:infrastructure:example:manager": [
+    {
+      "profile": "https://zenith-research.ca/ontology/normalized/v0.1.0/schemas/core.schema.json#/$defs/EntityProjection",
+      "value": {
+        "id": "urn:hub:infrastructure:example:manager",
+        "types": [
+          "https://zenith-research.ca/ontology/hub/infrastructure/terms/ServiceInstance"
+        ],
+        "invocationContract": {
+          "id": "urn:hub:infrastructure:example:contract",
+          "sha256": "4e37005cafe2c6bb024cf5445f709ac3775ce86c6f90385e02cc23581c6fba2c",
+          "byteLength": 912,
+          "mediaType": "application/json"
+        }
+      }
+    },
+    {
+      "profile": "https://zenith-research.ca/ontology/hub/infrastructure/v0.1.0/schemas/infrastructure.schema.json#/$defs/ImplementationBinding",
+      "value": {
+        "id": "urn:hub:infrastructure:example:manager",
+        "types": [
+          "https://zenith-research.ca/ontology/hub/infrastructure/terms/ServiceInstance"
+        ],
+        "kind": "management-agent"
+      }
+    }
+  ],
+  "urn:hub:infrastructure:example:application": [
+    {
+      "profile": "https://zenith-research.ca/ontology/normalized/v0.1.0/schemas/core.schema.json#/$defs/EntityProjection",
+      "value": {
+        "id": "urn:hub:infrastructure:example:application",
+        "types": [
+          "https://zenith-research.ca/ontology/hub/infrastructure/terms/ServiceInstance"
+        ],
+        "invocationContract": {
+          "id": "urn:hub:infrastructure:example:contract",
+          "sha256": "4e37005cafe2c6bb024cf5445f709ac3775ce86c6f90385e02cc23581c6fba2c",
+          "byteLength": 912,
+          "mediaType": "application/json"
+        }
+      }
+    },
+    {
+      "profile": "https://zenith-research.ca/ontology/hub/infrastructure/v0.1.0/schemas/infrastructure.schema.json#/$defs/ImplementationBinding",
+      "value": {
+        "id": "urn:hub:infrastructure:example:application",
+        "types": [
+          "https://zenith-research.ca/ontology/hub/infrastructure/terms/ServiceInstance"
+        ],
+        "kind": "application",
+        "endpoints": [
+          {
+            "uri": "http://127.0.0.1:19999/msg",
+            "purpose": "msg(message) -> reply"
+          }
+        ],
+        "ports": [
+          19999
+        ]
+      }
+    }
+  ],
+  "urn:hub:infrastructure:example:database-server": [
+    {
+      "profile": "https://zenith-research.ca/ontology/normalized/v0.1.0/schemas/core.schema.json#/$defs/EntityProjection",
+      "value": {
+        "id": "urn:hub:infrastructure:example:database-server",
+        "types": [
+          "https://zenith-research.ca/ontology/hub/infrastructure/terms/ServiceInstance"
+        ],
+        "invocationContract": {
+          "id": "urn:hub:infrastructure:example:contract",
+          "sha256": "4e37005cafe2c6bb024cf5445f709ac3775ce86c6f90385e02cc23581c6fba2c",
+          "byteLength": 912,
+          "mediaType": "application/json"
+        }
+      }
+    },
+    {
+      "profile": "https://zenith-research.ca/ontology/hub/infrastructure/v0.1.0/schemas/infrastructure.schema.json#/$defs/ImplementationBinding",
+      "value": {
+        "id": "urn:hub:infrastructure:example:database-server",
+        "types": [
+          "https://zenith-research.ca/ontology/hub/infrastructure/terms/ServiceInstance"
+        ],
+        "kind": "database-server"
+      }
+    }
+  ],
+  "urn:hub:infrastructure:example:object-store": [
+    {
+      "profile": "https://zenith-research.ca/ontology/normalized/v0.1.0/schemas/core.schema.json#/$defs/EntityProjection",
+      "value": {
+        "id": "urn:hub:infrastructure:example:object-store",
+        "types": [
+          "https://zenith-research.ca/ontology/hub/infrastructure/terms/ServiceInstance"
+        ],
+        "invocationContract": {
+          "id": "urn:hub:infrastructure:example:contract",
+          "sha256": "4e37005cafe2c6bb024cf5445f709ac3775ce86c6f90385e02cc23581c6fba2c",
+          "byteLength": 912,
+          "mediaType": "application/json"
+        }
+      }
+    },
+    {
+      "profile": "https://zenith-research.ca/ontology/hub/infrastructure/v0.1.0/schemas/infrastructure.schema.json#/$defs/ImplementationBinding",
+      "value": {
+        "id": "urn:hub:infrastructure:example:object-store",
+        "types": [
+          "https://zenith-research.ca/ontology/hub/infrastructure/terms/ServiceInstance"
+        ],
+        "kind": "object-store"
+      }
+    }
+  ],
+  "urn:hub:infrastructure:example:file-store": [
+    {
+      "profile": "https://zenith-research.ca/ontology/normalized/v0.1.0/schemas/core.schema.json#/$defs/EntityProjection",
+      "value": {
+        "id": "urn:hub:infrastructure:example:file-store",
+        "types": [
+          "https://zenith-research.ca/ontology/hub/infrastructure/terms/ServiceInstance"
+        ],
+        "invocationContract": {
+          "id": "https://example.invalid/contracts/file-store.json",
+          "sha256": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+          "byteLength": 128,
+          "mediaType": "application/json"
+        }
+      }
+    },
+    {
+      "profile": "https://zenith-research.ca/ontology/hub/infrastructure/v0.1.0/schemas/infrastructure.schema.json#/$defs/ImplementationBinding",
+      "value": {
+        "id": "urn:hub:infrastructure:example:file-store",
+        "types": [
+          "https://zenith-research.ca/ontology/hub/infrastructure/terms/ServiceInstance"
+        ],
+        "kind": "file-store"
+      }
+    }
+  ],
+  "urn:hub:infrastructure:example:space": [
+    {
+      "profile": "https://zenith-research.ca/ontology/hub/infrastructure/v0.1.0/schemas/infrastructure.schema.json#/$defs/CollectionProfile",
+      "value": {
+        "id": "urn:hub:infrastructure:example:space",
+        "types": [
+          "https://zenith-research.ca/ontology/terms/Collection"
+        ],
+        "kind": "space"
+      }
+    }
+  ],
+  "urn:hub:infrastructure:example:database": [
+    {
+      "profile": "https://zenith-research.ca/ontology/hub/infrastructure/v0.1.0/schemas/infrastructure.schema.json#/$defs/CollectionProfile",
+      "value": {
+        "id": "urn:hub:infrastructure:example:database",
+        "types": [
+          "https://zenith-research.ca/ontology/terms/Collection"
+        ],
+        "kind": "database"
+      }
+    },
+    {
+      "profile": "https://zenith-research.ca/ontology/hub/infrastructure/v0.1.0/schemas/infrastructure.schema.json#/$defs/ImplementationBinding",
+      "value": {
+        "id": "urn:hub:infrastructure:example:database",
+        "types": [
+          "https://zenith-research.ca/ontology/terms/Collection"
+        ],
+        "kind": "collection",
+        "remoteStore": "postgresql://database.example.invalid/demo"
+      }
+    }
+  ],
+  "urn:hub:infrastructure:example:bucket": [
+    {
+      "profile": "https://zenith-research.ca/ontology/hub/infrastructure/v0.1.0/schemas/infrastructure.schema.json#/$defs/CollectionProfile",
+      "value": {
+        "id": "urn:hub:infrastructure:example:bucket",
+        "types": [
+          "https://zenith-research.ca/ontology/terms/Collection"
+        ],
+        "kind": "bucket"
+      }
+    },
+    {
+      "profile": "https://zenith-research.ca/ontology/hub/infrastructure/v0.1.0/schemas/infrastructure.schema.json#/$defs/ImplementationBinding",
+      "value": {
+        "id": "urn:hub:infrastructure:example:bucket",
+        "types": [
+          "https://zenith-research.ca/ontology/terms/Collection"
+        ],
+        "kind": "collection",
+        "remoteStore": "https://objects.example.invalid/buckets/demo"
+      }
+    }
+  ],
+  "urn:hub:infrastructure:example:local-files": [
+    {
+      "profile": "https://zenith-research.ca/ontology/hub/infrastructure/v0.1.0/schemas/infrastructure.schema.json#/$defs/CollectionProfile",
+      "value": {
+        "id": "urn:hub:infrastructure:example:local-files",
+        "types": [
+          "https://zenith-research.ca/ontology/terms/Collection"
+        ],
+        "kind": "file-collection"
+      }
+    },
+    {
+      "profile": "https://zenith-research.ca/ontology/hub/infrastructure/v0.1.0/schemas/infrastructure.schema.json#/$defs/ImplementationBinding",
+      "value": {
+        "id": "urn:hub:infrastructure:example:local-files",
+        "types": [
+          "https://zenith-research.ca/ontology/terms/Collection"
+        ],
+        "kind": "collection",
+        "paths": [
+          "/example/local-files"
+        ]
+      }
+    }
+  ],
+  "urn:hub:infrastructure:example:remote-files": [
+    {
+      "profile": "https://zenith-research.ca/ontology/hub/infrastructure/v0.1.0/schemas/infrastructure.schema.json#/$defs/CollectionProfile",
+      "value": {
+        "id": "urn:hub:infrastructure:example:remote-files",
+        "types": [
+          "https://zenith-research.ca/ontology/terms/Collection"
+        ],
+        "kind": "file-collection"
+      }
+    },
+    {
+      "profile": "https://zenith-research.ca/ontology/hub/infrastructure/v0.1.0/schemas/infrastructure.schema.json#/$defs/ImplementationBinding",
+      "value": {
+        "id": "urn:hub:infrastructure:example:remote-files",
+        "types": [
+          "https://zenith-research.ca/ontology/terms/Collection"
+        ],
+        "kind": "collection",
+        "remoteStore": "sftp://files.example.invalid/demo"
+      }
+    }
+  ],
+  "urn:hub:infrastructure:example:volume": [
+    {
+      "profile": "https://zenith-research.ca/ontology/hub/infrastructure/v0.1.0/schemas/infrastructure.schema.json#/$defs/ImplementationBinding",
+      "value": {
+        "id": "urn:hub:infrastructure:example:volume",
+        "types": [
+          "https://zenith-research.ca/ontology/hub/infrastructure/terms/StorageVolume"
+        ],
+        "kind": "volume",
+        "paths": [
+          "/Volumes/ExampleVolume"
+        ]
+      }
+    }
+  ]
+}

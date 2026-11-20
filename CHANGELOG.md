@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+### Added
+- Add the Hub-owned Infrastructure extension, verified offline module closure, inherited admission profiles, portable bundles and optional subclass queries — environment records can share normalized Core semantics without duplicating classes or adopting service databases.
+
 ### Fixed
 - Preserve empty RDF datasets as no-op imports and reject conflicting schema identities or inapplicable CLI flags — valid exports remain reimportable without ambiguous validation or silently ignored owner intent.
 

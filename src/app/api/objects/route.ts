@@ -15,7 +15,7 @@ function rejected(error: unknown, mutation = false) {
 export async function GET(request: Request) {
   try {
     const value = await controller.get(normalizeNextRequest(request));
-    return value.jsonld ? new Response(JSON.stringify(value.document), {headers: {...headers, 'Content-Type': 'application/ld+json'}})
+    return value.jsonld || value.bundle ? new Response(JSON.stringify(value.document), {headers: {...headers, 'Content-Type': value.bundle ? 'application/vnd.zenith.hub-object-bundle+json' : 'application/ld+json'}})
       : Response.json(value, {headers});
   } catch (error) {return rejected(error);}
 }
@@ -24,7 +24,7 @@ export async function POST(request: Request) {
     const effective = normalizeNextRequest(request);
     controller.admitMutation(effective);
     return Response.json(await controller.post(effective,
-      await readAction(request, {limit: 1100000, deadline: 5000})), {headers});
+      await readAction(request, {limit: 5*1024**2, deadline: 5000})), {headers});
   }
   catch (error) {return rejected(error, true);}
 }

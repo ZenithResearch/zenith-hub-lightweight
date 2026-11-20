@@ -1,0 +1,187 @@
+{
+  "@context": {
+    "infra": "https://zenith-research.ca/ontology/hub/infrastructure/terms/",
+    "zn": "https://zenith-research.ca/ontology/terms/"
+  },
+  "@graph": [
+    {
+      "@id": "urn:hub:infrastructure:example:machine",
+      "@type": "infra:Machine",
+      "infra:managedBy": {
+        "@id": "urn:hub:infrastructure:example:manager"
+      },
+      "infra:usesInterface": {
+        "@id": "urn:hub:infrastructure:example:interface"
+      }
+    },
+    {
+      "@id": "urn:hub:infrastructure:example:manager",
+      "@type": "infra:ServiceInstance",
+      "infra:hostedBy": {
+        "@id": "urn:hub:infrastructure:example:machine"
+      }
+    },
+    {
+      "@id": "urn:hub:infrastructure:example:application",
+      "@type": "infra:ServiceInstance",
+      "infra:hostedBy": {
+        "@id": "urn:hub:infrastructure:example:machine"
+      },
+      "infra:usesStorage": {
+        "@id": "urn:hub:infrastructure:example:volume"
+      },
+      "infra:usesInterface": {
+        "@id": "urn:hub:infrastructure:example:interface"
+      },
+      "infra:usesDNSZone": {
+        "@id": "urn:hub:infrastructure:example:zone"
+      }
+    },
+    {
+      "@id": "urn:hub:infrastructure:example:database-server",
+      "@type": "infra:ServiceInstance",
+      "infra:hostedBy": {
+        "@id": "urn:hub:infrastructure:example:machine"
+      },
+      "infra:usesStorage": {
+        "@id": "urn:hub:infrastructure:example:volume"
+      }
+    },
+    {
+      "@id": "urn:hub:infrastructure:example:object-store",
+      "@type": "infra:ServiceInstance",
+      "infra:hostedBy": {
+        "@id": "urn:example:external-machine"
+      }
+    },
+    {
+      "@id": "urn:hub:infrastructure:example:file-store",
+      "@type": "infra:ServiceInstance",
+      "infra:hostedBy": {
+        "@id": "urn:example:external-file-host"
+      }
+    },
+    {
+      "@id": "urn:hub:infrastructure:example:deployment",
+      "@type": "infra:Deployment",
+      "infra:hostedBy": {
+        "@id": "urn:hub:infrastructure:example:machine"
+      },
+      "infra:realizes": {
+        "@id": "urn:hub:infrastructure:example:application"
+      },
+      "zn:HAS_ARTIFACT": {
+        "@id": "urn:hub:infrastructure:example:manifest"
+      }
+    },
+    {
+      "@id": "urn:hub:infrastructure:example:network",
+      "@type": "infra:Network",
+      "infra:usesDNSZone": {
+        "@id": "urn:hub:infrastructure:example:zone"
+      }
+    },
+    {
+      "@id": "urn:hub:infrastructure:example:interface",
+      "@type": "infra:NetworkInterface",
+      "infra:hostedBy": {
+        "@id": "urn:hub:infrastructure:example:machine"
+      },
+      "infra:attachedTo": {
+        "@id": "urn:hub:infrastructure:example:network"
+      }
+    },
+    {
+      "@id": "urn:hub:infrastructure:example:volume",
+      "@type": "infra:StorageVolume",
+      "infra:hostedBy": {
+        "@id": "urn:hub:infrastructure:example:machine"
+      }
+    },
+    {
+      "@id": "urn:hub:infrastructure:example:zone",
+      "@type": "infra:DNSZone",
+      "infra:dnsName": "example.invalid."
+    },
+    {
+      "@id": "urn:hub:infrastructure:example:space",
+      "@type": "zn:Collection",
+      "infra:hasMember": [
+        {
+          "@id": "urn:hub:infrastructure:example:machine"
+        },
+        {
+          "@id": "urn:hub:infrastructure:example:application"
+        },
+        {
+          "@id": "urn:hub:infrastructure:example:deployment"
+        },
+        {
+          "@id": "urn:hub:infrastructure:example:database"
+        },
+        {
+          "@id": "urn:hub:infrastructure:example:bucket"
+        },
+        {
+          "@id": "urn:hub:infrastructure:example:local-files"
+        },
+        {
+          "@id": "urn:hub:infrastructure:example:remote-files"
+        }
+      ]
+    },
+    {
+      "@id": "urn:hub:infrastructure:example:database",
+      "@type": "zn:Collection",
+      "infra:hostedBy": {
+        "@id": "urn:hub:infrastructure:example:database-server"
+      },
+      "infra:usesStorage": {
+        "@id": "urn:hub:infrastructure:example:volume"
+      }
+    },
+    {
+      "@id": "urn:hub:infrastructure:example:bucket",
+      "@type": "zn:Collection",
+      "infra:hostedBy": {
+        "@id": "urn:hub:infrastructure:example:object-store"
+      }
+    },
+    {
+      "@id": "urn:hub:infrastructure:example:local-files",
+      "@type": "zn:Collection",
+      "infra:hostedBy": {
+        "@id": "urn:hub:infrastructure:example:machine"
+      },
+      "infra:usesStorage": {
+        "@id": "urn:hub:infrastructure:example:volume"
+      }
+    },
+    {
+      "@id": "urn:hub:infrastructure:example:remote-files",
+      "@type": "zn:Collection",
+      "infra:hostedBy": {
+        "@id": "urn:hub:infrastructure:example:file-store"
+      }
+    },
+    {
+      "@id": "urn:hub:infrastructure:example:manifest",
+      "@type": "zn:Artifact"
+    },
+    {
+      "@id": "urn:hub:infrastructure:example:contract",
+      "@type": "zn:Artifact"
+    },
+    {
+      "@id": "urn:hub:infrastructure:example:event",
+      "@type": "zn:Event",
+      "zn:HAS_ARTIFACT": {
+        "@id": "urn:hub:infrastructure:example:receipt"
+      }
+    },
+    {
+      "@id": "urn:hub:infrastructure:example:receipt",
+      "@type": "zn:Receipt"
+    }
+  ]
+}

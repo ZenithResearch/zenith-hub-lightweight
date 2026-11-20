@@ -1,4 +1,5 @@
 /** One local operator API; request documents cannot configure storage or loaders. */
+import {exportBundle,importBundle} from './bundle.mjs';
 import path from 'node:path';
 import {randomBytes} from 'node:crypto';
 import {ObjectStore} from './store.mjs';
@@ -31,7 +32,7 @@ export function createObjectController({env = process.env, registryFile = path.j
       const parameters = new URL(request.url).searchParams;
       const query = Object.fromEntries(parameters);
       const operation = query.operation || 'list';
-      for (const key of parameters.keys()) if (parameters.getAll(key).length > 1 && !(operation === 'export' && key === 'id')) reject('duplicate_query_parameter', 400);
+      for (const key of parameters.keys()) if (parameters.getAll(key).length > 1 && !(['export','export-bundle'].includes(operation) && key === 'id')) reject('duplicate_query_parameter', 400);
       if (operation === 'session') {
         closed(query, ['operation']);
         return {schema: 'zenith.hub-object-session.v1', csrf, mode: 'local'};
@@ -39,8 +40,9 @@ export function createObjectController({env = process.env, registryFile = path.j
       const s = await store();
       if (operation === 'registry') {closed(query, ['operation']); return s.registry.describe();}
       if (operation === 'list') {
-        closed(query, [], ['operation', 'type', 'after', 'limit']);
-        return {schema: 'zenith.hub-object-list.v1', ...s.list({...query, limit: query.limit === undefined ? 100 : Number(query.limit)})};
+        closed(query, [], ['operation', 'type', 'after', 'limit','includeSubclasses']);
+        if(query.includeSubclasses!==undefined&&!['true','false'].includes(query.includeSubclasses))reject('invalid_list_query',400);
+        return {schema: 'zenith.hub-object-list.v1', ...s.list({...query,includeSubclasses:query.includeSubclasses==='true', limit: query.limit === undefined ? 100 : Number(query.limit)})};
       }
       if (operation === 'get') {closed(query, ['operation', 'id']); return {schema: 'zenith.hub-object.v1', ...await s.get(query.id)};}
       if (operation === 'relationships') {
@@ -52,17 +54,23 @@ export function createObjectController({env = process.env, registryFile = path.j
         const connected = s.connected({...query, depth: query.depth === undefined ? 1 : Number(query.depth), limit: query.limit === undefined ? 100 : Number(query.limit)});
         return {schema: 'zenith.hub-object-set.v1', ...connected, document: await s.exportDocument({ids: connected.ids})};
       }
-      if (operation === 'export') {
+      if (['export','export-bundle'].includes(operation)) {
         closed(query, ['operation'], ['id', 'graph']);
         if (query.id && query.graph) reject('ambiguous_export_selection', 400);
-        return {jsonld: true, document: await s.exportDocument(query.id ? {ids: parameters.getAll('id')} : query.graph ? {graph: query.graph} : {})};
+        const selection=query.id ? {ids:parameters.getAll('id')} : query.graph ? {graph:query.graph} : {};
+        return operation==='export-bundle' ? {bundle:true,document:await exportBundle(s,selection)} : {jsonld:true,document:await s.exportDocument(selection)};
       }
       reject('invalid_object_operation', 400);
     },
     async post(request, body) {
       admit(request, true);
-      closed(body, ['schema', 'operation', 'document', 'importKey'], ['expectedRevisions', 'source', 'projections', 'id', 'expectedRevision']);
-      if (body.schema !== 'zenith.hub-object-action.v1' || !['create', 'update', 'import'].includes(body.operation)) reject('invalid_object_operation', 400);
+      closed(body, ['schema', 'operation', 'document', 'importKey'], ['expectedRevisions', 'source', 'projections', 'id', 'expectedRevision','admission','expectedBundleSha256']);
+      if (body.schema !== 'zenith.hub-object-action.v1' || !['create', 'update', 'import','import-bundle'].includes(body.operation)) reject('invalid_object_operation', 400);
+      if(body.operation==='import-bundle') {
+        if(['id','expectedRevision','admission','projections'].some(k=>Object.hasOwn(body,k)))reject('invalid_request',400);
+        return importBundle(await store(),body.document,{importKey:body.importKey,expectedBundleSha256:body.expectedBundleSha256,expectedRevisions:body.expectedRevisions??{},source:body.source??null});
+      }
+      if(Object.hasOwn(body,'expectedBundleSha256'))reject('invalid_request',400);
       if (body.operation === 'import' && (body.id !== undefined || body.expectedRevision !== undefined) ||
           body.operation !== 'import' && body.expectedRevisions !== undefined ||
           body.operation === 'create' && body.expectedRevision !== undefined) reject('invalid_request', 400);
@@ -70,6 +78,7 @@ export function createObjectController({env = process.env, registryFile = path.j
       return s.importDocument(body.document, {importKey: body.importKey, intent: body.operation,
         ...(body.operation === 'import' ? {expectedRevisions: body.expectedRevisions ?? {}} : {objectId: body.id,
           expectedRevisions: body.operation === 'update' ? {[body.id]: body.expectedRevision} : {}}),
+        ...(body.admission!==undefined?{admission:body.admission}:{}),
         source: body.source ?? null, projections: body.projections ?? {}});
     },
     async close() {if (storePromise) (await storePromise).close();},

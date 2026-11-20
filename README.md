@@ -103,3 +103,5 @@ exports and revision-checked updates. See [the storage contract and walkthrough]
 Run `npm run test:objects` and `node scripts/objects-roundtrip.mjs` for the isolated
 semantic round-trip acceptance checks. The feature requires explicit owner data
 directory configuration; opening onboarding does not initialize an object store.
+
+The proposed [Hub Infrastructure extension](docs/infrastructure/README.md) adds offline-verified environment schemas and portable profile bundles to the optional object store. It does not provision services or change normalized Core.

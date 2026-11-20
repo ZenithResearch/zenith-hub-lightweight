@@ -65,7 +65,8 @@ async function interpret() {
   for (const group of groups.values()) {
     const ids = [...new Set(group.filter(q => q.subject.termType === 'NamedNode').map(q => q.subject.value))].sort();
     const nquads = await canon(group);
-    fragments.push({ids, nquads, nodes: await fromRDF(nquads)});
+    const recordQuads=group.map(q=>({...q,graph:{termType:'DefaultGraph',value:''}}));
+    fragments.push({ids, nquads, nodes: await fromRDF(nquads), recordNodes: await fromRDF(NQuads.serialize(recordQuads))});
   }
   if (fragments.reduce((n, f) => n + f.ids.length, 0) > 1000) fail('dataset_too_large');
   return {nquads: await canon(quads), fragments, contexts: [...used].sort()};
