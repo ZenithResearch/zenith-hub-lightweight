@@ -1,0 +1,40 @@
+{
+  "profile": "urn:zenith:review:addressable-invocable:1",
+  "maxMessageLifetimeSeconds": 60,
+  "resultRetentionSeconds": 600,
+  "operations": {
+    "urn:zenith:hub:operation:inspect": {
+      "effect": "query",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "description": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "description"
+        ],
+        "additionalProperties": false
+      },
+      "errorSchema": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "code"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "schemaDialect": "https://json-schema.org/draft/2020-12/schema"
+}

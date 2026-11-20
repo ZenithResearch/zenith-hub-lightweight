@@ -1,0 +1,324 @@
+{
+  "schemaVersion": "hub.infrastructure-ontology.v1",
+  "ontologyId": "https://zenith-research.ca/ontology/hub/infrastructure",
+  "version": "0.1.0",
+  "status": "proposed-unpublished",
+  "versionIri": "https://zenith-research.ca/ontology/hub/infrastructure/v0.1.0/ontology.jsonld",
+  "namespace": "https://zenith-research.ca/ontology/hub/infrastructure/terms/",
+  "owner": "ZenithResearch/zenith-hub-lightweight",
+  "ontologyDocuments": [
+    {
+      "path": "ontology.jsonld",
+      "ontologyId": "https://zenith-research.ca/ontology/hub/infrastructure",
+      "versionIri": "https://zenith-research.ca/ontology/hub/infrastructure/v0.1.0/ontology.jsonld"
+    }
+  ],
+  "dependencies": [
+    {
+      "ontologyId": "https://zenith-research.ca/ontology/normalized/modules/core",
+      "version": "0.1.0",
+      "versionIri": "https://zenith-research.ca/ontology/normalized/v0.1.0/modules/core.jsonld",
+      "sha256": "7b5700135b8880b587a9a09d81cf11f6a02e06ca9202a918cb94cc0e9feadc62",
+      "manifestSha256": "d73a66b7f780b8ebc1ec1ac1f7d3791eec91a0259dca90faf37927636ad08a4a"
+    }
+  ],
+  "profiles": [
+    {
+      "id": "https://zenith-research.ca/ontology/hub/infrastructure/v0.1.0/schemas/infrastructure.schema.json#/$defs/MachineObserved",
+      "representation": "expanded-node",
+      "appliesTo": [
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/Machine"
+      ],
+      "includeSubclasses": true
+    },
+    {
+      "id": "https://zenith-research.ca/ontology/hub/infrastructure/v0.1.0/schemas/infrastructure.schema.json#/$defs/MachineAdmitted",
+      "representation": "expanded-node",
+      "appliesTo": [
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/Machine"
+      ],
+      "includeSubclasses": true,
+      "admissionOnly": "infrastructure"
+    },
+    {
+      "id": "https://zenith-research.ca/ontology/hub/infrastructure/v0.1.0/schemas/infrastructure.schema.json#/$defs/ServiceInstanceObserved",
+      "representation": "expanded-node",
+      "appliesTo": [
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/ServiceInstance"
+      ],
+      "includeSubclasses": true
+    },
+    {
+      "id": "https://zenith-research.ca/ontology/hub/infrastructure/v0.1.0/schemas/infrastructure.schema.json#/$defs/ServiceInstanceAdmitted",
+      "representation": "expanded-node",
+      "appliesTo": [
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/ServiceInstance"
+      ],
+      "includeSubclasses": true,
+      "admissionOnly": "infrastructure"
+    },
+    {
+      "id": "https://zenith-research.ca/ontology/hub/infrastructure/v0.1.0/schemas/infrastructure.schema.json#/$defs/DeploymentObserved",
+      "representation": "expanded-node",
+      "appliesTo": [
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/Deployment"
+      ],
+      "includeSubclasses": true
+    },
+    {
+      "id": "https://zenith-research.ca/ontology/hub/infrastructure/v0.1.0/schemas/infrastructure.schema.json#/$defs/DeploymentAdmitted",
+      "representation": "expanded-node",
+      "appliesTo": [
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/Deployment"
+      ],
+      "includeSubclasses": true,
+      "admissionOnly": "infrastructure"
+    },
+    {
+      "id": "https://zenith-research.ca/ontology/hub/infrastructure/v0.1.0/schemas/infrastructure.schema.json#/$defs/NetworkObserved",
+      "representation": "expanded-node",
+      "appliesTo": [
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/Network"
+      ],
+      "includeSubclasses": true
+    },
+    {
+      "id": "https://zenith-research.ca/ontology/hub/infrastructure/v0.1.0/schemas/infrastructure.schema.json#/$defs/NetworkAdmitted",
+      "representation": "expanded-node",
+      "appliesTo": [
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/Network"
+      ],
+      "includeSubclasses": true,
+      "admissionOnly": "infrastructure"
+    },
+    {
+      "id": "https://zenith-research.ca/ontology/hub/infrastructure/v0.1.0/schemas/infrastructure.schema.json#/$defs/NetworkInterfaceObserved",
+      "representation": "expanded-node",
+      "appliesTo": [
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/NetworkInterface"
+      ],
+      "includeSubclasses": true
+    },
+    {
+      "id": "https://zenith-research.ca/ontology/hub/infrastructure/v0.1.0/schemas/infrastructure.schema.json#/$defs/NetworkInterfaceAdmitted",
+      "representation": "expanded-node",
+      "appliesTo": [
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/NetworkInterface"
+      ],
+      "includeSubclasses": true,
+      "admissionOnly": "infrastructure"
+    },
+    {
+      "id": "https://zenith-research.ca/ontology/hub/infrastructure/v0.1.0/schemas/infrastructure.schema.json#/$defs/StorageVolumeObserved",
+      "representation": "expanded-node",
+      "appliesTo": [
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/StorageVolume"
+      ],
+      "includeSubclasses": true
+    },
+    {
+      "id": "https://zenith-research.ca/ontology/hub/infrastructure/v0.1.0/schemas/infrastructure.schema.json#/$defs/StorageVolumeAdmitted",
+      "representation": "expanded-node",
+      "appliesTo": [
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/StorageVolume"
+      ],
+      "includeSubclasses": true,
+      "admissionOnly": "infrastructure"
+    },
+    {
+      "id": "https://zenith-research.ca/ontology/hub/infrastructure/v0.1.0/schemas/infrastructure.schema.json#/$defs/DNSZoneObserved",
+      "representation": "expanded-node",
+      "appliesTo": [
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/DNSZone"
+      ],
+      "includeSubclasses": true
+    },
+    {
+      "id": "https://zenith-research.ca/ontology/hub/infrastructure/v0.1.0/schemas/infrastructure.schema.json#/$defs/DNSZoneAdmitted",
+      "representation": "expanded-node",
+      "appliesTo": [
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/DNSZone"
+      ],
+      "includeSubclasses": true,
+      "admissionOnly": "infrastructure"
+    },
+    {
+      "id": "https://zenith-research.ca/ontology/hub/infrastructure/v0.1.0/schemas/infrastructure.schema.json#/$defs/ImplementationBinding",
+      "representation": "projection",
+      "appliesTo": [
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/Machine",
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/ServiceInstance",
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/Deployment",
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/Network",
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/NetworkInterface",
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/StorageVolume",
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/DNSZone",
+        "https://zenith-research.ca/ontology/terms/Collection"
+      ],
+      "includeSubclasses": true,
+      "identityField": "id",
+      "typesField": "types",
+      "distinctIdentityFields": [
+        "manager"
+      ]
+    },
+    {
+      "id": "https://zenith-research.ca/ontology/hub/infrastructure/v0.1.0/schemas/infrastructure.schema.json#/$defs/CollectionProfile",
+      "representation": "projection",
+      "appliesTo": [
+        "https://zenith-research.ca/ontology/terms/Collection"
+      ],
+      "includeSubclasses": true,
+      "identityField": "id",
+      "typesField": "types"
+    }
+  ],
+  "admissionPolicies": [
+    {
+      "id": "infrastructure",
+      "requiredProjections": [
+        {
+          "type": "https://zenith-research.ca/ontology/terms/Entity",
+          "profile": "https://zenith-research.ca/ontology/normalized/v0.1.0/schemas/core.schema.json#/$defs/EntityProjection"
+        },
+        {
+          "type": "https://zenith-research.ca/ontology/terms/Collection",
+          "profile": "https://zenith-research.ca/ontology/hub/infrastructure/v0.1.0/schemas/infrastructure.schema.json#/$defs/CollectionProfile"
+        }
+      ]
+    }
+  ],
+  "relationships": [
+    {
+      "predicate": "https://zenith-research.ca/ontology/hub/infrastructure/terms/hostedBy",
+      "subjects": [
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/Machine",
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/ServiceInstance",
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/Deployment",
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/NetworkInterface",
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/StorageVolume",
+        "https://zenith-research.ca/ontology/terms/Collection",
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/DNSZone"
+      ],
+      "targets": [
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/Machine",
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/ServiceInstance"
+      ]
+    },
+    {
+      "predicate": "https://zenith-research.ca/ontology/hub/infrastructure/terms/realizes",
+      "subjects": [
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/Deployment"
+      ],
+      "targets": [
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/ServiceInstance"
+      ]
+    },
+    {
+      "predicate": "https://zenith-research.ca/ontology/hub/infrastructure/terms/managedBy",
+      "subjects": [],
+      "targets": [
+        "https://zenith-research.ca/ontology/terms/Entity"
+      ]
+    },
+    {
+      "predicate": "https://zenith-research.ca/ontology/hub/infrastructure/terms/attachedTo",
+      "subjects": [
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/NetworkInterface"
+      ],
+      "targets": [
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/Network"
+      ]
+    },
+    {
+      "predicate": "https://zenith-research.ca/ontology/hub/infrastructure/terms/usesInterface",
+      "subjects": [
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/Machine",
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/ServiceInstance",
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/Deployment"
+      ],
+      "targets": [
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/NetworkInterface"
+      ]
+    },
+    {
+      "predicate": "https://zenith-research.ca/ontology/hub/infrastructure/terms/usesStorage",
+      "subjects": [
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/ServiceInstance",
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/Deployment",
+        "https://zenith-research.ca/ontology/terms/Collection"
+      ],
+      "targets": [
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/StorageVolume"
+      ]
+    },
+    {
+      "predicate": "https://zenith-research.ca/ontology/hub/infrastructure/terms/hasMember",
+      "subjects": [
+        "https://zenith-research.ca/ontology/terms/Collection"
+      ],
+      "targets": []
+    },
+    {
+      "predicate": "https://zenith-research.ca/ontology/hub/infrastructure/terms/usesDNSZone",
+      "subjects": [
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/Network",
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/ServiceInstance"
+      ],
+      "targets": [
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/DNSZone"
+      ]
+    },
+    {
+      "predicate": "https://zenith-research.ca/ontology/terms/HAS_ARTIFACT",
+      "subjects": [],
+      "targets": [
+        "https://zenith-research.ca/ontology/terms/Artifact"
+      ]
+    }
+  ],
+  "resources": [
+    {
+      "url": "urn:hub:infrastructure:example:contract",
+      "path": "examples/invocation-contract.json",
+      "sha256": "4e37005cafe2c6bb024cf5445f709ac3775ce86c6f90385e02cc23581c6fba2c"
+    }
+  ],
+  "files": [
+    {
+      "path": "domain.json",
+      "bytes": 485,
+      "sha256": "906a1d145c46f7a8250d2a222a12f2251c1e89be2e412e1dc5ed1f486ff77eb8"
+    },
+    {
+      "path": "examples/connected.jsonld",
+      "bytes": 5181,
+      "sha256": "22f7e026a5814c2c8aedfd34722566618a46494efa9d3abb4f37a943a4c51d2e"
+    },
+    {
+      "path": "examples/invocation-contract.json",
+      "bytes": 912,
+      "sha256": "4e37005cafe2c6bb024cf5445f709ac3775ce86c6f90385e02cc23581c6fba2c"
+    },
+    {
+      "path": "examples/projections.json",
+      "bytes": 11195,
+      "sha256": "1964aa3cfd2f19028c62c83c4cf55547063c46241afdde49369b5041c8b81d03"
+    },
+    {
+      "path": "ontology.jsonld",
+      "bytes": 6489,
+      "sha256": "04a73b50532f9cd11457a2629fd8918b4ce5c59f61a470532cd991f2a61e9d5b"
+    },
+    {
+      "path": "README.md",
+      "bytes": 2907,
+      "sha256": "b8d6cdbfae62f5835d652842ac8775a76707863a56e274f7f24b86b18907a222"
+    },
+    {
+      "path": "schemas/infrastructure.schema.json",
+      "bytes": 85279,
+      "sha256": "5c1d4e6fca092f06dd05c6dbe6814709240ee09051dd8ffe4cb506bab100426b"
+    }
+  ]
+}

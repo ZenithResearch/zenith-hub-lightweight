@@ -48,9 +48,26 @@ try {
   assert.equal(await canonical(document),await canonical(value));
   const recognized=await read('operation=list');assert.equal(recognized.items.length,2);
   assert.ok(value.some(node=>node['@id']==='urn:hub:example:catalog'));
+  const infraRoot='profiles/object-store/ontology/infrastructure/examples/';
+  const infrastructure=JSON.parse(await readFile(infraRoot+'connected.jsonld','utf8'));
+  const projections=JSON.parse(await readFile(infraRoot+'projections.json','utf8'));
+  async function mutate(body) {
+    const response=await fetch(origin+'/api/objects',{method:'POST',headers:{Origin:origin,'Content-Type':'application/json','X-Zenith-CSRF':session.csrf},
+      body:JSON.stringify({schema:'zenith.hub-object-action.v1',...body}),signal:AbortSignal.timeout(20000)});
+    const result=await response.json();assert.equal(response.status,200,JSON.stringify(result));return result;
+  }
+  const added=await mutate({operation:'import',importKey:'built-infrastructure',document:infrastructure,projections,admission:'infrastructure'});
+  assert.equal(added.created.length,20);
+  const entities=await read('operation=list&type='+encodeURIComponent('https://zenith-research.ca/ontology/terms/Entity')+'&includeSubclasses=true');
+  assert.equal(entities.items.length,6);
+  const portable=await fetch(origin+'/api/objects?operation=export-bundle');
+  assert.equal(portable.headers.get('content-type'),'application/vnd.zenith.hub-object-bundle+json');
+  const bundle=await portable.json();assert.ok(Object.keys(bundle.projections).length>=20);
+  await mutate({operation:'import-bundle',importKey:'built-portable',document:bundle,expectedBundleSha256:bundle.integrity.sha256});
+  assert.equal((await mutate({operation:'import-bundle',importKey:'built-portable',document:bundle})).replayed,true);
   const denied=await fetch(origin+'/api/objects',{method:'POST',headers:{Origin:'https://invalid.example','Content-Type':'application/json'},body:'malformed JSON'});
   assert.equal(denied.status,403);
-  console.log(JSON.stringify({passed:true,builtOperator:true,standalone,semanticRoundTrip:true,objectCount:2,exportMediaType:'application/ld+json',crossOriginRejected:true}));
+  console.log(JSON.stringify({passed:true,builtOperator:true,standalone,semanticRoundTrip:true,objectCount:22,infrastructureAdmission:true,subclassQuery:true,portableBindings:true,exportMediaType:'application/ld+json',crossOriginRejected:true}));
 } catch(error) {console.error(logs);throw error;}
 finally {
   child.kill('SIGTERM');

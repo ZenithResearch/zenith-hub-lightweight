@@ -1,0 +1,10 @@
+{
+  "id": "urn:zenith:hub:domain:infrastructure",
+  "type": "zn:Domain",
+  "key": "hub/infrastructure",
+  "publisher": "hub",
+  "label": "Infrastructure",
+  "scope": "Discovery, setup and observation of physical/logical infrastructure. Schema admission, reachability, health and authority are distinct.",
+  "sourceModuleRef": "https://zenith-research.ca/ontology/hub/infrastructure/v0.1.0/ontology.jsonld",
+  "vocabularyRef": "https://zenith-research.ca/ontology/hub/infrastructure"
+}
