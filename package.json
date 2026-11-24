@@ -4,15 +4,22 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "next dev",
+    "dev": "node scripts/hub.mjs serve --dev",
     "build": "next build",
-    "start": "next start",
+    "start": "node scripts/hub.mjs serve --production",
     "typecheck": "tsc --noEmit",
-    "operator": "node scripts/operator.mjs",
+    "operator": "node scripts/hub.mjs serve",
     "test:deployer": "node --test tests/deployer/*.test.mjs",
-    "operator:start": "node scripts/operator.mjs --production",
+    "operator:start": "node scripts/hub.mjs serve --production",
     "check:source": "node scripts/check-source.mjs",
-    "test:objects": "node --test tests/objects/*.test.mjs"
+    "test:objects": "node --test tests/objects/*.test.mjs",
+    "test:setup": "node --test tests/setup/*.test.mjs",
+    "test:hub": "node --test tests/hub/*.test.mjs",
+    "hub": "node scripts/hub.mjs",
+    "test:application": "node --test tests/application/*.test.mjs",
+    "catalog:check": "node scripts/catalog-content.mjs",
+    "catalog:generate": "node scripts/catalog-content.mjs --write",
+    "test:catalog": "node --test tests/catalog/*.test.mjs"
   },
   "dependencies": {
     "ajv": "8.20.0",

@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+### Changed
+- Connect database-first launch, default Hermes model configuration and the Apps & services gallery through the existing reviewed APIs — onboarding must recognize installed software and retain setup, connections and native data without requiring a guide profile.
+
 ### Added
 - Add the single-writer object repository, application persistence, pinned software catalog and native inspection contracts — Hub records must resolve to committed object revisions while preserving legacy readers and source/build provenance.
 
