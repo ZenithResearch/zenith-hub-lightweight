@@ -1,0 +1,58 @@
+{
+  "schema": "zenith.hub.default-provider-review.v1",
+  "verifiedAt": "2026-11-23T22:28:30.968772+00:00",
+  "change": "Configure uses the native default provider/model configuration, without creating or selecting named profiles.",
+  "compatibility": {
+    "databaseSchemaMigrationRequired": false,
+    "legacyNamedBindingsReadable": true,
+    "defaultConfigurationMode": "The legacy create-guide-profile action accepts a reviewed defaultConfiguration=true binding; new Hub installs skip that binding step.",
+    "nativeDefaultHome": "instance/data for Hub installs; inspected default home for explicitly reused software."
+  },
+  "validation": {
+    "setupAndApplicationTests": {
+      "passed": 105,
+      "failed": 0
+    },
+    "pythonBridgeTests": {
+      "passed": 10,
+      "skipped": 0,
+      "providerNetwork": "mocked"
+    },
+    "hubTypecheck": "passed",
+    "sharedUITypecheck": "passed",
+    "sourceProvenance": "passed",
+    "pythonSyntax": "passed",
+    "liveUI": "Configure opened the connection choices and then the native Hermes provider dropdown, without a profile step.",
+    "externalSignInOrInferencePerformed": false
+  },
+  "live": {
+    "url": "http://127.0.0.1:4318",
+    "before": {
+      "revision": 48,
+      "instances": 1,
+      "operations": 5,
+      "catalogPackage": {
+        "id": "urn:zenith:hub:catalog-package:builtin",
+        "version": "2026.11.23.1",
+        "digest": "61032dd9cfafe063702368cc2071f4f91509358b1d6facf8c74a69d1abddcd43"
+      },
+      "generation": 14
+    },
+    "after": {
+      "revision": 48,
+      "instances": 1,
+      "operations": 5,
+      "catalogPackage": {
+        "id": "urn:zenith:hub:catalog-package:builtin",
+        "version": "2026.11.23.1",
+        "digest": "61032dd9cfafe063702368cc2071f4f91509358b1d6facf8c74a69d1abddcd43"
+      },
+      "generation": 14
+    },
+    "installed": true,
+    "configured": false,
+    "namedProfileCreated": false,
+    "serviceStarted": false
+  },
+  "sharedUICommit": "05a1a1aced007066cb06738bed5b861ecf1b2433"
+}

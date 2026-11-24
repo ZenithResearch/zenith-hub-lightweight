@@ -1,0 +1,71 @@
+{
+  "checkedAt": "2026-11-20T19:13:23.908Z",
+  "localModels": [
+    {
+      "id": "qwen35-4b",
+      "name": "Qwen3.5 4B",
+      "tier": "Compact",
+      "machineLabel": "Around 16 GB memory",
+      "downloadBytes": 3398986144,
+      "fits": true,
+      "recommended": false
+    },
+    {
+      "id": "qwen35-9b",
+      "name": "Qwen3.5 9B",
+      "tier": "Balanced",
+      "machineLabel": "Around 24\u201332 GB memory",
+      "downloadBytes": 6602227488,
+      "fits": true,
+      "recommended": true
+    },
+    {
+      "id": "qwen35-27b",
+      "name": "Qwen3.5 27B",
+      "tier": "Larger",
+      "machineLabel": "Around 48\u201364 GB memory",
+      "downloadBytes": 17671958688,
+      "fits": false,
+      "recommended": false
+    },
+    {
+      "id": "qwen35-397b-a17b",
+      "name": "Qwen3.5 397B-A17B",
+      "tier": "Flagship Mac",
+      "machineLabel": "512 GB unified-memory Macs",
+      "downloadBytes": 245015336096,
+      "fits": false,
+      "recommended": false
+    }
+  ],
+  "hardware": {
+    "ram_total_bytes": 25769803776,
+    "ram_available_bytes": 8519335936,
+    "vram_total_bytes": 25769803776,
+    "uma": true,
+    "gpu_name": null
+  },
+  "activeConfigurationUnchanged": true,
+  "appliedOperationsUnchanged": true,
+  "nativeEstimatorSimulation": [
+    {
+      "memoryGiB": 24,
+      "fits": false
+    },
+    {
+      "memoryGiB": 128,
+      "fits": false
+    },
+    {
+      "memoryGiB": 256,
+      "fits": false
+    },
+    {
+      "memoryGiB": 512,
+      "fits": true,
+      "spilled": false,
+      "contextTokens": 262144
+    }
+  ],
+  "downloadOrInferencePerformed": false
+}

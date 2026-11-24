@@ -1,0 +1,86 @@
+{
+  "schema": "zenith.hub-catalog-fixes-live-qualification.v1",
+  "at": "2026-11-23T21:17:15.512Z",
+  "url": "http://127.0.0.1:4318/hub",
+  "sourceRuntime": {
+    "src/lib/catalog/package.mjs": "b3cc3195472e3f38ffd0decca86b5b7bb229bd684061af745691b8d5fad95643",
+    "src/lib/catalog/service.mjs": "58447a5b527ae2b082b0b714c721e91d9374336bdecd1ac5ba5e6a39b716800f"
+  },
+  "schemaMigrationRequired": false,
+  "catalogStartupCommit": false,
+  "catalog": {
+    "id": "urn:zenith:hub:catalog-package:builtin",
+    "version": "2026.11.23.1",
+    "digest": "61032dd9cfafe063702368cc2071f4f91509358b1d6facf8c74a69d1abddcd43"
+  },
+  "status": {
+    "schema": "zenith.hub-database-status.v1",
+    "ready": true,
+    "storage": "sqlite",
+    "schemaVersion": 5,
+    "repositoryId": "urn:zenith:hub:repository:5a06235d-21e0-4c2c-ab51-6c907c999b26",
+    "generation": 9,
+    "definitionSetId": "urn:zenith:hub:definition-set:2ce5e2f67d3df7de45bb9d3ec29b26f0af8ccba71e870218101fe56637bd36d3",
+    "objects": 30,
+    "hostRef": "urn:zenith:hub:machine:88499f0b-215f-4d3a-a3f4-42b9b5dc0938",
+    "software": 6,
+    "installations": 2,
+    "profiles": 2,
+    "connections": 0,
+    "operations": 4,
+    "catalog": {
+      "state": "ready",
+      "version": "2026.11.23.1",
+      "digest": "61032dd9cfafe063702368cc2071f4f91509358b1d6facf8c74a69d1abddcd43"
+    },
+    "serverInstanceId": "22306b4b-0375-4d82-9e64-6a62fb582df6"
+  },
+  "before": {
+    "generation": 8,
+    "setupRevision": 43,
+    "objects": 30,
+    "inspections": 3
+  },
+  "after": {
+    "generation": 9,
+    "setupRevision": 44,
+    "objects": 30,
+    "inspections": 4
+  },
+  "checks": {
+    "existingRepositoryAndDefinitionSet": true,
+    "launcherPreparationNoOp": true,
+    "savedSetupAndSelection": true,
+    "connectionsProfilesServicesOperations": true,
+    "installationIdentityAndProvenance": true,
+    "allObjectAndUnitHistory": true,
+    "allSelectedVersionsAndReferenceBindings": true,
+    "originalApplicationDocuments": true,
+    "originalCommitLedger": true,
+    "allImmutableBytes": true,
+    "existingMigrationMetadata": true,
+    "qualifiedFixSourceHashes": true,
+    "committedCatalogAndDefaults": true,
+    "onlyNormalEntryAndInspectionUpdates": true,
+    "verifiedBackup": true
+  },
+  "walkthrough": {
+    "welcomeRecognizedInstalledHermes": true,
+    "savedHubGuideProviderAndModelVisible": true,
+    "keptCurrentConfiguration": true,
+    "continueReachedGallery": true,
+    "twoSavedResourcesVisible": true,
+    "sixCatalogChoices": true,
+    "runtimeInstallAndConnectForms": true,
+    "devgraphConnectOnly": true,
+    "closedFormsWithoutReviewOrApply": true
+  },
+  "nativeSoftwareInstalledConfiguredStarted": false,
+  "malformedPackagesUsed": false,
+  "immutableFilesPreserved": 117,
+  "backupWithinSetupRoot": "application-backups/catalog-fixes-restart-2026-11-23T21-11-23-744Z",
+  "limitations": [
+    "No provider inference, software installation or external connection was performed.",
+    "Existing Hermes and Service Management stayed stopped; external connection registry stayed empty."
+  ]
+}

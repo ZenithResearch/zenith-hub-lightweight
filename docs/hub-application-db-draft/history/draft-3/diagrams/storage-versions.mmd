@@ -1,0 +1,21 @@
+flowchart TB
+    Row["Ontology-backed application row"]
+    Selection["Current selectedObjects<br/>objectId + objectRevision"]
+    Object["StoredObjectRecord<br/>object identity + revision"]
+    Unit["AtomicUnitVersion<br/>one compatible revision per current unit"]
+    RDF["Immutable JSON-LD<br/>semantic facts and declared links"]
+    Bindings["Immutable bindings file<br/>profile ID + validated values"]
+    Defs["Pinned definition files<br/>modules / schemas / manifests"]
+    View["Validated application view<br/>RDF + profile values"]
+    Ops["Operational overlay<br/>inspection / desired state / journals"]
+    Row -->|"objectVersion: objectId + revision + profileId"| Object
+    Selection -->|"selects exact current object revision"| Object
+    Object -->|"committed atomicUnit id + revision"| Unit
+    Object -->|"jsonldFile — hash / length / media type"| RDF
+    Object -->|"bindingsFile — same object / unit revision"| Bindings
+    Object -->|"trusted exact definition references"| Defs
+    RDF -->|"mapped semantic facts"| View
+    Bindings -->|"validated profile / implementation values"| View
+    Defs -->|"type and schema validation"| View
+    View -->|"must equal object-backed columns"| Row
+    Ops -.->|"explicitly owned operational fields"| Row

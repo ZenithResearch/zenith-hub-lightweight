@@ -1,0 +1,3063 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://zenith-research.ca/ontology/hub/infrastructure/v0.1.0/schemas/infrastructure.schema.json",
+  "title": "Hub Infrastructure schemas (Core projections remain separate)",
+  "$defs": {
+    "MachineObserved": {
+      "type": "object",
+      "required": [
+        "@id",
+        "@type"
+      ],
+      "properties": {
+        "@id": {
+          "type": "string",
+          "format": "uri",
+          "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+        },
+        "@type": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "format": "uri",
+            "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/hostedBy": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/realizes": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/managedBy": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/attachedTo": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/usesInterface": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/usesStorage": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/hasMember": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/usesDNSZone": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/terms/HAS_ARTIFACT": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/dnsName": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@value"
+            ],
+            "properties": {
+              "@value": {
+                "type": "string",
+                "pattern": "^(?:[A-Za-z0-9_-]+\\.)+$"
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": true
+    },
+    "MachineAdmitted": {
+      "type": "object",
+      "required": [
+        "@id",
+        "@type"
+      ],
+      "properties": {
+        "@id": {
+          "type": "string",
+          "format": "uri",
+          "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+        },
+        "@type": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "format": "uri",
+            "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/hostedBy": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/realizes": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/managedBy": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/attachedTo": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/usesInterface": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/usesStorage": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/hasMember": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/usesDNSZone": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/terms/HAS_ARTIFACT": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/dnsName": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@value"
+            ],
+            "properties": {
+              "@value": {
+                "type": "string",
+                "pattern": "^(?:[A-Za-z0-9_-]+\\.)+$"
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": true
+    },
+    "ServiceInstanceObserved": {
+      "type": "object",
+      "required": [
+        "@id",
+        "@type"
+      ],
+      "properties": {
+        "@id": {
+          "type": "string",
+          "format": "uri",
+          "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+        },
+        "@type": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "format": "uri",
+            "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/hostedBy": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/realizes": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/managedBy": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/attachedTo": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/usesInterface": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/usesStorage": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/hasMember": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/usesDNSZone": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/terms/HAS_ARTIFACT": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/dnsName": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@value"
+            ],
+            "properties": {
+              "@value": {
+                "type": "string",
+                "pattern": "^(?:[A-Za-z0-9_-]+\\.)+$"
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": true
+    },
+    "ServiceInstanceAdmitted": {
+      "type": "object",
+      "required": [
+        "@id",
+        "@type",
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/hostedBy"
+      ],
+      "properties": {
+        "@id": {
+          "type": "string",
+          "format": "uri",
+          "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+        },
+        "@type": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "format": "uri",
+            "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/hostedBy": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/realizes": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/managedBy": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/attachedTo": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/usesInterface": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/usesStorage": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/hasMember": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/usesDNSZone": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/terms/HAS_ARTIFACT": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/dnsName": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@value"
+            ],
+            "properties": {
+              "@value": {
+                "type": "string",
+                "pattern": "^(?:[A-Za-z0-9_-]+\\.)+$"
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": true
+    },
+    "DeploymentObserved": {
+      "type": "object",
+      "required": [
+        "@id",
+        "@type"
+      ],
+      "properties": {
+        "@id": {
+          "type": "string",
+          "format": "uri",
+          "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+        },
+        "@type": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "format": "uri",
+            "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/hostedBy": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/realizes": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/managedBy": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/attachedTo": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/usesInterface": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/usesStorage": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/hasMember": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/usesDNSZone": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/terms/HAS_ARTIFACT": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/dnsName": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@value"
+            ],
+            "properties": {
+              "@value": {
+                "type": "string",
+                "pattern": "^(?:[A-Za-z0-9_-]+\\.)+$"
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": true
+    },
+    "DeploymentAdmitted": {
+      "type": "object",
+      "required": [
+        "@id",
+        "@type",
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/hostedBy",
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/realizes"
+      ],
+      "properties": {
+        "@id": {
+          "type": "string",
+          "format": "uri",
+          "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+        },
+        "@type": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "format": "uri",
+            "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/hostedBy": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/realizes": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          },
+          "maxItems": 1
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/managedBy": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/attachedTo": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/usesInterface": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/usesStorage": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/hasMember": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/usesDNSZone": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/terms/HAS_ARTIFACT": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/dnsName": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@value"
+            ],
+            "properties": {
+              "@value": {
+                "type": "string",
+                "pattern": "^(?:[A-Za-z0-9_-]+\\.)+$"
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": true
+    },
+    "NetworkObserved": {
+      "type": "object",
+      "required": [
+        "@id",
+        "@type"
+      ],
+      "properties": {
+        "@id": {
+          "type": "string",
+          "format": "uri",
+          "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+        },
+        "@type": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "format": "uri",
+            "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/hostedBy": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/realizes": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/managedBy": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/attachedTo": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/usesInterface": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/usesStorage": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/hasMember": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/usesDNSZone": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/terms/HAS_ARTIFACT": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/dnsName": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@value"
+            ],
+            "properties": {
+              "@value": {
+                "type": "string",
+                "pattern": "^(?:[A-Za-z0-9_-]+\\.)+$"
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": true
+    },
+    "NetworkAdmitted": {
+      "type": "object",
+      "required": [
+        "@id",
+        "@type"
+      ],
+      "properties": {
+        "@id": {
+          "type": "string",
+          "format": "uri",
+          "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+        },
+        "@type": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "format": "uri",
+            "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/hostedBy": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/realizes": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/managedBy": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/attachedTo": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/usesInterface": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/usesStorage": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/hasMember": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/usesDNSZone": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/terms/HAS_ARTIFACT": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/dnsName": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@value"
+            ],
+            "properties": {
+              "@value": {
+                "type": "string",
+                "pattern": "^(?:[A-Za-z0-9_-]+\\.)+$"
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": true
+    },
+    "NetworkInterfaceObserved": {
+      "type": "object",
+      "required": [
+        "@id",
+        "@type"
+      ],
+      "properties": {
+        "@id": {
+          "type": "string",
+          "format": "uri",
+          "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+        },
+        "@type": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "format": "uri",
+            "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/hostedBy": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/realizes": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/managedBy": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/attachedTo": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/usesInterface": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/usesStorage": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/hasMember": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/usesDNSZone": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/terms/HAS_ARTIFACT": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/dnsName": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@value"
+            ],
+            "properties": {
+              "@value": {
+                "type": "string",
+                "pattern": "^(?:[A-Za-z0-9_-]+\\.)+$"
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": true
+    },
+    "NetworkInterfaceAdmitted": {
+      "type": "object",
+      "required": [
+        "@id",
+        "@type",
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/hostedBy",
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/attachedTo"
+      ],
+      "properties": {
+        "@id": {
+          "type": "string",
+          "format": "uri",
+          "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+        },
+        "@type": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "format": "uri",
+            "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/hostedBy": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          },
+          "maxItems": 1
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/realizes": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/managedBy": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/attachedTo": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          },
+          "maxItems": 1
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/usesInterface": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/usesStorage": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/hasMember": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/usesDNSZone": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/terms/HAS_ARTIFACT": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/dnsName": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@value"
+            ],
+            "properties": {
+              "@value": {
+                "type": "string",
+                "pattern": "^(?:[A-Za-z0-9_-]+\\.)+$"
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": true
+    },
+    "StorageVolumeObserved": {
+      "type": "object",
+      "required": [
+        "@id",
+        "@type"
+      ],
+      "properties": {
+        "@id": {
+          "type": "string",
+          "format": "uri",
+          "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+        },
+        "@type": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "format": "uri",
+            "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/hostedBy": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/realizes": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/managedBy": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/attachedTo": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/usesInterface": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/usesStorage": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/hasMember": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/usesDNSZone": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/terms/HAS_ARTIFACT": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/dnsName": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@value"
+            ],
+            "properties": {
+              "@value": {
+                "type": "string",
+                "pattern": "^(?:[A-Za-z0-9_-]+\\.)+$"
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": true
+    },
+    "StorageVolumeAdmitted": {
+      "type": "object",
+      "required": [
+        "@id",
+        "@type"
+      ],
+      "properties": {
+        "@id": {
+          "type": "string",
+          "format": "uri",
+          "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+        },
+        "@type": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "format": "uri",
+            "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/hostedBy": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/realizes": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/managedBy": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/attachedTo": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/usesInterface": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/usesStorage": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/hasMember": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/usesDNSZone": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/terms/HAS_ARTIFACT": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/dnsName": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@value"
+            ],
+            "properties": {
+              "@value": {
+                "type": "string",
+                "pattern": "^(?:[A-Za-z0-9_-]+\\.)+$"
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": true
+    },
+    "DNSZoneObserved": {
+      "type": "object",
+      "required": [
+        "@id",
+        "@type"
+      ],
+      "properties": {
+        "@id": {
+          "type": "string",
+          "format": "uri",
+          "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+        },
+        "@type": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "format": "uri",
+            "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/hostedBy": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/realizes": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/managedBy": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/attachedTo": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/usesInterface": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/usesStorage": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/hasMember": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/usesDNSZone": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/terms/HAS_ARTIFACT": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/dnsName": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@value"
+            ],
+            "properties": {
+              "@value": {
+                "type": "string",
+                "pattern": "^(?:[A-Za-z0-9_-]+\\.)+$"
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": true
+    },
+    "DNSZoneAdmitted": {
+      "type": "object",
+      "required": [
+        "@id",
+        "@type",
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/dnsName"
+      ],
+      "properties": {
+        "@id": {
+          "type": "string",
+          "format": "uri",
+          "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+        },
+        "@type": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "format": "uri",
+            "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/hostedBy": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/realizes": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/managedBy": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/attachedTo": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/usesInterface": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/usesStorage": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/hasMember": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/usesDNSZone": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/terms/HAS_ARTIFACT": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@id"
+            ],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/dnsName": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@value"
+            ],
+            "properties": {
+              "@value": {
+                "type": "string",
+                "pattern": "^(?:[A-Za-z0-9_-]+\\.)+$"
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": true
+    },
+    "CollectionProfile": {
+      "allOf": [
+        {
+          "$ref": "https://zenith-research.ca/ontology/normalized/v0.1.0/schemas/collection.schema.json"
+        }
+      ],
+      "type": "object",
+      "required": [
+        "id",
+        "types",
+        "kind"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uri",
+          "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+        },
+        "types": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "format": "uri",
+            "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+          }
+        },
+        "kind": {
+          "enum": [
+            "space",
+            "database",
+            "bucket",
+            "file-collection",
+            "object-collection"
+          ]
+        },
+        "label": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "ImplementationBinding": {
+      "type": "object",
+      "required": [
+        "id",
+        "types",
+        "kind"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uri",
+          "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+        },
+        "types": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "format": "uri",
+            "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+          }
+        },
+        "kind": {
+          "enum": [
+            "physical-machine",
+            "virtual-machine",
+            "application",
+            "api",
+            "database-server",
+            "object-store",
+            "file-store",
+            "management-agent",
+            "network",
+            "volume",
+            "dns-zone",
+            "collection"
+          ]
+        },
+        "manager": {
+          "type": "string",
+          "format": "uri",
+          "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+        },
+        "endpoints": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "uri"
+            ],
+            "properties": {
+              "uri": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              },
+              "purpose": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "addresses": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "ports": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 65535
+          }
+        },
+        "paths": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "remoteStore": {
+          "type": "string",
+          "format": "uri",
+          "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+        },
+        "tailscale": {
+          "type": "object",
+          "properties": {
+            "node": {
+              "type": "string"
+            },
+            "routes": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "secS": {
+          "type": "object",
+          "required": [
+            "receiver",
+            "opcodes"
+          ],
+          "properties": {
+            "receiver": {
+              "type": "string",
+              "format": "uri",
+              "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+            },
+            "opcodes": {
+              "type": "object",
+              "propertyNames": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+              },
+              "additionalProperties": {
+                "type": "integer",
+                "minimum": 0
+              }
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

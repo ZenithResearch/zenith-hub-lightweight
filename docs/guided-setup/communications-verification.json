@@ -1,0 +1,16 @@
+{
+  "date": "2026-11-20",
+  "preview": "http://127.0.0.1:4318/",
+  "uiLibraryCommit": "fb1c496ee8bbf4368b334af4880c25325b13a222",
+  "passed": [
+    "33 setup tests, including connected/pending/stopped/stale/offline states and read-only custom-port discovery.",
+    "UI library typecheck/build/provenance; Hub typecheck and optimized production build.",
+    "Normal and standalone setup package checks.",
+    "Browser shows the saved Matrix endpoint as Connected with Manage and no Choose action.",
+    "Browser shows pending choices as Selected, a stopped Hermes as Stopped and an incomplete installation explicitly.",
+    "Discovery does not duplicate saved rows or change registered configurations and operations."
+  ],
+  "evidence": "evidence/communications-connected-status.jpg",
+  "serviceConfigurationUnchanged": true,
+  "appliedOperationsUnchanged": true
+}

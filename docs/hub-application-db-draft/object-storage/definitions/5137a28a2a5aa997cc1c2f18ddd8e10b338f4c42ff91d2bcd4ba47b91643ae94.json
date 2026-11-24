@@ -1,0 +1,1950 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:zenith:hub:application-db:draft:6",
+  "title": "Hub application logical database \u2014 integrated repository",
+  "description": "Revision-backed application views, explicit private application bindings and immutable object/schema/definition files. Native application files and credentials retain their existing owners.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema": {
+      "const": "zenith.hub-application-db.draft.v6"
+    },
+    "hub": {
+      "$ref": "#/$defs/HubSettings"
+    },
+    "hosts": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/Host"
+      }
+    },
+    "installations": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/SoftwareInstallationRecord"
+      }
+    },
+    "profiles": {
+      "type": "array",
+      "items": {
+        "oneOf": [
+          {
+            "$ref": "#/$defs/ConfigurationProfile"
+          },
+          {
+            "$ref": "#/$defs/HermesConfigurationProfile"
+          }
+        ]
+      }
+    },
+    "services": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/ServiceInstance"
+      }
+    },
+    "connections": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/Connection"
+      }
+    },
+    "operations": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/SetupOperation"
+      }
+    },
+    "objectRecords": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/StoredObjectRecord"
+      }
+    },
+    "softwareDescriptors": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/SoftwareDescriptor"
+      }
+    },
+    "catalogEntries": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/SoftwareCatalogEntry"
+      }
+    },
+    "sourceSnapshots": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/SoftwareSourceSnapshot"
+      }
+    },
+    "builds": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/SoftwareBuild"
+      }
+    },
+    "snapshotMode": {
+      "const": "current"
+    },
+    "selectedObjects": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/ObjectSelection"
+      }
+    },
+    "rdfUnits": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/RdfUnitRecord"
+      }
+    },
+    "selectedUnits": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/AtomicUnitVersion"
+      }
+    },
+    "referenceBindings": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/ReferenceBinding"
+      }
+    },
+    "inspectionRecords": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/InspectionWrite"
+      }
+    }
+  },
+  "required": [
+    "schema",
+    "hub",
+    "hosts",
+    "installations",
+    "profiles",
+    "services",
+    "connections",
+    "operations",
+    "objectRecords",
+    "softwareDescriptors",
+    "catalogEntries",
+    "sourceSnapshots",
+    "builds",
+    "snapshotMode",
+    "selectedObjects",
+    "rdfUnits",
+    "selectedUnits",
+    "referenceBindings",
+    "inspectionRecords"
+  ],
+  "$defs": {
+    "IRI": {
+      "type": "string",
+      "format": "uri",
+      "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+    },
+    "PresenceObservation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "state": {
+          "enum": [
+            "present",
+            "absent",
+            "unknown"
+          ]
+        },
+        "observedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "method": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "evidenceRefs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/IRI"
+          }
+        },
+        "inspectionId": {
+          "$ref": "#/$defs/IRI"
+        }
+      },
+      "required": [
+        "state",
+        "observedAt",
+        "method"
+      ]
+    },
+    "CompatibilityObservation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "state": {
+          "enum": [
+            "supported",
+            "unsupported",
+            "unknown"
+          ]
+        },
+        "observedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "method": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "evidenceRefs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/IRI"
+          }
+        }
+      },
+      "required": [
+        "state",
+        "observedAt",
+        "method"
+      ]
+    },
+    "RuntimeObservation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "state": {
+          "enum": [
+            "running",
+            "stopped",
+            "unreachable",
+            "unknown"
+          ]
+        },
+        "observedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "method": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "evidenceRefs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/IRI"
+          }
+        }
+      },
+      "required": [
+        "state",
+        "observedAt",
+        "method"
+      ]
+    },
+    "Host": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/IRI"
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "kind": {
+          "enum": [
+            "physical",
+            "virtual",
+            "unknown"
+          ]
+        },
+        "objectVersion": {
+          "$ref": "#/$defs/ObjectVersionBinding"
+        }
+      },
+      "required": [
+        "id",
+        "revision",
+        "label",
+        "kind",
+        "objectVersion"
+      ]
+    },
+    "SoftwareCatalogEntry": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/IRI"
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "catalogId": {
+          "$ref": "#/$defs/IRI"
+        },
+        "key": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "softwareRef": {
+          "$ref": "#/$defs/IRI"
+        },
+        "adapterRef": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "supportedModes": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "install",
+              "connect",
+              "vps"
+            ]
+          }
+        }
+      },
+      "required": [
+        "id",
+        "revision",
+        "catalogId",
+        "key",
+        "softwareRef",
+        "adapterRef",
+        "supportedModes"
+      ],
+      "additionalProperties": false
+    },
+    "InstallationLocations": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "source": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "environment": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "launcher": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "runtimeRoot": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        }
+      },
+      "required": []
+    },
+    "SoftwareInstallationRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/IRI"
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "softwareRef": {
+          "$ref": "#/$defs/IRI"
+        },
+        "hostRef": {
+          "$ref": "#/$defs/IRI"
+        },
+        "management": {
+          "enum": [
+            "hub-managed",
+            "external"
+          ]
+        },
+        "locations": {
+          "$ref": "#/$defs/InstallationLocations",
+          "description": "Location bindings may change for the same verified installed copy; new inspection required for fresh presence."
+        },
+        "presence": {
+          "$ref": "#/$defs/PresenceObservation"
+        },
+        "compatibility": {
+          "$ref": "#/$defs/CompatibilityObservation"
+        },
+        "receiptRefs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/IRI"
+          }
+        },
+        "objectVersion": {
+          "$ref": "#/$defs/ObjectVersionBinding"
+        },
+        "sourceSnapshotRef": {
+          "$ref": "#/$defs/IRI",
+          "description": "Exact inspected source object-version; omitted when unknown. Cannot be retargeted on this installation identity."
+        },
+        "buildRef": {
+          "$ref": "#/$defs/IRI",
+          "description": "Exact inspected build object-version; omitted when unknown. An upgrade creates a new installation description."
+        }
+      },
+      "required": [
+        "id",
+        "revision",
+        "softwareRef",
+        "hostRef",
+        "management",
+        "locations",
+        "presence",
+        "compatibility",
+        "objectVersion"
+      ]
+    },
+    "ConfigurationProfile": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/ConfigurationProfileFields"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "profileKind": {
+              "const": "generic"
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "ServiceInstance": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/IRI"
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "softwareRef": {
+          "$ref": "#/$defs/IRI"
+        },
+        "installationRef": {
+          "$ref": "#/$defs/IRI"
+        },
+        "profileRef": {
+          "$ref": "#/$defs/IRI"
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "management": {
+          "enum": [
+            "hub-managed",
+            "external"
+          ]
+        },
+        "hostRefs": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/IRI"
+          },
+          "minItems": 1
+        },
+        "desiredState": {
+          "enum": [
+            "running",
+            "stopped",
+            "unmanaged"
+          ]
+        },
+        "runtime": {
+          "$ref": "#/$defs/RuntimeObservation"
+        },
+        "objectVersion": {
+          "$ref": "#/$defs/ObjectVersionBinding"
+        }
+      },
+      "required": [
+        "id",
+        "revision",
+        "softwareRef",
+        "label",
+        "management",
+        "desiredState",
+        "objectVersion"
+      ]
+    },
+    "Connection": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/IRI"
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "targetRef": {
+          "$ref": "#/$defs/IRI"
+        },
+        "adapterRef": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "endpoint": {
+          "type": "string",
+          "format": "uri"
+        },
+        "enabled": {
+          "type": "boolean"
+        },
+        "credentialRef": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "endpointPolicyRef": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "targetScope": {
+          "enum": [
+            "local",
+            "external-unresolved"
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "revision",
+        "label",
+        "targetRef",
+        "adapterRef",
+        "endpoint",
+        "enabled",
+        "targetScope"
+      ]
+    },
+    "SetupOperation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/IRI"
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "action": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "targetRefs": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/IRI"
+          }
+        },
+        "state": {
+          "enum": [
+            "reviewed",
+            "applying",
+            "complete",
+            "reconciliation-required",
+            "cancelled"
+          ]
+        },
+        "outcome": {
+          "enum": [
+            "succeeded",
+            "failed",
+            "unknown"
+          ]
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "planArtifactRef": {
+          "$ref": "#/$defs/IRI"
+        },
+        "receiptRefs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/IRI"
+          }
+        },
+        "error": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "code": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            },
+            "message": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            }
+          },
+          "required": [
+            "code"
+          ]
+        },
+        "expectedTargets": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ExpectedTarget"
+          }
+        }
+      },
+      "required": [
+        "id",
+        "revision",
+        "action",
+        "targetRefs",
+        "state",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "StoredFileRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "storageKey": {
+          "type": "string",
+          "pattern": "^(?:[A-Za-z0-9_-]+/)*[A-Za-z0-9_-]+\\.(?:json|jsonld)$"
+        },
+        "artifact": {
+          "$ref": "https://zenith-research.ca/ontology/normalized/v0.1.0/schemas/core.schema.json#/$defs/ArtifactRef"
+        }
+      },
+      "required": [
+        "storageKey",
+        "artifact"
+      ]
+    },
+    "DefinitionRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "enum": [
+            "ontology-module",
+            "json-schema",
+            "jsonld-context",
+            "package-manifest",
+            "field-mapping"
+          ]
+        },
+        "id": {
+          "$ref": "#/$defs/IRI"
+        },
+        "file": {
+          "$ref": "#/$defs/StoredFileRef"
+        }
+      },
+      "required": [
+        "kind",
+        "id",
+        "file"
+      ]
+    },
+    "StoredObjectRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/IRI"
+        },
+        "objectRevision": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "types": {
+          "type": "array",
+          "minItems": 0,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/IRI"
+          }
+        },
+        "jsonldFile": {
+          "$ref": "#/$defs/StoredFileRef"
+        },
+        "definitions": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/DefinitionRef"
+          }
+        },
+        "bindingsFile": {
+          "$ref": "#/$defs/StoredFileRef"
+        },
+        "admission": {
+          "enum": [
+            "observation",
+            "infrastructure"
+          ],
+          "description": "New writes are observation only. Explicit validated legacy imports may retain infrastructure admission as read-only."
+        },
+        "atomicUnit": {
+          "$ref": "#/$defs/AtomicUnitVersion"
+        },
+        "mappingRef": {
+          "$ref": "#/$defs/MappingRef"
+        },
+        "legacyReadOnly": {
+          "const": true
+        },
+        "legacyOrigin": {
+          "type": "object",
+          "properties": {
+            "sourceFingerprint": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "sourceRevision": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "sourceImportKey": {
+              "type": "string"
+            },
+            "sourceProvenance": {
+              "type": "object"
+            }
+          },
+          "required": [
+            "sourceFingerprint",
+            "sourceRevision"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "id",
+        "objectRevision",
+        "types",
+        "jsonldFile",
+        "definitions",
+        "bindingsFile",
+        "admission",
+        "atomicUnit"
+      ]
+    },
+    "ObjectVersionBinding": {
+      "type": "object",
+      "properties": {
+        "objectId": {
+          "$ref": "#/$defs/IRI"
+        },
+        "objectRevision": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "profileId": {
+          "$ref": "#/$defs/IRI"
+        }
+      },
+      "required": [
+        "objectId",
+        "objectRevision",
+        "profileId"
+      ],
+      "additionalProperties": false
+    },
+    "HubSettings": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/IRI"
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "localHostRef": {
+          "$ref": "#/$defs/IRI"
+        },
+        "selectedGuideProfileRef": {
+          "$ref": "#/$defs/IRI"
+        },
+        "enteredAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "revision",
+        "label"
+      ]
+    },
+    "SoftwareDescriptor": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/IRI"
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "key": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]{0,63}$"
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "publisher": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "repository": {
+          "type": "string",
+          "format": "uri"
+        },
+        "objectVersion": {
+          "$ref": "#/$defs/ObjectVersionBinding"
+        }
+      },
+      "required": [
+        "id",
+        "revision",
+        "key",
+        "label",
+        "objectVersion"
+      ],
+      "additionalProperties": false
+    },
+    "SoftwareSourceSnapshot": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/IRI"
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "softwareRef": {
+          "$ref": "#/$defs/IRI"
+        },
+        "repository": {
+          "type": "string",
+          "format": "uri",
+          "description": "Canonical repository identity and commit define the snapshot. New identity when these facts change."
+        },
+        "commit": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{40}$",
+          "description": "Immutable source commit for this snapshot identity; never a mutable branch."
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "manifestSha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "objectVersion": {
+          "$ref": "#/$defs/ObjectVersionBinding"
+        }
+      },
+      "required": [
+        "id",
+        "revision",
+        "softwareRef",
+        "repository",
+        "commit",
+        "objectVersion"
+      ],
+      "additionalProperties": false
+    },
+    "SoftwareBuild": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/IRI"
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "softwareRef": {
+          "$ref": "#/$defs/IRI"
+        },
+        "sourceSnapshotRef": {
+          "$ref": "#/$defs/IRI",
+          "description": "Exact source object-version selector required in referenceBindings."
+        },
+        "content": {
+          "$ref": "https://zenith-research.ca/ontology/normalized/v0.1.0/schemas/core.schema.json#/$defs/ArtifactRef",
+          "description": "Build content identity; replacing it requires a new build identity."
+        },
+        "platform": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "description": "Applicable target platform is identity-defining."
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "objectVersion": {
+          "$ref": "#/$defs/ObjectVersionBinding"
+        }
+      },
+      "required": [
+        "id",
+        "revision",
+        "softwareRef",
+        "content",
+        "objectVersion"
+      ],
+      "additionalProperties": false
+    },
+    "ConfigurationProfileFields": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/IRI"
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "softwareRef": {
+          "$ref": "#/$defs/IRI"
+        },
+        "installationRef": {
+          "$ref": "#/$defs/IRI"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "configArtifactRef": {
+          "$ref": "#/$defs/IRI"
+        },
+        "nativeHome": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "credentialRefs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          }
+        },
+        "objectVersion": {
+          "$ref": "#/$defs/ObjectVersionBinding"
+        },
+        "profileKind": {
+          "enum": [
+            "generic",
+            "hermes"
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "revision",
+        "softwareRef",
+        "name",
+        "objectVersion",
+        "profileKind"
+      ]
+    },
+    "HermesConfigurationProfile": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/ConfigurationProfileFields"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "profileKind": {
+              "const": "hermes"
+            },
+            "modelBinding": {
+              "type": "object",
+              "properties": {
+                "providerId": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                },
+                "modelName": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                },
+                "serverConnectionRef": {
+                  "$ref": "#/$defs/IRI"
+                }
+              },
+              "required": [
+                "modelName"
+              ],
+              "additionalProperties": false,
+              "anyOf": [
+                {
+                  "required": [
+                    "providerId"
+                  ]
+                },
+                {
+                  "required": [
+                    "serverConnectionRef"
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "HostProjection": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/IRI"
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "kind": {
+          "enum": [
+            "physical",
+            "virtual",
+            "unknown"
+          ]
+        },
+        "types": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/IRI"
+          }
+        }
+      },
+      "required": [
+        "id",
+        "label",
+        "kind",
+        "types"
+      ],
+      "additionalProperties": false
+    },
+    "SoftwareDescriptorProjection": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/IRI"
+        },
+        "key": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]{0,63}$"
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "publisher": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "repository": {
+          "type": "string",
+          "format": "uri"
+        },
+        "types": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/IRI"
+          }
+        }
+      },
+      "required": [
+        "id",
+        "key",
+        "label",
+        "types"
+      ],
+      "additionalProperties": false
+    },
+    "SoftwareSourceSnapshotProjection": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/IRI"
+        },
+        "softwareRef": {
+          "$ref": "#/$defs/IRI"
+        },
+        "repository": {
+          "type": "string",
+          "format": "uri"
+        },
+        "commit": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{40}$"
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "manifestSha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "types": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/IRI"
+          }
+        }
+      },
+      "required": [
+        "id",
+        "softwareRef",
+        "repository",
+        "commit",
+        "types"
+      ],
+      "additionalProperties": false
+    },
+    "SoftwareBuildProjection": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/IRI"
+        },
+        "softwareRef": {
+          "$ref": "#/$defs/IRI"
+        },
+        "sourceSnapshotRef": {
+          "$ref": "#/$defs/IRI"
+        },
+        "content": {
+          "$ref": "https://zenith-research.ca/ontology/normalized/v0.1.0/schemas/core.schema.json#/$defs/ArtifactRef"
+        },
+        "platform": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "types": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/IRI"
+          }
+        }
+      },
+      "required": [
+        "id",
+        "softwareRef",
+        "content",
+        "types"
+      ],
+      "additionalProperties": false
+    },
+    "SoftwareInstallationRecordProjection": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/IRI"
+        },
+        "softwareRef": {
+          "$ref": "#/$defs/IRI"
+        },
+        "hostRef": {
+          "$ref": "#/$defs/IRI"
+        },
+        "locations": {
+          "$ref": "#/$defs/InstallationLocations"
+        },
+        "sourceSnapshotRef": {
+          "$ref": "#/$defs/IRI"
+        },
+        "buildRef": {
+          "$ref": "#/$defs/IRI"
+        },
+        "types": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/IRI"
+          }
+        }
+      },
+      "required": [
+        "id",
+        "softwareRef",
+        "hostRef",
+        "locations",
+        "types"
+      ],
+      "additionalProperties": false
+    },
+    "ConfigurationProfileProjection": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/IRI"
+        },
+        "softwareRef": {
+          "$ref": "#/$defs/IRI"
+        },
+        "installationRef": {
+          "$ref": "#/$defs/IRI"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "configArtifactRef": {
+          "$ref": "#/$defs/IRI"
+        },
+        "nativeHome": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "credentialRefs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          }
+        },
+        "profileKind": {
+          "const": "generic"
+        },
+        "types": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/IRI"
+          }
+        }
+      },
+      "required": [
+        "id",
+        "softwareRef",
+        "name",
+        "profileKind",
+        "types"
+      ],
+      "additionalProperties": false
+    },
+    "HermesConfigurationProfileProjection": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/IRI"
+        },
+        "softwareRef": {
+          "$ref": "#/$defs/IRI"
+        },
+        "installationRef": {
+          "$ref": "#/$defs/IRI"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "configArtifactRef": {
+          "$ref": "#/$defs/IRI"
+        },
+        "nativeHome": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "credentialRefs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          }
+        },
+        "profileKind": {
+          "const": "hermes"
+        },
+        "modelBinding": {
+          "type": "object",
+          "properties": {
+            "providerId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            },
+            "modelName": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            },
+            "serverConnectionRef": {
+              "$ref": "#/$defs/IRI"
+            }
+          },
+          "required": [
+            "modelName"
+          ],
+          "additionalProperties": false,
+          "anyOf": [
+            {
+              "required": [
+                "providerId"
+              ]
+            },
+            {
+              "required": [
+                "serverConnectionRef"
+              ]
+            }
+          ]
+        },
+        "types": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/IRI"
+          }
+        }
+      },
+      "required": [
+        "id",
+        "softwareRef",
+        "name",
+        "profileKind",
+        "types"
+      ],
+      "additionalProperties": false
+    },
+    "ServiceInstanceProjection": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/IRI"
+        },
+        "softwareRef": {
+          "$ref": "#/$defs/IRI"
+        },
+        "installationRef": {
+          "$ref": "#/$defs/IRI"
+        },
+        "profileRef": {
+          "$ref": "#/$defs/IRI"
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "hostRefs": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/IRI"
+          },
+          "minItems": 1
+        },
+        "types": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/IRI"
+          }
+        }
+      },
+      "required": [
+        "id",
+        "softwareRef",
+        "label",
+        "types"
+      ],
+      "additionalProperties": false
+    },
+    "ProfileBindingsFile": {
+      "type": "object",
+      "properties": {
+        "schema": {
+          "const": "zenith.hub-object-bindings.draft.v6"
+        },
+        "objectId": {
+          "$ref": "#/$defs/IRI"
+        },
+        "objectRevision": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "bindings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "profile": {
+                "$ref": "#/$defs/IRI"
+              },
+              "value": {
+                "type": "object"
+              }
+            },
+            "required": [
+              "profile",
+              "value"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "atomicUnit": {
+          "$ref": "#/$defs/AtomicUnitVersion"
+        }
+      },
+      "required": [
+        "schema",
+        "objectId",
+        "objectRevision",
+        "bindings",
+        "atomicUnit"
+      ],
+      "additionalProperties": false
+    },
+    "AtomicUnitVersion": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/IRI"
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "required": [
+        "id",
+        "revision"
+      ],
+      "additionalProperties": false
+    },
+    "ObjectSelection": {
+      "type": "object",
+      "properties": {
+        "objectId": {
+          "$ref": "#/$defs/IRI"
+        },
+        "objectRevision": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "required": [
+        "objectId",
+        "objectRevision"
+      ],
+      "additionalProperties": false
+    },
+    "MappingRef": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/IRI"
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      },
+      "required": [
+        "id",
+        "sha256"
+      ],
+      "additionalProperties": false
+    },
+    "RdfUnitRecord": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/IRI"
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "members": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/IRI"
+          }
+        },
+        "semanticSha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "jsonldFile": {
+          "$ref": "#/$defs/StoredFileRef"
+        }
+      },
+      "required": [
+        "id",
+        "revision",
+        "members",
+        "semanticSha256",
+        "jsonldFile"
+      ],
+      "additionalProperties": false
+    },
+    "ReferenceBinding": {
+      "type": "object",
+      "properties": {
+        "ownerKind": {
+          "enum": [
+            "object",
+            "application"
+          ]
+        },
+        "ownerRef": {
+          "$ref": "#/$defs/IRI"
+        },
+        "ownerRevision": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "field": {
+          "type": "string",
+          "pattern": "^/"
+        },
+        "targetRef": {
+          "$ref": "#/$defs/IRI"
+        },
+        "mode": {
+          "enum": [
+            "current",
+            "object-version",
+            "external"
+          ]
+        },
+        "objectRevision": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "required": [
+        "ownerKind",
+        "ownerRef",
+        "ownerRevision",
+        "field",
+        "targetRef",
+        "mode"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "mode": {
+                "const": "object-version"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "objectRevision"
+            ]
+          },
+          "else": {
+            "not": {
+              "required": [
+                "objectRevision"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "ExpectedTarget": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/IRI"
+        },
+        "kind": {
+          "enum": [
+            "object",
+            "application"
+          ]
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "id",
+        "kind",
+        "revision"
+      ],
+      "additionalProperties": false
+    },
+    "InspectionSubject": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "candidate"
+            },
+            "candidateId": {
+              "$ref": "#/$defs/IRI"
+            },
+            "copyIdentity": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            }
+          },
+          "required": [
+            "kind",
+            "candidateId"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "installation"
+            },
+            "installationVersion": {
+              "$ref": "#/$defs/ObjectSelection"
+            },
+            "copyIdentity": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            }
+          },
+          "required": [
+            "kind",
+            "installationVersion"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "InspectionProof": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/IRI"
+        },
+        "softwareVersion": {
+          "$ref": "#/$defs/ObjectSelection"
+        },
+        "hostVersion": {
+          "$ref": "#/$defs/ObjectSelection"
+        },
+        "subject": {
+          "$ref": "#/$defs/InspectionSubject"
+        },
+        "fingerprint": {
+          "oneOf": [
+            {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "const": "sha256"
+                },
+                "sha256": {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                }
+              },
+              "required": [
+                "kind",
+                "sha256"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "const": "unavailable"
+                },
+                "reason": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                }
+              },
+              "required": [
+                "kind",
+                "reason"
+              ],
+              "additionalProperties": false
+            }
+          ]
+        },
+        "scope": {
+          "type": "object",
+          "properties": {
+            "key": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            },
+            "complete": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "key",
+            "complete"
+          ],
+          "additionalProperties": false
+        },
+        "observedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "validUntil": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "bootId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "adapterDigest": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "state": {
+          "enum": [
+            "present",
+            "absent",
+            "unknown"
+          ]
+        },
+        "reasons": {
+          "type": "array",
+          "maxItems": 32,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          }
+        },
+        "sourceVersion": {
+          "$ref": "#/$defs/ObjectSelection"
+        },
+        "buildVersion": {
+          "$ref": "#/$defs/ObjectSelection"
+        }
+      },
+      "required": [
+        "id",
+        "softwareVersion",
+        "hostVersion",
+        "subject",
+        "fingerprint",
+        "scope",
+        "observedAt",
+        "validUntil",
+        "bootId",
+        "adapterDigest",
+        "state",
+        "reasons"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "state": {
+                "const": "present"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "subject": {
+                "required": [
+                  "copyIdentity"
+                ]
+              },
+              "fingerprint": {
+                "properties": {
+                  "kind": {
+                    "const": "sha256"
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "InspectionWrite": {
+      "type": "object",
+      "properties": {
+        "proof": {
+          "$ref": "#/$defs/InspectionProof"
+        },
+        "association": {
+          "$ref": "#/$defs/ObjectSelection"
+        }
+      },
+      "required": [
+        "proof"
+      ],
+      "additionalProperties": false
+    },
+    "RetainedReviewProjection": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/IRI"
+        },
+        "types": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/IRI"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "documentDigest": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      },
+      "required": [
+        "id",
+        "types",
+        "label",
+        "documentDigest"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

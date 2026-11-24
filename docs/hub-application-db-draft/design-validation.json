@@ -1,0 +1,141 @@
+{
+  "status": "draft-6-design-synthetic-checks",
+  "checks": [
+    {
+      "name": "all API and internal commit schema definitions compile",
+      "passed": true
+    },
+    {
+      "name": "register-existing request is closed and carries no storage root",
+      "passed": true
+    },
+    {
+      "name": "generic profile request rejects AI-specific fields",
+      "passed": true
+    },
+    {
+      "name": "connection credential handles stay opaque strings",
+      "passed": true
+    },
+    {
+      "name": "client cannot submit a managed installer outcome as a public command",
+      "passed": true
+    },
+    {
+      "name": "internal operational-only batch is specified independently of RDF units",
+      "passed": true
+    },
+    {
+      "name": "every logical record field has an explicit physical mapping",
+      "passed": true
+    },
+    {
+      "name": "diagram scalar types follow schemas rather than Ref suffixes",
+      "passed": true
+    },
+    {
+      "name": "diagram arrays and external schema structures are resolved",
+      "passed": true
+    },
+    {
+      "name": "diagram composition preserves optional Hermes specialization",
+      "passed": true
+    },
+    {
+      "name": "diagram union, cycle and unresolved-reference fallbacks are honest",
+      "passed": true
+    },
+    {
+      "name": "inspection errors and incomplete scopes mean unknown, not absent",
+      "passed": true
+    },
+    {
+      "name": "presence classification distinguishes verified copy and scoped absence",
+      "passed": true
+    },
+    {
+      "name": "fresh inspection permits presence without profiles or running service",
+      "passed": true
+    },
+    {
+      "name": "expired, changed, rebooted or clock-anomalous proof is unknown",
+      "passed": true
+    },
+    {
+      "name": "migration planning is deterministic and does not mutate legacy metadata",
+      "passed": true
+    },
+    {
+      "name": "legacy receipt and partial install never become fresh presence proof",
+      "passed": true
+    },
+    {
+      "name": "migration retains native handles and external ownership without fake services",
+      "passed": true
+    },
+    {
+      "name": "synthetic migration replay survives restart without duplicate identities",
+      "passed": true
+    },
+    {
+      "name": "conflicting legacy identities and changed-source apply require review",
+      "passed": true
+    },
+    {
+      "name": "proposed additive DDL preserves legacy tables and reaches user_version 5 in memory",
+      "passed": true
+    },
+    {
+      "name": "exact object and unit composite foreign keys reject dangling/mismatched versions",
+      "passed": true
+    },
+    {
+      "name": "commit idempotency and alias uniqueness are physical constraints",
+      "passed": true
+    },
+    {
+      "name": "exact historical reference cannot name a missing stored revision",
+      "passed": true
+    },
+    {
+      "name": "legacy admission is preserved only through explicit read-only carryover",
+      "passed": true
+    },
+    {
+      "name": "external service state cannot claim a managed running target",
+      "passed": true
+    },
+    {
+      "name": "all physical foreign keys remain consistent in the synthetic database",
+      "passed": true
+    },
+    {
+      "name": "diagram provenance matches every material schema/generator/ontology/DDL input",
+      "passed": true
+    },
+    {
+      "name": "unrelated ongoing UI, setup, hub and published ontology inputs remain unchanged",
+      "passed": true
+    },
+    {
+      "name": "catalog slice preserves base definition pins, published ontologies, native adapters and ongoing UI",
+      "passed": true
+    },
+    {
+      "name": "runtime contracts mirror review semantics under their separate internal version identifiers",
+      "passed": true
+    },
+    {
+      "name": "inspection writes require typed server proof metadata and no caller handle field",
+      "passed": true
+    }
+  ],
+  "liveDataTouched": false,
+  "sqlExecution": ":memory: only",
+  "limits": [
+    "Pure presence policy, not native installation inspection",
+    "Synthetic migration identity/replay, not full conversion",
+    "DDL and schema validation, not HTTP integration or crash/power-loss qualification",
+    "Mermaid source/type/provenance checks; no layout renderer available"
+  ]
+}

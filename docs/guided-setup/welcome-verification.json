@@ -1,0 +1,54 @@
+{
+  "date": "2026-11-20",
+  "source": {
+    "repository": "NousResearch/hermes-agent",
+    "commit": "e5a86d08d3d8c5e2f61bc2e5354d96ba25a56f97",
+    "archiveSha256": "1781487d4ed551d109acb5c5ae00827ccb980e92eb0c4fe134b680fbb969a3e1",
+    "verifiedFiles": 4475,
+    "latestHeadUpgrade": false
+  },
+  "checks": {
+    "uiLibraryTypecheckBuildAndProvenance": true,
+    "hubProductionBuild": true,
+    "setupTests": {
+      "passed": 48,
+      "skipped": 0
+    },
+    "nativeAdapterTests": {
+      "passed": 9,
+      "skipped": 0
+    },
+    "deployerAndObjectRegressions": {
+      "passed": 110,
+      "skipped": 0
+    },
+    "setupApiNormalPackage": true,
+    "setupApiStandalonePackage": true,
+    "nativeInstallApiAndAgentReply": true
+  },
+  "nativeQualification": {
+    "report": "welcome-native-verification.json",
+    "backend": "local deterministic OpenAI-protocol fixture",
+    "sourceCacheUsedForBuild": true,
+    "bootstrapAndRuntimesDownloaded": true,
+    "disposableServicesStopped": true
+  },
+  "browser": {
+    "surface": "ChatGPT in-app browser",
+    "url": "http://127.0.0.1:4318/",
+    "officialSourceVisible": true,
+    "installReviewOnWelcomeCanvas": true,
+    "installationApplied": false,
+    "evidence": "evidence/welcome-official-nous.jpg"
+  },
+  "ownerWalkthrough": {
+    "root": "/Volumes/home/bananawalnut/Zenith/Hub-Walkthrough-20261120",
+    "freshUnconfigured": true
+  },
+  "notQualified": [
+    "Cloud account sign-in with owner credentials",
+    "Full open-model download and inference",
+    "Direct Safari or Chrome interaction"
+  ],
+  "uiLibraryCommit": "807b58f"
+}

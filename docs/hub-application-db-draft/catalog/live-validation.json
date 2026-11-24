@@ -1,0 +1,125 @@
+{
+  "schema": "zenith.hub-live-catalog-launch-validation.v1",
+  "at": "2026-11-23T20:54:34.561046+00:00",
+  "url": "http://127.0.0.1:4318/hub",
+  "branch": "codex/hub-repository-foundation",
+  "schemaMigration": {
+    "required": false,
+    "review": "Existing v5 activation and complete prior migration journal; same repository identity and base definition set."
+  },
+  "catalogImport": {
+    "version": "2026.11.23.1",
+    "digest": "61032dd9cfafe063702368cc2071f4f91509358b1d6facf8c74a69d1abddcd43",
+    "software": 6,
+    "recipes": 11,
+    "newObjects": 12,
+    "revisedExistingSoftware": 6,
+    "generationBefore": 6,
+    "generationAfter": 7,
+    "repeatImportChanged": false
+  },
+  "verification": {
+    "preservationBeforeEntry": {
+      "setup": true,
+      "connections": true,
+      "existingRows": true,
+      "softwareIdentitiesAndCoreFields": true,
+      "allHistoricalObjectVersions": true,
+      "allHistoricalUnits": true,
+      "originalDocumentsAndCommitLedger": true,
+      "originalImmutableFileHashes": true,
+      "activationAndMigrationMetadata": true,
+      "establishedCatalogAndDefaults": true,
+      "exactRecipeSoftwareSourcePins": true,
+      "repeatImportNoOp": true
+    },
+    "readOnlyHttp": {
+      "preservedSetupConfigsAndSelection": true,
+      "setupUsesCommittedCatalogDigest": true,
+      "galleryShowsSavedInstancesAndSixCatalogChoices": true,
+      "inventoryCommittedVerified": true,
+      "storedRecipeHasJsonLDAndValidatedProfile": true,
+      "readsDoNotCommit": true
+    },
+    "realBrowserEntry": {
+      "browserContinueSucceeded": true,
+      "continuePersistedThroughDatabase": true,
+      "onlyEntryMetadataAndFreshInspectionChanged": true,
+      "existingConfigurationsAndSelectionsPreserved": true,
+      "connectionRegistryPreserved": true,
+      "profileServiceAndOperationRecordsPreserved": true,
+      "installationIdentityAndProvenancePreserved": true,
+      "allOriginalObjectVersionsAndStoredBytesPreserved": true,
+      "existingMigrationMetadataPreserved": true
+    },
+    "resourceFlow": {
+      "software": "devgraph",
+      "mode": "connect-only",
+      "formOpened": true,
+      "formClosedWithoutReviewOrApply": true
+    }
+  },
+  "normalEntryWrites": {
+    "generationBefore": 7,
+    "generationAfter": 8,
+    "setupRevisionBefore": 42,
+    "setupRevisionAfter": 43,
+    "changed": "Welcome entry timestamp and fresh inspection evidence only; no configuration changes.",
+    "inspectionRecordsBefore": 2,
+    "inspectionRecordsAfter": 3
+  },
+  "preserved": {
+    "existingInstances": 2,
+    "profiles": 2,
+    "installations": 2,
+    "operations": 4,
+    "externalConnections": 0,
+    "originalSelectedObjects": 18,
+    "allOriginalObjectVersionsAndFiles": true,
+    "originalImmutableFilesVerified": 70,
+    "baseDefinitionSet": "urn:zenith:hub:definition-set:2ce5e2f67d3df7de45bb9d3ec29b26f0af8ccba71e870218101fe56637bd36d3",
+    "repositoryId": "urn:zenith:hub:repository:5a06235d-21e0-4c2c-ab51-6c907c999b26"
+  },
+  "currentStatus": {
+    "schema": "zenith.hub-database-status.v1",
+    "ready": true,
+    "storage": "sqlite",
+    "schemaVersion": 5,
+    "repositoryId": "urn:zenith:hub:repository:5a06235d-21e0-4c2c-ab51-6c907c999b26",
+    "generation": 8,
+    "definitionSetId": "urn:zenith:hub:definition-set:2ce5e2f67d3df7de45bb9d3ec29b26f0af8ccba71e870218101fe56637bd36d3",
+    "objects": 30,
+    "hostRef": "urn:zenith:hub:machine:88499f0b-215f-4d3a-a3f4-42b9b5dc0938",
+    "software": 6,
+    "installations": 2,
+    "profiles": 2,
+    "connections": 0,
+    "operations": 4,
+    "catalog": {
+      "state": "ready",
+      "version": "2026.11.23.1",
+      "digest": "61032dd9cfafe063702368cc2071f4f91509358b1d6facf8c74a69d1abddcd43"
+    }
+  },
+  "backup": {
+    "locationWithinPrivateSetupRoot": "application-backups/catalog-launch-2026-11-23T20-45-23-774Z",
+    "databaseQuickCheck": "ok",
+    "foreignKeyCheck": "passed",
+    "databaseSha256": "676bffe762353059f29126eed3873dfd4b76145dd2a6a93136a92b577fb5ac31",
+    "immutableFileHashesVerified": true,
+    "nativeDataCopied": false
+  },
+  "server": {
+    "launcherPid": 50295,
+    "listenerPidAtVerification": 50307,
+    "port": 4318,
+    "separateReleasedHub4218": "Preserved; original listener 42101 unchanged."
+  },
+  "browser": "Continue reached gallery; two saved resources and six catalog choices visible; Devgraph connect-only form opened and closed without review/apply.",
+  "limits": [
+    "No software installation, provider inference, native configuration, model download or external service start was performed.",
+    "Existing Hermes and Service Management were kept in their stopped state.",
+    "External connection registry was empty before and after; no Devgraph/Matrix connection was added."
+  ],
+  "sourceChanges": "Documentation/evidence only for this restart; existing uncommitted implementation work preserved."
+}

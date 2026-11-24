@@ -1,0 +1,30 @@
+{
+  "timestampOnlyRefresh": {
+    "sameSourceRevision": 7,
+    "sameGraphAssertions": true,
+    "firstProjectionRevision": 1,
+    "nextProjectionRevision": 2
+  },
+  "statusChange": {
+    "before": "Stopped",
+    "after": "Ready",
+    "sameGraphAssertions": true
+  },
+  "partialInstall": {
+    "status": "Setup incomplete",
+    "deploymentNodes": 1,
+    "dataCollections": 1,
+    "filesystemExistenceChecked": false
+  },
+  "sameEndpointAcrossRegistries": {
+    "distinctServiceIdentities": true
+  },
+  "backendDependency": {
+    "component": "hermes",
+    "configurationValidatedByCurrentCatalog": true,
+    "modelEndpointPresentInConfig": true,
+    "backendServerNodeOrEdge": false,
+    "serviceInstances": 1
+  },
+  "testScope": "In-memory store and synthetic fixture records; no live configuration changed."
+}

@@ -1,0 +1,29 @@
+{
+  "atomicUnit": {
+    "id": "urn:example:unit:c296342ffafff13d95f3ad490d3656cac859a13b57e2013bc27e65fdb8ba99c1",
+    "revision": 1
+  },
+  "schema": "zenith.hub-object-bindings.draft.v4",
+  "objectId": "urn:example:build:hermes-synthetic",
+  "objectRevision": 1,
+  "bindings": [
+    {
+      "profile": "urn:zenith:hub:application-db:draft:4#/$defs/SoftwareBuildProjection",
+      "value": {
+        "types": [
+          "https://zenith-research.ca/ontology/terms/Artifact"
+        ],
+        "id": "urn:example:build:hermes-synthetic",
+        "softwareRef": "urn:example:software:hermes",
+        "sourceSnapshotRef": "urn:example:release:hermes",
+        "content": {
+          "id": "urn:example:external-build-content",
+          "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "byteLength": 1234,
+          "mediaType": "application/octet-stream"
+        },
+        "platform": "synthetic-no-download"
+      }
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "date": "2026-11-20",
+  "scope": "Welcome presentation only; native installation and backend contracts unchanged",
+  "uiSourceCommit": "314a6b6",
+  "checks": {
+    "canonicalUiBuild": "passed",
+    "canonicalUiSource": "passed",
+    "hubTypecheck": "passed",
+    "setupTests": {
+      "passed": 56,
+      "failed": 0
+    },
+    "browser": {
+      "url": "http://127.0.0.1:4318/",
+      "initialActions": "Continue and Configure directly on cloud background",
+      "expandedSetup": "One native modal over background",
+      "initialFocus": "Close Hermes setup",
+      "closeAndEscapeFocus": "Configure",
+      "guideDraft": "Temporary non-sent draft retained through modal open/close, then cleared",
+      "guideCollapsedState": "Circle retained when modal reopened",
+      "modelMessagesSent": 0
+    }
+  },
+  "evidence": "evidence/welcome-background-actions.jpg",
+  "limitations": [
+    "IAB browser verified; direct Safari/Chrome automation not performed",
+    "Background recreation remains a plan; current runtime artwork remains PNG",
+    "Preview comment overlay intercepted actions in the original tab, so interaction QA used a separate temporary tab"
+  ]
+}

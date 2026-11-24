@@ -1,0 +1,26 @@
+flowchart TB
+    Host["Host<br/>infra:Machine"]
+    Descriptor["Software descriptor<br/>zn:Artifact"]
+    Source["Source snapshot<br/>zn:Artifact"]
+    Build["Build output<br/>zn:Artifact"]
+    Installation["Installation description<br/>zn:Artifact"]
+    Profile["Named configuration<br/>zn:Artifact"]
+    Service["Operational service<br/>infra:ServiceInstance"]
+    ConfigContent["Separate configuration content<br/>zn:Artifact"]
+    Bindings["Paths · credentials · model binding<br/>versioned sidecar values"]
+    Source -->|"app:describesSoftware"| Descriptor
+    Build -->|"app:describesSoftware"| Descriptor
+    Build -->|"app:sourceSnapshot"| Source
+    Installation -->|"app:describesSoftware"| Descriptor
+    Installation -->|"app:installationHost"| Host
+    Installation -->|"app:sourceSnapshot"| Source
+    Installation -->|"app:installedBuild"| Build
+    Profile -->|"app:describesSoftware"| Descriptor
+    Profile -->|"app:installationRecord"| Installation
+    Profile -->|"app:configurationContent"| ConfigContent
+    Service -->|"app:describesSoftware"| Descriptor
+    Service -->|"app:installationRecord"| Installation
+    Service -->|"app:configurationProfile"| Profile
+    Service -->|"infra:hostedBy"| Host
+    Installation -.->|"locations"| Bindings
+    Profile -.->|"nativeHome / credentialRefs / modelBinding"| Bindings

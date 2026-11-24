@@ -1,0 +1,20 @@
+{
+  "schema": "zenith.hub-object-bindings.draft.v2",
+  "objectId": "urn:example:software:hermes",
+  "objectRevision": 1,
+  "bindings": [
+    {
+      "profile": "urn:zenith:hub:application-db:draft:2#/$defs/SoftwareDescriptorProjection",
+      "value": {
+        "types": [
+          "https://zenith-research.ca/ontology/terms/Artifact"
+        ],
+        "id": "urn:example:software:hermes",
+        "key": "hermes",
+        "label": "Hermes",
+        "publisher": "Nous Research",
+        "repository": "https://github.com/NousResearch/hermes-agent"
+      }
+    }
+  ]
+}

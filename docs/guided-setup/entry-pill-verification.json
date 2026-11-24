@@ -1,0 +1,36 @@
+{
+  "date": "2026-11-20",
+  "entry": {
+    "normalCloudScreen": true,
+    "actions": [
+      "Enter Hub",
+      "Configure"
+    ],
+    "installationRequired": true,
+    "providerOrChatRequired": false,
+    "destination": "/hub"
+  },
+  "composer": {
+    "pillIsTextInput": true,
+    "visibleLauncherLabelRemoved": true,
+    "singleMessageField": true,
+    "conversationAbovePill": true,
+    "draftRetainedWhenMinimized": true,
+    "sendRequiresExplicitSubmit": true
+  },
+  "checks": {
+    "uiLibraryBuildAndProvenance": true,
+    "hubTypecheck": true,
+    "hubSourceProvenance": true,
+    "setupTests": {
+      "passed": 53,
+      "failed": 0,
+      "skipped": 0
+    },
+    "browserTypingAndEscapeVerified": true,
+    "browserTestMessageSent": false
+  },
+  "compatibility": "Existing chat API and proof records preserved; entry timestamp additive; legacy component children remain readable.",
+  "evidence": "evidence/welcome-direct-input-pill.jpg",
+  "uiLibraryCommit": "17aee81"
+}

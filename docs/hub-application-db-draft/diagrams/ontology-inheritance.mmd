@@ -1,0 +1,46 @@
+flowchart TB
+    Thing["owl:Thing"]
+    zn_Entity["zn:Entity"]
+    zn_Person["zn:Person"]
+    zn_Organization["zn:Organization"]
+    zn_Agent["zn:Agent"]
+    zn_Artifact["zn:Artifact"]
+    zn_ExternalLink["zn:ExternalLink"]
+    zn_Receipt["zn:Receipt"]
+    zn_Event["zn:Event"]
+    zn_Domain["zn:Domain"]
+    zn_Collection["zn:Collection"]
+    zn_Handoff["zn:Handoff"]
+    zn_Actor["zn:Actor"]
+    infra_Machine["infra:Machine"]
+    infra_ServiceInstance["infra:ServiceInstance"]
+    infra_Deployment["infra:Deployment"]
+    infra_Network["infra:Network"]
+    infra_NetworkInterface["infra:NetworkInterface"]
+    infra_StorageVolume["infra:StorageVolume"]
+    infra_DNSZone["infra:DNSZone"]
+    CoreModule["Core module — existing"]
+    InfraModule["Infrastructure — proposed / unpublished"]
+    AppRelations["Application relations — REVIEW ONLY / properties, no classes"]
+    Thing -->|"parent → subclass"| zn_Entity
+    zn_Entity -->|"parent → subclass"| zn_Person
+    zn_Entity -->|"parent → subclass"| zn_Organization
+    zn_Entity -->|"parent → subclass"| zn_Agent
+    Thing -->|"parent → subclass"| zn_Artifact
+    Thing -->|"parent → subclass"| zn_ExternalLink
+    zn_Artifact -->|"parent → subclass"| zn_Receipt
+    Thing -->|"parent → subclass"| zn_Event
+    Thing -->|"parent → subclass"| zn_Domain
+    Thing -->|"parent → subclass"| zn_Collection
+    zn_Artifact -->|"parent → subclass"| zn_Handoff
+    zn_Actor -.->|"owl:equivalentClass"| zn_Entity
+    zn_Entity -->|"parent → subclass"| infra_Machine
+    zn_Agent -->|"parent → subclass"| infra_ServiceInstance
+    Thing -->|"parent → subclass"| infra_Deployment
+    Thing -->|"parent → subclass"| infra_Network
+    Thing -->|"parent → subclass"| infra_NetworkInterface
+    Thing -->|"parent → subclass"| infra_StorageVolume
+    Thing -->|"parent → subclass"| infra_DNSZone
+    InfraModule ==>|"owl:imports"| CoreModule
+    AppRelations -.->|"proposed import"| CoreModule
+    AppRelations -.->|"proposed import"| InfraModule

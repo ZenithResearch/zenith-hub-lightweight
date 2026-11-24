@@ -1,0 +1,11 @@
+{
+  "@id": "urn:example:release:hermes",
+  "@type": [
+    "https://zenith-research.ca/ontology/terms/Artifact"
+  ],
+  "https://zenith-research.ca/ontology/hub/application-draft/terms/describesSoftware": [
+    {
+      "@id": "urn:example:software:hermes"
+    }
+  ]
+}

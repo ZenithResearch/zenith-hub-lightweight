@@ -1,0 +1,113 @@
+{
+  "schema": "zenith.hub-catalog-validation-fixes.v1",
+  "at": "2026-11-23T21:04:14.946788+00:00",
+  "branch": "codex/hub-repository-foundation",
+  "head": "efe521340efe90697b29ad18752dcf9aec512916",
+  "changesCommitted": false,
+  "fixes": {
+    "objectIdentity": {
+      "boundary": "readPackage before publication compilation",
+      "error": "catalog_object_identity_collision",
+      "covers": [
+        "recipe/software matching-label reproduction",
+        "package/software collision",
+        "package/recipe collision"
+      ],
+      "intentionalCompositionPreserved": "SoftwareDescriptor and CatalogSoftwareMetadata profiles on one software object; multiple recipe references to that object"
+    },
+    "entryActions": {
+      "boundary": "recipes attached to each catalog entry",
+      "error": "catalog_entry_action_missing",
+      "required": {
+        "install": "qualified install action",
+        "connect": "qualified connect action",
+        "vps": "explicit unqualified legacy install recipe, never qualified implicitly"
+      },
+      "supplementaryRecipes": "Configure-only recipes are valid when another eligible attached recipe supplies installation. Unattached recipes do not count.",
+      "resolution": "Prefer a qualified matching recipe automatically; explicit unqualified recipe selections remain blocked.",
+      "removedPermissions": "Missing actions are not restored; explicitly withdrawing the mode is accepted."
+    }
+  },
+  "validation": {
+    "redBaseline": {
+      "command": "node --test tests/catalog/validation-regressions.test.mjs",
+      "tests": 14,
+      "pass": 3,
+      "fail": 11
+    },
+    "focusedAfterFix": {
+      "command": "node --test tests/catalog/validation-regressions.test.mjs",
+      "tests": 14,
+      "pass": 14,
+      "fail": 0
+    },
+    "catalogProducer": {
+      "command": "npm run catalog:check",
+      "passed": true,
+      "version": "2026.11.23.1",
+      "indexedFiles": 19,
+      "softwareObjects": 6,
+      "recipes": 11
+    },
+    "catalogSuite": {
+      "command": "npm run test:catalog",
+      "tests": 42,
+      "pass": 42,
+      "fail": 0
+    },
+    "relatedSuites": {
+      "command": "node --test tests/objects/*.test.mjs tests/application/*.test.mjs tests/setup/*.test.mjs tests/hub/*.test.mjs",
+      "tests": 199,
+      "pass": 199,
+      "fail": 0
+    },
+    "strengthenedLabelAlignment": {
+      "command": "node --test --test-name-pattern='default package retains' tests/catalog/validation-regressions.test.mjs",
+      "tests": 1,
+      "pass": 1,
+      "fail": 0,
+      "overlapsCatalogSuite": true
+    },
+    "contractChecks": 68,
+    "designChecks": 32,
+    "sourcePins": "passed",
+    "gitDiffCheck": "passed",
+    "node": "24.20.0"
+  },
+  "regressionCoverage": [
+    "Failed fresh packages publish generation zero, no content objects, commits or private documents.",
+    "Invalid updates retain the entire prior repository state, active catalog digest, ordinary local objects and object history.",
+    "Matching labels cannot hide a software/recipe identity collision.",
+    "Multiple recipes can share software and intentional profile composition; configure-only supplement remains configure-only.",
+    "An unqualified recipe cannot shadow qualified coverage or qualify itself through a different explicit selection.",
+    "Unattached recipes cannot authorize an advertised mode; mode withdrawal preserves prior recipe history.",
+    "Default 18 authored objects match independently validated stored profiles/RDF; software labels and all six membership modes agree.",
+    "Stable identities/defaults, Devgraph connect-only, unqualified Matrix VPS and repeat-import no-op behavior remain intact."
+  ],
+  "runtimeChanges": {
+    "src/lib/catalog/package.mjs": {
+      "before": "24493aad8b58c541e01cf504d3def19385a5bc08fd77ac12cd59be0fa81f491f",
+      "after": "b3cc3195472e3f38ffd0decca86b5b7bb229bd684061af745691b8d5fad95643"
+    },
+    "src/lib/catalog/service.mjs": {
+      "before": "fcdc71e94da5275be93fe2f55de42445fcf3ba011db30df2945f71f4426854ee",
+      "after": "58447a5b527ae2b082b0b714c721e91d9374336bdecd1ac5ba5e6a39b716800f"
+    }
+  },
+  "contentAndOtherRuntimeInputsUnchanged": true,
+  "live": {
+    "restartPerformed": false,
+    "migrationOrCatalogSyncPerformed": false,
+    "malformedPackageTestedAgainstLiveData": false,
+    "databaseOrBackupOpenedByThisTask": false,
+    "nativeAppDataTouchedByThisTask": false,
+    "requalified": false,
+    "priorEvidence": "live-validation.json"
+  },
+  "limits": [
+    "Qualification is fixture-only for this validation change; no new production build or live UI/HTTP qualification was performed.",
+    "Valid existing packages retain their shapes/defaults. Previously accepted malformed packages now reject; automatic repair of an already malformed stored snapshot is not implemented.",
+    "Remote retrieval, new ontology types, additional stores/executors and publisher trust expansion remain out of scope."
+  ],
+  "subsequentLiveQualification": "live-fixes-validation.json"
+}

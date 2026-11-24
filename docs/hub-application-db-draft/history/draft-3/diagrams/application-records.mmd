@@ -1,0 +1,135 @@
+erDiagram
+    HubSettings {
+        IRI id PK
+        integer revision
+        string label
+        IRI localHostRef FK "optional"
+        IRI selectedGuideProfileRef FK "optional"
+    }
+    Host {
+        IRI id PK
+        integer revision
+        string label
+        string kind
+        ObjectVersion objectVersion
+    }
+    SoftwareDescriptor {
+        IRI id PK
+        integer revision
+        string key
+        string label
+        string publisher "optional"
+        string repository "optional"
+        ObjectVersion objectVersion
+    }
+    SoftwareCatalogEntry {
+        IRI id PK
+        integer revision
+        json catalogId
+        string key
+        IRI softwareRef FK
+        IRI adapterRef
+        json supportedModes
+    }
+    SoftwareSourceSnapshot {
+        IRI id PK
+        integer revision
+        IRI softwareRef FK
+        string repository
+        string commit
+        string version "optional"
+        string manifestSha256 "optional"
+        ObjectVersion objectVersion
+    }
+    SoftwareBuild {
+        IRI id PK
+        integer revision
+        IRI softwareRef FK
+        IRI sourceSnapshotRef FK "optional"
+        json content
+        string platform "optional"
+        string version "optional"
+        ObjectVersion objectVersion
+    }
+    SoftwareInstallationRecord {
+        IRI id PK
+        integer revision
+        IRI softwareRef FK
+        IRI hostRef FK
+        string management
+        json locations
+        json presence
+        json compatibility
+        json receiptRefs "optional"
+        ObjectVersion objectVersion
+        IRI sourceSnapshotRef FK "optional"
+        IRI buildRef FK "optional"
+    }
+    ConfigurationProfile {
+        IRI id PK
+        integer revision
+        IRI softwareRef FK
+        IRI installationRef FK "optional"
+        string name
+        IRI configArtifactRef "optional"
+        string nativeHome "optional"
+        json credentialRefs "optional"
+        ObjectVersion objectVersion
+        string profileKind
+        json modelBinding "Hermes only"
+    }
+    ServiceInstance {
+        IRI id PK
+        integer revision
+        IRI softwareRef FK
+        IRI installationRef FK "optional"
+        IRI profileRef FK "optional"
+        string label
+        string management
+        json hostRefs FK "optional"
+        string desiredState
+        json runtime "optional"
+        ObjectVersion objectVersion
+    }
+    Connection {
+        IRI id PK
+        integer revision
+        string label
+        IRI targetRef
+        IRI adapterRef
+        string endpoint
+        boolean enabled
+        IRI credentialRef "optional"
+        IRI endpointPolicyRef "optional"
+        string targetScope
+    }
+    SetupOperation {
+        IRI id PK
+        integer revision
+        string action
+        json targetRefs
+        string state
+        string outcome "optional"
+        string createdAt
+        string updatedAt
+        IRI planArtifactRef "optional"
+        json receiptRefs "optional"
+        json error "optional"
+    }
+    Host o|--o{ HubSettings : localHostRef
+    ConfigurationProfile o|--o{ HubSettings : selectedGuideProfileRef
+    SoftwareDescriptor ||--o{ SoftwareCatalogEntry : softwareRef
+    SoftwareDescriptor ||--o{ SoftwareSourceSnapshot : softwareRef
+    SoftwareDescriptor ||--o{ SoftwareBuild : softwareRef
+    SoftwareSourceSnapshot o|--o{ SoftwareBuild : sourceSnapshotRef
+    SoftwareDescriptor ||--o{ SoftwareInstallationRecord : softwareRef
+    Host ||--o{ SoftwareInstallationRecord : hostRef
+    SoftwareSourceSnapshot o|--o{ SoftwareInstallationRecord : sourceSnapshotRef
+    SoftwareBuild o|--o{ SoftwareInstallationRecord : buildRef
+    SoftwareDescriptor ||--o{ ConfigurationProfile : softwareRef
+    SoftwareInstallationRecord o|--o{ ConfigurationProfile : installationRef
+    SoftwareDescriptor ||--o{ ServiceInstance : softwareRef
+    SoftwareInstallationRecord o|--o{ ServiceInstance : installationRef
+    ConfigurationProfile o|--o{ ServiceInstance : profileRef
+    Host }o--o{ ServiceInstance : hostRefs
+    Connection o|--o{ ConfigurationProfile : Hermes_model_server

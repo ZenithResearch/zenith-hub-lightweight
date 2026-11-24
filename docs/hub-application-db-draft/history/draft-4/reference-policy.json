@@ -1,0 +1,21 @@
+{
+  "schema": "zenith.hub-reference-policy.draft.v4",
+  "default": "current selection; loaded history is never an implicit fallback",
+  "historicalObjects": "Always validate local RDF/profile consistency using their own trusted mapping. Historical cross-object traversal requires explicit exact-version or external bindings; otherwise report unresolved and never resolve through current state.",
+  "purposes": {
+    "semantic-association": {"snapshotModes":["current","object-version","external"],"actionModes":["current"]},
+    "configuration-content": {"snapshotModes":["current","object-version","external"],"actionModes":["current","object-version"],"type":"https://zenith-research.ca/ontology/terms/Artifact"},
+    "retained-plan-evidence": {"snapshotModes":["current","object-version","external"],"actionModes":["current","object-version"],"type":"https://zenith-research.ca/ontology/terms/Artifact"},
+    "receipt": {"snapshotModes":["current","object-version","external"],"actionModes":[],"type":"https://zenith-research.ca/ontology/terms/Receipt"},
+    "connection": {"snapshotModes":["current","object-version","external"],"actionModes":["current","external"],"note":"Enabled local targets must be current. Disabled historical bindings are retained but cannot execute. External use requires adapter-specific endpoint/authentication/capability preflight."},
+    "operation-target": {"snapshotModes":["current","object-version","external"],"actionModes":["current"],"note":"Journals retain exact history. Applying a reviewed plan separately checks current revisions, adapter/catalog pins, expiry and authority."}
+  },
+  "adapters": {
+    "hermes":{"targetType":"https://zenith-research.ca/ontology/hub/infrastructure/terms/ServiceInstance"},
+    "devgraph":{"targetType":"https://zenith-research.ca/ontology/hub/infrastructure/terms/ServiceInstance"},
+    "matrix":{"targetType":"https://zenith-research.ca/ontology/hub/infrastructure/terms/ServiceInstance"},
+    "service-management":{"targetType":"https://zenith-research.ca/ontology/hub/infrastructure/terms/ServiceInstance"},
+    "process-runtime":{"targetType":"https://zenith-research.ca/ontology/hub/infrastructure/terms/ServiceInstance"},
+    "model-server":{"targetType":"https://zenith-research.ca/ontology/hub/infrastructure/terms/ServiceInstance"}
+  }
+}

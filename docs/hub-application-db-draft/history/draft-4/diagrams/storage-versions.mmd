@@ -1,0 +1,25 @@
+flowchart TB
+    Row["Ontology-backed application row"]
+    Selection["Current selection<br/>selectedObjects + selectedUnits"]
+    Object["StoredObjectRecord<br/>object identity + revision"]
+    Unit["RDF unit commit<br/>RDFC-1.0 digest + complete named membership"]
+    Batch["SQLite transaction batch<br/>idempotency + repository generation"]
+    RDF["Immutable JSON-LD<br/>semantic facts and declared links"]
+    Bindings["Immutable bindings file<br/>profile ID + validated values"]
+    Defs["Pinned definition files<br/>modules / schemas / manifests"]
+    View["Validated application view<br/>RDF + profile values"]
+    Ops["Operational overlay<br/>inspection / desired state / journals"]
+    Batch -->|"publishes complete compatible selection"| Selection
+    Batch -->|"commits object versions and projections"| Object
+    Row -->|"objectVersion: objectId + revision + profileId"| Object
+    Selection -->|"selects exact current object revision"| Object
+    Object -->|"RDF unit identity + semantic revision"| Unit
+    Unit -->|"canonical RDF digest and complete membership"| RDF
+    Object -->|"jsonldFile — hash / length / media type"| RDF
+    Object -->|"bindingsFile — object revision; binding-only update can reuse RDF unit"| Bindings
+    Object -->|"trusted exact definition references"| Defs
+    RDF -->|"mapped semantic facts"| View
+    Bindings -->|"validated profile / implementation values"| View
+    Defs -->|"type and schema validation"| View
+    View -->|"must equal object-backed columns"| Row
+    Ops -.->|"explicitly owned operational fields"| Row

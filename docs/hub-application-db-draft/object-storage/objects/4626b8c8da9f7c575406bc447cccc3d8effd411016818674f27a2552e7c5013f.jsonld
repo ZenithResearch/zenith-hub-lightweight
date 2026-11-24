@@ -1,0 +1,16 @@
+{
+  "@id": "urn:example:service:hermes-api",
+  "@type": [
+    "https://zenith-research.ca/ontology/hub/infrastructure/terms/ServiceInstance"
+  ],
+  "http://www.w3.org/2000/01/rdf-schema#label": [
+    {
+      "@value": "Example Hermes API"
+    }
+  ],
+  "https://zenith-research.ca/ontology/hub/infrastructure/terms/hostedBy": [
+    {
+      "@id": "urn:example:host:one"
+    }
+  ]
+}

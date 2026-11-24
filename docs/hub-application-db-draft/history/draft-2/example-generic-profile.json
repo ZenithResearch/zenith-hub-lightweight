@@ -1,0 +1,621 @@
+{
+  "schema": "zenith.hub-application-db.draft.v2",
+  "hub": {
+    "id": "urn:example:hub:one",
+    "revision": 1,
+    "label": "Example Hub",
+    "localHostRef": "urn:example:host:one"
+  },
+  "hosts": [
+    {
+      "id": "urn:example:host:one",
+      "revision": 1,
+      "label": "Example machine",
+      "kind": "physical",
+      "objectVersion": {
+        "objectId": "urn:example:host:one",
+        "objectRevision": 1,
+        "profileId": "urn:zenith:hub:application-db:draft:2#/$defs/HostProjection"
+      }
+    }
+  ],
+  "softwareDescriptors": [
+    {
+      "id": "urn:example:software:hermes",
+      "revision": 1,
+      "key": "hermes",
+      "label": "Hermes",
+      "publisher": "Nous Research",
+      "repository": "https://github.com/NousResearch/hermes-agent",
+      "objectVersion": {
+        "objectId": "urn:example:software:hermes",
+        "objectRevision": 1,
+        "profileId": "urn:zenith:hub:application-db:draft:2#/$defs/SoftwareDescriptorProjection"
+      }
+    }
+  ],
+  "catalogEntries": [
+    {
+      "id": "urn:example:catalog-entry:builtin-hermes",
+      "revision": 1,
+      "catalogId": "urn:example:catalog:builtin-software",
+      "key": "hermes",
+      "softwareRef": "urn:example:software:hermes",
+      "adapterRef": "hermes",
+      "supportedModes": [
+        "install",
+        "connect"
+      ]
+    }
+  ],
+  "sourceSnapshots": [
+    {
+      "id": "urn:example:release:hermes",
+      "revision": 1,
+      "softwareRef": "urn:example:software:hermes",
+      "repository": "https://github.com/NousResearch/hermes-agent",
+      "commit": "e5a86d08d3d8c5e2f61bc2e5354d96ba25a56f97",
+      "objectVersion": {
+        "objectId": "urn:example:release:hermes",
+        "objectRevision": 1,
+        "profileId": "urn:zenith:hub:application-db:draft:2#/$defs/SoftwareSourceSnapshotProjection"
+      }
+    }
+  ],
+  "builds": [],
+  "installations": [
+    {
+      "id": "urn:example:installation:hermes-one",
+      "revision": 1,
+      "softwareRef": "urn:example:software:hermes",
+      "hostRef": "urn:example:host:one",
+      "management": "external",
+      "locations": {
+        "source": "/example/hermes-agent",
+        "environment": "/example/hermes-agent/.venv",
+        "launcher": "/example/bin/hermes"
+      },
+      "presence": {
+        "state": "present",
+        "observedAt": "2026-11-22T19:00:00Z",
+        "method": "synthetic fixture only"
+      },
+      "compatibility": {
+        "state": "unknown",
+        "observedAt": "2026-11-22T19:00:00Z",
+        "method": "synthetic fixture only",
+        "reason": "No adapter qualification was performed."
+      },
+      "sourceSnapshotRef": "urn:example:release:hermes",
+      "objectVersion": {
+        "objectId": "urn:example:installation:hermes-one",
+        "objectRevision": 1,
+        "profileId": "urn:zenith:hub:application-db:draft:2#/$defs/SoftwareInstallationRecordProjection"
+      }
+    }
+  ],
+  "profiles": [
+    {
+      "id": "urn:example:profile:generic",
+      "revision": 1,
+      "softwareRef": "urn:example:software:hermes",
+      "installationRef": "urn:example:installation:hermes-one",
+      "name": "Named configuration",
+      "profileKind": "generic",
+      "objectVersion": {
+        "objectId": "urn:example:profile:generic",
+        "objectRevision": 1,
+        "profileId": "urn:zenith:hub:application-db:draft:2#/$defs/ConfigurationProfileProjection"
+      }
+    }
+  ],
+  "services": [],
+  "connections": [],
+  "operations": [],
+  "objectRecords": [
+    {
+      "id": "urn:example:host:one",
+      "objectRevision": 1,
+      "admission": "observation",
+      "types": [
+        "https://zenith-research.ca/ontology/hub/infrastructure/terms/Machine"
+      ],
+      "jsonldFile": {
+        "storageKey": "objects/50c03b5d40621c88917008c2f71e097107683ed5e70c7c3b858a295c5c7c81c4.jsonld",
+        "artifact": {
+          "id": "urn:sha256:50c03b5d40621c88917008c2f71e097107683ed5e70c7c3b858a295c5c7c81c4",
+          "sha256": "50c03b5d40621c88917008c2f71e097107683ed5e70c7c3b858a295c5c7c81c4",
+          "byteLength": 230,
+          "mediaType": "application/ld+json"
+        }
+      },
+      "bindingsFile": {
+        "storageKey": "bindings/76710849a1d53d2bbf4260a8622e36b1d768cda9c286aa543d3f888acf9cc7bc.json",
+        "artifact": {
+          "id": "urn:sha256:76710849a1d53d2bbf4260a8622e36b1d768cda9c286aa543d3f888acf9cc7bc",
+          "sha256": "76710849a1d53d2bbf4260a8622e36b1d768cda9c286aa543d3f888acf9cc7bc",
+          "byteLength": 465,
+          "mediaType": "application/json"
+        }
+      },
+      "definitions": [
+        {
+          "kind": "ontology-module",
+          "id": "https://zenith-research.ca/ontology/normalized/v0.1.0/modules/core.jsonld",
+          "file": {
+            "storageKey": "definitions/7b5700135b8880b587a9a09d81cf11f6a02e06ca9202a918cb94cc0e9feadc62.jsonld",
+            "artifact": {
+              "id": "urn:sha256:7b5700135b8880b587a9a09d81cf11f6a02e06ca9202a918cb94cc0e9feadc62",
+              "sha256": "7b5700135b8880b587a9a09d81cf11f6a02e06ca9202a918cb94cc0e9feadc62",
+              "byteLength": 5856,
+              "mediaType": "application/ld+json"
+            }
+          }
+        },
+        {
+          "kind": "package-manifest",
+          "id": "https://zenith-research.ca/ontology/normalized",
+          "file": {
+            "storageKey": "definitions/d73a66b7f780b8ebc1ec1ac1f7d3791eec91a0259dca90faf37927636ad08a4a.json",
+            "artifact": {
+              "id": "urn:sha256:d73a66b7f780b8ebc1ec1ac1f7d3791eec91a0259dca90faf37927636ad08a4a",
+              "sha256": "d73a66b7f780b8ebc1ec1ac1f7d3791eec91a0259dca90faf37927636ad08a4a",
+              "byteLength": 8112,
+              "mediaType": "application/json"
+            }
+          }
+        },
+        {
+          "kind": "json-schema",
+          "id": "https://zenith-research.ca/ontology/normalized/v0.1.0/schemas/core.schema.json#/$defs/ArtifactRef",
+          "file": {
+            "storageKey": "definitions/cb9222ce2c13e1a911191b1aa0e3cef6a5baed4bd8e8ba4d3b0004875f510eed.json",
+            "artifact": {
+              "id": "urn:sha256:cb9222ce2c13e1a911191b1aa0e3cef6a5baed4bd8e8ba4d3b0004875f510eed",
+              "sha256": "cb9222ce2c13e1a911191b1aa0e3cef6a5baed4bd8e8ba4d3b0004875f510eed",
+              "byteLength": 9787,
+              "mediaType": "application/json"
+            }
+          }
+        },
+        {
+          "kind": "ontology-module",
+          "id": "https://zenith-research.ca/ontology/hub/infrastructure/v0.1.0/ontology.jsonld",
+          "file": {
+            "storageKey": "definitions/04a73b50532f9cd11457a2629fd8918b4ce5c59f61a470532cd991f2a61e9d5b.jsonld",
+            "artifact": {
+              "id": "urn:sha256:04a73b50532f9cd11457a2629fd8918b4ce5c59f61a470532cd991f2a61e9d5b",
+              "sha256": "04a73b50532f9cd11457a2629fd8918b4ce5c59f61a470532cd991f2a61e9d5b",
+              "byteLength": 6489,
+              "mediaType": "application/ld+json"
+            }
+          }
+        },
+        {
+          "kind": "package-manifest",
+          "id": "https://zenith-research.ca/ontology/hub/infrastructure",
+          "file": {
+            "storageKey": "definitions/589395a228a0f41af404eceabef9ed343b15a532279cae083090e0b9678641f4.json",
+            "artifact": {
+              "id": "urn:sha256:589395a228a0f41af404eceabef9ed343b15a532279cae083090e0b9678641f4",
+              "sha256": "589395a228a0f41af404eceabef9ed343b15a532279cae083090e0b9678641f4",
+              "byteLength": 13028,
+              "mediaType": "application/json"
+            }
+          }
+        },
+        {
+          "kind": "json-schema",
+          "id": "https://zenith-research.ca/ontology/hub/infrastructure/v0.1.0/schemas/infrastructure.schema.json#/$defs/MachineObserved",
+          "file": {
+            "storageKey": "definitions/5c1d4e6fca092f06dd05c6dbe6814709240ee09051dd8ffe4cb506bab100426b.json",
+            "artifact": {
+              "id": "urn:sha256:5c1d4e6fca092f06dd05c6dbe6814709240ee09051dd8ffe4cb506bab100426b",
+              "sha256": "5c1d4e6fca092f06dd05c6dbe6814709240ee09051dd8ffe4cb506bab100426b",
+              "byteLength": 85279,
+              "mediaType": "application/json"
+            }
+          }
+        },
+        {
+          "kind": "json-schema",
+          "id": "urn:zenith:hub:application-db:draft:2#/$defs/HostProjection",
+          "file": {
+            "storageKey": "definitions/d148277cda0eac27cd4e520ad279f277c1195f44dd6d7755a6f252f1b1abf4f8.json",
+            "artifact": {
+              "id": "urn:sha256:d148277cda0eac27cd4e520ad279f277c1195f44dd6d7755a6f252f1b1abf4f8",
+              "sha256": "d148277cda0eac27cd4e520ad279f277c1195f44dd6d7755a6f252f1b1abf4f8",
+              "byteLength": 31382,
+              "mediaType": "application/json"
+            }
+          }
+        },
+        {
+          "kind": "json-schema",
+          "id": "urn:zenith:hub:application-db:draft:2#/$defs/ProfileBindingsFile",
+          "file": {
+            "storageKey": "definitions/d148277cda0eac27cd4e520ad279f277c1195f44dd6d7755a6f252f1b1abf4f8.json",
+            "artifact": {
+              "id": "urn:sha256:d148277cda0eac27cd4e520ad279f277c1195f44dd6d7755a6f252f1b1abf4f8",
+              "sha256": "d148277cda0eac27cd4e520ad279f277c1195f44dd6d7755a6f252f1b1abf4f8",
+              "byteLength": 31382,
+              "mediaType": "application/json"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "urn:example:software:hermes",
+      "objectRevision": 1,
+      "admission": "observation",
+      "types": [
+        "https://zenith-research.ca/ontology/terms/Artifact"
+      ],
+      "jsonldFile": {
+        "storageKey": "objects/c61e94a52134f0e2ed221cc5a07a1bd27bc2414cf5480449b77fba1a8b25f318.jsonld",
+        "artifact": {
+          "id": "urn:sha256:c61e94a52134f0e2ed221cc5a07a1bd27bc2414cf5480449b77fba1a8b25f318",
+          "sha256": "c61e94a52134f0e2ed221cc5a07a1bd27bc2414cf5480449b77fba1a8b25f318",
+          "byteLength": 210,
+          "mediaType": "application/ld+json"
+        }
+      },
+      "bindingsFile": {
+        "storageKey": "bindings/9e9388fb5906cc3171527961e6e69ba0ae777c5d3af708863c80ace0330901b8.json",
+        "artifact": {
+          "id": "urn:sha256:9e9388fb5906cc3171527961e6e69ba0ae777c5d3af708863c80ace0330901b8",
+          "sha256": "9e9388fb5906cc3171527961e6e69ba0ae777c5d3af708863c80ace0330901b8",
+          "byteLength": 571,
+          "mediaType": "application/json"
+        }
+      },
+      "definitions": [
+        {
+          "kind": "ontology-module",
+          "id": "https://zenith-research.ca/ontology/normalized/v0.1.0/modules/core.jsonld",
+          "file": {
+            "storageKey": "definitions/7b5700135b8880b587a9a09d81cf11f6a02e06ca9202a918cb94cc0e9feadc62.jsonld",
+            "artifact": {
+              "id": "urn:sha256:7b5700135b8880b587a9a09d81cf11f6a02e06ca9202a918cb94cc0e9feadc62",
+              "sha256": "7b5700135b8880b587a9a09d81cf11f6a02e06ca9202a918cb94cc0e9feadc62",
+              "byteLength": 5856,
+              "mediaType": "application/ld+json"
+            }
+          }
+        },
+        {
+          "kind": "package-manifest",
+          "id": "https://zenith-research.ca/ontology/normalized",
+          "file": {
+            "storageKey": "definitions/d73a66b7f780b8ebc1ec1ac1f7d3791eec91a0259dca90faf37927636ad08a4a.json",
+            "artifact": {
+              "id": "urn:sha256:d73a66b7f780b8ebc1ec1ac1f7d3791eec91a0259dca90faf37927636ad08a4a",
+              "sha256": "d73a66b7f780b8ebc1ec1ac1f7d3791eec91a0259dca90faf37927636ad08a4a",
+              "byteLength": 8112,
+              "mediaType": "application/json"
+            }
+          }
+        },
+        {
+          "kind": "json-schema",
+          "id": "https://zenith-research.ca/ontology/normalized/v0.1.0/schemas/core.schema.json#/$defs/ArtifactRef",
+          "file": {
+            "storageKey": "definitions/cb9222ce2c13e1a911191b1aa0e3cef6a5baed4bd8e8ba4d3b0004875f510eed.json",
+            "artifact": {
+              "id": "urn:sha256:cb9222ce2c13e1a911191b1aa0e3cef6a5baed4bd8e8ba4d3b0004875f510eed",
+              "sha256": "cb9222ce2c13e1a911191b1aa0e3cef6a5baed4bd8e8ba4d3b0004875f510eed",
+              "byteLength": 9787,
+              "mediaType": "application/json"
+            }
+          }
+        },
+        {
+          "kind": "json-schema",
+          "id": "urn:zenith:hub:application-db:draft:2#/$defs/SoftwareDescriptorProjection",
+          "file": {
+            "storageKey": "definitions/d148277cda0eac27cd4e520ad279f277c1195f44dd6d7755a6f252f1b1abf4f8.json",
+            "artifact": {
+              "id": "urn:sha256:d148277cda0eac27cd4e520ad279f277c1195f44dd6d7755a6f252f1b1abf4f8",
+              "sha256": "d148277cda0eac27cd4e520ad279f277c1195f44dd6d7755a6f252f1b1abf4f8",
+              "byteLength": 31382,
+              "mediaType": "application/json"
+            }
+          }
+        },
+        {
+          "kind": "json-schema",
+          "id": "urn:zenith:hub:application-db:draft:2#/$defs/ProfileBindingsFile",
+          "file": {
+            "storageKey": "definitions/d148277cda0eac27cd4e520ad279f277c1195f44dd6d7755a6f252f1b1abf4f8.json",
+            "artifact": {
+              "id": "urn:sha256:d148277cda0eac27cd4e520ad279f277c1195f44dd6d7755a6f252f1b1abf4f8",
+              "sha256": "d148277cda0eac27cd4e520ad279f277c1195f44dd6d7755a6f252f1b1abf4f8",
+              "byteLength": 31382,
+              "mediaType": "application/json"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "urn:example:release:hermes",
+      "objectRevision": 1,
+      "admission": "observation",
+      "types": [
+        "https://zenith-research.ca/ontology/terms/Artifact"
+      ],
+      "jsonldFile": {
+        "storageKey": "objects/f40ccfc87eba6b9e83c76af2351334ac3608375f6e829a0d4446c009192d0a4e.jsonld",
+        "artifact": {
+          "id": "urn:sha256:f40ccfc87eba6b9e83c76af2351334ac3608375f6e829a0d4446c009192d0a4e",
+          "sha256": "f40ccfc87eba6b9e83c76af2351334ac3608375f6e829a0d4446c009192d0a4e",
+          "byteLength": 117,
+          "mediaType": "application/ld+json"
+        }
+      },
+      "bindingsFile": {
+        "storageKey": "bindings/385a87780f444a672ae9eede6e3d78e07dc8d8dcbd47821b5ec4a47da178bdb7.json",
+        "artifact": {
+          "id": "urn:sha256:385a87780f444a672ae9eede6e3d78e07dc8d8dcbd47821b5ec4a47da178bdb7",
+          "sha256": "385a87780f444a672ae9eede6e3d78e07dc8d8dcbd47821b5ec4a47da178bdb7",
+          "byteLength": 599,
+          "mediaType": "application/json"
+        }
+      },
+      "definitions": [
+        {
+          "kind": "ontology-module",
+          "id": "https://zenith-research.ca/ontology/normalized/v0.1.0/modules/core.jsonld",
+          "file": {
+            "storageKey": "definitions/7b5700135b8880b587a9a09d81cf11f6a02e06ca9202a918cb94cc0e9feadc62.jsonld",
+            "artifact": {
+              "id": "urn:sha256:7b5700135b8880b587a9a09d81cf11f6a02e06ca9202a918cb94cc0e9feadc62",
+              "sha256": "7b5700135b8880b587a9a09d81cf11f6a02e06ca9202a918cb94cc0e9feadc62",
+              "byteLength": 5856,
+              "mediaType": "application/ld+json"
+            }
+          }
+        },
+        {
+          "kind": "package-manifest",
+          "id": "https://zenith-research.ca/ontology/normalized",
+          "file": {
+            "storageKey": "definitions/d73a66b7f780b8ebc1ec1ac1f7d3791eec91a0259dca90faf37927636ad08a4a.json",
+            "artifact": {
+              "id": "urn:sha256:d73a66b7f780b8ebc1ec1ac1f7d3791eec91a0259dca90faf37927636ad08a4a",
+              "sha256": "d73a66b7f780b8ebc1ec1ac1f7d3791eec91a0259dca90faf37927636ad08a4a",
+              "byteLength": 8112,
+              "mediaType": "application/json"
+            }
+          }
+        },
+        {
+          "kind": "json-schema",
+          "id": "https://zenith-research.ca/ontology/normalized/v0.1.0/schemas/core.schema.json#/$defs/ArtifactRef",
+          "file": {
+            "storageKey": "definitions/cb9222ce2c13e1a911191b1aa0e3cef6a5baed4bd8e8ba4d3b0004875f510eed.json",
+            "artifact": {
+              "id": "urn:sha256:cb9222ce2c13e1a911191b1aa0e3cef6a5baed4bd8e8ba4d3b0004875f510eed",
+              "sha256": "cb9222ce2c13e1a911191b1aa0e3cef6a5baed4bd8e8ba4d3b0004875f510eed",
+              "byteLength": 9787,
+              "mediaType": "application/json"
+            }
+          }
+        },
+        {
+          "kind": "json-schema",
+          "id": "urn:zenith:hub:application-db:draft:2#/$defs/SoftwareSourceSnapshotProjection",
+          "file": {
+            "storageKey": "definitions/d148277cda0eac27cd4e520ad279f277c1195f44dd6d7755a6f252f1b1abf4f8.json",
+            "artifact": {
+              "id": "urn:sha256:d148277cda0eac27cd4e520ad279f277c1195f44dd6d7755a6f252f1b1abf4f8",
+              "sha256": "d148277cda0eac27cd4e520ad279f277c1195f44dd6d7755a6f252f1b1abf4f8",
+              "byteLength": 31382,
+              "mediaType": "application/json"
+            }
+          }
+        },
+        {
+          "kind": "json-schema",
+          "id": "urn:zenith:hub:application-db:draft:2#/$defs/ProfileBindingsFile",
+          "file": {
+            "storageKey": "definitions/d148277cda0eac27cd4e520ad279f277c1195f44dd6d7755a6f252f1b1abf4f8.json",
+            "artifact": {
+              "id": "urn:sha256:d148277cda0eac27cd4e520ad279f277c1195f44dd6d7755a6f252f1b1abf4f8",
+              "sha256": "d148277cda0eac27cd4e520ad279f277c1195f44dd6d7755a6f252f1b1abf4f8",
+              "byteLength": 31382,
+              "mediaType": "application/json"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "urn:example:installation:hermes-one",
+      "objectRevision": 1,
+      "admission": "observation",
+      "types": [
+        "https://zenith-research.ca/ontology/terms/Artifact"
+      ],
+      "jsonldFile": {
+        "storageKey": "objects/009ba0f36abcff5e6c3743382b72e554d91c45f10966ec9b109664b49d21e95f.jsonld",
+        "artifact": {
+          "id": "urn:sha256:009ba0f36abcff5e6c3743382b72e554d91c45f10966ec9b109664b49d21e95f",
+          "sha256": "009ba0f36abcff5e6c3743382b72e554d91c45f10966ec9b109664b49d21e95f",
+          "byteLength": 126,
+          "mediaType": "application/ld+json"
+        }
+      },
+      "bindingsFile": {
+        "storageKey": "bindings/813a140af95e413a651ba9f0016ff0d1f72f48f5a6775ab5f044b128bff112a0.json",
+        "artifact": {
+          "id": "urn:sha256:813a140af95e413a651ba9f0016ff0d1f72f48f5a6775ab5f044b128bff112a0",
+          "sha256": "813a140af95e413a651ba9f0016ff0d1f72f48f5a6775ab5f044b128bff112a0",
+          "byteLength": 770,
+          "mediaType": "application/json"
+        }
+      },
+      "definitions": [
+        {
+          "kind": "ontology-module",
+          "id": "https://zenith-research.ca/ontology/normalized/v0.1.0/modules/core.jsonld",
+          "file": {
+            "storageKey": "definitions/7b5700135b8880b587a9a09d81cf11f6a02e06ca9202a918cb94cc0e9feadc62.jsonld",
+            "artifact": {
+              "id": "urn:sha256:7b5700135b8880b587a9a09d81cf11f6a02e06ca9202a918cb94cc0e9feadc62",
+              "sha256": "7b5700135b8880b587a9a09d81cf11f6a02e06ca9202a918cb94cc0e9feadc62",
+              "byteLength": 5856,
+              "mediaType": "application/ld+json"
+            }
+          }
+        },
+        {
+          "kind": "package-manifest",
+          "id": "https://zenith-research.ca/ontology/normalized",
+          "file": {
+            "storageKey": "definitions/d73a66b7f780b8ebc1ec1ac1f7d3791eec91a0259dca90faf37927636ad08a4a.json",
+            "artifact": {
+              "id": "urn:sha256:d73a66b7f780b8ebc1ec1ac1f7d3791eec91a0259dca90faf37927636ad08a4a",
+              "sha256": "d73a66b7f780b8ebc1ec1ac1f7d3791eec91a0259dca90faf37927636ad08a4a",
+              "byteLength": 8112,
+              "mediaType": "application/json"
+            }
+          }
+        },
+        {
+          "kind": "json-schema",
+          "id": "https://zenith-research.ca/ontology/normalized/v0.1.0/schemas/core.schema.json#/$defs/ArtifactRef",
+          "file": {
+            "storageKey": "definitions/cb9222ce2c13e1a911191b1aa0e3cef6a5baed4bd8e8ba4d3b0004875f510eed.json",
+            "artifact": {
+              "id": "urn:sha256:cb9222ce2c13e1a911191b1aa0e3cef6a5baed4bd8e8ba4d3b0004875f510eed",
+              "sha256": "cb9222ce2c13e1a911191b1aa0e3cef6a5baed4bd8e8ba4d3b0004875f510eed",
+              "byteLength": 9787,
+              "mediaType": "application/json"
+            }
+          }
+        },
+        {
+          "kind": "json-schema",
+          "id": "urn:zenith:hub:application-db:draft:2#/$defs/SoftwareInstallationRecordProjection",
+          "file": {
+            "storageKey": "definitions/d148277cda0eac27cd4e520ad279f277c1195f44dd6d7755a6f252f1b1abf4f8.json",
+            "artifact": {
+              "id": "urn:sha256:d148277cda0eac27cd4e520ad279f277c1195f44dd6d7755a6f252f1b1abf4f8",
+              "sha256": "d148277cda0eac27cd4e520ad279f277c1195f44dd6d7755a6f252f1b1abf4f8",
+              "byteLength": 31382,
+              "mediaType": "application/json"
+            }
+          }
+        },
+        {
+          "kind": "json-schema",
+          "id": "urn:zenith:hub:application-db:draft:2#/$defs/ProfileBindingsFile",
+          "file": {
+            "storageKey": "definitions/d148277cda0eac27cd4e520ad279f277c1195f44dd6d7755a6f252f1b1abf4f8.json",
+            "artifact": {
+              "id": "urn:sha256:d148277cda0eac27cd4e520ad279f277c1195f44dd6d7755a6f252f1b1abf4f8",
+              "sha256": "d148277cda0eac27cd4e520ad279f277c1195f44dd6d7755a6f252f1b1abf4f8",
+              "byteLength": 31382,
+              "mediaType": "application/json"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "urn:example:profile:generic",
+      "objectRevision": 1,
+      "admission": "observation",
+      "types": [
+        "https://zenith-research.ca/ontology/terms/Artifact"
+      ],
+      "jsonldFile": {
+        "storageKey": "objects/b134ce33e7b52ea6d40b0fed0f8392d9453ac39142d40109040d832582926c5a.jsonld",
+        "artifact": {
+          "id": "urn:sha256:b134ce33e7b52ea6d40b0fed0f8392d9453ac39142d40109040d832582926c5a",
+          "sha256": "b134ce33e7b52ea6d40b0fed0f8392d9453ac39142d40109040d832582926c5a",
+          "byteLength": 223,
+          "mediaType": "application/ld+json"
+        }
+      },
+      "bindingsFile": {
+        "storageKey": "bindings/b3bb5f1343ae7657bb677d00b831624f6cf8f1ab2d527a5f4c2d61b747745c41.json",
+        "artifact": {
+          "id": "urn:sha256:b3bb5f1343ae7657bb677d00b831624f6cf8f1ab2d527a5f4c2d61b747745c41",
+          "sha256": "b3bb5f1343ae7657bb677d00b831624f6cf8f1ab2d527a5f4c2d61b747745c41",
+          "byteLength": 606,
+          "mediaType": "application/json"
+        }
+      },
+      "definitions": [
+        {
+          "kind": "ontology-module",
+          "id": "https://zenith-research.ca/ontology/normalized/v0.1.0/modules/core.jsonld",
+          "file": {
+            "storageKey": "definitions/7b5700135b8880b587a9a09d81cf11f6a02e06ca9202a918cb94cc0e9feadc62.jsonld",
+            "artifact": {
+              "id": "urn:sha256:7b5700135b8880b587a9a09d81cf11f6a02e06ca9202a918cb94cc0e9feadc62",
+              "sha256": "7b5700135b8880b587a9a09d81cf11f6a02e06ca9202a918cb94cc0e9feadc62",
+              "byteLength": 5856,
+              "mediaType": "application/ld+json"
+            }
+          }
+        },
+        {
+          "kind": "package-manifest",
+          "id": "https://zenith-research.ca/ontology/normalized",
+          "file": {
+            "storageKey": "definitions/d73a66b7f780b8ebc1ec1ac1f7d3791eec91a0259dca90faf37927636ad08a4a.json",
+            "artifact": {
+              "id": "urn:sha256:d73a66b7f780b8ebc1ec1ac1f7d3791eec91a0259dca90faf37927636ad08a4a",
+              "sha256": "d73a66b7f780b8ebc1ec1ac1f7d3791eec91a0259dca90faf37927636ad08a4a",
+              "byteLength": 8112,
+              "mediaType": "application/json"
+            }
+          }
+        },
+        {
+          "kind": "json-schema",
+          "id": "https://zenith-research.ca/ontology/normalized/v0.1.0/schemas/core.schema.json#/$defs/ArtifactRef",
+          "file": {
+            "storageKey": "definitions/cb9222ce2c13e1a911191b1aa0e3cef6a5baed4bd8e8ba4d3b0004875f510eed.json",
+            "artifact": {
+              "id": "urn:sha256:cb9222ce2c13e1a911191b1aa0e3cef6a5baed4bd8e8ba4d3b0004875f510eed",
+              "sha256": "cb9222ce2c13e1a911191b1aa0e3cef6a5baed4bd8e8ba4d3b0004875f510eed",
+              "byteLength": 9787,
+              "mediaType": "application/json"
+            }
+          }
+        },
+        {
+          "kind": "json-schema",
+          "id": "urn:zenith:hub:application-db:draft:2#/$defs/ConfigurationProfileProjection",
+          "file": {
+            "storageKey": "definitions/d148277cda0eac27cd4e520ad279f277c1195f44dd6d7755a6f252f1b1abf4f8.json",
+            "artifact": {
+              "id": "urn:sha256:d148277cda0eac27cd4e520ad279f277c1195f44dd6d7755a6f252f1b1abf4f8",
+              "sha256": "d148277cda0eac27cd4e520ad279f277c1195f44dd6d7755a6f252f1b1abf4f8",
+              "byteLength": 31382,
+              "mediaType": "application/json"
+            }
+          }
+        },
+        {
+          "kind": "json-schema",
+          "id": "urn:zenith:hub:application-db:draft:2#/$defs/ProfileBindingsFile",
+          "file": {
+            "storageKey": "definitions/d148277cda0eac27cd4e520ad279f277c1195f44dd6d7755a6f252f1b1abf4f8.json",
+            "artifact": {
+              "id": "urn:sha256:d148277cda0eac27cd4e520ad279f277c1195f44dd6d7755a6f252f1b1abf4f8",
+              "sha256": "d148277cda0eac27cd4e520ad279f277c1195f44dd6d7755a6f252f1b1abf4f8",
+              "byteLength": 31382,
+              "mediaType": "application/json"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

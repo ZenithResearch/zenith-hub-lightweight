@@ -1,0 +1,155 @@
+{
+  "date": "2026-11-20",
+  "ui_library_commit": "e4b3c415c15f7165dfeb1c5c8b71519afc5feb69",
+  "preview": "http://127.0.0.1:4318/",
+  "passed": [
+    "Continue remains primary; Configure opens native on-page settings.",
+    "UI library typecheck/build/provenance and final Hub production build.",
+    "23 setup contract tests, 6 preparation regressions, 3 private model-manager HTTP tests.",
+    "Normal and standalone package setup boundary checks.",
+    "Live installed Hermes provider descriptors, native memory estimates and disk preflight.",
+    "Live model discovery returns hub-local-guide from the existing server.",
+    "Active Hermes configuration and applied-operation count were preserved.",
+    "Browser verified Claude/Gemini API-key entry and ChatGPT/Grok native sign-in controls.",
+    "Browser verified all three local presets, machine recommendation, oversized-model blocking and existing-server model discovery.",
+    "Final rebuild verified the mode-switch regression and Escape focus restoration."
+  ],
+  "evidence": [
+    "evidence/hermes-cloud-providers.jpg",
+    "evidence/hermes-continue-secondary-configure.jpg"
+  ],
+  "limits": [
+    "The existing user-completed ChatGPT login and native model catalog were verified. No new sign-in, provider key submission or cloud chat was performed during this update.",
+    "No new model weights were downloaded or model servers launched. Balanced-model preflight required 8.1 GiB free and found approximately 0.2 GiB on its volume.",
+    "No existing personal Hermes, model server, released Hub, Matrix or Devgraph resource was reconfigured."
+  ],
+  "functional_validation_ui_commit": "b42db7926d705e618f825624c9ddd7b764611407",
+  "visual_update": {
+    "reference": "InvestorDeck/src/presentation-assets/founder-thesis-v0_39-bitmap-title/zenith-cloud-reveal-castalia-bitmap-v1.png",
+    "sha256": "476fa2526cab00074223fc292d6980de55c144f43e91c9ad069c01dd205a2f35",
+    "passed": [
+      "Library typecheck, build and source provenance",
+      "Hub optimized production build and existing setup package check",
+      "Browser shows original cloud-reveal artwork and the Configure Hermes CTA",
+      "Bundled image and HTTP response match original bitmap bytes"
+    ],
+    "evidence": "evidence/hermes-landing-bitmap.jpg"
+  },
+  "continue_configuration_update": {
+    "primary": "Continue",
+    "secondary": "Configure",
+    "configuration": "Native on-page dialog with existing reviewed actions",
+    "passed": [
+      "Continue advances to Communications",
+      "Configure opens model settings on the landing page",
+      "Action review and cancel stay in the dialog",
+      "Escape closes the dialog and restores focus to Configure",
+      "Hermes configuration digest and applied-operation count remain unchanged",
+      "Library typecheck/build/provenance and Hub optimized build/setup package check"
+    ],
+    "evidence": [
+      "evidence/hermes-continue-secondary-configure.jpg",
+      "evidence/hermes-on-page-configuration.jpg"
+    ]
+  },
+  "initial_landing_validation": {
+    "implementation_agent": "gpt-6.2-astra",
+    "passed": [
+      "Existing confirmed installation displays one Configure Hermes CTA with no setup rail or chat on landing.",
+      "Configure Hermes opens the actual instance API and model settings without applying changes.",
+      "Empty state displays one Install Hermes CTA and opens a Hermes-only draft and reviewed plan.",
+      "Occupied API port rejects review; choosing a free port yields the Hermes-only plan.",
+      "Reviewing the fresh installation creates no setup root, installation or service data.",
+      "Repeated live process observations preserve correct running=true and reachable=true.",
+      "UI library typecheck, build, source provenance; Hub typecheck and optimized production build.",
+      "15 setup regression tests; normal and standalone setup package boundary checks."
+    ],
+    "evidence": [
+      "evidence/hermes-landing-configure.jpg",
+      "evidence/hermes-landing-install.jpg"
+    ]
+  },
+  "model_setup_update": {
+    "paths": [
+      "native cloud provider",
+      "guided managed local model",
+      "existing model server"
+    ],
+    "presets": [
+      "Qwen3.5 4B",
+      "Qwen3.5 9B",
+      "Qwen3.5 27B",
+      "Qwen3.5 397B-A17B"
+    ],
+    "recommended_on_preview_machine": "Qwen3.5 9B",
+    "memory_bytes": 25769803776,
+    "documentation": "hermes-model-setup.md",
+    "backend_switching_regression": "Browser verified that selecting an existing server after a local preset clears its inferred context, endpoint and credential reference.",
+    "active_configuration_sha256": "5e0fea237cb3e297f7d1259f6ecebecb3cac4eba4a99fee68ca78a32a1fef28d",
+    "applied_operation_count_unchanged": true
+  },
+  "flagship_update": {
+    "model": "Qwen3.5 397B-A17B Q4_K_M",
+    "target": "512 GB unified-memory Macs",
+    "downloadGiB": 228.2,
+    "nativeEstimatorSimulation": [
+      {
+        "memoryGiB": 24,
+        "fits": false
+      },
+      {
+        "memoryGiB": 128,
+        "fits": false
+      },
+      {
+        "memoryGiB": 256,
+        "fits": false
+      },
+      {
+        "memoryGiB": 512,
+        "fits": true,
+        "spilled": false,
+        "contextTokens": 262144
+      }
+    ],
+    "runtimeValidation": "Estimator and split-file integrity tests only; no flagship weights downloaded or model run.",
+    "providerSelector": "Single Hermes provider dropdown; redundant brand shortcut row removed.",
+    "browserVerified": [
+      "Four local presets render; flagship remains disabled on the 24 GB Mac.",
+      "One Hermes provider dropdown renders with the native Grok sign-in action; no brand shortcut row.",
+      "The active Hermes configuration and applied operations remain unchanged."
+    ],
+    "passedChecks": [
+      "UI library typecheck, build and provenance",
+      "Hub optimized production build",
+      "24 setup contract tests",
+      "5 model-manager/integrity tests",
+      "Normal and standalone package boundary checks"
+    ],
+    "evidence": [
+      "evidence/hermes-provider-dropdown.jpg",
+      "evidence/hermes-flagship-model.jpg"
+    ]
+  },
+  "connected_model_picker_update": {
+    "behavior": [
+      "Auto-load account models when connected.",
+      "Prefer the saved provider model or Hermes\u2019s recommended default without changing the running backend.",
+      "Use an explained dropdown; manual IDs remain in a collapsed advanced disclosure.",
+      "Hide completed sign-in codes, check/cancel controls and redundant sign-in CTA.",
+      "Preserve manual selection after catalog refresh."
+    ],
+    "verifiedProvider": "openai-codex",
+    "availableModels": 17,
+    "nativeDefault": "gpt-6.2-sol",
+    "passed": [
+      "UI library typecheck/build/provenance",
+      "Hub typecheck and optimized production build",
+      "28 setup contract tests",
+      "7 private model-manager/integrity tests",
+      "Browser auto-load/default selection, hidden manual ID, absent sign-in CTA, and preservation of a user choice on refresh.",
+      "Active backend and applied operation count unchanged."
+    ],
+    "evidence": "evidence/hermes-connected-model-picker.jpg"
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "date": "2026-11-20",
+  "uiLibraryCommit": "8986f18",
+  "passed": [
+    "UI library typecheck/build and source provenance",
+    "Hub typecheck and 37 setup tests",
+    "Hub source provenance and diff whitespace check",
+    "Live welcome reload resolves to Install Hermes using the empty profile"
+  ],
+  "browserLimitation": "Only the in-app browser is exposed to automation in this session. Safari and Chrome confirmation is pending.",
+  "change": "Cancelled requests cannot overwrite newer startup checks; welcome exposes controller error details and a retry action.",
+  "evidence": "evidence/startup-recovery-welcome.jpg",
+  "onboardingFlow": "onboarding-flow.md"
+}

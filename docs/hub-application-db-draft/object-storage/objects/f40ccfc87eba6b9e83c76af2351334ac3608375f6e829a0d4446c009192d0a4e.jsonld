@@ -1,0 +1,6 @@
+{
+  "@id": "urn:example:release:hermes",
+  "@type": [
+    "https://zenith-research.ca/ontology/terms/Artifact"
+  ]
+}

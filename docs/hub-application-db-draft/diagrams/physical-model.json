@@ -1,0 +1,371 @@
+{
+  "sourceHashes": {
+    "schema.json": "6fc363660d78da828d13738743ad68ea7a86d6567d84f06030d565ecd43bdcfc",
+    "field-ownership.json": "4f72629681d7b4646ade1d0e265f608cdb95303238de2ade02b296bf0809d567",
+    "application-relations.jsonld": "b5edf7dbac64c8c0f75782e538b859ecf0247ad16ebeb50f2dc6498e07c0a54a",
+    "reference-policy.json": "6874cdd36e3134eb20501445e2da039e320bbf4c7ddc8bf9333186c46a368cd5",
+    "physical-mapping.json": "4f3cfd16c4396e2e2201c0b0dca8b4cf53e87bf9a79783ef6a8c149a6c0470f0",
+    "persistence.md": "75cf6153f2e409f5a9dbbcc90df02fdc501eec48ba09bd0b22832146db4e5536",
+    "commit-protocol.md": "668541809399c0fbfefa81095720d46cdb234c3878cb667b0a03edad1fcb9a24",
+    "api.schema.json": "6f0852136cc722677827d98860e9efbb1da3ca38756d77ba3069bf3b1981b5ba",
+    "commit.schema.json": "80dc7a127c55b17908a4745a2bcdbe86633d518fd282927ca841f54621e48e3f",
+    "schema-shapes.mjs": "634c7df02c681a9bd1ead12723d782f09e2c41b05952205cb033ab6e30a6ebf2",
+    "generate-diagrams.mjs": "d55c304c751ab1a8e73f6528bbb8493ce0cdb22de442ddee382e887f25f0b34f",
+    "migrations/003-revision-ledger.sql": "c9a14480147709242c419ded25edb59c4141a902d128904cd6ba14fa7206c095",
+    "migrations/004-application-projections.sql": "e8fc4224fd5cd69ea33d54fb4fdd025255c75893f3e30a5924796c21dd9280b8",
+    "migrations/005-application-state.sql": "53be6646ec970dee44e013db754e9413c0f7503a1267ce346cd96dbf0234ebfd",
+    "profiles/object-store/ontology/zenith-0.1.0/modules/core.jsonld": "7b5700135b8880b587a9a09d81cf11f6a02e06ca9202a918cb94cc0e9feadc62",
+    "profiles/object-store/ontology/zenith-0.1.0/schemas/core.schema.json": "cb9222ce2c13e1a911191b1aa0e3cef6a5baed4bd8e8ba4d3b0004875f510eed",
+    "profiles/object-store/ontology/infrastructure/ontology.jsonld": "04a73b50532f9cd11457a2629fd8918b4ce5c59f61a470532cd991f2a61e9d5b"
+  },
+  "tables": [
+    "hub_adapter_bindings",
+    "hub_application_document_versions",
+    "hub_application_documents",
+    "hub_catalog_entries",
+    "hub_commits",
+    "hub_connections",
+    "hub_current_objects",
+    "hub_current_units",
+    "hub_definition_pins",
+    "hub_definition_sets",
+    "hub_files",
+    "hub_identity_aliases",
+    "hub_inspection_associations",
+    "hub_inspections",
+    "hub_installation_state",
+    "hub_legacy_imports",
+    "hub_object_identities",
+    "hub_object_type_history",
+    "hub_object_versions",
+    "hub_operations",
+    "hub_profile_values",
+    "hub_projections",
+    "hub_rdf_links",
+    "hub_rdf_unit_members",
+    "hub_rdf_unit_versions",
+    "hub_record_heads",
+    "hub_reference_bindings",
+    "hub_schema_migrations",
+    "hub_service_state",
+    "hub_settings",
+    "hub_setup_drafts",
+    "hub_software_keys",
+    "hub_store_state"
+  ],
+  "edges": [
+    {
+      "from": "hub_application_document_versions",
+      "to": "hub_commits",
+      "label": "commit_id",
+      "required": true
+    },
+    {
+      "from": "hub_application_documents",
+      "to": "hub_application_document_versions",
+      "label": "document_key_and_revision",
+      "required": true
+    },
+    {
+      "from": "hub_catalog_entries",
+      "to": "hub_record_heads",
+      "label": "kind_and_id",
+      "required": true
+    },
+    {
+      "from": "hub_catalog_entries",
+      "to": "hub_current_objects",
+      "label": "software_id",
+      "required": true
+    },
+    {
+      "from": "hub_connections",
+      "to": "hub_record_heads",
+      "label": "kind_and_id",
+      "required": true
+    },
+    {
+      "from": "hub_current_objects",
+      "to": "hub_current_units",
+      "label": "unit_id_and_unit_revision",
+      "required": true
+    },
+    {
+      "from": "hub_current_objects",
+      "to": "hub_object_versions",
+      "label": "object_id_and_object_revision_and_unit_id_and_unit_revision",
+      "required": true
+    },
+    {
+      "from": "hub_current_units",
+      "to": "hub_rdf_unit_versions",
+      "label": "unit_id_and_unit_revision",
+      "required": true
+    },
+    {
+      "from": "hub_definition_pins",
+      "to": "hub_files",
+      "label": "file_sha256",
+      "required": true
+    },
+    {
+      "from": "hub_definition_pins",
+      "to": "hub_definition_sets",
+      "label": "set_id",
+      "required": true
+    },
+    {
+      "from": "hub_definition_sets",
+      "to": "hub_files",
+      "label": "manifest_sha256",
+      "required": true
+    },
+    {
+      "from": "hub_identity_aliases",
+      "to": "hub_files",
+      "label": "provenance_sha256",
+      "required": true
+    },
+    {
+      "from": "hub_identity_aliases",
+      "to": "hub_object_identities",
+      "label": "target_id",
+      "required": true
+    },
+    {
+      "from": "hub_inspection_associations",
+      "to": "hub_object_versions",
+      "label": "installation_id_and_object_revision",
+      "required": true
+    },
+    {
+      "from": "hub_inspection_associations",
+      "to": "hub_commits",
+      "label": "commit_id",
+      "required": true
+    },
+    {
+      "from": "hub_inspection_associations",
+      "to": "hub_inspections",
+      "label": "inspection_id",
+      "required": true
+    },
+    {
+      "from": "hub_inspections",
+      "to": "hub_object_versions",
+      "label": "inspected_installation_id_and_inspected_installation_revision",
+      "required": false
+    },
+    {
+      "from": "hub_inspections",
+      "to": "hub_object_versions",
+      "label": "build_id_and_build_revision",
+      "required": false
+    },
+    {
+      "from": "hub_inspections",
+      "to": "hub_object_versions",
+      "label": "source_id_and_source_revision",
+      "required": false
+    },
+    {
+      "from": "hub_inspections",
+      "to": "hub_object_versions",
+      "label": "host_id_and_host_revision",
+      "required": true
+    },
+    {
+      "from": "hub_inspections",
+      "to": "hub_object_versions",
+      "label": "software_id_and_software_revision",
+      "required": true
+    },
+    {
+      "from": "hub_inspections",
+      "to": "hub_commits",
+      "label": "commit_id",
+      "required": true
+    },
+    {
+      "from": "hub_installation_state",
+      "to": "hub_record_heads",
+      "label": "kind_and_object_id",
+      "required": true
+    },
+    {
+      "from": "hub_installation_state",
+      "to": "hub_inspections",
+      "label": "latest_inspection_id",
+      "required": false
+    },
+    {
+      "from": "hub_installation_state",
+      "to": "hub_current_objects",
+      "label": "object_id",
+      "required": true
+    },
+    {
+      "from": "hub_legacy_imports",
+      "to": "hub_commits",
+      "label": "commit_id",
+      "required": true
+    },
+    {
+      "from": "hub_legacy_imports",
+      "to": "hub_files",
+      "label": "source_sha256",
+      "required": true
+    },
+    {
+      "from": "hub_object_type_history",
+      "to": "hub_object_versions",
+      "label": "object_id_and_object_revision",
+      "required": true
+    },
+    {
+      "from": "hub_object_versions",
+      "to": "hub_rdf_unit_members",
+      "label": "unit_id_and_unit_revision_and_object_id",
+      "required": true
+    },
+    {
+      "from": "hub_object_versions",
+      "to": "hub_commits",
+      "label": "commit_id",
+      "required": true
+    },
+    {
+      "from": "hub_object_versions",
+      "to": "hub_files",
+      "label": "mapping_sha256",
+      "required": false
+    },
+    {
+      "from": "hub_object_versions",
+      "to": "hub_definition_sets",
+      "label": "definition_set_id",
+      "required": true
+    },
+    {
+      "from": "hub_object_versions",
+      "to": "hub_files",
+      "label": "bindings_sha256",
+      "required": true
+    },
+    {
+      "from": "hub_object_versions",
+      "to": "hub_files",
+      "label": "jsonld_sha256",
+      "required": true
+    },
+    {
+      "from": "hub_object_versions",
+      "to": "hub_object_identities",
+      "label": "object_id",
+      "required": true
+    },
+    {
+      "from": "hub_operations",
+      "to": "hub_record_heads",
+      "label": "kind_and_id",
+      "required": true
+    },
+    {
+      "from": "hub_profile_values",
+      "to": "hub_object_versions",
+      "label": "object_id_and_object_revision",
+      "required": true
+    },
+    {
+      "from": "hub_projections",
+      "to": "hub_profile_values",
+      "label": "object_id_and_object_revision_and_profile_id",
+      "required": true
+    },
+    {
+      "from": "hub_projections",
+      "to": "hub_current_objects",
+      "label": "object_id_and_object_revision",
+      "required": true
+    },
+    {
+      "from": "hub_projections",
+      "to": "hub_record_heads",
+      "label": "kind_and_object_id",
+      "required": true
+    },
+    {
+      "from": "hub_rdf_links",
+      "to": "hub_rdf_unit_versions",
+      "label": "unit_id_and_unit_revision",
+      "required": true
+    },
+    {
+      "from": "hub_rdf_unit_members",
+      "to": "hub_rdf_unit_versions",
+      "label": "unit_id_and_unit_revision",
+      "required": true
+    },
+    {
+      "from": "hub_rdf_unit_members",
+      "to": "hub_object_identities",
+      "label": "object_id",
+      "required": true
+    },
+    {
+      "from": "hub_rdf_unit_versions",
+      "to": "hub_commits",
+      "label": "commit_id",
+      "required": true
+    },
+    {
+      "from": "hub_rdf_unit_versions",
+      "to": "hub_files",
+      "label": "jsonld_sha256",
+      "required": true
+    },
+    {
+      "from": "hub_reference_bindings",
+      "to": "hub_object_versions",
+      "label": "target_id_and_target_revision",
+      "required": false
+    },
+    {
+      "from": "hub_service_state",
+      "to": "hub_record_heads",
+      "label": "kind_and_object_id",
+      "required": true
+    },
+    {
+      "from": "hub_service_state",
+      "to": "hub_current_objects",
+      "label": "object_id",
+      "required": true
+    },
+    {
+      "from": "hub_settings",
+      "to": "hub_record_heads",
+      "label": "kind_and_id",
+      "required": true
+    },
+    {
+      "from": "hub_settings",
+      "to": "hub_current_objects",
+      "label": "selected_guide_profile_id",
+      "required": false
+    },
+    {
+      "from": "hub_settings",
+      "to": "hub_current_objects",
+      "label": "local_host_id",
+      "required": false
+    },
+    {
+      "from": "hub_software_keys",
+      "to": "hub_object_identities",
+      "label": "object_id",
+      "required": true
+    }
+  ],
+  "verification": "DDL executed only in memory; all FK endpoints checked"
+}
