@@ -245,6 +245,16 @@
             "docs/guided-setup/hermes-installation-entry-review.json",
             "docs/guided-setup/apps-services-gallery-review.json"
           ]
+        },
+        {
+          "path": "tests/test_inkling_runtime.py",
+          "previousSha256": "ace6c2a706075eed3d2655b9fcdd0d0d4f0b9f78985c76d07da96c52f5ef8ec4",
+          "sha256": "bb59b81fbed2777b07917cb03e0e9c320d1fd3beb8f7fa6c0be526a81dec7233",
+          "reason": "Make supported Apple-silicon and rejected Linux hardware explicit in the job fixture; assert context/inference errors so Linux CI exercises the intended qualification stages.",
+          "evidence": [
+            "https://github.com/ZenithResearch/zenith-hub-lightweight/actions/runs/45307743048",
+            "tests/test_inkling_runtime.py"
+          ]
         }
       ]
     },

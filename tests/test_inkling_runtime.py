@@ -128,8 +128,10 @@ class HookTests(unittest.TestCase):
 
 class JobTests(unittest.TestCase):
     def test_new_model_is_retained_only_after_inference_and_actual_context_pass(self):
-        for ctx,ready,success in [(65536,True,True),(32768,True,False),(65536,False,False)]:
-            with self.subTest(ctx=ctx,ready=ready), tempfile.TemporaryDirectory() as temp:
+        cases = [("Darwin","arm64",65536,True,True), ("Darwin","arm64",32768,True,False),
+                 ("Darwin","arm64",65536,False,False), ("Linux","x86_64",65536,True,False)]
+        for system,machine,ctx,ready,success in cases:
+            with self.subTest(system=system,ctx=ctx,ready=ready), tempfile.TemporaryDirectory() as temp:
                 root=Path(temp);saved={"model":{"provider":"custom","default":"old-model"},"mcp_servers":{"keep":{}}}
                 prior=copy.deepcopy(saved)
                 def save(cfg):saved.clear();saved.update(copy.deepcopy(cfg))
@@ -150,14 +152,15 @@ class JobTests(unittest.TestCase):
                 modules={"hermes_cli":types.ModuleType("hermes_cli"),"hermes_cli.local_runtime":types.ModuleType("hermes_cli.local_runtime"),
                          "hermes_cli.local_runtime.endpoint":types.SimpleNamespace(child_query=lambda x:"model="+x)}
                 modules["hermes_cli.local_runtime"].catalog=types.SimpleNamespace(catalog_by_id=lambda:{model["id"]:entry})
-                with patch.dict(sys.modules,modules),patch.object(bridge,"runtime_policy",return_value=policy),patch.object(policy,"ensure_engine",return_value=root/"engine"),patch.object(policy,"download_weights"),patch.object(bridge.shutil,"disk_usage",return_value=types.SimpleNamespace(free=64*GIB)):
+                with patch.dict(sys.modules,modules),patch.object(policy.platform,"system",return_value=system),patch.object(policy.platform,"machine",return_value=machine),patch.object(bridge,"runtime_policy",return_value=policy),patch.object(policy,"ensure_engine",return_value=root/"engine"),patch.object(policy,"download_weights"),patch.object(bridge.shutil,"disk_usage",return_value=types.SimpleNamespace(free=64*GIB)):
                     bridge.start_inkling(root,manifest,api,config,boot,Mock())
                     self.assertEqual(saved,prior)
                     run,release=pending[0]
                     try:
                         if success: run()
                         else:
-                            with self.assertRaises(ValueError):run()
+                            expected = "Apple silicon" if system != "Darwin" else "64,000 tokens" if ctx < policy.MIN_CONTEXT else "inference readiness"
+                            with self.assertRaisesRegex(ValueError,expected):run()
                     finally:release()
                     if success:
                         self.assertEqual(saved["model"]["default"],native_id)

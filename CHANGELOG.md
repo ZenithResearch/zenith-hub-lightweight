@@ -3,6 +3,9 @@
 ## [Unreleased]
 
 ### Fixed
+- Make Inkling job fixtures specify supported and unsupported hardware and assert the actual qualification failure — Linux CI must test context/inference handling without accidentally failing every path at the platform guard.
+
+### Fixed
 - Run all JavaScript and Python suites plus packaged API, migration and design checks in CI, with pinned HTTP test dependencies and separate exact follow-up ledgers for historical snapshots — release qualification must cover the current provider bridge and database launch paths without weakening original provenance checks.
 
 ### Added

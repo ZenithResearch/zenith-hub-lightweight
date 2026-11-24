@@ -76,5 +76,12 @@
     "Container integrations run in GitHub CI, not on the live local stack.",
     "No real model weights downloaded or real-model inference qualification performed.",
     "CI results are verified separately against the final PR head."
+  ],
+  "ciFollowups": [
+    {
+      "run": 45307743048,
+      "finding": "Inkling job fixture inherited the Linux runner platform instead of specifying its supported platform.",
+      "correction": "Explicit Darwin/arm64 and Linux/x86_64 cases, with specific context/inference failure assertions; production platform restrictions unchanged."
+    }
   ]
 }
