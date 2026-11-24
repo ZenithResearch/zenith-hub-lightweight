@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+### Fixed
+- Run all JavaScript and Python suites plus packaged API, migration and design checks in CI, with pinned HTTP test dependencies and separate exact follow-up ledgers for historical snapshots — release qualification must cover the current provider bridge and database launch paths without weakening original provenance checks.
+
 ### Added
 - Publish the Hub database ownership, migration/recovery and onboarding specifications with retained historical review fixtures and an exact follow-up pin ledger — reviewers need to distinguish current behavior, earlier design evidence and intentionally changed inputs.
 

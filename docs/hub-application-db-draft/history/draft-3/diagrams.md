@@ -257,4 +257,3 @@ flowchart TB
     View -->|"must equal object-backed columns"| Row
     Ops -.->|"explicitly owned operational fields"| Row
 ```
-

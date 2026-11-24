@@ -18,4 +18,3 @@ Source-only rollback archive: `/Volumes/home/bananawalnut/artifacts/resource-gra
 - Production webpack build passes. Production and standalone Hub API fixtures pass gallery reads, reviewed Add/cancel and preservation of unrelated objects and setup/draft bytes. Existing production object API and setup API qualification scripts pass.
 - Live `http://127.0.0.1:4318/hub` verified: compact six-card gallery, one registered resource, no graph tab/identity section or global Add action, accessible refresh icon and retained inline card flow. A card flow was opened and closed without review/apply. No service was installed, started or connected.
 - Live setup revision remains 37; setup SHA256 before/after: `06864caadc7ac2513cf51d8feca7a32d5ff8b38c12686e7cc40e3f11fc6d76ae`. Existing projection scope revisions remained 39 and 3703 with unchanged observation timestamps across refresh and browser checks. The old tables remain present and unused by gallery reads.
-

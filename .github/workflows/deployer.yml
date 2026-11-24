@@ -15,15 +15,33 @@ jobs:
           node-version: '24'
           cache: npm
       - run: npm ci --ignore-scripts
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - run: python3 -m pip install -r tests/requirements.txt
       - run: npm run check:source
-      - run: python3 -m unittest tests/test_provider_activation.py tests/test_native_profile.py tests/test_resource_reader.py tests/test_installer_bundle.py
+      - run: npm run catalog:check
+      - run: python3 -m unittest discover -s tests -p 'test_*.py'
       - run: npm run test:deployer
+      - run: npm run test:setup
       - run: npm run test:objects
+      - run: npm run test:hub
+      - run: npm run test:application
+      - run: npm run test:catalog
       - run: node scripts/verify-infrastructure.mjs
+      - run: node docs/hub-application-db-draft/verify.mjs
+      - run: node docs/hub-application-db-draft/verify-design.mjs
       - run: npm run typecheck
       - run: npm run build
       - run: node scripts/check-object-api.mjs
       - run: node scripts/check-object-api.mjs --standalone
+      - run: node scripts/check-setup-api.mjs
+      - run: node scripts/check-setup-api.mjs --standalone
+      - run: node scripts/check-hub-api.mjs
+      - run: node scripts/check-hub-api.mjs --standalone
+      - run: node scripts/check-application-api.mjs
+      - run: node scripts/check-application-api.mjs --standalone
+      - run: node scripts/check-application-api.mjs --dev
       - run: npm audit --audit-level=moderate
 
   docker-demo:

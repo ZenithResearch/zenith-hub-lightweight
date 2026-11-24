@@ -114,7 +114,7 @@
       "passed": true
     },
     {
-      "name": "unrelated ongoing UI, setup, hub and published ontology inputs remain unchanged",
+      "name": "unrelated inputs and published ontology remain unchanged; qualified follow-ups retain exact pins",
       "passed": true
     },
     {
