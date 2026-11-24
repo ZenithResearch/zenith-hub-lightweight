@@ -1,0 +1,24 @@
+{
+  "atomicUnit": {
+    "id": "urn:example:unit:e48893d154377960c53b75e23be1807a6a734dbc73d680beb07d33361f1fe411",
+    "revision": 1
+  },
+  "schema": "zenith.hub-object-bindings.draft.v3",
+  "objectId": "urn:example:profile:generic",
+  "objectRevision": 1,
+  "bindings": [
+    {
+      "profile": "urn:zenith:hub:application-db:draft:3#/$defs/ConfigurationProfileProjection",
+      "value": {
+        "types": [
+          "https://zenith-research.ca/ontology/terms/Artifact"
+        ],
+        "id": "urn:example:profile:generic",
+        "softwareRef": "urn:example:software:hermes",
+        "installationRef": "urn:example:installation:hermes-one",
+        "name": "Named configuration",
+        "profileKind": "generic"
+      }
+    }
+  ]
+}

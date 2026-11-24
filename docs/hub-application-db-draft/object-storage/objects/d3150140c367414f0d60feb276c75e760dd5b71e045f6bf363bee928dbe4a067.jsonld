@@ -1,0 +1,31 @@
+{
+  "@id": "urn:example:service:hermes-api",
+  "@type": [
+    "https://zenith-research.ca/ontology/hub/infrastructure/terms/ServiceInstance"
+  ],
+  "https://zenith-research.ca/ontology/hub/application-draft/terms/describesSoftware": [
+    {
+      "@id": "urn:example:software:hermes"
+    }
+  ],
+  "https://zenith-research.ca/ontology/hub/application-draft/terms/installationRecord": [
+    {
+      "@id": "urn:example:installation:hermes-one"
+    }
+  ],
+  "https://zenith-research.ca/ontology/hub/application-draft/terms/configurationProfile": [
+    {
+      "@id": "urn:example:profile:hub-guide"
+    }
+  ],
+  "http://www.w3.org/2000/01/rdf-schema#label": [
+    {
+      "@value": "Example Hermes API"
+    }
+  ],
+  "https://zenith-research.ca/ontology/hub/infrastructure/terms/hostedBy": [
+    {
+      "@id": "urn:example:host:one"
+    }
+  ]
+}

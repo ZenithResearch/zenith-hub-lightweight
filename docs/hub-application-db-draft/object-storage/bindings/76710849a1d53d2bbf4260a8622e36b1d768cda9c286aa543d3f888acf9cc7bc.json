@@ -1,0 +1,18 @@
+{
+  "schema": "zenith.hub-object-bindings.draft.v2",
+  "objectId": "urn:example:host:one",
+  "objectRevision": 1,
+  "bindings": [
+    {
+      "profile": "urn:zenith:hub:application-db:draft:2#/$defs/HostProjection",
+      "value": {
+        "types": [
+          "https://zenith-research.ca/ontology/hub/infrastructure/terms/Machine"
+        ],
+        "id": "urn:example:host:one",
+        "label": "Example machine",
+        "kind": "physical"
+      }
+    }
+  ]
+}

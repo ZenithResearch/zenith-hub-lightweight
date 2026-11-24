@@ -1,0 +1,11 @@
+{
+  "@id": "urn:example:profile:hub-guide",
+  "@type": [
+    "https://zenith-research.ca/ontology/terms/Artifact"
+  ],
+  "http://www.w3.org/2000/01/rdf-schema#label": [
+    {
+      "@value": "hub-guide"
+    }
+  ]
+}

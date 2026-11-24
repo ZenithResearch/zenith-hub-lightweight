@@ -1,0 +1,47 @@
+{
+  "schema": "zenith.hub-ontology-registry.v1",
+  "packages": [
+    {
+      "directory": "ontology/zenith-0.1.0",
+      "manifestSha256": "d73a66b7f780b8ebc1ec1ac1f7d3791eec91a0259dca90faf37927636ad08a4a",
+      "source": {
+        "repository": "ZenithResearch/zenith-ontology-normalized",
+        "tag": "v0.1.0",
+        "archiveSha256": "6ab9289cad7d811d0cdb2078a6261a538fbd77dbfa53db144e686bc7feafe91d"
+      }
+    },
+    {
+      "directory": "ontology/infrastructure",
+      "manifestSha256": "589395a228a0f41af404eceabef9ed343b15a532279cae083090e0b9678641f4",
+      "source": {
+        "repository": "ZenithResearch/zenith-hub-lightweight",
+        "version": "0.1.0",
+        "status": "proposed-unpublished"
+      }
+    }
+  ],
+  "resources": [],
+  "profiles": [
+    {
+      "id": "https://zenith-research.ca/ontology/normalized/v0.1.0/schemas/core.schema.json#/$defs/EntityProjection",
+      "representation": "projection",
+      "appliesTo": [
+        "https://zenith-research.ca/ontology/terms/Entity",
+        "https://zenith-research.ca/ontology/terms/Person",
+        "https://zenith-research.ca/ontology/terms/Organization",
+        "https://zenith-research.ca/ontology/terms/Agent"
+      ],
+      "identityField": "id",
+      "typesField": "types",
+      "includeSubclasses": true
+    },
+    {
+      "id": "https://zenith-research.ca/ontology/normalized/v0.1.0/schemas/core.schema.json#/$defs/InvocationContract",
+      "representation": "projection",
+      "appliesTo": [
+        "https://zenith-research.ca/ontology/terms/Artifact"
+      ],
+      "includeSubclasses": true
+    }
+  ]
+}

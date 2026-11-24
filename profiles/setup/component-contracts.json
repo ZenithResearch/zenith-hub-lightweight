@@ -1,0 +1,561 @@
+{
+  "schema": "zenith.hub-component-contracts.v1",
+  "components": {
+    "service-management": {
+      "adapter": "python-bundle",
+      "modes": [
+        "install",
+        "connect"
+      ],
+      "packageDependencies": [],
+      "serviceRequirements": [
+        "process-runtime"
+      ],
+      "defaultPort": 18091,
+      "module": "service_management",
+      "configurationSchema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "endpoint": {
+            "type": "string",
+            "maxLength": 240
+          },
+          "port": {
+            "type": "integer",
+            "minimum": 1024,
+            "maximum": 65535
+          },
+          "label": {
+            "type": "string",
+            "maxLength": 80
+          },
+          "secretRef": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9-]{0,63}$"
+          }
+        }
+      },
+      "health": "service",
+      "prerequisites": [
+        "Python 3.12",
+        "macOS Apple silicon"
+      ],
+      "artifacts": [
+        {
+          "kind": "released-wheel-closure",
+          "lock": "artifacts.darwin-arm64.json",
+          "group": "base",
+          "files": [
+            "anyio-4.16.0-py3-none-any.whl",
+            "attrs-26.1.0-py3-none-any.whl",
+            "cffi-2.1.1-cp312-cp312-macosx_11_0_arm64.whl",
+            "cryptography-50.0.1-cp311-abi3-macosx_11_0_arm64.whl",
+            "h11-0.16.0-py3-none-any.whl",
+            "h2-4.4.1-py3-none-any.whl",
+            "hpack-4.2.0-py3-none-any.whl",
+            "httpcore2-2.16.2-py3-none-any.whl",
+            "httpx2-2.16.2-py3-none-any.whl",
+            "hyperframe-6.1.0-py3-none-any.whl",
+            "idna-3.20-py3-none-any.whl",
+            "jsonschema-4.26.0-py3-none-any.whl",
+            "jsonschema_specifications-2025.9.1-py3-none-any.whl",
+            "pycparser-3.12-py3-none-any.whl",
+            "python_multipart-0.0.34-py3-none-any.whl",
+            "referencing-0.37.0-py3-none-any.whl",
+            "rpds_py-2026.9.1-cp312-cp312-macosx_11_0_arm64.whl",
+            "service_management-0.1.0-py3-none-any.whl",
+            "truststore-0.10.5-py3-none-any.whl",
+            "typing_extensions-4.16.0-py3-none-any.whl",
+            "vercel_headers-0.8.0-py3-none-any.whl",
+            "vercel_internal_core-0.2.2-py3-none-any.whl",
+            "vercel_oidc-0.12.0-py3-none-any.whl",
+            "vercel_queue-0.9.2-py3-none-any.whl"
+          ]
+        }
+      ],
+      "minDiskMiB": 128,
+      "repository": "ZenithResearch/service-management",
+      "sourceRef": {
+        "path": "profiles/process-macos/release.v1.json",
+        "pointer": "/components/service-management"
+      },
+      "sourceVersionLabel": "0.1.0",
+      "actions": [
+        "install",
+        "resume-install",
+        "configure",
+        "start",
+        "stop",
+        "backup"
+      ]
+    },
+    "process-runtime": {
+      "adapter": "python-bundle",
+      "modes": [
+        "install",
+        "connect"
+      ],
+      "packageDependencies": [],
+      "serviceRequirements": [],
+      "defaultPort": 18092,
+      "module": "process_runtime",
+      "configurationSchema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "endpoint": {
+            "type": "string",
+            "maxLength": 240
+          },
+          "port": {
+            "type": "integer",
+            "minimum": 1024,
+            "maximum": 65535
+          },
+          "label": {
+            "type": "string",
+            "maxLength": 80
+          },
+          "secretRef": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9-]{0,63}$"
+          }
+        }
+      },
+      "health": "runtime",
+      "prerequisites": [
+        "Python 3.12",
+        "macOS Apple silicon"
+      ],
+      "artifacts": [
+        {
+          "kind": "released-wheel-closure",
+          "lock": "artifacts.darwin-arm64.json",
+          "group": "base",
+          "files": [
+            "attrs-26.1.0-py3-none-any.whl",
+            "jsonschema-4.26.0-py3-none-any.whl",
+            "jsonschema_specifications-2025.9.1-py3-none-any.whl",
+            "process_runtime-0.1.0-py3-none-any.whl",
+            "referencing-0.37.0-py3-none-any.whl",
+            "rpds_py-2026.9.1-cp312-cp312-macosx_11_0_arm64.whl",
+            "typing_extensions-4.16.0-py3-none-any.whl"
+          ]
+        }
+      ],
+      "minDiskMiB": 128,
+      "repository": "ZenithResearch/process-runtime",
+      "sourceRef": {
+        "path": "profiles/process-macos/release.v1.json",
+        "pointer": "/components/process-runtime"
+      },
+      "sourceVersionLabel": "0.1.0",
+      "actions": [
+        "install",
+        "resume-install",
+        "configure",
+        "start",
+        "stop",
+        "backup"
+      ]
+    },
+    "frank": {
+      "adapter": "python-bundle",
+      "modes": [
+        "install"
+      ],
+      "packageDependencies": [
+        "process-runtime"
+      ],
+      "serviceRequirements": [
+        "process-runtime"
+      ],
+      "defaultPort": null,
+      "module": null,
+      "configurationSchema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "endpoint": {
+            "type": "string",
+            "maxLength": 240
+          },
+          "port": {
+            "type": "integer",
+            "minimum": 1024,
+            "maximum": 65535
+          },
+          "label": {
+            "type": "string",
+            "maxLength": 80
+          },
+          "secretRef": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9-]{0,63}$"
+          }
+        }
+      },
+      "health": "none",
+      "prerequisites": [
+        "Python 3.12",
+        "macOS Apple silicon"
+      ],
+      "artifacts": [
+        {
+          "kind": "released-wheel-closure",
+          "lock": "artifacts.darwin-arm64.json",
+          "group": "base",
+          "files": [
+            "anyio-4.16.0-py3-none-any.whl",
+            "attrs-26.1.0-py3-none-any.whl",
+            "certifi-2026.7.22-py3-none-any.whl",
+            "frank_executor-0.1.0-py3-none-any.whl",
+            "h11-0.16.0-py3-none-any.whl",
+            "httpcore-1.0.9-py3-none-any.whl",
+            "httpx-0.28.1-py3-none-any.whl",
+            "idna-3.20-py3-none-any.whl",
+            "jsonschema-4.26.0-py3-none-any.whl",
+            "jsonschema_specifications-2025.9.1-py3-none-any.whl",
+            "process_runtime-0.1.0-py3-none-any.whl",
+            "referencing-0.37.0-py3-none-any.whl",
+            "rpds_py-2026.9.1-cp312-cp312-macosx_11_0_arm64.whl",
+            "typing_extensions-4.16.0-py3-none-any.whl"
+          ]
+        }
+      ],
+      "minDiskMiB": 128,
+      "repository": "ZenithResearch/frank-executor",
+      "sourceRef": {
+        "path": "profiles/process-macos/release.v1.json",
+        "pointer": "/components/frank"
+      },
+      "sourceVersionLabel": "0.1.0",
+      "actions": [
+        "install",
+        "resume-install",
+        "configure",
+        "start",
+        "stop",
+        "backup"
+      ]
+    },
+    "devgraph": {
+      "adapter": "external",
+      "modes": [
+        "connect"
+      ],
+      "packageDependencies": [],
+      "serviceRequirements": [],
+      "defaultPort": 4220,
+      "module": null,
+      "configurationSchema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "endpoint": {
+            "type": "string",
+            "maxLength": 240
+          },
+          "port": {
+            "type": "integer",
+            "minimum": 1024,
+            "maximum": 65535
+          },
+          "label": {
+            "type": "string",
+            "maxLength": 80
+          },
+          "secretRef": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9-]{0,63}$"
+          }
+        }
+      },
+      "health": "devgraph",
+      "prerequisites": [
+        "Existing Devgraph API",
+        "Owner-configured read credential reference"
+      ],
+      "artifacts": [],
+      "minDiskMiB": 0,
+      "repository": "ZenithResearch/devgraph",
+      "source": {
+        "commit": "51fb962f8d3c08904b32e8d04235315edf4d9797"
+      },
+      "actions": [
+        "install",
+        "resume-install",
+        "configure",
+        "start",
+        "stop",
+        "backup"
+      ]
+    },
+    "matrix": {
+      "adapter": "synapse",
+      "modes": [
+        "install",
+        "connect",
+        "vps"
+      ],
+      "packageDependencies": [],
+      "serviceRequirements": [],
+      "defaultPort": 18408,
+      "module": "synapse.app.homeserver",
+      "configurationSchema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "endpoint": {
+            "type": "string",
+            "maxLength": 240
+          },
+          "port": {
+            "type": "integer",
+            "minimum": 1024,
+            "maximum": 65535
+          },
+          "label": {
+            "type": "string",
+            "maxLength": 80
+          },
+          "secretRef": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9-]{0,63}$"
+          },
+          "serverName": {
+            "type": "string",
+            "pattern": "^[a-z0-9][a-z0-9.-]{0,200}(:[0-9]{1,5})?$"
+          },
+          "identityAcknowledged": {
+            "type": "boolean"
+          },
+          "domainMode": {
+            "enum": [
+              "development",
+              "owned",
+              "managed"
+            ]
+          },
+          "access": {
+            "enum": [
+              "private",
+              "public-client",
+              "federated"
+            ]
+          },
+          "federation": {
+            "type": "boolean"
+          },
+          "tailscale": {
+            "type": "boolean"
+          },
+          "tailscaleHttpsPort": {
+            "type": "integer",
+            "minimum": 1024,
+            "maximum": 65535
+          }
+        }
+      },
+      "health": "matrix",
+      "prerequisites": [
+        "Choose a permanent server name",
+        "Pinned Synapse artifact closure",
+        "Public TLS/DNS for public access"
+      ],
+      "artifacts": [
+        {
+          "kind": "native-wheel-closure",
+          "lock": "artifacts.darwin-arm64.json",
+          "group": "matrix",
+          "build": "explicit-source-build",
+          "sourceSha256": "3ea0ce402ecca0b85460ce1bd0b98652bfe0b5bcf701452b763395eaf48319bc",
+          "files": [
+            "annotated_types-0.8.0-py3-none-any.whl",
+            "attrs-26.1.0-py3-none-any.whl",
+            "automat-25.4.16-py3-none-any.whl",
+            "bcrypt-5.0.0-cp39-abi3-macosx_10_12_universal2.whl",
+            "bleach-6.4.0-py3-none-any.whl",
+            "canonicaljson-2.0.0-py3-none-any.whl",
+            "certifi-2026.10.23-py3-none-any.whl",
+            "cffi-2.1.1-cp312-cp312-macosx_11_0_arm64.whl",
+            "charset_normalizer-3.5.2-cp312-cp312-macosx_10_13_universal2.whl",
+            "constantly-23.10.4-py3-none-any.whl",
+            "cryptography-50.0.2-cp311-abi3-macosx_11_0_arm64.whl",
+            "hyperlink-21.0.0-py2.py3-none-any.whl",
+            "idna-3.20-py3-none-any.whl",
+            "ijson-3.6.0-cp312-cp312-macosx_11_0_arm64.whl",
+            "immutabledict-4.3.1-py3-none-any.whl",
+            "incremental-24.11.0-py3-none-any.whl",
+            "jinja2-3.1.6-py3-none-any.whl",
+            "jsonschema-4.26.0-py3-none-any.whl",
+            "jsonschema_specifications-2025.9.1-py3-none-any.whl",
+            "markupsafe-3.0.4-cp312-cp312-macosx_11_0_arm64.whl",
+            "matrix_common-1.3.0-py3-none-any.whl",
+            "matrix_synapse-1.165.0-cp311-abi3-macosx_11_0_arm64.whl",
+            "msgpack-1.2.4-cp312-cp312-macosx_11_0_arm64.whl",
+            "multipart-2.0.1-py3-none-any.whl",
+            "netaddr-1.3.0-py3-none-any.whl",
+            "packaging-26.3-py3-none-any.whl",
+            "phonenumbers-9.0.43-py2.py3-none-any.whl",
+            "pillow-13.0.0-cp312-cp312-macosx_11_0_arm64.whl",
+            "prometheus_client-0.26.0-py3-none-any.whl",
+            "pyasn1-0.6.5-py3-none-any.whl",
+            "pyasn1_modules-0.4.2-py3-none-any.whl",
+            "pycparser-3.12-py3-none-any.whl",
+            "pydantic-2.14.4-py3-none-any.whl",
+            "pydantic_core-2.50.5-cp312-cp312-macosx_11_0_arm64.whl",
+            "pymacaroons-0.13.0-py2.py3-none-any.whl",
+            "pynacl-1.6.2-cp38-abi3-macosx_10_10_universal2.whl",
+            "pyopenssl-26.4.0-py3-none-any.whl",
+            "pyparsing-3.3.3-py3-none-any.whl",
+            "pyrsistent-0.20.0-cp312-cp312-macosx_10_9_universal2.whl",
+            "python_multipart-0.0.34-py3-none-any.whl",
+            "pyyaml-6.0.3-cp312-cp312-macosx_11_0_arm64.whl",
+            "referencing-0.37.0-py3-none-any.whl",
+            "requests-2.34.2-py3-none-any.whl",
+            "rpds_py-2026.9.1-cp312-cp312-macosx_11_0_arm64.whl",
+            "semantic_version-2.10.0-py2.py3-none-any.whl",
+            "service_identity-26.1.0-py3-none-any.whl",
+            "setuptools-84.2.1-py3-none-any.whl",
+            "setuptools_rust-1.13.0-py3-none-any.whl",
+            "signedjson-1.1.4-py3-none-any.whl",
+            "six-1.17.0-py2.py3-none-any.whl",
+            "sortedcontainers-2.4.0-py2.py3-none-any.whl",
+            "treq-26.7.0-py3-none-any.whl",
+            "twisted-26.10.0-py3-none-any.whl",
+            "typing_extensions-4.16.0-py3-none-any.whl",
+            "typing_inspection-0.4.5-py3-none-any.whl",
+            "unpaddedbase64-2.1.0-py3-none-any.whl",
+            "urllib3-2.8.0-py3-none-any.whl",
+            "webencodings-0.6.1-py3-none-any.whl",
+            "zope_interface-8.7-cp312-cp312-macosx_11_0_arm64.whl"
+          ],
+          "preparationManifest": "matrix-build.json",
+          "preparationSha256": "0c26ef29c883379ace29ac8204ffeffbe094860ba21fe564bc5975ba768dbd49"
+        }
+      ],
+      "minDiskMiB": 512,
+      "repository": "element-hq/synapse",
+      "sourceRef": {
+        "path": "profiles/setup/matrix-build.json",
+        "pointer": "/source"
+      },
+      "actions": [
+        "install",
+        "resume-install",
+        "configure",
+        "start",
+        "stop",
+        "backup",
+        "prepare-artifacts",
+        "enable-network"
+      ]
+    },
+    "hermes": {
+      "adapter": "hermes",
+      "modes": [
+        "connect",
+        "install"
+      ],
+      "packageDependencies": [],
+      "serviceRequirements": [],
+      "defaultPort": 8642,
+      "module": null,
+      "configurationSchema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "endpoint": {
+            "type": "string",
+            "maxLength": 240
+          },
+          "port": {
+            "type": "integer",
+            "minimum": 1024,
+            "maximum": 65535
+          },
+          "label": {
+            "type": "string",
+            "maxLength": 80
+          },
+          "secretRef": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9-]{0,63}$"
+          },
+          "backendKind": {
+            "enum": [
+              "local",
+              "remote"
+            ]
+          },
+          "modelEndpoint": {
+            "type": "string",
+            "maxLength": 240
+          },
+          "modelName": {
+            "type": "string",
+            "maxLength": 120
+          },
+          "contextLength": {
+            "type": "integer",
+            "minimum": 1024,
+            "maximum": 2097152
+          },
+          "providerId": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_.:-]{0,89}$"
+          },
+          "localModelId": {
+            "type": "string",
+            "enum": [
+              "qwen35-4b",
+              "qwen35-9b",
+              "qwen35-27b",
+              "qwen35-397b-a17b",
+              "inkling-2-mini"
+            ]
+          },
+          "modelFamily": {
+            "enum": [
+              "inkling-2-mini"
+            ]
+          }
+        }
+      },
+      "health": "hermes",
+      "prerequisites": [
+        "Qualified Hermes service artifact or existing local Hermes API",
+        "Configured model backend"
+      ],
+      "artifacts": [
+        {
+          "kind": "pinned-hermes-managed-build",
+          "manifest": "hermes-installer.json",
+          "manifestSha256": "5584586f7f126df61d5a71d400a9ac37e33edb8e72fc5ccdcc78c6e004e2a814",
+          "group": "hermes"
+        }
+      ],
+      "minDiskMiB": 256,
+      "repository": "NousResearch/hermes-agent",
+      "sourceRef": {
+        "path": "profiles/setup/hermes-installer.json",
+        "pointer": "/source"
+      },
+      "sourceVersionLabel": "0.0.0 + exact source commit",
+      "actions": [
+        "install",
+        "resume-install",
+        "configure",
+        "start",
+        "stop",
+        "backup",
+        "configure-backend",
+        "setup-hermes",
+        "create-guide-profile",
+        "setup-local-model"
+      ]
+    }
+  }
+}

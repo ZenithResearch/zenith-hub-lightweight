@@ -1,0 +1,16 @@
+{
+  "@context": {
+    "zn": "https://zenith-research.ca/ontology/terms/",
+    "cms": "urn:zenith:hub:catalog:",
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#"
+  },
+  "@id": "urn:zenith:software:frank",
+  "@type": "zn:Artifact",
+  "rdfs:label": "Frank",
+  "cms:key": "frank",
+  "rdfs:comment": "Executes eligible work through configured providers.",
+  "cms:publisher": "ZenithResearch",
+  "cms:repository": {
+    "@id": "https://github.com/ZenithResearch/frank-executor"
+  }
+}

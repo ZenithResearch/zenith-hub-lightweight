@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1510" height="1050" viewBox="0 0 1510 1050"><defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10" fill="#788a83"/></marker></defs><style>text{font-family:Arial,sans-serif;fill:#283832} .label{font-size:16px;font-weight:600}.small{font-size:12px;fill:#64746b} .edge{fill:none;stroke:#83938a;stroke-width:1.5;marker-end:url(#arrow)} .dashed{stroke-dasharray:5 4}</style><rect width="100%" height="100%" fill="white"/><text x="38" y="42" style="font-size:25px;font-weight:600">Modules and domains — verified offline imports</text><text x="38" y="70" class="small">Import arrows: importer → dependency. Instance/schema links are dashed and are not inheritance. All identifiers are proposals; no website publication is performed.</text>
+<rect x="25" y="100" width="535" height="860" fill="#fafbfa" stroke="#dbe2dc"/><text x="45" y="128" class="label">Existing normalized Zenith · 0.1.0</text>
+<path d="M460 301H495V198H460" class="edge"/>
+<path d="M460 404H495V198H460" class="edge"/>
+<path d="M460 507H495V198H460" class="edge"/>
+<path d="M460 610H495V198H460" class="edge"/>
+<path d="M460 713H495V198H460" class="edge"/>
+<path d="M70 816H48V198H70" class="edge"/>
+<path d="M70 816H48V713H70" class="edge"/>
+<path d="M70 816H48V301H70" class="edge"/>
+<path d="M70 816H48V507H70" class="edge"/>
+<path d="M70 816H48V610H70" class="edge"/>
+<path d="M70 816H48V404H70" class="edge"/>
+<rect x="70" y="165" width="390" height="67" rx="14" fill="#f1f3f2" stroke="#cdd6cf"/><text x="265" y="196.5" text-anchor="middle" class="label">core</text><text x="265" y="217.5" text-anchor="middle" class="small">verified module · exact published bytes</text>
+<rect x="70" y="268" width="390" height="67" rx="14" fill="#f1f3f2" stroke="#cdd6cf"/><text x="265" y="299.5" text-anchor="middle" class="label">directory</text><text x="265" y="320.5" text-anchor="middle" class="small">verified module · exact published bytes</text>
+<rect x="70" y="371" width="390" height="67" rx="14" fill="#f1f3f2" stroke="#cdd6cf"/><text x="265" y="402.5" text-anchor="middle" class="label">messaging</text><text x="265" y="423.5" text-anchor="middle" class="small">verified module · exact published bytes</text>
+<rect x="70" y="474" width="390" height="67" rx="14" fill="#f1f3f2" stroke="#cdd6cf"/><text x="265" y="505.5" text-anchor="middle" class="label">request-management</text><text x="265" y="526.5" text-anchor="middle" class="small">verified module · exact published bytes</text>
+<rect x="70" y="577" width="390" height="67" rx="14" fill="#f1f3f2" stroke="#cdd6cf"/><text x="265" y="608.5" text-anchor="middle" class="label">vocabulary</text><text x="265" y="629.5" text-anchor="middle" class="small">verified module · exact published bytes</text>
+<rect x="70" y="680" width="390" height="67" rx="14" fill="#f1f3f2" stroke="#cdd6cf"/><text x="265" y="711.5" text-anchor="middle" class="label">work</text><text x="265" y="732.5" text-anchor="middle" class="small">verified module · exact published bytes</text>
+<rect x="70" y="783" width="390" height="67" rx="14" fill="#f1f3f2" stroke="#cdd6cf"/><text x="265" y="814.5" text-anchor="middle" class="label">Root ontology</text><text x="265" y="835.5" text-anchor="middle" class="small">verified module · exact published bytes</text>
+<rect x="745" y="205" width="680" height="120" rx="14" fill="#e3f2e7" stroke="#cdd6cf"/><text x="1085" y="263" text-anchor="middle" class="label">Hub Infrastructure · proposed 0.1.0</text><text x="1085" y="284" text-anchor="middle" class="small">ontology/hub/infrastructure · 7 new classes</text>
+<path d="M745 265H650V198H460" class="edge"/>
+<text x="610" y="180" class="small">owl:imports · exact Core 0.1.0 hash pins</text>
+<rect x="745" y="440" width="680" height="110" rx="14" fill="#e3f2e7" stroke="#cdd6cf"/><text x="1085" y="493" text-anchor="middle" class="label">Infrastructure domain</text><text x="1085" y="514" text-anchor="middle" class="small">instance of existing zn:Domain · hub/infrastructure</text>
+<path d="M940 440V325" class="edge dashed"/>
+<text x="780" y="392" class="small">sourceModuleRef · versioned module</text>
+<path d="M1260 440V325" class="edge dashed"/>
+<text x="1120" y="371" class="small">vocabularyRef · canonical identity</text>
+<rect x="745" y="660" width="680" height="115" rx="14" fill="#efedf5" stroke="#cdd6cf"/><text x="1085" y="715.5" text-anchor="middle" class="label">Schemas and implementation bindings</text><text x="1085" y="736.5" text-anchor="middle" class="small">Core EntityProjection + infrastructure shapes + portable bindings</text>
+<path d="M1085 660V595H1465V345H1345V325" class="edge dashed"/>
+<text x="810" y="625" class="small">module-owned schemas; not inheritance</text>
+<rect x="745" y="840" width="680" height="80" rx="14" fill="#f1f3f2" stroke="#cdd6cf"/><text x="1085" y="878" text-anchor="middle" class="label">zn:Domain — existing Core class</text><text x="1085" y="899" text-anchor="middle" class="small">Infrastructure is an instance; Domain is not a superclass of infrastructure objects</text>
+<path d="M1425 495H1490V880H1425" class="edge dashed"/>
+<text x="1438" y="815" class="small">rdf:type</text>
+<text x="45" y="990" class="small">Existing domains: zn/core · zn/work · zn/directory · zn/request-management · zn/vocabulary · zn/evidence · zn/messaging</text><text x="45" y="1018" class="small">Module verification requires complete local imports and parent declarations; a cached context or schema is not a verified ontology module.</text></svg>

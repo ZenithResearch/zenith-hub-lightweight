@@ -1,0 +1,64 @@
+{
+  "@context": {
+    "owl": "http://www.w3.org/2002/07/owl#",
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+    "app": "https://zenith-research.ca/ontology/hub/application-draft/terms/",
+    "imports": {
+      "@id": "owl:imports",
+      "@type": "@id"
+    }
+  },
+  "@graph": [
+    {
+      "@id": "urn:zenith:hub:application-relations:draft:3",
+      "@type": "owl:Ontology",
+      "rdfs:label": "Review-only Hub application relations \u2014 no new classes",
+      "imports": [
+        "https://zenith-research.ca/ontology/normalized/v0.1.0/modules/core.jsonld",
+        "https://zenith-research.ca/ontology/hub/infrastructure/v0.1.0/ontology.jsonld"
+      ]
+    },
+    {
+      "@id": "app:describesSoftware",
+      "@type": "owl:ObjectProperty",
+      "rdfs:label": "describesSoftware",
+      "rdfs:comment": "Software descriptor associated with this record."
+    },
+    {
+      "@id": "app:installationHost",
+      "@type": "owl:ObjectProperty",
+      "rdfs:label": "installationHost",
+      "rdfs:comment": "Host on which the described software copy is installed; not hosting of the description file."
+    },
+    {
+      "@id": "app:sourceSnapshot",
+      "@type": "owl:ObjectProperty",
+      "rdfs:label": "sourceSnapshot",
+      "rdfs:comment": "Source snapshot associated with a build or described installed version."
+    },
+    {
+      "@id": "app:installedBuild",
+      "@type": "owl:ObjectProperty",
+      "rdfs:label": "installedBuild",
+      "rdfs:comment": "Build associated with the described installed version."
+    },
+    {
+      "@id": "app:installationRecord",
+      "@type": "owl:ObjectProperty",
+      "rdfs:label": "installationRecord",
+      "rdfs:comment": "Installation description associated with a configuration or operational service."
+    },
+    {
+      "@id": "app:configurationProfile",
+      "@type": "owl:ObjectProperty",
+      "rdfs:label": "configurationProfile",
+      "rdfs:comment": "Named configuration used by an operational service."
+    },
+    {
+      "@id": "app:configurationContent",
+      "@type": "owl:ObjectProperty",
+      "rdfs:label": "configurationContent",
+      "rdfs:comment": "Independently retained configuration content; distinct from the named configuration record."
+    }
+  ]
+}

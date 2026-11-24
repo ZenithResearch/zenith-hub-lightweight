@@ -1,0 +1,21 @@
+{
+  "@id": "urn:example:profile:generic",
+  "@type": [
+    "https://zenith-research.ca/ontology/terms/Artifact"
+  ],
+  "https://zenith-research.ca/ontology/hub/application-draft/terms/describesSoftware": [
+    {
+      "@id": "urn:example:software:hermes"
+    }
+  ],
+  "https://zenith-research.ca/ontology/hub/application-draft/terms/installationRecord": [
+    {
+      "@id": "urn:example:installation:hermes-one"
+    }
+  ],
+  "http://www.w3.org/2000/01/rdf-schema#label": [
+    {
+      "@value": "Named configuration"
+    }
+  ]
+}

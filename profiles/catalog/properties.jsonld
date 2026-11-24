@@ -1,0 +1,32 @@
+{
+  "@context": {
+    "owl": "http://www.w3.org/2002/07/owl#",
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#"
+  },
+  "@graph": [
+    {
+      "@id": "urn:zenith:hub:catalog-properties:v1",
+      "@type": "owl:Ontology"
+    },
+    {
+      "@id": "urn:zenith:hub:catalog:key",
+      "@type": "owl:DatatypeProperty"
+    },
+    {
+      "@id": "urn:zenith:hub:catalog:spec",
+      "@type": "owl:DatatypeProperty"
+    },
+    {
+      "@id": "urn:zenith:hub:catalog:publisher",
+      "@type": "owl:DatatypeProperty"
+    },
+    {
+      "@id": "urn:zenith:hub:catalog:software",
+      "@type": "owl:ObjectProperty"
+    },
+    {
+      "@id": "urn:zenith:hub:catalog:repository",
+      "@type": "owl:ObjectProperty"
+    }
+  ]
+}

@@ -1,0 +1,164 @@
+{
+  "schema": "zenith.hub-physical-mapping.draft.v6",
+  "records": {
+    "Host": {
+      "id": "hub_projections.object_id",
+      "revision": "hub_record_heads.revision",
+      "label": "hub_projections.projected_json.label",
+      "kind": "hub_projections.projected_json.kind",
+      "objectVersion": "hub_projections.{object_id,object_revision,profile_id}"
+    },
+    "SoftwareDescriptor": {
+      "id": "hub_projections.object_id",
+      "revision": "hub_record_heads.revision",
+      "key": "hub_projections.projected_json.key",
+      "label": "hub_projections.projected_json.label",
+      "publisher": "hub_projections.projected_json.publisher",
+      "repository": "hub_projections.projected_json.repository",
+      "objectVersion": "hub_projections.{object_id,object_revision,profile_id}"
+    },
+    "SoftwareSourceSnapshot": {
+      "id": "hub_projections.object_id",
+      "revision": "hub_record_heads.revision",
+      "softwareRef": "hub_projections.projected_json.softwareRef",
+      "repository": "hub_projections.projected_json.repository",
+      "commit": "hub_projections.projected_json.commit",
+      "version": "hub_projections.projected_json.version",
+      "manifestSha256": "hub_projections.projected_json.manifestSha256",
+      "objectVersion": "hub_projections.{object_id,object_revision,profile_id}"
+    },
+    "SoftwareBuild": {
+      "id": "hub_projections.object_id",
+      "revision": "hub_record_heads.revision",
+      "softwareRef": "hub_projections.projected_json.softwareRef",
+      "sourceSnapshotRef": "hub_projections.projected_json.sourceSnapshotRef",
+      "content": "hub_projections.projected_json.content",
+      "platform": "hub_projections.projected_json.platform",
+      "version": "hub_projections.projected_json.version",
+      "objectVersion": "hub_projections.{object_id,object_revision,profile_id}"
+    },
+    "SoftwareInstallationRecord": {
+      "id": "hub_projections.object_id",
+      "revision": "hub_record_heads.revision",
+      "softwareRef": "hub_projections.projected_json.softwareRef",
+      "hostRef": "hub_projections.projected_json.hostRef",
+      "management": "hub_installation_state.management",
+      "locations": "hub_projections.projected_json.locations",
+      "presence": "hub_inspections -> validated hub_installation_state.presence_json cache",
+      "compatibility": "hub_installation_state.compatibility_json",
+      "receiptRefs": "hub_installation_state.receipt_refs_json",
+      "objectVersion": "hub_projections.{object_id,object_revision,profile_id}",
+      "sourceSnapshotRef": "hub_projections.projected_json.sourceSnapshotRef",
+      "buildRef": "hub_projections.projected_json.buildRef"
+    },
+    "ConfigurationProfile": {
+      "id": "hub_projections.object_id",
+      "revision": "hub_record_heads.revision",
+      "softwareRef": "hub_projections.projected_json.softwareRef",
+      "installationRef": "hub_projections.projected_json.installationRef",
+      "name": "hub_projections.projected_json.name",
+      "configArtifactRef": "hub_projections.projected_json.configArtifactRef",
+      "nativeHome": "hub_projections.projected_json.nativeHome",
+      "credentialRefs": "hub_projections.projected_json.credentialRefs",
+      "objectVersion": "hub_projections.{object_id,object_revision,profile_id}",
+      "profileKind": "hub_projections.projected_json.profileKind"
+    },
+    "HermesConfigurationProfile": {
+      "id": "hub_projections.object_id",
+      "revision": "hub_record_heads.revision",
+      "softwareRef": "hub_projections.projected_json.softwareRef",
+      "installationRef": "hub_projections.projected_json.installationRef",
+      "name": "hub_projections.projected_json.name",
+      "configArtifactRef": "hub_projections.projected_json.configArtifactRef",
+      "nativeHome": "hub_projections.projected_json.nativeHome",
+      "credentialRefs": "hub_projections.projected_json.credentialRefs",
+      "objectVersion": "hub_projections.{object_id,object_revision,profile_id}",
+      "profileKind": "hub_projections.projected_json.profileKind",
+      "modelBinding": "hub_projections.projected_json.modelBinding"
+    },
+    "ServiceInstance": {
+      "id": "hub_projections.object_id",
+      "revision": "hub_record_heads.revision",
+      "softwareRef": "hub_projections.projected_json.softwareRef",
+      "installationRef": "hub_projections.projected_json.installationRef",
+      "profileRef": "hub_projections.projected_json.profileRef",
+      "label": "hub_projections.projected_json.label",
+      "management": "hub_service_state.management",
+      "hostRefs": "hub_projections.projected_json.hostRefs",
+      "desiredState": "hub_service_state.desired_state",
+      "runtime": "hub_service_state.runtime_json",
+      "objectVersion": "hub_projections.{object_id,object_revision,profile_id}"
+    },
+    "HubSettings": {
+      "id": "hub_settings.id",
+      "revision": "hub_record_heads.revision",
+      "label": "hub_settings.label",
+      "localHostRef": "hub_settings.local_host_id",
+      "selectedGuideProfileRef": "hub_settings.selected_guide_profile_id",
+      "enteredAt": "hub_settings.entered_at"
+    },
+    "SoftwareCatalogEntry": {
+      "id": "hub_catalog_entries.id",
+      "revision": "hub_record_heads.revision",
+      "catalogId": "hub_catalog_entries.catalog_id",
+      "key": "hub_catalog_entries.catalog_key",
+      "softwareRef": "hub_catalog_entries.software_id",
+      "adapterRef": "hub_catalog_entries.adapter_ref",
+      "supportedModes": "hub_catalog_entries.supported_modes_json"
+    },
+    "Connection": {
+      "id": "hub_connections.id",
+      "revision": "hub_record_heads.revision",
+      "label": "hub_connections.label",
+      "targetRef": "hub_connections.target_id",
+      "adapterRef": "hub_connections.adapter_ref",
+      "endpoint": "hub_connections.endpoint",
+      "enabled": "hub_connections.enabled",
+      "credentialRef": "hub_connections.credential_ref",
+      "endpointPolicyRef": "hub_connections.endpoint_policy_ref",
+      "targetScope": "hub_connections.target_scope"
+    },
+    "SetupOperation": {
+      "id": "hub_operations.id",
+      "revision": "hub_record_heads.revision",
+      "action": "hub_operations.action",
+      "targetRefs": "hub_operations.target_refs_json",
+      "state": "hub_operations.state",
+      "outcome": "hub_operations.outcome",
+      "createdAt": "hub_operations.created_at",
+      "updatedAt": "hub_operations.updated_at",
+      "planArtifactRef": "hub_operations.plan_artifact_id",
+      "receiptRefs": "hub_operations.receipt_refs_json",
+      "error": "hub_operations.error_json",
+      "expectedTargets": "hub_operations.expected_targets_json"
+    }
+  },
+  "rules": [
+    "SQL NULL for optional fields reconstructs omission, not a new semantic null value",
+    "JSON columns preserve exact schema structures; set-valued RDF arrays use declared sorted unique order",
+    "SQLite enabled 0/1 maps exactly to JSON false/true",
+    "Typed projected_json includes validated profile types; application row schema omits types and obtains ontology metadata through objectVersion",
+    "No direct write to a semantic projection column; repository regenerates it from the selected object version"
+  ],
+  "privateDocuments": {
+    "authority": "Internal application/native bindings; never additional ontology classes or public object fields",
+    "versions": "hub_application_document_versions",
+    "heads": "hub_application_documents",
+    "fields": {
+      "key": "document_key",
+      "revision": "revision",
+      "kind": "kind",
+      "value": "value_json",
+      "sha256": "sha256",
+      "commit": "commit_id"
+    },
+    "kinds": [
+      "setup",
+      "resource-registry",
+      "review-plan",
+      "native-binding",
+      "migration",
+      "application"
+    ]
+  }
+}

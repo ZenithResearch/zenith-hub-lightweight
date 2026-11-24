@@ -1,0 +1,23 @@
+{
+  "schema": "zenith.hub-object-bindings.draft.v2",
+  "objectId": "urn:example:service:hermes-api",
+  "objectRevision": 1,
+  "bindings": [
+    {
+      "profile": "urn:zenith:hub:application-db:draft:2#/$defs/ServiceInstanceProjection",
+      "value": {
+        "types": [
+          "https://zenith-research.ca/ontology/hub/infrastructure/terms/ServiceInstance"
+        ],
+        "id": "urn:example:service:hermes-api",
+        "softwareRef": "urn:example:software:hermes",
+        "installationRef": "urn:example:installation:hermes-one",
+        "profileRef": "urn:example:profile:hub-guide",
+        "label": "Example Hermes API",
+        "hostRefs": [
+          "urn:example:host:one"
+        ]
+      }
+    }
+  ]
+}

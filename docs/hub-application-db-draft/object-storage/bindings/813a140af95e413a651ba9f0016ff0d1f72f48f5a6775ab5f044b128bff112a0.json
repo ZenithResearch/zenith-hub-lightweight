@@ -1,0 +1,24 @@
+{
+  "schema": "zenith.hub-object-bindings.draft.v2",
+  "objectId": "urn:example:installation:hermes-one",
+  "objectRevision": 1,
+  "bindings": [
+    {
+      "profile": "urn:zenith:hub:application-db:draft:2#/$defs/SoftwareInstallationRecordProjection",
+      "value": {
+        "types": [
+          "https://zenith-research.ca/ontology/terms/Artifact"
+        ],
+        "id": "urn:example:installation:hermes-one",
+        "softwareRef": "urn:example:software:hermes",
+        "hostRef": "urn:example:host:one",
+        "locations": {
+          "source": "/example/hermes-agent",
+          "environment": "/example/hermes-agent/.venv",
+          "launcher": "/example/bin/hermes"
+        },
+        "sourceSnapshotRef": "urn:example:release:hermes"
+      }
+    }
+  ]
+}

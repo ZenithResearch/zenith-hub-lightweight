@@ -1,0 +1,23 @@
+{
+  "change": "Apps & services gallery",
+  "catalogVersion": "2026.11.23.2",
+  "sharedUICommit": "4fc513d373c48903c1eeb0215eaac66bd5cfbe00",
+  "databaseSchemaChanged": false,
+  "apiEnvelopeChanged": false,
+  "identityChanges": false,
+  "preservation": {
+    "databaseGroupsUnchanged": 9,
+    "stableNativeFilesUnchanged": 32,
+    "liveRuntimeFilesUpdated": [
+      "channel_directory.json",
+      "gateway_state.json"
+    ],
+    "liveRuntimeExplanation": "The same continuously running Hermes gateway maintains channel discovery and heartbeat state; these are not configuration or history migrations.",
+    "hermesRestarted": false
+  },
+  "validation": {
+    "uniqueContractChecksPassed": 86,
+    "method": "Full catalog/gallery/application run: 85 passed; newly added upgrade fixture corrected to publish its legacy catalog first, then passed on focused rerun; final gallery controls rerun passed.",
+    "browser": "Verified configured/available section counts, Hermes details and available-app on-page setup without applying an install or connection."
+  }
+}

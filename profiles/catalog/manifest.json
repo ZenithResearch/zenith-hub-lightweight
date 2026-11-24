@@ -1,0 +1,48 @@
+{
+  "schema": "zenith.hub-catalog-definitions.v1",
+  "id": "urn:zenith:hub:catalog-definitions:v1",
+  "files": [
+    {
+      "path": "field-ownership.json",
+      "sha256": "4286c66a51196d77fb87d730b087fa14e921dcfb9c5a1c9800bf880574fd1405"
+    },
+    {
+      "path": "properties.jsonld",
+      "sha256": "745a7062e7f61f84400d467dfed8a501d6bebc4064a333716b63881354f68ed2"
+    },
+    {
+      "path": "schema.json",
+      "sha256": "d4cdaa71587f296840130d3e8e6fce8bceefa5016504d24b344f54c66f8f3fa7"
+    }
+  ],
+  "releaseFiles": [
+    {
+      "path": "profiles/setup/component-contracts.json",
+      "sha256": "18435cb8d64e5bedf7272457d682f6eaebeeb2b6252916b4fbfd63d6bf285e70"
+    },
+    {
+      "path": "profiles/setup/catalog.schema.json",
+      "sha256": "65dfba433c6ac8ec53535c2750bfadb350562dbd12d67f362538f01b05d1da18"
+    },
+    {
+      "path": "profiles/process-macos/release.v1.json",
+      "sha256": "bed5667e2fc46c1c33af61ade705d2fea56f1f0f02df3b573a95cd78c3d25775"
+    },
+    {
+      "path": "profiles/setup/hermes-installer.json",
+      "sha256": "5584586f7f126df61d5a71d400a9ac37e33edb8e72fc5ccdcc78c6e004e2a814"
+    },
+    {
+      "path": "profiles/setup/matrix-build.json",
+      "sha256": "0c26ef29c883379ace29ac8204ffeffbe094860ba21fe564bc5975ba768dbd49"
+    },
+    {
+      "path": "profiles/setup/artifacts.darwin-arm64.json",
+      "sha256": "012b4fc4e880001f3be658750450d3d2bd7712d70cbe88d72b64e2dc54fedf88"
+    },
+    {
+      "path": "profiles/setup/hermes-models.json",
+      "sha256": "bcf07b61ab7da5cd33efae9c1e376b63a8e97a49484dee1fa426480c02538d26"
+    }
+  ]
+}

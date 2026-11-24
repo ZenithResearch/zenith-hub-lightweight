@@ -1,0 +1,36 @@
+{
+  "date": "2026-11-20",
+  "uiSourceCommit": "edb7fcf2e66d19a7cd95c2b6aa531dcf6eddfa49",
+  "scope": "Dot-only initial guide state and glass composer presentation",
+  "checks": {
+    "canonicalUiBuild": "passed",
+    "canonicalUiSource": "passed",
+    "hubTypecheck": "passed",
+    "hubImportedSource": "passed",
+    "browser": {
+      "url": "http://127.0.0.1:4318/",
+      "initialState": "Collapsed glass circle with centered status dot and no chat glyph",
+      "dotControl": "Expanded input's leading dot minimizes; collapsed dot opens input",
+      "separateMinusControl": "removed",
+      "draftRetention": "Non-sent temporary draft survived dot minimize/reopen and modal open/close, then was cleared",
+      "computedGlass": {
+        "fill": "rgba(255, 255, 255, 0.1)",
+        "backdropFilter": "blur(2px)"
+      },
+      "textColor": {
+        "cloudBackground": "rgb(255, 255, 255)",
+        "modal": "rgb(23, 38, 34)"
+      },
+      "modelMessagesSent": 0
+    }
+  },
+  "styleReference": "zenith-landing/src/components/ui/GlassBox.tsx",
+  "evidence": [
+    "evidence/hermes-glass-collapsed.jpg",
+    "evidence/hermes-glass-expanded.jpg"
+  ],
+  "limitations": [
+    "IAB browser verified; no direct Safari or Chrome automation",
+    "Existing native setup tests were not rerun for this presentation-only change"
+  ]
+}

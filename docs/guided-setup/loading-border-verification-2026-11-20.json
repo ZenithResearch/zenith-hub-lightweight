@@ -1,0 +1,43 @@
+{
+  "date": "2026-11-20",
+  "uiSourceCommit": "f5fa9cd467812604e9eb42e04c99dab97d8969ae",
+  "scope": "Border-only Hermes reply loading feedback",
+  "checks": {
+    "canonicalUiBuild": "passed",
+    "canonicalUiSource": "passed",
+    "hubImportedSource": "passed",
+    "hubTypecheck": "passed",
+    "browser": {
+      "fixture": "Controlled local promise; no native model calls",
+      "pending": {
+        "replyPanelHidden": true,
+        "ariaBusy": "true",
+        "animation": "zn-hermes-loading-border",
+        "observedDashOffsets": [
+          "-10.9334px",
+          "-16.6334px"
+        ],
+        "borderBounds": {
+          "width": 378,
+          "height": 58
+        }
+      },
+      "minimized": {
+        "loadingBorderPresent": true,
+        "ariaBusy": "true"
+      },
+      "replyArrived": {
+        "loadingBorders": 0,
+        "ariaBusy": "false",
+        "replyPanelHidden": false,
+        "text": "The reply is ready."
+      },
+      "modelMessagesSent": 0
+    }
+  },
+  "evidence": "evidence/hermes-input-loading.jpg",
+  "temporaryFixture": "removed",
+  "limitations": [
+    "Reduced-motion fallback is implemented but was not toggled at OS/browser level during this check"
+  ]
+}

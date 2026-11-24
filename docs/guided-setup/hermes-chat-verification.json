@@ -1,0 +1,24 @@
+{
+  "date": "2026-11-20",
+  "preview": "http://127.0.0.1:4318/",
+  "uiLibraryCommit": "0ea7354",
+  "passed": [
+    "37 setup tests, including chat eligibility, stopped/stale/offline states and resource identity.",
+    "UI library typecheck, build and source provenance; Hub optimized production build and TypeScript.",
+    "Normal and standalone setup API package checks; no installer apply.",
+    "Browser: floating chat opens on welcome and Communications, minimizes, and Escape restores the launcher.",
+    "Browser: stopped Hermes retains the panel but disables Message Hermes and sending.",
+    "Browser after reset: fresh welcome offers Install Hermes and no configured chat.",
+    "Fresh setup API: zero instances and operations, with no setup root created by read-only inspection."
+  ],
+  "evidence": "evidence/hermes-global-chat-welcome.jpg",
+  "evidenceContext": "Saved configured-but-stopped test instance before resetting the preview.",
+  "reset": {
+    "privateDataBackupRetained": true,
+    "freshCredentialsPreloaded": false,
+    "testConnectionsRemoved": true,
+    "personalServicesPreserved": true
+  },
+  "realModelMessageSentDuringThisVerification": false,
+  "buildWarnings": "Production build retains 13 dynamic filesystem tracing warnings in existing object/workspace/deployer code."
+}

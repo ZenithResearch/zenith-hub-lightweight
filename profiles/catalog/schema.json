@@ -1,0 +1,269 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:zenith:hub:catalog-profiles:v1",
+  "$defs": {
+    "SoftwareMetadata": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uri"
+        },
+        "types": {
+          "type": "array",
+          "items": {
+            "const": "https://zenith-research.ca/ontology/terms/Artifact"
+          },
+          "minItems": 1,
+          "maxItems": 1
+        },
+        "key": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]{0,47}$"
+        },
+        "publisher": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "repository": {
+          "type": "string",
+          "format": "uri"
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096
+        }
+      },
+      "required": [
+        "id",
+        "types",
+        "key",
+        "publisher",
+        "repository",
+        "description"
+      ],
+      "additionalProperties": false
+    },
+    "Recipe": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uri"
+        },
+        "types": {
+          "type": "array",
+          "items": {
+            "const": "https://zenith-research.ca/ontology/terms/Artifact"
+          },
+          "minItems": 1,
+          "maxItems": 1
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "softwareRef": {
+          "type": "string",
+          "format": "uri"
+        },
+        "specJson": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 65536
+        }
+      },
+      "required": [
+        "id",
+        "types",
+        "label",
+        "softwareRef",
+        "specJson"
+      ],
+      "additionalProperties": false
+    },
+    "Package": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uri"
+        },
+        "types": {
+          "type": "array",
+          "items": {
+            "const": "https://zenith-research.ca/ontology/terms/Artifact"
+          },
+          "minItems": 1,
+          "maxItems": 1
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "specJson": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 262144
+        }
+      },
+      "required": [
+        "id",
+        "types",
+        "label",
+        "specJson"
+      ],
+      "additionalProperties": false
+    },
+    "RecipeBody": {
+      "type": "object",
+      "properties": {
+        "version": {
+          "type": "string",
+          "pattern": "^[0-9]+(?:\\.[0-9]+)*$"
+        },
+        "maintainer": {
+          "type": "string",
+          "format": "uri"
+        },
+        "capability": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]{0,47}$"
+        },
+        "mode": {
+          "enum": [
+            "install",
+            "connect",
+            "vps"
+          ]
+        },
+        "actions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "contract": {
+          "type": "object",
+          "properties": {
+            "path": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            },
+            "sha256": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            }
+          },
+          "required": [
+            "path",
+            "sha256"
+          ],
+          "additionalProperties": false
+        },
+        "qualification": {
+          "enum": [
+            "supported",
+            "unqualified"
+          ]
+        },
+        "qualificationReason": {
+          "type": "string",
+          "maxLength": 1024
+        }
+      },
+      "required": [
+        "version",
+        "maintainer",
+        "capability",
+        "mode",
+        "actions",
+        "contract",
+        "qualification"
+      ],
+      "additionalProperties": false
+    },
+    "PackageBody": {
+      "type": "object",
+      "properties": {
+        "version": {
+          "type": "string",
+          "pattern": "^[0-9]+(?:\\.[0-9]+)*$"
+        },
+        "catalogId": {
+          "type": "string",
+          "format": "uri"
+        },
+        "publisher": {
+          "type": "string",
+          "format": "uri"
+        },
+        "files": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 512
+              },
+              "sha256": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              }
+            },
+            "required": [
+              "path",
+              "sha256"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 2,
+          "maxItems": 64
+        },
+        "profiles": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 512
+              },
+              "sha256": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              }
+            },
+            "required": [
+              "path",
+              "sha256"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 1,
+          "maxItems": 8
+        }
+      },
+      "required": [
+        "version",
+        "catalogId",
+        "publisher",
+        "files",
+        "profiles"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

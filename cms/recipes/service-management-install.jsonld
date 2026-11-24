@@ -1,0 +1,14 @@
+{
+  "@context": {
+    "zn": "https://zenith-research.ca/ontology/terms/",
+    "cms": "urn:zenith:hub:catalog:",
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#"
+  },
+  "@id": "urn:zenith:hub:recipe:service-management-install",
+  "@type": "zn:Artifact",
+  "rdfs:label": "Service Management \u2014 install",
+  "cms:software": {
+    "@id": "urn:zenith:software:service-management"
+  },
+  "cms:spec": "{\"actions\":[\"install\",\"resume-install\",\"configure\",\"start\",\"stop\",\"backup\"],\"capability\":\"service-management\",\"contract\":{\"path\":\"profiles/setup/component-contracts.json\",\"sha256\":\"18435cb8d64e5bedf7272457d682f6eaebeeb2b6252916b4fbfd63d6bf285e70\"},\"maintainer\":\"https://github.com/ZenithResearch\",\"mode\":\"install\",\"qualification\":\"supported\",\"version\":\"1\"}"
+}

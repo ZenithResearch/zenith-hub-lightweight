@@ -1,0 +1,310 @@
+{
+  "schema": "zenith.hermes-model-options.v1",
+  "checkedOn": "2026-11-20",
+  "hermesCommit": "e5a86d08d3d8c5e2f61bc2e5354d96ba25a56f97",
+  "recommendationNote": "Memory bands are starting suggestions, not guarantees. Hermes estimates weights, context and runtime overhead for this machine before setup.",
+  "sources": [
+    "https://hermes-agent.nousresearch.com/docs/integrations/providers",
+    "https://huggingface.co/Qwen/Qwen3.5-4B",
+    "https://huggingface.co/Qwen/Qwen3.5-9B",
+    "https://huggingface.co/Qwen/Qwen3.5-27B",
+    "https://huggingface.co/Qwen/Qwen3.5-397B-A17B",
+    "https://www.apple.com/mac-studio/specs/",
+    "https://thinkingmachines.ai/news/inkling-2-mini/",
+    "https://huggingface.co/thinkingmachines/Inkling-2-Mini",
+    "https://unsloth.ai/docs/models/inkling-2-mini",
+    "https://huggingface.co/unsloth/Inkling-2-Mini-GGUF"
+  ],
+  "models": [
+    {
+      "id": "qwen35-4b",
+      "name": "Qwen3.5 4B",
+      "tier": "Compact",
+      "machineLabel": "Around 16 GB memory",
+      "description": "A smaller download for everyday help and lighter machines.",
+      "modelCard": "https://huggingface.co/Qwen/Qwen3.5-4B",
+      "catalog": {
+        "id": "qwen35-4b",
+        "display_name": "Qwen3.5 4B",
+        "description": "A smaller download for everyday help and lighter machines.",
+        "repo": "ggml-org/Qwen3.5-4B-GGUF",
+        "variants": [
+          {
+            "quant": "Q4_K_M",
+            "files": [
+              {
+                "path": "Qwen3.5-4B-Q4_K_M.gguf",
+                "size_bytes": 3032091584,
+                "sha256": "217002fa8008ef4fc6d548353a3aebef055a96e6ff8e0e2c0953ef8254a89c14",
+                "revision": "8d43d974efc48399cb58957ad49c8b26bf5a109c"
+              }
+            ]
+          }
+        ],
+        "mmproj": {
+          "path": "mmproj-Qwen3.5-4B-Q8_0.gguf",
+          "local": "mmproj-qwen35-4b.gguf",
+          "size_bytes": 366894560,
+          "sha256": "5a5ba634d46f9888599963bfc52194eadf099e1efdbee46d71957d911cf62654",
+          "revision": "8d43d974efc48399cb58957ad49c8b26bf5a109c"
+        },
+        "n_ctx_train": 262144,
+        "full_layers": 8,
+        "recurrent_layers": 24,
+        "per_layer_f16": 4096,
+        "n_vocab": 248320,
+        "architecture": "qwen35",
+        "quality": 40,
+        "recommend": true
+      }
+    },
+    {
+      "id": "qwen35-9b",
+      "name": "Qwen3.5 9B",
+      "tier": "Balanced",
+      "machineLabel": "Around 24\u201332 GB memory",
+      "description": "More capable general assistance with a moderate memory footprint.",
+      "modelCard": "https://huggingface.co/Qwen/Qwen3.5-9B",
+      "catalog": {
+        "id": "qwen35-9b",
+        "display_name": "Qwen3.5 9B",
+        "description": "More capable general assistance with a moderate memory footprint.",
+        "repo": "unsloth/Qwen3.5-9B-GGUF",
+        "variants": [
+          {
+            "quant": "Q4_K_M",
+            "files": [
+              {
+                "path": "Qwen3.5-9B-Q4_K_M.gguf",
+                "size_bytes": 5680522464,
+                "sha256": "03b74727a860a56338e042c4420bb3f04b2fec5734175f4cb9fa853daf52b7e8",
+                "revision": "3885219b6810b007914f3a7950a8d1b469d598a5"
+              }
+            ]
+          }
+        ],
+        "mmproj": {
+          "path": "mmproj-BF16.gguf",
+          "local": "mmproj-qwen35-9b.gguf",
+          "size_bytes": 921705024,
+          "sha256": "853698ce7aa6c7ba732478bad280240969ddf7b0fcbf93900046f63903a83383",
+          "revision": "3885219b6810b007914f3a7950a8d1b469d598a5"
+        },
+        "n_ctx_train": 262144,
+        "full_layers": 8,
+        "recurrent_layers": 24,
+        "per_layer_f16": 4096,
+        "n_vocab": 248320,
+        "architecture": "qwen35",
+        "quality": 55,
+        "recommend": true
+      }
+    },
+    {
+      "id": "qwen35-27b",
+      "name": "Qwen3.5 27B",
+      "tier": "Larger",
+      "machineLabel": "Around 48\u201364 GB memory",
+      "description": "A larger model for stronger reasoning when the machine has room.",
+      "modelCard": "https://huggingface.co/Qwen/Qwen3.5-27B",
+      "catalog": {
+        "id": "qwen35-27b",
+        "display_name": "Qwen3.5 27B",
+        "description": "A larger model for stronger reasoning when the machine has room.",
+        "repo": "unsloth/Qwen3.5-27B-GGUF",
+        "variants": [
+          {
+            "quant": "Q4_K_M",
+            "files": [
+              {
+                "path": "Qwen3.5-27B-Q4_K_M.gguf",
+                "size_bytes": 16740812704,
+                "sha256": "84b5f7f112156d63836a01a69dc3f11a6ba63b10a23b8ca7a7efaf52d5a2d806",
+                "revision": "3221f178a6b842d04f1fb42f1c413534adcc0a6a"
+              }
+            ]
+          }
+        ],
+        "mmproj": {
+          "path": "mmproj-BF16.gguf",
+          "local": "mmproj-qwen35-27b.gguf",
+          "size_bytes": 931145984,
+          "sha256": "29fe388bf3a45b981b2b38b966834f90cbabf998158d75ff1dd1b70a9f5f121c",
+          "revision": "3221f178a6b842d04f1fb42f1c413534adcc0a6a"
+        },
+        "n_ctx_train": 262144,
+        "full_layers": 16,
+        "recurrent_layers": 48,
+        "per_layer_f16": 4096,
+        "n_vocab": 248320,
+        "architecture": "qwen35",
+        "quality": 70,
+        "recommend": true
+      }
+    },
+    {
+      "id": "qwen35-397b-a17b",
+      "name": "Qwen3.5 397B-A17B",
+      "tier": "Flagship Mac",
+      "machineLabel": "512 GB unified-memory Macs",
+      "description": "A flagship mixture-of-experts model for high-memory Mac Studio configurations. All model weights must fit, despite only a subset being active per token.",
+      "modelCard": "https://huggingface.co/Qwen/Qwen3.5-397B-A17B",
+      "catalog": {
+        "id": "qwen35-397b-a17b",
+        "display_name": "Qwen3.5 397B-A17B",
+        "description": "Flagship model for high-memory Macs.",
+        "repo": "unsloth/Qwen3.5-397B-A17B-GGUF",
+        "variants": [
+          {
+            "quant": "Q4_K_M",
+            "files": [
+              {
+                "path": "Q4_K_M/Qwen3.5-397B-A17B-Q4_K_M-00001-of-00006.gguf",
+                "size_bytes": 10943552,
+                "sha256": "63c290c9be83e1b4dd41833d81bd933afd535d65657579b9f92f5c3f76e0218d",
+                "revision": "da33c16fa4440f831149fcf53b98a22bc07785e5"
+              },
+              {
+                "path": "Q4_K_M/Qwen3.5-397B-A17B-Q4_K_M-00002-of-00006.gguf",
+                "size_bytes": 49136153056,
+                "sha256": "dc94995a3605f3130700e96df51ee56cf93bd9340fe891918403450556453ed7",
+                "revision": "da33c16fa4440f831149fcf53b98a22bc07785e5"
+              },
+              {
+                "path": "Q4_K_M/Qwen3.5-397B-A17B-Q4_K_M-00003-of-00006.gguf",
+                "size_bytes": 49735103552,
+                "sha256": "2952dadb60137f413d5f70f6ca3c06007e24198e712c882a094432f58f76c230",
+                "revision": "da33c16fa4440f831149fcf53b98a22bc07785e5"
+              },
+              {
+                "path": "Q4_K_M/Qwen3.5-397B-A17B-Q4_K_M-00004-of-00006.gguf",
+                "size_bytes": 49914377024,
+                "sha256": "c7b99959e8fb78c8cfc9b71f3da07a2b4a6d39bf377dfa226f0a7b730c8cf3ba",
+                "revision": "da33c16fa4440f831149fcf53b98a22bc07785e5"
+              },
+              {
+                "path": "Q4_K_M/Qwen3.5-397B-A17B-Q4_K_M-00005-of-00006.gguf",
+                "size_bytes": 49654346688,
+                "sha256": "eeea4540f7289ab3baad2b3f2b4b6798e70a1802b9b4b269799a1f04d75b0af0",
+                "revision": "da33c16fa4440f831149fcf53b98a22bc07785e5"
+              },
+              {
+                "path": "Q4_K_M/Qwen3.5-397B-A17B-Q4_K_M-00006-of-00006.gguf",
+                "size_bytes": 45642707040,
+                "sha256": "d3bf93bb9fe007910ae9c0fd130d7776d7c6149635c9e7f158312308beb9b754",
+                "revision": "da33c16fa4440f831149fcf53b98a22bc07785e5"
+              }
+            ]
+          }
+        ],
+        "mmproj": {
+          "path": "mmproj-BF16.gguf",
+          "size_bytes": 921705184,
+          "sha256": "b3624272d7b9b49ffe6c6d0c592980bed6b026ce59cde11708bb230395c2a227",
+          "revision": "da33c16fa4440f831149fcf53b98a22bc07785e5",
+          "local": "mmproj-qwen35-397b-a17b.gguf"
+        },
+        "n_ctx_train": 262144,
+        "full_layers": 15,
+        "recurrent_layers": 45,
+        "per_layer_f16": 2048,
+        "n_vocab": 248320,
+        "architecture": "qwen35moe",
+        "moe": true,
+        "decode_fraction": 0.042821158690176324,
+        "quality": 85,
+        "recommend": true
+      }
+    },
+    {
+      "id": "inkling-2-mini",
+      "name": "Inkling 2 Mini",
+      "tier": "Optional \u00b7 experimental",
+      "machineLabel": "Apple silicon \u00b7 at least 32 GiB, plus a live memory check",
+      "description": "Thinking Machines Lab inference for Hermes. Not yet qualified for Hub onboarding; the publisher reports limitations with multi-turn chat and complex instructions. Never selected automatically.",
+      "modelCard": "https://huggingface.co/thinkingmachines/Inkling-2-Mini",
+      "publisher": "Thinking Machines Lab",
+      "quantizationPublisher": "Unsloth",
+      "license": "Apache-2.0",
+      "notice": "docs/guided-setup/inkling/NOTICE.md",
+      "qualification": {
+        "status": "not-qualified",
+        "measuredMemoryBytes": null,
+        "contextTokens": 65536,
+        "streaming": "not-exposed-by-hub",
+        "toolCalls": "disabled-by-hub"
+      },
+      "managed": {
+        "platform": "darwin-arm64",
+        "layout": "unsloth-looped-root",
+        "contextTokens": 65536,
+        "reason": "Experimental: installs an instance-owned Unsloth engine alongside Hermes's existing engine. No global software is replaced. Requires at least 32 GiB RAM and enough currently available memory for the 65,536-token configuration.",
+        "memory": {
+          "basis": "configuration-derived conservative estimate; not a measured 64K run",
+          "minimumPhysicalBytes": 34359738368,
+          "fullAttentionApplications": 8,
+          "localAttentionApplications": 40,
+          "kvBytesPerTokenPerApplication": 4096,
+          "localWindowTokens": 1024,
+          "runtimeOverheadBytes": 4294967296,
+          "systemReserveBytes": 6442450944
+        },
+        "engine": {
+          "publisher": "Unsloth",
+          "repository": "unslothai/llama.cpp",
+          "release": "b12588-mix-c0c3de8",
+          "commit": "e854428673114be17c32272440a43f4b4ebd20b8",
+          "compatibility": "Unsloth root looped-layer GGUF and per-expert NVFP4 scales; never substitute Mainline_Support files",
+          "url": "https://github.com/unslothai/llama.cpp/releases/download/b12588-mix-c0c3de8/llama-b12588-mix-c0c3de8-bin-macos-arm64.tar.gz",
+          "size_bytes": 13114900,
+          "sha256": "229def18e27ed740ec4f3a6508f084b25630e08d8a87ada40b00622fc496ceb8",
+          "expandedBytes": 536870912,
+          "verification": "archive bytes hashed in memory on 2026-11-20; matches GitHub asset digest",
+          "assetId": 773705810,
+          "observedBuildCommit": "883286076",
+          "executableSmoke": "M4 Pro: --version and required --help flags passed; no model/server loaded",
+          "commitKind": "release tag target; binary reports separate build identifier"
+        }
+      },
+      "catalog": {
+        "id": "inkling-2-mini",
+        "display_name": "Inkling 2 Mini",
+        "description": "Optional experimental inference; Hermes remains the agent.",
+        "repo": "unsloth/Inkling-2-Mini-GGUF",
+        "variants": [
+          {
+            "quant": "UD-Q4_K_XL",
+            "validated": false,
+            "files": [
+              {
+                "path": "Inkling-2-Mini-UD-Q4_K_XL.gguf",
+                "size_bytes": 17629759456,
+                "sha256": "e62d463c135ffe283df8d94b279a96ca145ac128b52ce854478613045bf4de15",
+                "revision": "ea0c79b2ecd73669e774c8519b79bfabfddbc027"
+              }
+            ]
+          }
+        ],
+        "n_ctx_train": 1048576,
+        "full_layers": 8,
+        "swa_layers": 40,
+        "swa_window": 1024,
+        "recurrent_layers": 0,
+        "per_layer_f16": 4096,
+        "n_vocab": 201024,
+        "architecture": "inkling2",
+        "moe": true,
+        "recommend": false,
+        "sampling": {
+          "temp": 1.0,
+          "top-p": 1.0,
+          "top-k": 0,
+          "min-p": 0.0
+        }
+      },
+      "textOnly": true,
+      "companionNote": "No companion required for text-only inference. Vision projector and DSpark drafter are deliberately excluded; those combinations are unqualified.",
+      "sourceRevision": "ed40e7da625f594fc9c4990f5f66be24873c22d7"
+    }
+  ]
+}

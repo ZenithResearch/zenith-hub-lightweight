@@ -1,0 +1,87 @@
+{
+  "schema": "zenith.hub.publication-validation.v1",
+  "date": "2026-11-23",
+  "scope": "Local qualification before publishing the repository-foundation PR; CI is authoritative on the PR head.",
+  "javascript": {
+    "passed": 317,
+    "failed": 0,
+    "suites": [
+      "deployer",
+      "setup",
+      "objects",
+      "hub",
+      "application",
+      "catalog"
+    ]
+  },
+  "python": {
+    "discovered": 64,
+    "passed": 63,
+    "skipped": 1,
+    "cleanEnvironment": "Python 3.12 with tests/requirements.txt",
+    "skip": "Opt-in installed-Hermes agent fixture; separately qualified below."
+  },
+  "nativeHermesFixture": {
+    "passed": 1,
+    "inference": "Local fake model server only; no user configuration, credentials or external model used.",
+    "streaming": false,
+    "tools": false
+  },
+  "apiSmoke": {
+    "passed": 9,
+    "modes": [
+      "production",
+      "standalone",
+      "development"
+    ],
+    "coverage": [
+      "objects",
+      "setup",
+      "hub",
+      "application startup",
+      "explicit migration",
+      "restart and retained reviews",
+      "credential preservation",
+      "stale-plan rejection"
+    ]
+  },
+  "reviewContracts": {
+    "passed": 68,
+    "synthetic": true
+  },
+  "reviewDesign": {
+    "passed": 32,
+    "synthetic": true
+  },
+  "sourcePins": "passed",
+  "catalog": "2026.11.23.2",
+  "typecheck": "passed",
+  "productionBuild": "passed from locked clean install in disposable copy",
+  "intermediateBackendBuild": "passed",
+  "npmAudit": {
+    "vulnerabilities": 0
+  },
+  "ui": {
+    "pr": "https://github.com/ZenithResearch/zenith-ui-deployment/pull/1",
+    "head": "0ec45f743e2f99c5aef5f7463c4c81d2d33d7f8a",
+    "testsPassed": 6,
+    "ci": "success"
+  },
+  "preservation": {
+    "logicalDatabaseTablesUnchanged": 33,
+    "nativeServicesRestarted": false,
+    "privateEnvironmentsOrLiveDataCommitted": false
+  },
+  "limits": [
+    "Container integrations run in GitHub CI, not on the live local stack.",
+    "No real model weights downloaded or real-model inference qualification performed.",
+    "CI results are verified separately against the final PR head."
+  ],
+  "ciFollowups": [
+    {
+      "run": 45307743048,
+      "finding": "Inkling job fixture inherited the Linux runner platform instead of specifying its supported platform.",
+      "correction": "Explicit Darwin/arm64 and Linux/x86_64 cases, with specific context/inference failure assertions; production platform restrictions unchanged."
+    }
+  ]
+}

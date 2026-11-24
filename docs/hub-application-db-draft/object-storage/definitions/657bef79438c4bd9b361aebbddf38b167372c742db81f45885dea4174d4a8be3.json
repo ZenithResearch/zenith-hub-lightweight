@@ -1,0 +1,829 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:zenith:hub:application-db:draft:1",
+  "title": "Hub application logical database \u2014 review draft 1",
+  "description": "Review-only logical application model. Every ontology-typed object has a stored JSON-LD file and pinned applicable definitions, referenced through objectRecords. No runtime migration or file storage implementation is activated.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema": {
+      "const": "zenith.hub-application-db.draft.v1"
+    },
+    "hub": {
+      "$ref": "#/$defs/Hub"
+    },
+    "hosts": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/Host"
+      }
+    },
+    "software": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/SoftwareCatalogEntry"
+      }
+    },
+    "releases": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/SoftwareRelease"
+      }
+    },
+    "installations": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/SoftwareInstallationRecord"
+      }
+    },
+    "profiles": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/ConfigurationProfile"
+      }
+    },
+    "services": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/ServiceInstance"
+      }
+    },
+    "connections": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/Connection"
+      }
+    },
+    "operations": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/SetupOperation"
+      }
+    },
+    "objectRecords": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/StoredObjectRecord"
+      }
+    }
+  },
+  "required": [
+    "schema",
+    "hub",
+    "hosts",
+    "software",
+    "releases",
+    "installations",
+    "profiles",
+    "services",
+    "connections",
+    "operations",
+    "objectRecords"
+  ],
+  "$defs": {
+    "IRI": {
+      "type": "string",
+      "format": "uri",
+      "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+    },
+    "PresenceObservation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "state": {
+          "enum": [
+            "present",
+            "absent",
+            "unknown"
+          ]
+        },
+        "observedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "method": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "evidenceRefs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/IRI"
+          }
+        }
+      },
+      "required": [
+        "state",
+        "observedAt",
+        "method"
+      ]
+    },
+    "CompatibilityObservation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "state": {
+          "enum": [
+            "supported",
+            "unsupported",
+            "unknown"
+          ]
+        },
+        "observedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "method": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "evidenceRefs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/IRI"
+          }
+        }
+      },
+      "required": [
+        "state",
+        "observedAt",
+        "method"
+      ]
+    },
+    "RuntimeObservation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "state": {
+          "enum": [
+            "running",
+            "stopped",
+            "unreachable",
+            "unknown"
+          ]
+        },
+        "observedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "method": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "evidenceRefs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/IRI"
+          }
+        }
+      },
+      "required": [
+        "state",
+        "observedAt",
+        "method"
+      ]
+    },
+    "Hub": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/IRI"
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "localHostRef": {
+          "$ref": "#/$defs/IRI"
+        },
+        "selectedGuideProfileRef": {
+          "$ref": "#/$defs/IRI"
+        },
+        "objectRef": {
+          "$ref": "#/$defs/IRI"
+        }
+      },
+      "required": [
+        "id",
+        "revision",
+        "label"
+      ]
+    },
+    "Host": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/IRI"
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "kind": {
+          "enum": [
+            "physical",
+            "virtual",
+            "unknown"
+          ]
+        },
+        "objectRef": {
+          "$ref": "#/$defs/IRI"
+        }
+      },
+      "required": [
+        "id",
+        "revision",
+        "label",
+        "kind",
+        "objectRef"
+      ]
+    },
+    "SoftwareCatalogEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/IRI"
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "key": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]{0,63}$"
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "publisher": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "repository": {
+          "type": "string",
+          "format": "uri"
+        },
+        "adapterRef": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "supportedModes": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "install",
+              "connect"
+            ]
+          }
+        },
+        "objectRef": {
+          "$ref": "#/$defs/IRI"
+        }
+      },
+      "required": [
+        "id",
+        "revision",
+        "key",
+        "label",
+        "adapterRef",
+        "supportedModes",
+        "objectRef"
+      ]
+    },
+    "SoftwareRelease": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/IRI"
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "softwareRef": {
+          "$ref": "#/$defs/IRI"
+        },
+        "source": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "repository": {
+              "type": "string",
+              "format": "uri"
+            },
+            "revision": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            },
+            "version": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            }
+          },
+          "required": [
+            "repository",
+            "revision"
+          ]
+        },
+        "manifestSha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "artifactSha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "objectRef": {
+          "$ref": "#/$defs/IRI"
+        }
+      },
+      "required": [
+        "id",
+        "revision",
+        "softwareRef",
+        "source",
+        "objectRef"
+      ]
+    },
+    "InstallationLocations": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "source": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "environment": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "launcher": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "runtimeRoot": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        }
+      },
+      "required": []
+    },
+    "SoftwareInstallationRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/IRI"
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "softwareRef": {
+          "$ref": "#/$defs/IRI"
+        },
+        "releaseRef": {
+          "$ref": "#/$defs/IRI"
+        },
+        "hostRef": {
+          "$ref": "#/$defs/IRI"
+        },
+        "management": {
+          "enum": [
+            "hub-managed",
+            "external"
+          ]
+        },
+        "locations": {
+          "$ref": "#/$defs/InstallationLocations"
+        },
+        "presence": {
+          "$ref": "#/$defs/PresenceObservation"
+        },
+        "compatibility": {
+          "$ref": "#/$defs/CompatibilityObservation"
+        },
+        "receiptRefs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/IRI"
+          }
+        },
+        "objectRef": {
+          "$ref": "#/$defs/IRI"
+        }
+      },
+      "required": [
+        "id",
+        "revision",
+        "softwareRef",
+        "hostRef",
+        "management",
+        "locations",
+        "presence",
+        "compatibility",
+        "objectRef"
+      ]
+    },
+    "ConfigurationProfile": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/IRI"
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "softwareRef": {
+          "$ref": "#/$defs/IRI"
+        },
+        "installationRef": {
+          "$ref": "#/$defs/IRI"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "configArtifactRef": {
+          "$ref": "#/$defs/IRI"
+        },
+        "nativeHome": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "credentialRefs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          }
+        },
+        "modelBinding": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "providerId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            },
+            "modelName": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            },
+            "serverConnectionRef": {
+              "$ref": "#/$defs/IRI"
+            }
+          },
+          "required": []
+        },
+        "objectRef": {
+          "$ref": "#/$defs/IRI"
+        }
+      },
+      "required": [
+        "id",
+        "revision",
+        "softwareRef",
+        "name",
+        "objectRef"
+      ]
+    },
+    "ServiceInstance": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/IRI"
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "softwareRef": {
+          "$ref": "#/$defs/IRI"
+        },
+        "installationRef": {
+          "$ref": "#/$defs/IRI"
+        },
+        "profileRef": {
+          "$ref": "#/$defs/IRI"
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "management": {
+          "enum": [
+            "hub-managed",
+            "external"
+          ]
+        },
+        "hostRefs": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/IRI"
+          }
+        },
+        "desiredState": {
+          "enum": [
+            "running",
+            "stopped",
+            "unmanaged"
+          ]
+        },
+        "runtime": {
+          "$ref": "#/$defs/RuntimeObservation"
+        },
+        "objectRef": {
+          "$ref": "#/$defs/IRI"
+        }
+      },
+      "required": [
+        "id",
+        "revision",
+        "softwareRef",
+        "label",
+        "management",
+        "desiredState",
+        "objectRef"
+      ]
+    },
+    "Connection": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/IRI"
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "targetRef": {
+          "$ref": "#/$defs/IRI"
+        },
+        "adapterRef": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "endpoint": {
+          "type": "string",
+          "format": "uri"
+        },
+        "enabled": {
+          "type": "boolean"
+        },
+        "credentialRef": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "endpointPolicyRef": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "objectRef": {
+          "$ref": "#/$defs/IRI"
+        }
+      },
+      "required": [
+        "id",
+        "revision",
+        "label",
+        "targetRef",
+        "adapterRef",
+        "endpoint",
+        "enabled"
+      ]
+    },
+    "SetupOperation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/IRI"
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "action": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "targetRefs": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/IRI"
+          }
+        },
+        "state": {
+          "enum": [
+            "reviewed",
+            "applying",
+            "complete",
+            "reconciliation-required",
+            "cancelled"
+          ]
+        },
+        "outcome": {
+          "enum": [
+            "succeeded",
+            "failed",
+            "unknown"
+          ]
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "planArtifactRef": {
+          "$ref": "#/$defs/IRI"
+        },
+        "receiptRefs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/IRI"
+          }
+        },
+        "error": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "code": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            },
+            "message": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            }
+          },
+          "required": [
+            "code"
+          ]
+        },
+        "objectRef": {
+          "$ref": "#/$defs/IRI"
+        }
+      },
+      "required": [
+        "id",
+        "revision",
+        "action",
+        "targetRefs",
+        "state",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "StoredFileRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "storageKey": {
+          "type": "string",
+          "pattern": "^(?:[A-Za-z0-9_-]+/)*[A-Za-z0-9_-]+\\.(?:json|jsonld)$"
+        },
+        "artifact": {
+          "$ref": "https://zenith-research.ca/ontology/normalized/v0.1.0/schemas/core.schema.json#/$defs/ArtifactRef"
+        }
+      },
+      "required": [
+        "storageKey",
+        "artifact"
+      ]
+    },
+    "DefinitionRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "enum": [
+            "ontology-module",
+            "json-schema",
+            "jsonld-context",
+            "package-manifest"
+          ]
+        },
+        "id": {
+          "$ref": "#/$defs/IRI"
+        },
+        "file": {
+          "$ref": "#/$defs/StoredFileRef"
+        }
+      },
+      "required": [
+        "kind",
+        "id",
+        "file"
+      ]
+    },
+    "StoredObjectRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/IRI"
+        },
+        "objectRevision": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "types": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/IRI"
+          }
+        },
+        "jsonldFile": {
+          "$ref": "#/$defs/StoredFileRef"
+        },
+        "definitions": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/DefinitionRef"
+          }
+        }
+      },
+      "required": [
+        "id",
+        "objectRevision",
+        "types",
+        "jsonldFile",
+        "definitions"
+      ]
+    }
+  }
+}

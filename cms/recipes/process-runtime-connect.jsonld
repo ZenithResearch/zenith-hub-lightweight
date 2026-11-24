@@ -1,0 +1,14 @@
+{
+  "@context": {
+    "zn": "https://zenith-research.ca/ontology/terms/",
+    "cms": "urn:zenith:hub:catalog:",
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#"
+  },
+  "@id": "urn:zenith:hub:recipe:process-runtime-connect",
+  "@type": "zn:Artifact",
+  "rdfs:label": "Process Runtime \u2014 connect",
+  "cms:software": {
+    "@id": "urn:zenith:software:process-runtime"
+  },
+  "cms:spec": "{\"actions\":[\"connect\"],\"capability\":\"process-runtime\",\"contract\":{\"path\":\"profiles/setup/component-contracts.json\",\"sha256\":\"18435cb8d64e5bedf7272457d682f6eaebeeb2b6252916b4fbfd63d6bf285e70\"},\"maintainer\":\"https://github.com/ZenithResearch\",\"mode\":\"connect\",\"qualification\":\"supported\",\"version\":\"1\"}"
+}

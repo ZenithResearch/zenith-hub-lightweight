@@ -19,3 +19,5 @@ profiles/devgraph-docker/context/
 
 .native-sources/
 .native-npm-cache/
+
+.next-preview/

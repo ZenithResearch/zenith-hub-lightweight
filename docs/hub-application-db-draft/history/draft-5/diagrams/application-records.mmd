@@ -1,0 +1,137 @@
+erDiagram
+    HubSettings {
+        IRI id PK
+        integer revision
+        string label
+        IRI localHostRef FK "optional"
+        IRI selectedGuideProfileRef FK "optional"
+        datetime enteredAt "optional"
+    }
+    Host {
+        IRI id PK
+        integer revision
+        string label
+        string kind
+        ObjectVersionBinding objectVersion
+    }
+    SoftwareDescriptor {
+        IRI id PK
+        integer revision
+        string key
+        string label
+        string publisher "optional"
+        URI repository "optional"
+        ObjectVersionBinding objectVersion
+    }
+    SoftwareCatalogEntry {
+        IRI id PK
+        integer revision
+        IRI catalogId
+        string key
+        IRI softwareRef FK
+        string adapterRef
+        string_array supportedModes
+    }
+    SoftwareSourceSnapshot {
+        IRI id PK
+        integer revision
+        IRI softwareRef FK
+        URI repository
+        string commit
+        string version "optional"
+        string manifestSha256 "optional"
+        ObjectVersionBinding objectVersion
+    }
+    SoftwareBuild {
+        IRI id PK
+        integer revision
+        IRI softwareRef FK
+        IRI sourceSnapshotRef FK "optional"
+        ArtifactRef content
+        string platform "optional"
+        string version "optional"
+        ObjectVersionBinding objectVersion
+    }
+    SoftwareInstallationRecord {
+        IRI id PK
+        integer revision
+        IRI softwareRef FK
+        IRI hostRef FK
+        string management
+        InstallationLocations locations
+        PresenceObservation presence
+        CompatibilityObservation compatibility
+        IRI_array receiptRefs "optional"
+        ObjectVersionBinding objectVersion
+        IRI sourceSnapshotRef FK "optional"
+        IRI buildRef FK "optional"
+    }
+    ConfigurationProfile {
+        IRI id PK
+        integer revision
+        IRI softwareRef FK
+        IRI installationRef FK "optional"
+        string name
+        IRI configArtifactRef "optional"
+        string nativeHome "optional"
+        string_array credentialRefs "optional"
+        ObjectVersionBinding objectVersion
+        string profileKind
+        JSON_object modelBinding "Hermes only"
+    }
+    ServiceInstance {
+        IRI id PK
+        integer revision
+        IRI softwareRef FK
+        IRI installationRef FK "optional"
+        IRI profileRef FK "optional"
+        string label
+        string management
+        IRI_array hostRefs FK "optional"
+        string desiredState
+        RuntimeObservation runtime "optional"
+        ObjectVersionBinding objectVersion
+    }
+    Connection {
+        IRI id PK
+        integer revision
+        string label
+        IRI targetRef
+        string adapterRef
+        URI endpoint
+        boolean enabled
+        string credentialRef "optional"
+        string endpointPolicyRef "optional"
+        string targetScope
+    }
+    SetupOperation {
+        IRI id PK
+        integer revision
+        string action
+        IRI_array targetRefs
+        string state
+        string outcome "optional"
+        datetime createdAt
+        datetime updatedAt
+        IRI planArtifactRef "optional"
+        IRI_array receiptRefs "optional"
+        JSON_object error "optional"
+        ExpectedTarget_array expectedTargets "optional"
+    }
+    Host o|--o{ HubSettings : localHostRef
+    ConfigurationProfile o|--o{ HubSettings : selectedGuideProfileRef
+    SoftwareDescriptor ||--o{ SoftwareCatalogEntry : softwareRef
+    SoftwareDescriptor ||--o{ SoftwareSourceSnapshot : softwareRef
+    SoftwareDescriptor ||--o{ SoftwareBuild : softwareRef
+    SoftwareSourceSnapshot o|--o{ SoftwareBuild : sourceSnapshotRef
+    SoftwareDescriptor ||--o{ SoftwareInstallationRecord : softwareRef
+    Host ||--o{ SoftwareInstallationRecord : hostRef
+    SoftwareSourceSnapshot o|--o{ SoftwareInstallationRecord : sourceSnapshotRef
+    SoftwareBuild o|--o{ SoftwareInstallationRecord : buildRef
+    SoftwareDescriptor ||--o{ ConfigurationProfile : softwareRef
+    SoftwareInstallationRecord o|--o{ ConfigurationProfile : installationRef
+    SoftwareDescriptor ||--o{ ServiceInstance : softwareRef
+    SoftwareInstallationRecord o|--o{ ServiceInstance : installationRef
+    ConfigurationProfile o|--o{ ServiceInstance : profileRef
+    Host }o--o{ ServiceInstance : hostRefs
+    Connection o|--o{ ConfigurationProfile : implementation_model_server_binding

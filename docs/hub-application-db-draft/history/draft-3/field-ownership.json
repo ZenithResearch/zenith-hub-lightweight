@@ -1,0 +1,450 @@
+{
+  "schema": "zenith.hub-field-ownership.draft.v3",
+  "records": {
+    "Host": {
+      "appliesTo": "https://zenith-research.ca/ontology/hub/infrastructure/terms/Machine",
+      "includeSubclasses": true,
+      "projection": "urn:zenith:hub:application-db:draft:3#/$defs/HostProjection",
+      "fields": {
+        "id": {
+          "owner": "rdf",
+          "predicate": "@id"
+        },
+        "revision": {
+          "owner": "operational"
+        },
+        "label": {
+          "owner": "rdf",
+          "predicate": "http://www.w3.org/2000/01/rdf-schema#label",
+          "valueKind": "literal"
+        },
+        "kind": {
+          "owner": "implementation"
+        },
+        "objectVersion": {
+          "owner": "operational"
+        }
+      }
+    },
+    "SoftwareDescriptor": {
+      "appliesTo": "https://zenith-research.ca/ontology/terms/Artifact",
+      "includeSubclasses": true,
+      "projection": "urn:zenith:hub:application-db:draft:3#/$defs/SoftwareDescriptorProjection",
+      "fields": {
+        "id": {
+          "owner": "rdf",
+          "predicate": "@id"
+        },
+        "revision": {
+          "owner": "operational"
+        },
+        "key": {
+          "owner": "profile"
+        },
+        "label": {
+          "owner": "rdf",
+          "predicate": "http://www.w3.org/2000/01/rdf-schema#label",
+          "valueKind": "literal"
+        },
+        "publisher": {
+          "owner": "profile"
+        },
+        "repository": {
+          "owner": "profile"
+        },
+        "objectVersion": {
+          "owner": "operational"
+        }
+      }
+    },
+    "SoftwareSourceSnapshot": {
+      "appliesTo": "https://zenith-research.ca/ontology/terms/Artifact",
+      "includeSubclasses": true,
+      "projection": "urn:zenith:hub:application-db:draft:3#/$defs/SoftwareSourceSnapshotProjection",
+      "fields": {
+        "id": {
+          "owner": "rdf",
+          "predicate": "@id"
+        },
+        "revision": {
+          "owner": "operational"
+        },
+        "softwareRef": {
+          "owner": "rdf",
+          "predicate": "https://zenith-research.ca/ontology/hub/application-draft/terms/describesSoftware",
+          "valueKind": "iri"
+        },
+        "repository": {
+          "owner": "profile"
+        },
+        "commit": {
+          "owner": "profile"
+        },
+        "version": {
+          "owner": "profile"
+        },
+        "manifestSha256": {
+          "owner": "profile"
+        },
+        "objectVersion": {
+          "owner": "operational"
+        }
+      }
+    },
+    "SoftwareBuild": {
+      "appliesTo": "https://zenith-research.ca/ontology/terms/Artifact",
+      "includeSubclasses": true,
+      "projection": "urn:zenith:hub:application-db:draft:3#/$defs/SoftwareBuildProjection",
+      "fields": {
+        "id": {
+          "owner": "rdf",
+          "predicate": "@id"
+        },
+        "revision": {
+          "owner": "operational"
+        },
+        "softwareRef": {
+          "owner": "rdf",
+          "predicate": "https://zenith-research.ca/ontology/hub/application-draft/terms/describesSoftware",
+          "valueKind": "iri"
+        },
+        "sourceSnapshotRef": {
+          "owner": "rdf",
+          "predicate": "https://zenith-research.ca/ontology/hub/application-draft/terms/sourceSnapshot",
+          "valueKind": "iri"
+        },
+        "content": {
+          "owner": "profile"
+        },
+        "platform": {
+          "owner": "profile"
+        },
+        "version": {
+          "owner": "profile"
+        },
+        "objectVersion": {
+          "owner": "operational"
+        }
+      }
+    },
+    "SoftwareInstallationRecord": {
+      "appliesTo": "https://zenith-research.ca/ontology/terms/Artifact",
+      "includeSubclasses": true,
+      "projection": "urn:zenith:hub:application-db:draft:3#/$defs/SoftwareInstallationRecordProjection",
+      "fields": {
+        "id": {
+          "owner": "rdf",
+          "predicate": "@id"
+        },
+        "revision": {
+          "owner": "operational"
+        },
+        "softwareRef": {
+          "owner": "rdf",
+          "predicate": "https://zenith-research.ca/ontology/hub/application-draft/terms/describesSoftware",
+          "valueKind": "iri"
+        },
+        "hostRef": {
+          "owner": "rdf",
+          "predicate": "https://zenith-research.ca/ontology/hub/application-draft/terms/installationHost",
+          "valueKind": "iri"
+        },
+        "management": {
+          "owner": "operational"
+        },
+        "locations": {
+          "owner": "implementation"
+        },
+        "presence": {
+          "owner": "operational"
+        },
+        "compatibility": {
+          "owner": "operational"
+        },
+        "receiptRefs": {
+          "owner": "operational"
+        },
+        "objectVersion": {
+          "owner": "operational"
+        },
+        "sourceSnapshotRef": {
+          "owner": "rdf",
+          "predicate": "https://zenith-research.ca/ontology/hub/application-draft/terms/sourceSnapshot",
+          "valueKind": "iri"
+        },
+        "buildRef": {
+          "owner": "rdf",
+          "predicate": "https://zenith-research.ca/ontology/hub/application-draft/terms/installedBuild",
+          "valueKind": "iri"
+        }
+      }
+    },
+    "ConfigurationProfile": {
+      "appliesTo": "https://zenith-research.ca/ontology/terms/Artifact",
+      "includeSubclasses": true,
+      "projection": "urn:zenith:hub:application-db:draft:3#/$defs/ConfigurationProfileProjection",
+      "fields": {
+        "id": {
+          "owner": "rdf",
+          "predicate": "@id"
+        },
+        "revision": {
+          "owner": "operational"
+        },
+        "softwareRef": {
+          "owner": "rdf",
+          "predicate": "https://zenith-research.ca/ontology/hub/application-draft/terms/describesSoftware",
+          "valueKind": "iri"
+        },
+        "installationRef": {
+          "owner": "rdf",
+          "predicate": "https://zenith-research.ca/ontology/hub/application-draft/terms/installationRecord",
+          "valueKind": "iri"
+        },
+        "name": {
+          "owner": "rdf",
+          "predicate": "http://www.w3.org/2000/01/rdf-schema#label",
+          "valueKind": "literal"
+        },
+        "configArtifactRef": {
+          "owner": "rdf",
+          "predicate": "https://zenith-research.ca/ontology/hub/application-draft/terms/configurationContent",
+          "valueKind": "iri"
+        },
+        "nativeHome": {
+          "owner": "implementation"
+        },
+        "credentialRefs": {
+          "owner": "implementation"
+        },
+        "objectVersion": {
+          "owner": "operational"
+        },
+        "profileKind": {
+          "owner": "profile"
+        }
+      }
+    },
+    "HermesConfigurationProfile": {
+      "appliesTo": "https://zenith-research.ca/ontology/terms/Artifact",
+      "includeSubclasses": true,
+      "projection": "urn:zenith:hub:application-db:draft:3#/$defs/HermesConfigurationProfileProjection",
+      "fields": {
+        "id": {
+          "owner": "rdf",
+          "predicate": "@id"
+        },
+        "revision": {
+          "owner": "operational"
+        },
+        "softwareRef": {
+          "owner": "rdf",
+          "predicate": "https://zenith-research.ca/ontology/hub/application-draft/terms/describesSoftware",
+          "valueKind": "iri"
+        },
+        "installationRef": {
+          "owner": "rdf",
+          "predicate": "https://zenith-research.ca/ontology/hub/application-draft/terms/installationRecord",
+          "valueKind": "iri"
+        },
+        "name": {
+          "owner": "rdf",
+          "predicate": "http://www.w3.org/2000/01/rdf-schema#label",
+          "valueKind": "literal"
+        },
+        "configArtifactRef": {
+          "owner": "rdf",
+          "predicate": "https://zenith-research.ca/ontology/hub/application-draft/terms/configurationContent",
+          "valueKind": "iri"
+        },
+        "nativeHome": {
+          "owner": "implementation"
+        },
+        "credentialRefs": {
+          "owner": "implementation"
+        },
+        "objectVersion": {
+          "owner": "operational"
+        },
+        "profileKind": {
+          "owner": "profile"
+        },
+        "modelBinding": {
+          "owner": "profile"
+        }
+      }
+    },
+    "ServiceInstance": {
+      "appliesTo": "https://zenith-research.ca/ontology/hub/infrastructure/terms/ServiceInstance",
+      "includeSubclasses": true,
+      "projection": "urn:zenith:hub:application-db:draft:3#/$defs/ServiceInstanceProjection",
+      "fields": {
+        "id": {
+          "owner": "rdf",
+          "predicate": "@id"
+        },
+        "revision": {
+          "owner": "operational"
+        },
+        "softwareRef": {
+          "owner": "rdf",
+          "predicate": "https://zenith-research.ca/ontology/hub/application-draft/terms/describesSoftware",
+          "valueKind": "iri"
+        },
+        "installationRef": {
+          "owner": "rdf",
+          "predicate": "https://zenith-research.ca/ontology/hub/application-draft/terms/installationRecord",
+          "valueKind": "iri"
+        },
+        "profileRef": {
+          "owner": "rdf",
+          "predicate": "https://zenith-research.ca/ontology/hub/application-draft/terms/configurationProfile",
+          "valueKind": "iri"
+        },
+        "label": {
+          "owner": "rdf",
+          "predicate": "http://www.w3.org/2000/01/rdf-schema#label",
+          "valueKind": "literal"
+        },
+        "management": {
+          "owner": "operational"
+        },
+        "hostRefs": {
+          "owner": "rdf",
+          "predicate": "https://zenith-research.ca/ontology/hub/infrastructure/terms/hostedBy",
+          "valueKind": "iri-set"
+        },
+        "desiredState": {
+          "owner": "operational"
+        },
+        "runtime": {
+          "owner": "operational"
+        },
+        "objectVersion": {
+          "owner": "operational"
+        }
+      }
+    }
+  },
+  "untypedRecordOwner": "application-repository",
+  "rdfArrayPolicy": "hostRefs is a sorted unique IRI set; absence is represented by omission",
+  "untypedRecords": {
+    "HubSettings": {
+      "id": {
+        "owner": "application-settings-repository"
+      },
+      "revision": {
+        "owner": "application-settings-repository"
+      },
+      "label": {
+        "owner": "application-settings-repository"
+      },
+      "localHostRef": {
+        "owner": "application-settings-repository"
+      },
+      "selectedGuideProfileRef": {
+        "owner": "application-settings-repository"
+      }
+    },
+    "SoftwareCatalogEntry": {
+      "id": {
+        "owner": "catalog-repository"
+      },
+      "revision": {
+        "owner": "catalog-repository"
+      },
+      "catalogId": {
+        "owner": "catalog-repository"
+      },
+      "key": {
+        "owner": "catalog-repository"
+      },
+      "softwareRef": {
+        "owner": "catalog-repository"
+      },
+      "adapterRef": {
+        "owner": "catalog-repository"
+      },
+      "supportedModes": {
+        "owner": "catalog-repository"
+      }
+    },
+    "Connection": {
+      "id": {
+        "owner": "connection-binding-repository"
+      },
+      "revision": {
+        "owner": "connection-binding-repository"
+      },
+      "label": {
+        "owner": "connection-binding-repository"
+      },
+      "targetRef": {
+        "owner": "connection-binding-repository"
+      },
+      "adapterRef": {
+        "owner": "connection-binding-repository"
+      },
+      "endpoint": {
+        "owner": "connection-binding-repository"
+      },
+      "enabled": {
+        "owner": "connection-binding-repository"
+      },
+      "credentialRef": {
+        "owner": "connection-binding-repository"
+      },
+      "endpointPolicyRef": {
+        "owner": "connection-binding-repository"
+      },
+      "targetScope": {
+        "owner": "connection-binding-repository"
+      }
+    },
+    "SetupOperation": {
+      "id": {
+        "owner": "operation-journal"
+      },
+      "revision": {
+        "owner": "operation-journal"
+      },
+      "action": {
+        "owner": "operation-journal"
+      },
+      "targetRefs": {
+        "owner": "operation-journal"
+      },
+      "state": {
+        "owner": "operation-journal"
+      },
+      "outcome": {
+        "owner": "operation-journal"
+      },
+      "createdAt": {
+        "owner": "operation-journal"
+      },
+      "updatedAt": {
+        "owner": "operation-journal"
+      },
+      "planArtifactRef": {
+        "owner": "operation-journal"
+      },
+      "receiptRefs": {
+        "owner": "operation-journal"
+      },
+      "error": {
+        "owner": "operation-journal"
+      }
+    }
+  },
+  "snapshotPolicy": "Current selections must choose exactly one committed atomic-unit version, with every locally typed member selected from that version. Historical versions may be stored but cannot satisfy a different current selection.",
+  "externalReferenceOwner": "application-reference-registry; exact ownerRef + field JSON pointer + targetRef; absence requires local resolution; a known local type is checked even when an external declaration exists",
+  "semanticLinkPolicy": "RDF owns declared software, host, source/build, installation and configuration associations. Profile values are validated projections of those edges; paths, credentials, model bindings and undeclared structured attributes keep explicit profile/implementation owners.",
+  "installationProvenancePolicy": "One installation record describes one installed version. When both sourceSnapshotRef and buildRef are supplied, the referenced build must declare the same source snapshot. Mixed development environments require an explicit future model, not contradictory references.",
+  "storageMetadataOwners": {
+    "StoredObjectRecord": "object-repository",
+    "ObjectSelection": "object-repository snapshot reader",
+    "AtomicUnitVersion": "object-repository commit ledger",
+    "ExternalReferenceDeclaration": "application-reference-registry"
+  }
+}

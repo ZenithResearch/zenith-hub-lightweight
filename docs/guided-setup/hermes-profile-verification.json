@@ -1,0 +1,61 @@
+{
+  "date": "2026-11-20",
+  "change": "Separate machine installation from Hub guide-profile setup",
+  "softwareDetection": {
+    "readOnly": true,
+    "executesLauncher": false,
+    "existingInstallationDetected": true,
+    "admission": "Recorded revision, pinned native contract files and Python runtime"
+  },
+  "guide": {
+    "name": "hub-guide",
+    "nativeNamedProfile": true,
+    "createdDuringSetup": true,
+    "softwareReused": true,
+    "credentialsAndHistoryIsolated": true,
+    "templateScope": "Model selection only; guide signs in separately",
+    "registeredHubProfilesSelectable": true
+  },
+  "compatibility": "Optional software/profile receipt fields; legacy relative source/environment/tools/data paths remain supported",
+  "verification": {
+    "uiLibraryTypecheckBuildAndProvenance": true,
+    "hubTypecheck": true,
+    "hubProductionBuild": true,
+    "nativeProfileAndApiChat": {
+      "root": "/Volumes/home/bananawalnut/cache/hub-welcome-qualification/hub-welcome-native-3zxKle",
+      "bootstrap": "Existing verified Hermes software/runtime reused",
+      "checks": [
+        "Retained Hub guide reuses the detected software installation",
+        "Dedicated native hub-guide profile and guide identity retained",
+        "Native provider catalog and machine-sized model options loaded from installed source",
+        "Reviewed composite configured the private API/model and started Hermes while staying on welcome",
+        "Explicit question traversed the real Hermes API/agent and local protocol fixture",
+        "Controller reload retained completion evidence"
+      ],
+      "model": "Local deterministic protocol fixture, no cloud account or model-quality claim",
+      "passed": true
+    },
+    "browserEvidence": "evidence/welcome-installed-guide-profile.jpg",
+    "setupTests": {
+      "passed": 51,
+      "failed": 0,
+      "skipped": 0
+    },
+    "finalNativeSoftwareBindingGuard": {
+      "passed": true,
+      "providerCount": 49
+    },
+    "nativeTestServicesStopped": true
+  },
+  "preview": {
+    "url": "http://127.0.0.1:4318/",
+    "ownerGuideCreated": false,
+    "stage": "Installed software detected; create guide profile"
+  },
+  "uiLibraryCommit": "c0adf0c",
+  "notClaimed": [
+    "Cloud-provider sign-in with owner credentials",
+    "Full open-model download or model quality",
+    "Direct Safari/Chrome automation"
+  ]
+}

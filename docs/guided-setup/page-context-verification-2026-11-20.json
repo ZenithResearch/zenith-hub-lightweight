@@ -1,0 +1,65 @@
+{
+  "date": "2026-11-20",
+  "scope": "Owner-approved automatic current-page context appended to Hermes messages",
+  "approval": "Approve automatic page context",
+  "destinationAtApproval": {
+    "instance": "hermes-local",
+    "provider": "openai-codex",
+    "model": "gpt-6.2-sol",
+    "kind": "remote"
+  },
+  "limits": {
+    "pageTextCharacters": 10000,
+    "combinedMessageCharacters": 16000,
+    "composerQuestionCharacters": 4000
+  },
+  "checks": {
+    "setupTests": {
+      "passed": 59,
+      "failed": 0
+    },
+    "hubTypecheck": "passed",
+    "browser": {
+      "visiblePageTextIncluded": true,
+      "selectedOptionIncluded": true,
+      "excluded": [
+        "password values",
+        "text input values",
+        "textarea values",
+        "contenteditable values",
+        "hidden content",
+        "aria-hidden content",
+        "closed details content",
+        "unselected options",
+        "sign-in/device codes",
+        "explicit excluded regions",
+        "Hermes widget",
+        "query strings",
+        "URL fragments"
+      ],
+      "leakedFixtureSamples": [],
+      "repeatedCaptureUnchanged": true,
+      "activeDialogPreferred": true,
+      "underlyingPageExcludedWhenDialogOpen": true,
+      "modelMessagesSent": 0
+    },
+    "localReceiver": {
+      "composedPromptForwardedExactly": true,
+      "plainMessagesAccepted": true,
+      "oversizeRejectedBeforeForwarding": true,
+      "pageTextAbsentFromPersistedHubSetupState": true,
+      "toolsDisabled": true
+    },
+    "importedSource": "passed"
+  },
+  "implementation": {
+    "sender": "src/components/hub/GlobalHermesChat.tsx",
+    "capture": "src/lib/setup/page-context.ts",
+    "formatAndLimits": "src/lib/setup/chat-message.mjs",
+    "consumer": "src/lib/setup/controller.mjs"
+  },
+  "mvpSecSComment": "preserved beside capture/append",
+  "evidence": "evidence/hermes-page-context-example.jpg",
+  "temporaryFixture": "removed",
+  "migration": "No stored schema changes. New browser and API limits are deployed together."
+}

@@ -44,13 +44,16 @@ export async function privateBytes(file,limit) {
   } finally {await handle.close();}
 }
 export async function readRegistry(file) {
-  return validateRegistry(JSON.parse(new TextDecoder("utf-8",{fatal:true}).decode(await privateBytes(file,65536))));
+  const value=JSON.parse(new TextDecoder("utf-8",{fatal:true}).decode(await privateBytes(file,65536)));
+  if(value.schema==='zenith.hub-storage-redirect.v1'){const {applicationForRoot}=await import('./application/owner.mjs');const app=await applicationForRoot(value.setupRoot);if(app.resourcesFile!==file)throw new OperatorError('resource_registry_identity_mismatch',503);return validateRegistry(await app.readResources());}
+  return validateRegistry(value);
 }
 export function publicResource(r) {
   return {id:r.id,kind:r.kind,label:r.label,endpoint:r.endpoint,
           lifecycle:r.lifecycle,enabled:r.enabled,readOnly:true,processControl:false};
 }
 export async function changeRegistry(file,action) {
+  try{const value=JSON.parse((await privateBytes(file,65536)).toString('utf8'));if(value.schema==='zenith.hub-storage-redirect.v1'){const {applicationForRoot}=await import('./application/owner.mjs');const app=await applicationForRoot(value.setupRoot);if(app.resourcesFile!==file)throw new OperatorError('resource_registry_identity_mismatch',503);return app.changeResources(action);}}catch(e){if(e.code!=='ENOENT')throw e;}
   if(!path.isAbsolute(file))throw new OperatorError("invalid_resource_registry_path");
   const parent=await lstat(path.dirname(file));
   if(!parent.isDirectory() || parent.isSymbolicLink() || parent.uid!==process.getuid() || (parent.mode&0o077))

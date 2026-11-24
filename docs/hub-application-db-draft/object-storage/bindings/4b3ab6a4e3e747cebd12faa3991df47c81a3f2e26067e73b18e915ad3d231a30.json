@@ -1,0 +1,24 @@
+{
+  "atomicUnit": {
+    "id": "urn:example:unit:e9f6c4719cdb1b81530567273f10d4360aa7192c51c5d5a179fef0132ed6da4a",
+    "revision": 1
+  },
+  "schema": "zenith.hub-object-bindings.draft.v6",
+  "objectId": "urn:example:software:hermes",
+  "objectRevision": 1,
+  "bindings": [
+    {
+      "profile": "urn:zenith:hub:application-db:draft:6#/$defs/SoftwareDescriptorProjection",
+      "value": {
+        "types": [
+          "https://zenith-research.ca/ontology/terms/Artifact"
+        ],
+        "id": "urn:example:software:hermes",
+        "key": "hermes",
+        "label": "Hermes",
+        "publisher": "Nous Research",
+        "repository": "https://github.com/NousResearch/hermes-agent"
+      }
+    }
+  ]
+}

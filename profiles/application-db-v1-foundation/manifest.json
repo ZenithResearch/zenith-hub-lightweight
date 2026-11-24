@@ -1,0 +1,42 @@
+{
+  "schema": "zenith.hub-application-definitions.v1",
+  "id": "urn:zenith:hub:application-definitions:v1",
+  "files": [
+    {
+      "path": "003-revision-ledger.sql",
+      "sha256": "a829df6809bdd2b68c964ab29148619eff592eb60cd9dcd59bffac4e2f425b84"
+    },
+    {
+      "path": "004-application-projections.sql",
+      "sha256": "46ac6f8b2576f5baef2aec75beb1549a4e0f39cdcd929c2738770c663586d1de"
+    },
+    {
+      "path": "api.schema.json",
+      "sha256": "d3bd1fd9cca3ba26d6029e425d4bc53a647ac0535a5845c957b7a1a28952ea87"
+    },
+    {
+      "path": "application-relations.jsonld",
+      "sha256": "661b0f33a90e28082f7a9131a26b6de415fa790b319783617467541a30cb2c29"
+    },
+    {
+      "path": "commit.schema.json",
+      "sha256": "904092a8dd221ebe78cc31c8af0c76387dea217809ba5fe9ce7e2dc6fdc2010f"
+    },
+    {
+      "path": "field-ownership.json",
+      "sha256": "ecd5df06d34ee47348912396f282e3138bf457c726548e318b1818437ff449fb"
+    },
+    {
+      "path": "physical-mapping.json",
+      "sha256": "544f0c9b6e5083612513d83158c60bacc9bcf68328ca6f4ec6df7ea2ffbac2b5"
+    },
+    {
+      "path": "reference-policy.json",
+      "sha256": "858b11899feae3647adbaf1747d0d7d96809ab4bb7f8062d883118b7bb30f4ba"
+    },
+    {
+      "path": "schema.json",
+      "sha256": "065b9718985721a8ee1489a5a2814b3de7a3008700387c00e6f31cdf56e2f676"
+    }
+  ]
+}

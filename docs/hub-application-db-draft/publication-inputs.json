@@ -1,0 +1,443 @@
+{
+  "schema": "zenith.hub-publication-input-updates.v1",
+  "baselines": {
+    "integration-inputs.json": {
+      "sha256": "a4e8bd3c8d72dcd0b12403e7ad4db7231a588a3b9119ff624c009000728d20cd",
+      "updates": [
+        {
+          "path": "src/vendor/zenith-ui/HubSetup/HermesWelcome.tsx",
+          "previousSha256": "78d3fdee014c98d4c75b543fb1d1bfd55aff9c5ed99b0c097a8714ef0649fd0f",
+          "sha256": "de138b9440d84fcfff75589f091cb1358a37b8c0242f28dc2621ba02b26ec3ca",
+          "reason": "Authorized default-provider configuration, software-based entry and Apps & services follow-up after this historical snapshot; implementation tests and source pins qualify the exact current files.",
+          "evidence": [
+            "docs/guided-setup/default-provider-configuration-review.json",
+            "docs/guided-setup/hermes-installation-entry-review.json",
+            "docs/guided-setup/apps-services-gallery-review.json"
+          ]
+        },
+        {
+          "path": "src/vendor/zenith-ui/YourHub/YourHub.css",
+          "previousSha256": "03a9437038caefb93cb7b9ef40adce0aaf99a424632422c997f7ad354d7bf780",
+          "sha256": "ccc9cb2e46dbe25d126be66a2840e5c0094856d7cb43b61b17d4cfef7f2832c8",
+          "reason": "Authorized default-provider configuration, software-based entry and Apps & services follow-up after this historical snapshot; implementation tests and source pins qualify the exact current files.",
+          "evidence": [
+            "docs/guided-setup/default-provider-configuration-review.json",
+            "docs/guided-setup/hermes-installation-entry-review.json",
+            "docs/guided-setup/apps-services-gallery-review.json"
+          ]
+        },
+        {
+          "path": "src/vendor/zenith-ui/YourHub/YourHub.tsx",
+          "previousSha256": "fcd49340c1ca7e9d625ecbc89b03baadd480669f1f26d3f3a2150c7935def7aa",
+          "sha256": "1e1562b634465b5f06a0db78ddd96ba8730df2060d60b35c7109257d8b03850c",
+          "reason": "Authorized default-provider configuration, software-based entry and Apps & services follow-up after this historical snapshot; implementation tests and source pins qualify the exact current files.",
+          "evidence": [
+            "docs/guided-setup/default-provider-configuration-review.json",
+            "docs/guided-setup/hermes-installation-entry-review.json",
+            "docs/guided-setup/apps-services-gallery-review.json"
+          ]
+        },
+        {
+          "path": "src/lib/setup/welcome-state.mjs",
+          "previousSha256": "7dcbe04897ba9296a94961ee791ec49110a1c59eed0cacd9fa84ba4a4e03f734",
+          "sha256": "d7efda9781045b7ec2e41c1fa22a87e7fd61216fe27e80e09dd58e870655d12c",
+          "reason": "Authorized default-provider configuration, software-based entry and Apps & services follow-up after this historical snapshot; implementation tests and source pins qualify the exact current files.",
+          "evidence": [
+            "docs/guided-setup/default-provider-configuration-review.json",
+            "docs/guided-setup/hermes-installation-entry-review.json",
+            "docs/guided-setup/apps-services-gallery-review.json"
+          ]
+        },
+        {
+          "path": "src/lib/setup/hermes.mjs",
+          "previousSha256": "700ec25791a5b1d762d51c5b74551cbd1f6a446a3a5961ae230933fdbb016925",
+          "sha256": "edf1c48f0726032a1f9a7ee9264000fc36f5f0f1ec3bfe12627e1712e94369d3",
+          "reason": "Authorized default-provider configuration, software-based entry and Apps & services follow-up after this historical snapshot; implementation tests and source pins qualify the exact current files.",
+          "evidence": [
+            "docs/guided-setup/default-provider-configuration-review.json",
+            "docs/guided-setup/hermes-installation-entry-review.json",
+            "docs/guided-setup/apps-services-gallery-review.json"
+          ]
+        },
+        {
+          "path": "src/lib/setup/model-choice.mjs",
+          "previousSha256": "1eae8aa590e6f416f4856de50e4850805d7fbd445edd7627e8415e4da5d3621d",
+          "sha256": "9f90a96f95314bf26805f0e2f0b9ad64cd68cdbcc7bc433471e84e4cfe87509a",
+          "reason": "Authorized default-provider configuration, software-based entry and Apps & services follow-up after this historical snapshot; implementation tests and source pins qualify the exact current files.",
+          "evidence": [
+            "docs/guided-setup/default-provider-configuration-review.json",
+            "docs/guided-setup/hermes-installation-entry-review.json",
+            "docs/guided-setup/apps-services-gallery-review.json"
+          ]
+        },
+        {
+          "path": "src/lib/setup/hermes-installations.mjs",
+          "previousSha256": "81767013180a7eae1f596158afa902fe1c9449460e8e3e47e22d8cf4a716342d",
+          "sha256": "421b0674b6b533f2e4f352bb8b1fd3fc3c9db335c8d32fdc7d13d89d8e056e72",
+          "reason": "Authorized default-provider configuration, software-based entry and Apps & services follow-up after this historical snapshot; implementation tests and source pins qualify the exact current files.",
+          "evidence": [
+            "docs/guided-setup/default-provider-configuration-review.json",
+            "docs/guided-setup/hermes-installation-entry-review.json",
+            "docs/guided-setup/apps-services-gallery-review.json"
+          ]
+        },
+        {
+          "path": "src/lib/setup/model-choice.d.mts",
+          "previousSha256": "ae074e33ff699d47f98a43a11635e524bfebadfd77f473a3362020a967f3a8cd",
+          "sha256": "f25de03de825c4faf857855c6809e34bdad27566a4327dca7948f315b1311e70",
+          "reason": "Authorized default-provider configuration, software-based entry and Apps & services follow-up after this historical snapshot; implementation tests and source pins qualify the exact current files.",
+          "evidence": [
+            "docs/guided-setup/default-provider-configuration-review.json",
+            "docs/guided-setup/hermes-installation-entry-review.json",
+            "docs/guided-setup/apps-services-gallery-review.json"
+          ]
+        },
+        {
+          "path": "src/lib/setup/hermes-models.mjs",
+          "previousSha256": "902db4e29499aef48dd7f43841eb815e4e508b387c683a47255a0b679ac4c5ab",
+          "sha256": "0928797d2fe119991595f5d90648476b716226f18eac4db9d347b7881152cf51",
+          "reason": "Authorized default-provider configuration, software-based entry and Apps & services follow-up after this historical snapshot; implementation tests and source pins qualify the exact current files.",
+          "evidence": [
+            "docs/guided-setup/default-provider-configuration-review.json",
+            "docs/guided-setup/hermes-installation-entry-review.json",
+            "docs/guided-setup/apps-services-gallery-review.json"
+          ]
+        },
+        {
+          "path": "src/lib/hub/resources.mjs",
+          "previousSha256": "32bd05898d28b65e66d9e7b1d028a950722c851cfba378e5d7ce48d48c21be37",
+          "sha256": "099cc0499cc9275a5a5f43631b715ad2dd61d338aa93d97a15ddaf9436b2634c",
+          "reason": "Authorized default-provider configuration, software-based entry and Apps & services follow-up after this historical snapshot; implementation tests and source pins qualify the exact current files.",
+          "evidence": [
+            "docs/guided-setup/default-provider-configuration-review.json",
+            "docs/guided-setup/hermes-installation-entry-review.json",
+            "docs/guided-setup/apps-services-gallery-review.json"
+          ]
+        },
+        {
+          "path": "src/components/hub/YourHubPage.tsx",
+          "previousSha256": "4b9310a7b988d1dc61ce8f80216e61c723ee8c31d8dc72fd16ec88520f19e32f",
+          "sha256": "2638b28167b524d69fe7dc2b7cd39455de04a4a161e701873dcf8e468925a6e0",
+          "reason": "Authorized default-provider configuration, software-based entry and Apps & services follow-up after this historical snapshot; implementation tests and source pins qualify the exact current files.",
+          "evidence": [
+            "docs/guided-setup/default-provider-configuration-review.json",
+            "docs/guided-setup/hermes-installation-entry-review.json",
+            "docs/guided-setup/apps-services-gallery-review.json"
+          ]
+        },
+        {
+          "path": "src/components/hub/HermesWelcomePage.tsx",
+          "previousSha256": "62846d0c26bb1b84714486e11129030480386ce3ce752f5de210250276e56c55",
+          "sha256": "31933d1e6c5541561f138c4d338eedeeed1af2d2ca0bf72d4ff1a4766c69229b",
+          "reason": "Authorized default-provider configuration, software-based entry and Apps & services follow-up after this historical snapshot; implementation tests and source pins qualify the exact current files.",
+          "evidence": [
+            "docs/guided-setup/default-provider-configuration-review.json",
+            "docs/guided-setup/hermes-installation-entry-review.json",
+            "docs/guided-setup/apps-services-gallery-review.json"
+          ]
+        },
+        {
+          "path": "profiles/source-provenance.json",
+          "previousSha256": "8002d116d018d20bddf9ce5da3866f515b59a1f0d539d6aaa0ad17167b0a3b28",
+          "sha256": "2096b7d312715881d5c95bac3728e985c96df6fd468e992d7b43ab7c26ed8aea",
+          "reason": "Authorized default-provider configuration, software-based entry and Apps & services follow-up after this historical snapshot; implementation tests and source pins qualify the exact current files.",
+          "evidence": [
+            "docs/guided-setup/default-provider-configuration-review.json",
+            "docs/guided-setup/hermes-installation-entry-review.json",
+            "docs/guided-setup/apps-services-gallery-review.json"
+          ]
+        },
+        {
+          "path": "profiles/setup/catalog.json",
+          "previousSha256": "0fc9d62d386147406a79d48041bb6300acb81e1eec2a6b6b6a397263577ba73d",
+          "sha256": "3ec20200e0dd2b54b103fb39c5ff547dd5a7d8515631a6729f2d63ea1931ead3",
+          "reason": "Authorized default-provider configuration, software-based entry and Apps & services follow-up after this historical snapshot; implementation tests and source pins qualify the exact current files.",
+          "evidence": [
+            "docs/guided-setup/default-provider-configuration-review.json",
+            "docs/guided-setup/hermes-installation-entry-review.json",
+            "docs/guided-setup/apps-services-gallery-review.json"
+          ]
+        },
+        {
+          "path": "tests/test_hermes_model_manager.py",
+          "previousSha256": "fb973bfd5a6b28e8790518ec50ff0361451d051b701eb630e34400b44c26ae2a",
+          "sha256": "2bb360000a7038230951f42635c545d8efbeeb0acc2b6e2699d1097d459637b3",
+          "reason": "Authorized default-provider configuration, software-based entry and Apps & services follow-up after this historical snapshot; implementation tests and source pins qualify the exact current files.",
+          "evidence": [
+            "docs/guided-setup/default-provider-configuration-review.json",
+            "docs/guided-setup/hermes-installation-entry-review.json",
+            "docs/guided-setup/apps-services-gallery-review.json"
+          ]
+        },
+        {
+          "path": "tests/setup/welcome.test.mjs",
+          "previousSha256": "8d2caf518287c41b4e23c3f8a8f834c472746a2f3ecc512189afcbd64b5db64d",
+          "sha256": "144cffd858a7987d9fd252a49bf25f29f71d33505c627b0c362de436cd12f043",
+          "reason": "Authorized default-provider configuration, software-based entry and Apps & services follow-up after this historical snapshot; implementation tests and source pins qualify the exact current files.",
+          "evidence": [
+            "docs/guided-setup/default-provider-configuration-review.json",
+            "docs/guided-setup/hermes-installation-entry-review.json",
+            "docs/guided-setup/apps-services-gallery-review.json"
+          ]
+        },
+        {
+          "path": "tests/setup/inkling-binding.test.mjs",
+          "previousSha256": "7f466c360ca9e3d9ae56fa646fbd65b65f51e5c6146dbd3f848d56c549845113",
+          "sha256": "f7fb9695819694b46389b1cdf69406502e82e5fa9e60520736babf630b6c8981",
+          "reason": "Authorized default-provider configuration, software-based entry and Apps & services follow-up after this historical snapshot; implementation tests and source pins qualify the exact current files.",
+          "evidence": [
+            "docs/guided-setup/default-provider-configuration-review.json",
+            "docs/guided-setup/hermes-installation-entry-review.json",
+            "docs/guided-setup/apps-services-gallery-review.json"
+          ]
+        },
+        {
+          "path": "tests/setup/hermes-installations.test.mjs",
+          "previousSha256": "b107c717260a38e51652bee46c35a60a4c87c8f917d8115a71a052d118738c4d",
+          "sha256": "31cee6d18a28e7b288e7572c9171d0bb2d42c447a29f1af4990eb9767c2c7d23",
+          "reason": "Authorized default-provider configuration, software-based entry and Apps & services follow-up after this historical snapshot; implementation tests and source pins qualify the exact current files.",
+          "evidence": [
+            "docs/guided-setup/default-provider-configuration-review.json",
+            "docs/guided-setup/hermes-installation-entry-review.json",
+            "docs/guided-setup/apps-services-gallery-review.json"
+          ]
+        },
+        {
+          "path": "tests/setup/model-choice.test.mjs",
+          "previousSha256": "aa70d4f72fcde729e035c8b1fa5ec8256494fa32385be0a71b5d68e25e5b09e5",
+          "sha256": "5b3216d95414841b4e8f379ff7b7183f9aa3f29625000d74bd6e47e03b298278",
+          "reason": "Authorized default-provider configuration, software-based entry and Apps & services follow-up after this historical snapshot; implementation tests and source pins qualify the exact current files.",
+          "evidence": [
+            "docs/guided-setup/default-provider-configuration-review.json",
+            "docs/guided-setup/hermes-installation-entry-review.json",
+            "docs/guided-setup/apps-services-gallery-review.json"
+          ]
+        },
+        {
+          "path": "scripts/check-welcome-native.mjs",
+          "previousSha256": "d2c65a1dc9d77f53100ef7861e3f59d053cd569e68c7aadfc45d8305fb150ba2",
+          "sha256": "69319a05502a9f18a2e73b384108f2c0eea25c0c31a619e3403507d1bcbdf048",
+          "reason": "Authorized default-provider configuration, software-based entry and Apps & services follow-up after this historical snapshot; implementation tests and source pins qualify the exact current files.",
+          "evidence": [
+            "docs/guided-setup/default-provider-configuration-review.json",
+            "docs/guided-setup/hermes-installation-entry-review.json",
+            "docs/guided-setup/apps-services-gallery-review.json"
+          ]
+        },
+        {
+          "path": "scripts/setup/instance.py",
+          "previousSha256": "dd03e899c50f83d89beb79e1a4879dcf70dbf5ab0f5f1c0fd2c26b3b31cd2c0c",
+          "sha256": "12ef2c86a42b915729ba51fff30abfe87f893c5057e9b10cc260bce2fcd6363d",
+          "reason": "Authorized default-provider configuration, software-based entry and Apps & services follow-up after this historical snapshot; implementation tests and source pins qualify the exact current files.",
+          "evidence": [
+            "docs/guided-setup/default-provider-configuration-review.json",
+            "docs/guided-setup/hermes-installation-entry-review.json",
+            "docs/guided-setup/apps-services-gallery-review.json"
+          ]
+        },
+        {
+          "path": "scripts/setup/hermes-models.py",
+          "previousSha256": "58a568ee79fe4526e05f028f53ff24ae38b6e80749cf9db0e12e27fb1c87a295",
+          "sha256": "6e7502718a67dada400bfa6cb3dabd936693140e4ec03319ae4ced7b3705522f",
+          "reason": "Authorized default-provider configuration, software-based entry and Apps & services follow-up after this historical snapshot; implementation tests and source pins qualify the exact current files.",
+          "evidence": [
+            "docs/guided-setup/default-provider-configuration-review.json",
+            "docs/guided-setup/hermes-installation-entry-review.json",
+            "docs/guided-setup/apps-services-gallery-review.json"
+          ]
+        },
+        {
+          "path": "tests/test_inkling_runtime.py",
+          "previousSha256": "ace6c2a706075eed3d2655b9fcdd0d0d4f0b9f78985c76d07da96c52f5ef8ec4",
+          "sha256": "bb59b81fbed2777b07917cb03e0e9c320d1fd3beb8f7fa6c0be526a81dec7233",
+          "reason": "Make supported Apple-silicon and rejected Linux hardware explicit in the job fixture; assert context/inference errors so Linux CI exercises the intended qualification stages.",
+          "evidence": [
+            "https://github.com/ZenithResearch/zenith-hub-lightweight/actions/runs/45307743048",
+            "tests/test_inkling_runtime.py"
+          ]
+        }
+      ]
+    },
+    "catalog/input-baseline.json": {
+      "sha256": "8d74a29bf207fc30ee73a62b2680f40525628a62faf0c14f825aa8d98a36aa25",
+      "updates": [
+        {
+          "path": "src/vendor/zenith-ui/HubSetup/HermesWelcome.tsx",
+          "previousSha256": "78d3fdee014c98d4c75b543fb1d1bfd55aff9c5ed99b0c097a8714ef0649fd0f",
+          "sha256": "de138b9440d84fcfff75589f091cb1358a37b8c0242f28dc2621ba02b26ec3ca",
+          "reason": "Authorized default-provider configuration, software-based entry and Apps & services follow-up after this historical snapshot; implementation tests and source pins qualify the exact current files.",
+          "evidence": [
+            "docs/guided-setup/default-provider-configuration-review.json",
+            "docs/guided-setup/hermes-installation-entry-review.json",
+            "docs/guided-setup/apps-services-gallery-review.json"
+          ]
+        },
+        {
+          "path": "src/vendor/zenith-ui/YourHub/YourHub.css",
+          "previousSha256": "03a9437038caefb93cb7b9ef40adce0aaf99a424632422c997f7ad354d7bf780",
+          "sha256": "ccc9cb2e46dbe25d126be66a2840e5c0094856d7cb43b61b17d4cfef7f2832c8",
+          "reason": "Authorized default-provider configuration, software-based entry and Apps & services follow-up after this historical snapshot; implementation tests and source pins qualify the exact current files.",
+          "evidence": [
+            "docs/guided-setup/default-provider-configuration-review.json",
+            "docs/guided-setup/hermes-installation-entry-review.json",
+            "docs/guided-setup/apps-services-gallery-review.json"
+          ]
+        },
+        {
+          "path": "src/vendor/zenith-ui/YourHub/YourHub.tsx",
+          "previousSha256": "fcd49340c1ca7e9d625ecbc89b03baadd480669f1f26d3f3a2150c7935def7aa",
+          "sha256": "1e1562b634465b5f06a0db78ddd96ba8730df2060d60b35c7109257d8b03850c",
+          "reason": "Authorized default-provider configuration, software-based entry and Apps & services follow-up after this historical snapshot; implementation tests and source pins qualify the exact current files.",
+          "evidence": [
+            "docs/guided-setup/default-provider-configuration-review.json",
+            "docs/guided-setup/hermes-installation-entry-review.json",
+            "docs/guided-setup/apps-services-gallery-review.json"
+          ]
+        },
+        {
+          "path": "src/lib/setup/welcome-state.mjs",
+          "previousSha256": "7dcbe04897ba9296a94961ee791ec49110a1c59eed0cacd9fa84ba4a4e03f734",
+          "sha256": "d7efda9781045b7ec2e41c1fa22a87e7fd61216fe27e80e09dd58e870655d12c",
+          "reason": "Authorized default-provider configuration, software-based entry and Apps & services follow-up after this historical snapshot; implementation tests and source pins qualify the exact current files.",
+          "evidence": [
+            "docs/guided-setup/default-provider-configuration-review.json",
+            "docs/guided-setup/hermes-installation-entry-review.json",
+            "docs/guided-setup/apps-services-gallery-review.json"
+          ]
+        },
+        {
+          "path": "src/lib/setup/hermes.mjs",
+          "previousSha256": "700ec25791a5b1d762d51c5b74551cbd1f6a446a3a5961ae230933fdbb016925",
+          "sha256": "edf1c48f0726032a1f9a7ee9264000fc36f5f0f1ec3bfe12627e1712e94369d3",
+          "reason": "Authorized default-provider configuration, software-based entry and Apps & services follow-up after this historical snapshot; implementation tests and source pins qualify the exact current files.",
+          "evidence": [
+            "docs/guided-setup/default-provider-configuration-review.json",
+            "docs/guided-setup/hermes-installation-entry-review.json",
+            "docs/guided-setup/apps-services-gallery-review.json"
+          ]
+        },
+        {
+          "path": "src/lib/setup/model-choice.mjs",
+          "previousSha256": "1eae8aa590e6f416f4856de50e4850805d7fbd445edd7627e8415e4da5d3621d",
+          "sha256": "9f90a96f95314bf26805f0e2f0b9ad64cd68cdbcc7bc433471e84e4cfe87509a",
+          "reason": "Authorized default-provider configuration, software-based entry and Apps & services follow-up after this historical snapshot; implementation tests and source pins qualify the exact current files.",
+          "evidence": [
+            "docs/guided-setup/default-provider-configuration-review.json",
+            "docs/guided-setup/hermes-installation-entry-review.json",
+            "docs/guided-setup/apps-services-gallery-review.json"
+          ]
+        },
+        {
+          "path": "src/lib/setup/hermes-installations.mjs",
+          "previousSha256": "81767013180a7eae1f596158afa902fe1c9449460e8e3e47e22d8cf4a716342d",
+          "sha256": "421b0674b6b533f2e4f352bb8b1fd3fc3c9db335c8d32fdc7d13d89d8e056e72",
+          "reason": "Authorized default-provider configuration, software-based entry and Apps & services follow-up after this historical snapshot; implementation tests and source pins qualify the exact current files.",
+          "evidence": [
+            "docs/guided-setup/default-provider-configuration-review.json",
+            "docs/guided-setup/hermes-installation-entry-review.json",
+            "docs/guided-setup/apps-services-gallery-review.json"
+          ]
+        },
+        {
+          "path": "src/lib/setup/model-choice.d.mts",
+          "previousSha256": "ae074e33ff699d47f98a43a11635e524bfebadfd77f473a3362020a967f3a8cd",
+          "sha256": "f25de03de825c4faf857855c6809e34bdad27566a4327dca7948f315b1311e70",
+          "reason": "Authorized default-provider configuration, software-based entry and Apps & services follow-up after this historical snapshot; implementation tests and source pins qualify the exact current files.",
+          "evidence": [
+            "docs/guided-setup/default-provider-configuration-review.json",
+            "docs/guided-setup/hermes-installation-entry-review.json",
+            "docs/guided-setup/apps-services-gallery-review.json"
+          ]
+        },
+        {
+          "path": "src/lib/setup/hermes-models.mjs",
+          "previousSha256": "902db4e29499aef48dd7f43841eb815e4e508b387c683a47255a0b679ac4c5ab",
+          "sha256": "0928797d2fe119991595f5d90648476b716226f18eac4db9d347b7881152cf51",
+          "reason": "Authorized default-provider configuration, software-based entry and Apps & services follow-up after this historical snapshot; implementation tests and source pins qualify the exact current files.",
+          "evidence": [
+            "docs/guided-setup/default-provider-configuration-review.json",
+            "docs/guided-setup/hermes-installation-entry-review.json",
+            "docs/guided-setup/apps-services-gallery-review.json"
+          ]
+        },
+        {
+          "path": "src/lib/application/inventory.mjs",
+          "previousSha256": "fde86b3be246ca5e06eaa6e60a97d48be66a405e0c6b2104e3302e67e6eca351",
+          "sha256": "54fbfadd1145859f367376013e2ee115f20971a03b649c73d3b406d8f61cc7e0",
+          "reason": "Authorized default-provider configuration, software-based entry and Apps & services follow-up after this historical snapshot; implementation tests and source pins qualify the exact current files.",
+          "evidence": [
+            "docs/guided-setup/default-provider-configuration-review.json",
+            "docs/guided-setup/hermes-installation-entry-review.json",
+            "docs/guided-setup/apps-services-gallery-review.json"
+          ]
+        },
+        {
+          "path": "src/lib/application/model.mjs",
+          "previousSha256": "045dc39ae001af1b1c2059e12359a4e257203cca035d516006ac4bb533115359",
+          "sha256": "3ae3f18742fd25cbb7bac7a12e44c99220c0fab505c66948d09a415b2cce1035",
+          "reason": "Authorized default-provider configuration, software-based entry and Apps & services follow-up after this historical snapshot; implementation tests and source pins qualify the exact current files.",
+          "evidence": [
+            "docs/guided-setup/default-provider-configuration-review.json",
+            "docs/guided-setup/hermes-installation-entry-review.json",
+            "docs/guided-setup/apps-services-gallery-review.json"
+          ]
+        },
+        {
+          "path": "src/lib/hub/resources.mjs",
+          "previousSha256": "32bd05898d28b65e66d9e7b1d028a950722c851cfba378e5d7ce48d48c21be37",
+          "sha256": "099cc0499cc9275a5a5f43631b715ad2dd61d338aa93d97a15ddaf9436b2634c",
+          "reason": "Authorized default-provider configuration, software-based entry and Apps & services follow-up after this historical snapshot; implementation tests and source pins qualify the exact current files.",
+          "evidence": [
+            "docs/guided-setup/default-provider-configuration-review.json",
+            "docs/guided-setup/hermes-installation-entry-review.json",
+            "docs/guided-setup/apps-services-gallery-review.json"
+          ]
+        },
+        {
+          "path": "src/components/hub/YourHubPage.tsx",
+          "previousSha256": "4b9310a7b988d1dc61ce8f80216e61c723ee8c31d8dc72fd16ec88520f19e32f",
+          "sha256": "2638b28167b524d69fe7dc2b7cd39455de04a4a161e701873dcf8e468925a6e0",
+          "reason": "Authorized default-provider configuration, software-based entry and Apps & services follow-up after this historical snapshot; implementation tests and source pins qualify the exact current files.",
+          "evidence": [
+            "docs/guided-setup/default-provider-configuration-review.json",
+            "docs/guided-setup/hermes-installation-entry-review.json",
+            "docs/guided-setup/apps-services-gallery-review.json"
+          ]
+        },
+        {
+          "path": "src/components/hub/HermesWelcomePage.tsx",
+          "previousSha256": "62846d0c26bb1b84714486e11129030480386ce3ce752f5de210250276e56c55",
+          "sha256": "31933d1e6c5541561f138c4d338eedeeed1af2d2ca0bf72d4ff1a4766c69229b",
+          "reason": "Authorized default-provider configuration, software-based entry and Apps & services follow-up after this historical snapshot; implementation tests and source pins qualify the exact current files.",
+          "evidence": [
+            "docs/guided-setup/default-provider-configuration-review.json",
+            "docs/guided-setup/hermes-installation-entry-review.json",
+            "docs/guided-setup/apps-services-gallery-review.json"
+          ]
+        },
+        {
+          "path": "profiles/source-provenance.json",
+          "previousSha256": "8002d116d018d20bddf9ce5da3866f515b59a1f0d539d6aaa0ad17167b0a3b28",
+          "sha256": "2096b7d312715881d5c95bac3728e985c96df6fd468e992d7b43ab7c26ed8aea",
+          "reason": "Authorized default-provider configuration, software-based entry and Apps & services follow-up after this historical snapshot; implementation tests and source pins qualify the exact current files.",
+          "evidence": [
+            "docs/guided-setup/default-provider-configuration-review.json",
+            "docs/guided-setup/hermes-installation-entry-review.json",
+            "docs/guided-setup/apps-services-gallery-review.json"
+          ]
+        },
+        {
+          "path": "profiles/setup/catalog.json",
+          "previousSha256": "0fc9d62d386147406a79d48041bb6300acb81e1eec2a6b6b6a397263577ba73d",
+          "sha256": "3ec20200e0dd2b54b103fb39c5ff547dd5a7d8515631a6729f2d63ea1931ead3",
+          "reason": "Authorized default-provider configuration, software-based entry and Apps & services follow-up after this historical snapshot; implementation tests and source pins qualify the exact current files.",
+          "evidence": [
+            "docs/guided-setup/default-provider-configuration-review.json",
+            "docs/guided-setup/hermes-installation-entry-review.json",
+            "docs/guided-setup/apps-services-gallery-review.json"
+          ]
+        }
+      ]
+    }
+  }
+}

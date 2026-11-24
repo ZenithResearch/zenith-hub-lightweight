@@ -1,0 +1,98 @@
+{
+  "status": "draft-2-contract-fixture-checks",
+  "objectVersions": 4,
+  "typedViews": 4,
+  "checks": [
+    {
+      "name": "software installation without any guide or running service",
+      "passed": true
+    },
+    {
+      "name": "generic named profile without AI fields",
+      "passed": true
+    },
+    {
+      "name": "Hermes profile composition, build and stopped external service",
+      "passed": true
+    },
+    {
+      "name": "database Host label drift is rejected",
+      "passed": true
+    },
+    {
+      "name": "stale or missing object revision is rejected",
+      "passed": true
+    },
+    {
+      "name": "duplicate application rows are rejected",
+      "passed": true
+    },
+    {
+      "name": "a Host cannot use an Artifact stored version",
+      "passed": true
+    },
+    {
+      "name": "applicable observed schema reference is mandatory",
+      "passed": true
+    },
+    {
+      "name": "trusted definition pins cannot be substituted",
+      "passed": true
+    },
+    {
+      "name": "missing versioned projection value file is rejected",
+      "passed": true
+    },
+    {
+      "name": "mutable source branches are rejected",
+      "passed": true
+    },
+    {
+      "name": "unknown host references are rejected",
+      "passed": true
+    },
+    {
+      "name": "raw model fields are not accepted on generic profiles",
+      "passed": true
+    },
+    {
+      "name": "empty Hermes model configuration is rejected",
+      "passed": true
+    },
+    {
+      "name": "external service lifecycle remains unmanaged",
+      "passed": true
+    },
+    {
+      "name": "representation IRI is distinct and content addressed",
+      "passed": true
+    },
+    {
+      "name": "runtime state is not software presence",
+      "passed": true
+    },
+    {
+      "name": "two catalogs reference one stable software descriptor",
+      "passed": true
+    },
+    {
+      "name": "explicit external reference does not invent a local service or installation",
+      "passed": true
+    },
+    {
+      "name": "unresolved local connection targets are rejected",
+      "passed": true
+    },
+    {
+      "name": "inspection-owned operational state changes without changing semantic object version",
+      "passed": true
+    }
+  ],
+  "limitations": [
+    "Only synthetic observation-mode objects are qualified; no admitted Entity/runtime behavior is demonstrated.",
+    "Structured application attributes round-trip through pinned profile values; only declared RDF fields are RDF-queryable.",
+    "The trusted fixture manifest simulates committed immutable object versions; this is not a production commit/recovery implementation.",
+    "No live migration or application integration has been performed."
+  ],
+  "liveDataTouched": false
+}

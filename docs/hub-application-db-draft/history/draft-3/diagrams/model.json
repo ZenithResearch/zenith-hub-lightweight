@@ -1,0 +1,725 @@
+{
+  "schema": "urn:zenith:hub:application-db:draft:3",
+  "sourceHashes": {
+    "schema.json": "0983969dd4027de56bc26a4d478567efa6521cd420e9b39ae51b0b623f973e62",
+    "field-ownership.json": "19c0637a61d1bb474558254c317ab17cfe4f306cc69db40691fadda8bd33e443",
+    "application-relations.jsonld": "d4ba34c4bcddb8564c36b42844affd52e40d59686e42994e51d198d674b83b2b"
+  },
+  "models": [
+    {
+      "name": "application-records",
+      "title": "A — Application database / logical relational projection",
+      "nodes": [
+        {
+          "id": "HubSettings",
+          "label": "HubSettings",
+          "kind": "application-record"
+        },
+        {
+          "id": "Host",
+          "label": "Host",
+          "kind": "application-record"
+        },
+        {
+          "id": "SoftwareDescriptor",
+          "label": "SoftwareDescriptor",
+          "kind": "application-record"
+        },
+        {
+          "id": "SoftwareCatalogEntry",
+          "label": "SoftwareCatalogEntry",
+          "kind": "application-record"
+        },
+        {
+          "id": "SoftwareSourceSnapshot",
+          "label": "SoftwareSourceSnapshot",
+          "kind": "application-record"
+        },
+        {
+          "id": "SoftwareBuild",
+          "label": "SoftwareBuild",
+          "kind": "application-record"
+        },
+        {
+          "id": "SoftwareInstallationRecord",
+          "label": "SoftwareInstallationRecord",
+          "kind": "application-record"
+        },
+        {
+          "id": "ConfigurationProfile",
+          "label": "ConfigurationProfile",
+          "kind": "application-record"
+        },
+        {
+          "id": "ServiceInstance",
+          "label": "ServiceInstance",
+          "kind": "application-record"
+        },
+        {
+          "id": "Connection",
+          "label": "Connection",
+          "kind": "application-record"
+        },
+        {
+          "id": "SetupOperation",
+          "label": "SetupOperation",
+          "kind": "application-record"
+        }
+      ],
+      "edges": [
+        {
+          "from": "HubSettings",
+          "to": "Host",
+          "label": "localHostRef",
+          "kind": "application-reference"
+        },
+        {
+          "from": "HubSettings",
+          "to": "ConfigurationProfile",
+          "label": "selectedGuideProfileRef",
+          "kind": "application-reference"
+        },
+        {
+          "from": "SoftwareCatalogEntry",
+          "to": "SoftwareDescriptor",
+          "label": "softwareRef",
+          "kind": "application-reference"
+        },
+        {
+          "from": "SoftwareSourceSnapshot",
+          "to": "SoftwareDescriptor",
+          "label": "softwareRef",
+          "kind": "application-reference"
+        },
+        {
+          "from": "SoftwareBuild",
+          "to": "SoftwareDescriptor",
+          "label": "softwareRef",
+          "kind": "application-reference"
+        },
+        {
+          "from": "SoftwareBuild",
+          "to": "SoftwareSourceSnapshot",
+          "label": "sourceSnapshotRef",
+          "kind": "application-reference"
+        },
+        {
+          "from": "SoftwareInstallationRecord",
+          "to": "SoftwareDescriptor",
+          "label": "softwareRef",
+          "kind": "application-reference"
+        },
+        {
+          "from": "SoftwareInstallationRecord",
+          "to": "Host",
+          "label": "hostRef",
+          "kind": "application-reference"
+        },
+        {
+          "from": "SoftwareInstallationRecord",
+          "to": "SoftwareSourceSnapshot",
+          "label": "sourceSnapshotRef",
+          "kind": "application-reference"
+        },
+        {
+          "from": "SoftwareInstallationRecord",
+          "to": "SoftwareBuild",
+          "label": "buildRef",
+          "kind": "application-reference"
+        },
+        {
+          "from": "ConfigurationProfile",
+          "to": "SoftwareDescriptor",
+          "label": "softwareRef",
+          "kind": "application-reference"
+        },
+        {
+          "from": "ConfigurationProfile",
+          "to": "SoftwareInstallationRecord",
+          "label": "installationRef",
+          "kind": "application-reference"
+        },
+        {
+          "from": "ServiceInstance",
+          "to": "SoftwareDescriptor",
+          "label": "softwareRef",
+          "kind": "application-reference"
+        },
+        {
+          "from": "ServiceInstance",
+          "to": "SoftwareInstallationRecord",
+          "label": "installationRef",
+          "kind": "application-reference"
+        },
+        {
+          "from": "ServiceInstance",
+          "to": "ConfigurationProfile",
+          "label": "profileRef",
+          "kind": "application-reference"
+        },
+        {
+          "from": "ServiceInstance",
+          "to": "Host",
+          "label": "hostRefs",
+          "kind": "application-reference"
+        },
+        {
+          "from": "ConfigurationProfile",
+          "to": "Connection",
+          "label": "modelBinding.serverConnectionRef — Hermes only",
+          "kind": "implementation-binding"
+        }
+      ]
+    },
+    {
+      "name": "ontology-inheritance",
+      "title": "B — Ontology inheritance / existing Core + proposed Hub Infrastructure",
+      "nodes": [
+        {
+          "id": "Thing",
+          "label": "owl:Thing",
+          "kind": "ontology-class"
+        },
+        {
+          "id": "zn_Entity",
+          "label": "zn:Entity",
+          "kind": "ontology-class"
+        },
+        {
+          "id": "zn_Person",
+          "label": "zn:Person",
+          "kind": "ontology-class"
+        },
+        {
+          "id": "zn_Organization",
+          "label": "zn:Organization",
+          "kind": "ontology-class"
+        },
+        {
+          "id": "zn_Agent",
+          "label": "zn:Agent",
+          "kind": "ontology-class"
+        },
+        {
+          "id": "zn_Artifact",
+          "label": "zn:Artifact",
+          "kind": "ontology-class"
+        },
+        {
+          "id": "zn_ExternalLink",
+          "label": "zn:ExternalLink",
+          "kind": "ontology-class"
+        },
+        {
+          "id": "zn_Receipt",
+          "label": "zn:Receipt",
+          "kind": "ontology-class"
+        },
+        {
+          "id": "zn_Event",
+          "label": "zn:Event",
+          "kind": "ontology-class"
+        },
+        {
+          "id": "zn_Domain",
+          "label": "zn:Domain",
+          "kind": "ontology-class"
+        },
+        {
+          "id": "zn_Collection",
+          "label": "zn:Collection",
+          "kind": "ontology-class"
+        },
+        {
+          "id": "zn_Handoff",
+          "label": "zn:Handoff",
+          "kind": "ontology-class"
+        },
+        {
+          "id": "zn_Actor",
+          "label": "zn:Actor",
+          "kind": "ontology-class"
+        },
+        {
+          "id": "infra_Machine",
+          "label": "infra:Machine",
+          "kind": "ontology-class"
+        },
+        {
+          "id": "infra_ServiceInstance",
+          "label": "infra:ServiceInstance",
+          "kind": "ontology-class"
+        },
+        {
+          "id": "infra_Deployment",
+          "label": "infra:Deployment",
+          "kind": "ontology-class"
+        },
+        {
+          "id": "infra_Network",
+          "label": "infra:Network",
+          "kind": "ontology-class"
+        },
+        {
+          "id": "infra_NetworkInterface",
+          "label": "infra:NetworkInterface",
+          "kind": "ontology-class"
+        },
+        {
+          "id": "infra_StorageVolume",
+          "label": "infra:StorageVolume",
+          "kind": "ontology-class"
+        },
+        {
+          "id": "infra_DNSZone",
+          "label": "infra:DNSZone",
+          "kind": "ontology-class"
+        },
+        {
+          "id": "CoreModule",
+          "label": "Core module — existing",
+          "kind": "ontology-module"
+        },
+        {
+          "id": "InfraModule",
+          "label": "Infrastructure — proposed / unpublished",
+          "kind": "ontology-module"
+        },
+        {
+          "id": "AppRelations",
+          "label": "Application relations — REVIEW ONLY / properties, no classes",
+          "kind": "ontology-module"
+        }
+      ],
+      "edges": [
+        {
+          "from": "Thing",
+          "to": "zn_Entity",
+          "label": "parent → subclass",
+          "kind": "inheritance"
+        },
+        {
+          "from": "zn_Entity",
+          "to": "zn_Person",
+          "label": "parent → subclass",
+          "kind": "inheritance"
+        },
+        {
+          "from": "zn_Entity",
+          "to": "zn_Organization",
+          "label": "parent → subclass",
+          "kind": "inheritance"
+        },
+        {
+          "from": "zn_Entity",
+          "to": "zn_Agent",
+          "label": "parent → subclass",
+          "kind": "inheritance"
+        },
+        {
+          "from": "Thing",
+          "to": "zn_Artifact",
+          "label": "parent → subclass",
+          "kind": "inheritance"
+        },
+        {
+          "from": "Thing",
+          "to": "zn_ExternalLink",
+          "label": "parent → subclass",
+          "kind": "inheritance"
+        },
+        {
+          "from": "zn_Artifact",
+          "to": "zn_Receipt",
+          "label": "parent → subclass",
+          "kind": "inheritance"
+        },
+        {
+          "from": "Thing",
+          "to": "zn_Event",
+          "label": "parent → subclass",
+          "kind": "inheritance"
+        },
+        {
+          "from": "Thing",
+          "to": "zn_Domain",
+          "label": "parent → subclass",
+          "kind": "inheritance"
+        },
+        {
+          "from": "Thing",
+          "to": "zn_Collection",
+          "label": "parent → subclass",
+          "kind": "inheritance"
+        },
+        {
+          "from": "zn_Artifact",
+          "to": "zn_Handoff",
+          "label": "parent → subclass",
+          "kind": "inheritance"
+        },
+        {
+          "from": "zn_Actor",
+          "to": "zn_Entity",
+          "label": "owl:equivalentClass",
+          "kind": "equivalence"
+        },
+        {
+          "from": "zn_Entity",
+          "to": "infra_Machine",
+          "label": "parent → subclass",
+          "kind": "inheritance"
+        },
+        {
+          "from": "zn_Agent",
+          "to": "infra_ServiceInstance",
+          "label": "parent → subclass",
+          "kind": "inheritance"
+        },
+        {
+          "from": "Thing",
+          "to": "infra_Deployment",
+          "label": "parent → subclass",
+          "kind": "inheritance"
+        },
+        {
+          "from": "Thing",
+          "to": "infra_Network",
+          "label": "parent → subclass",
+          "kind": "inheritance"
+        },
+        {
+          "from": "Thing",
+          "to": "infra_NetworkInterface",
+          "label": "parent → subclass",
+          "kind": "inheritance"
+        },
+        {
+          "from": "Thing",
+          "to": "infra_StorageVolume",
+          "label": "parent → subclass",
+          "kind": "inheritance"
+        },
+        {
+          "from": "Thing",
+          "to": "infra_DNSZone",
+          "label": "parent → subclass",
+          "kind": "inheritance"
+        },
+        {
+          "from": "InfraModule",
+          "to": "CoreModule",
+          "label": "owl:imports",
+          "kind": "module-import"
+        },
+        {
+          "from": "AppRelations",
+          "to": "CoreModule",
+          "label": "proposed import",
+          "kind": "proposed-import"
+        },
+        {
+          "from": "AppRelations",
+          "to": "InfraModule",
+          "label": "proposed import",
+          "kind": "proposed-import"
+        }
+      ]
+    },
+    {
+      "name": "semantic-relations",
+      "title": "C — Semantic RDF relationships / schema roles, not ontology subclasses",
+      "nodes": [
+        {
+          "id": "Host",
+          "label": "Host | infra:Machine",
+          "kind": "schema-role"
+        },
+        {
+          "id": "Descriptor",
+          "label": "Software descriptor | zn:Artifact",
+          "kind": "schema-role"
+        },
+        {
+          "id": "Source",
+          "label": "Source snapshot | zn:Artifact",
+          "kind": "schema-role"
+        },
+        {
+          "id": "Build",
+          "label": "Build output | zn:Artifact",
+          "kind": "schema-role"
+        },
+        {
+          "id": "Installation",
+          "label": "Installation description | zn:Artifact",
+          "kind": "schema-role"
+        },
+        {
+          "id": "Profile",
+          "label": "Named configuration | zn:Artifact",
+          "kind": "schema-role"
+        },
+        {
+          "id": "Service",
+          "label": "Operational service | infra:ServiceInstance",
+          "kind": "schema-role"
+        },
+        {
+          "id": "ConfigContent",
+          "label": "Separate configuration content | zn:Artifact",
+          "kind": "schema-role"
+        },
+        {
+          "id": "Bindings",
+          "label": "Paths · credentials · model binding | versioned sidecar values",
+          "kind": "implementation-value"
+        }
+      ],
+      "edges": [
+        {
+          "from": "Source",
+          "to": "Descriptor",
+          "label": "app:describesSoftware",
+          "kind": "semantic-rdf"
+        },
+        {
+          "from": "Build",
+          "to": "Descriptor",
+          "label": "app:describesSoftware",
+          "kind": "semantic-rdf"
+        },
+        {
+          "from": "Build",
+          "to": "Source",
+          "label": "app:sourceSnapshot",
+          "kind": "semantic-rdf"
+        },
+        {
+          "from": "Installation",
+          "to": "Descriptor",
+          "label": "app:describesSoftware",
+          "kind": "semantic-rdf"
+        },
+        {
+          "from": "Installation",
+          "to": "Host",
+          "label": "app:installationHost",
+          "kind": "semantic-rdf"
+        },
+        {
+          "from": "Installation",
+          "to": "Source",
+          "label": "app:sourceSnapshot",
+          "kind": "semantic-rdf"
+        },
+        {
+          "from": "Installation",
+          "to": "Build",
+          "label": "app:installedBuild",
+          "kind": "semantic-rdf"
+        },
+        {
+          "from": "Profile",
+          "to": "Descriptor",
+          "label": "app:describesSoftware",
+          "kind": "semantic-rdf"
+        },
+        {
+          "from": "Profile",
+          "to": "Installation",
+          "label": "app:installationRecord",
+          "kind": "semantic-rdf"
+        },
+        {
+          "from": "Profile",
+          "to": "ConfigContent",
+          "label": "app:configurationContent",
+          "kind": "semantic-rdf"
+        },
+        {
+          "from": "Service",
+          "to": "Descriptor",
+          "label": "app:describesSoftware",
+          "kind": "semantic-rdf"
+        },
+        {
+          "from": "Service",
+          "to": "Installation",
+          "label": "app:installationRecord",
+          "kind": "semantic-rdf"
+        },
+        {
+          "from": "Service",
+          "to": "Profile",
+          "label": "app:configurationProfile",
+          "kind": "semantic-rdf"
+        },
+        {
+          "from": "Service",
+          "to": "Host",
+          "label": "infra:hostedBy",
+          "kind": "semantic-rdf"
+        },
+        {
+          "from": "Installation",
+          "to": "Bindings",
+          "label": "locations",
+          "kind": "implementation-binding"
+        },
+        {
+          "from": "Profile",
+          "to": "Bindings",
+          "label": "nativeHome / credentialRefs / modelBinding",
+          "kind": "implementation-binding"
+        }
+      ]
+    },
+    {
+      "name": "storage-versions",
+      "title": "D — Stored-object version contract / proposed, not implemented storage",
+      "nodes": [
+        {
+          "id": "Row",
+          "label": "Ontology-backed application row",
+          "kind": "application-record"
+        },
+        {
+          "id": "Selection",
+          "label": "Current selectedObjects | objectId + objectRevision",
+          "kind": "snapshot-selection"
+        },
+        {
+          "id": "Object",
+          "label": "StoredObjectRecord | object identity + revision",
+          "kind": "version-record"
+        },
+        {
+          "id": "Unit",
+          "label": "AtomicUnitVersion | one compatible revision per current unit",
+          "kind": "atomic-unit"
+        },
+        {
+          "id": "RDF",
+          "label": "Immutable JSON-LD | semantic facts and declared links",
+          "kind": "file"
+        },
+        {
+          "id": "Bindings",
+          "label": "Immutable bindings file | profile ID + validated values",
+          "kind": "file"
+        },
+        {
+          "id": "Defs",
+          "label": "Pinned definition files | modules / schemas / manifests",
+          "kind": "file"
+        },
+        {
+          "id": "View",
+          "label": "Validated application view | RDF + profile values",
+          "kind": "projection"
+        },
+        {
+          "id": "Ops",
+          "label": "Operational overlay | inspection / desired state / journals",
+          "kind": "application-record"
+        }
+      ],
+      "edges": [
+        {
+          "from": "Row",
+          "to": "Object",
+          "label": "objectVersion: objectId + revision + profileId",
+          "kind": "storage-reference"
+        },
+        {
+          "from": "Selection",
+          "to": "Object",
+          "label": "selects exact current object revision",
+          "kind": "snapshot-selection"
+        },
+        {
+          "from": "Object",
+          "to": "Unit",
+          "label": "committed atomicUnit id + revision",
+          "kind": "storage-reference"
+        },
+        {
+          "from": "Object",
+          "to": "RDF",
+          "label": "jsonldFile — hash / length / media type",
+          "kind": "storage-reference"
+        },
+        {
+          "from": "Object",
+          "to": "Bindings",
+          "label": "bindingsFile — same object / unit revision",
+          "kind": "storage-reference"
+        },
+        {
+          "from": "Object",
+          "to": "Defs",
+          "label": "trusted exact definition references",
+          "kind": "storage-reference"
+        },
+        {
+          "from": "RDF",
+          "to": "View",
+          "label": "mapped semantic facts",
+          "kind": "projection-input"
+        },
+        {
+          "from": "Bindings",
+          "to": "View",
+          "label": "validated profile / implementation values",
+          "kind": "projection-input"
+        },
+        {
+          "from": "Defs",
+          "to": "View",
+          "label": "type and schema validation",
+          "kind": "projection-input"
+        },
+        {
+          "from": "View",
+          "to": "Row",
+          "label": "must equal object-backed columns",
+          "kind": "projection-output"
+        },
+        {
+          "from": "Ops",
+          "to": "Row",
+          "label": "explicitly owned operational fields",
+          "kind": "operational-overlay"
+        }
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "diagram": "application-records",
+      "nodes": 11,
+      "edges": 17,
+      "allEndpointsDeclared": true
+    },
+    {
+      "diagram": "ontology-inheritance",
+      "nodes": 23,
+      "edges": 22,
+      "allEndpointsDeclared": true
+    },
+    {
+      "diagram": "semantic-relations",
+      "nodes": 9,
+      "edges": 16,
+      "allEndpointsDeclared": true
+    },
+    {
+      "diagram": "storage-versions",
+      "nodes": 9,
+      "edges": 11,
+      "allEndpointsDeclared": true
+    }
+  ],
+  "rendering": "Mermaid source; endpoint and schema checks performed. Layout is rendered by the document viewer."
+}

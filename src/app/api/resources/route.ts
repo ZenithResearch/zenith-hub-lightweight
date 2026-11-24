@@ -1,12 +1,13 @@
 import {resourceController} from "@/lib/resource-controller.mjs";
 import {normalizeNextRequest,readAction} from "@/lib/operator-http.mjs";
-import {OperatorError} from "@/lib/pilot-controller.mjs";
+import {operatorFailure} from "@/lib/operator-error.mjs";
 export const runtime="nodejs";
 export const dynamic="force-dynamic";
 const headers={"Cache-Control":"no-store","X-Content-Type-Options":"nosniff"};
 function rejected(error:unknown) {
-  return Response.json({error:error instanceof OperatorError?error.code:"resource_unavailable"},
-    {status:error instanceof OperatorError?error.status:503,headers});
+  const value=operatorFailure(error);
+  return Response.json({error:value?.code||"resource_unavailable"},
+    {status:value?.status||503,headers});
 }
 export async function GET(request:Request) {
   try {return Response.json(await resourceController.get(normalizeNextRequest(request)),{headers});}

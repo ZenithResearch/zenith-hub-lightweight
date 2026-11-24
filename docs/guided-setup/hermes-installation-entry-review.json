@@ -1,0 +1,34 @@
+{
+  "schema": "zenith.hub.hermes-entry-fix.v1",
+  "verifiedAt": "2026-11-23T22:52:26.172866+00:00",
+  "cause": "Fresh source-installer receipts were skipped because discovery accepted only the explicit software binding previously created by guide setup.",
+  "fix": [
+    "Resolve fresh source/environment/tools from the owned receipt without requiring a guide or provider.",
+    "Verify pinned source and Python runtime before entry.",
+    "Attach the exact inspected copy to the existing Hub instance and preserve it through later observations."
+  ],
+  "validation": {
+    "onboardingAndInspectionTests": {
+      "passed": 80,
+      "failed": 0
+    },
+    "typecheck": "passed",
+    "sourceProvenance": "passed",
+    "liveContinue": "Clicked Continue and observed the full resource gallery at /hub.",
+    "sourceAndRuntimeVerification": "present",
+    "providerConfigUnchanged": true,
+    "nativeFilesHashUnchanged": true,
+    "nativeHermesPidUnchanged": true,
+    "noReinstall": true,
+    "nativeNamedProfileRequired": false
+  },
+  "live": {
+    "url": "http://127.0.0.1:4318/hub",
+    "enteredAt": "2026-11-23T22:50:57.696Z",
+    "installationRef": "urn:zenith:hub:installed-version:211225572c5166ead2572a9eb4865ad6377f3f2c1f055c9b267910ff0200576b",
+    "source": "/Volumes/home/bananawalnut/Zenith/Hub-Walkthrough-20261120/instances/hermes-local/source",
+    "instanceId": "hermes-local",
+    "nativePid": 63479,
+    "catalogVersion": "2026.11.23.1"
+  }
+}

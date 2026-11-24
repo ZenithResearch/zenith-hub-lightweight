@@ -1,0 +1,156 @@
+{
+  "schema": "zenith.hub-application-integration-validation.v1",
+  "date": "2026-11-23T19:11:28.399935+00:00",
+  "branch": "codex/hub-repository-foundation",
+  "head": "efe521340efe90697b29ad18752dcf9aec512916",
+  "changesCommitted": false,
+  "checks": {
+    "existingJavaScriptSuites": {
+      "command": "node --test tests/objects/*.test.mjs tests/setup/*.test.mjs tests/hub/*.test.mjs tests/deployer/*.test.mjs",
+      "passed": 230
+    },
+    "finalFoundationAndApplication": {
+      "command": "node --test tests/application/*.test.mjs tests/objects/foundation.test.mjs",
+      "passed": 80,
+      "foundation": 49,
+      "application": 31,
+      "overlapsExistingFoundation": true
+    },
+    "pythonFixtures": {
+      "run": 54,
+      "passed": 53,
+      "skipped": 1,
+      "skipReason": "Native AIAgent fixture requires HUB_TEST_HERMES_SOURCE and its installed Python; no real provider inference was run."
+    },
+    "reviewContracts": 68,
+    "reviewDesign": 31,
+    "typescript": "passed in Webpack production build",
+    "sourcePins": "passed",
+    "productionBuild": "passed (Next 16.4.6, Webpack, Node 24)",
+    "builtHttp": {
+      "integratedProductionStandaloneDevelopment": 3,
+      "legacyFoundationObjectSetupGallery": 8,
+      "passed": 11,
+      "covers": [
+        "cross-route sessions",
+        "valid inspection request",
+        "persisted reviews after restart",
+        "setup/connection/generic-object database ownership",
+        "correct 422 repository rejection",
+        "stale generation rejection",
+        "credential continuity"
+      ]
+    },
+    "diffCheck": "passed",
+    "finalFocusedRegression": {
+      "command": "node --test tests/application/*.test.mjs tests/hub/*.test.mjs tests/setup/*.test.mjs tests/objects/*.test.mjs",
+      "passed": 197,
+      "applicationAtRun": 33,
+      "overlapsOtherJavaScriptSuites": true
+    },
+    "operatorSessionsAndCrossRealmErrors": {
+      "command": "node --test tests/application/session.test.mjs",
+      "passed": 4,
+      "overlapsFinalFocusedRegression": 2
+    },
+    "uniqueJavaScriptTestsPassedAcrossRuns": 265
+  },
+  "live": {
+    "migration": "applied after stopping the preview writer",
+    "sourceSchema": 2,
+    "targetSchema": 5,
+    "sourceSetupRevision": 40,
+    "setupComponents": 2,
+    "completedOperations": 4,
+    "originalObjectVersionsPreserved": 7,
+    "backupFilesVerified": 3,
+    "fullSetupAndConnectionRoundTrips": true,
+    "nativeDataCopied": false,
+    "nativeConfigurationValuesUnchanged": true,
+    "softwareDescriptors": 6,
+    "installationDescriptions": {
+      "retainedUnverified": 1,
+      "verifiedExistingCopy": 1,
+      "physicalCopiesCreated": 0
+    },
+    "postRegistrationSetupRevision": 41,
+    "restart": {
+      "sameRepository": true,
+      "sameGeneration": 5,
+      "databaseReinitialized": false
+    },
+    "uiAndApis": [
+      "/",
+      "/hub",
+      "/api/setup",
+      "/api/hub",
+      "/api/resources",
+      "/api/hub/inventory",
+      "/api/database"
+    ],
+    "galleryWarnings": 0,
+    "separateReleasedHub4218": "left running",
+    "repositoryRejection": {
+      "status": 422,
+      "code": "foundation_admission_unsupported",
+      "databaseGenerationUnchanged": true
+    },
+    "crossRouteSessionVerified": true
+  },
+  "nativeQualification": {
+    "scope": "Existing pinned Hermes source inventory, entry point, Python runtime and environment layout on this Mac",
+    "classification": "present",
+    "registered": true,
+    "modelOrProviderCalls": false,
+    "servicesStarted": false,
+    "httpFacade": {
+      "classification": "present",
+      "sourceVersionPinned": true,
+      "persisted": false,
+      "generationUnchanged": true
+    }
+  },
+  "limits": [
+    "Actual power loss, disk-full/fsync faults and mount-disconnect faults are not qualified.",
+    "Linux/native layouts and arbitrary Hermes versions are not qualified; unsupported inspectors return unknown.",
+    "Unpublished schema-4 foundation roots require a separate explicit converter.",
+    "The broader proposed generic v2 review endpoints are not implemented.",
+    "Standalone HTTP passed with the local linked dependency tree; fully relocated dependencies and Turbopack are not qualified.",
+    "Real provider inference, model streaming and tool execution were not exercised by this database integration."
+  ],
+  "verifiedBuildInputHashes": {
+    "src/lib/application/native-inspection.mjs": "33b1a08fbb1cc75cf07f46c055105e13c834c45dc7a35a8ee0e779a6130862e0",
+    "src/lib/application/compiler.mjs": "767cad5d83dadda67d4aae271cfc12d446bb8d4d79ba235b40e5d71eadfd5791",
+    "src/lib/application/migration.mjs": "ab05b73289dc799437f77cefd7ca7a6dede4d6c22398fbfc311fa32769de7d7e",
+    "src/lib/application/owner.mjs": "463416284c0d0645df022a3d9400566309a5f3d69b39aeeefc9487ef141e2471",
+    "src/lib/application/owner.d.mts": "130f3b93e97d71b8bffb0dad84a005980f87e63a7c440e30d152996a1836ce57",
+    "src/lib/application/inventory.mjs": "fde86b3be246ca5e06eaa6e60a97d48be66a405e0c6b2104e3302e67e6eca351",
+    "src/lib/application/database.mjs": "f7836d817493150a1b8c6e0f5ea184f353710f7d7a215bcb25d650f243b6b7c3",
+    "src/lib/application/model.mjs": "045dc39ae001af1b1c2059e12359a4e257203cca035d516006ac4bb533115359",
+    "src/instrumentation.ts": "8bca53099a4d54d9edac83da4e21b70569013489356fbbcde3f7fdbb27b2d26c",
+    "scripts/hub.mjs": "8e3ec4dbc680ca351643cea26b11aaa7f8c9688af9868020681ebf9584f5ed2f",
+    "scripts/check-application-api.mjs": "44125e5955113d1b092d1eaec17263c349aecc0916fb39249f263081241c7c07",
+    "src/lib/setup/runtime.ts": "f58bc6638f6163c4dca6b2a54691934863099d65a2729401358ee0bfedc475d7",
+    "src/lib/setup/state.mjs": "5a3be0ff23a5c555969187bc0f38ddceef919d359f913b05e500423a2ab3feb6",
+    "src/lib/setup/controller.mjs": "162050aa0a93f757603f6dbed3da5eae3961ce83bcb1800d64c67ef90edb8e9a",
+    "src/lib/resource-controller.mjs": "ee1f106d812a097e4088a7b64a4232a688ed9e48cf920391d6e3416c491337ee",
+    "src/lib/hub/controller.mjs": "ae4f80b6a15da2e4008c4bf091d2506f91dcec947eb7e59d885f096a73f09712",
+    "src/lib/objects/controller.mjs": "c4ecbd3781b2f079626929584aeafffd73154c3e6094ff325b57afde060b3b07",
+    "src/lib/operator-session.mjs": "b424d3936e829d2db82a607e78ba50b57eca7669168f8821bd0582d7deedc3bc",
+    "src/lib/operator-error.mjs": "28fdc445f2b22bf7ec964deef341f00e3dc15e91882c50989109c88ff40bfb89",
+    "src/lib/operator-error.d.mts": "a12a4d6940e370c27fbebcbcb716c26710a14d3ac111e8f19efda569c3004b96",
+    "src/app/api/objects/route.ts": "c9b3e61e5a229cb47a7d7391025b4b880bc8b3b64423bbaaa796df462f4be1f5",
+    "src/app/api/resources/route.ts": "c107f094ac542ac7c59df84df31ac41a2b307e2bd5aa820c5f447db492e89ab7",
+    "profiles/application-db/field-ownership.json": "87b0bac7526774360348b623addbe6bb7a7ca6b79237589f2d731e851c1ca5ce",
+    "profiles/application-db/005-application-state.sql": "53be6646ec970dee44e013db754e9413c0f7503a1267ce346cd96dbf0234ebfd",
+    "profiles/application-db/api.schema.json": "2132e2652707b59053aceea1b5e7691948174a620383253173b55767c3db1ec7",
+    "profiles/application-db/physical-mapping.json": "5cb5357406bf31c9bfd02c1b14496237a878f99136a0c356d9d0d652447b8f75",
+    "profiles/application-db/commit.schema.json": "cd6dd7aca9d53dc22981fefdf8edcf2ac7aeda7df9721d75f26a94d0382fb0bb",
+    "profiles/application-db/004-application-projections.sql": "6b372958fe372d186d538ebc65a95d67b34932537c77c8c5ccd61392ccbe3294",
+    "profiles/application-db/application-relations.jsonld": "661b0f33a90e28082f7a9131a26b6de415fa790b319783617467541a30cb2c29",
+    "profiles/application-db/reference-policy.json": "858b11899feae3647adbaf1747d0d7d96809ab4bb7f8062d883118b7bb30f4ba",
+    "profiles/application-db/manifest.json": "53e59c10fddfa86f3a7e3a4cb4260f43e9c91554a52a25aad6b090fad3fec6ae",
+    "profiles/application-db/003-revision-ledger.sql": "a829df6809bdd2b68c964ab29148619eff592eb60cd9dcd59bffac4e2f425b84",
+    "profiles/application-db/schema.json": "23d474200ee8c6a04d757743d7545391102ba9e974a7f31e95a92b415f6ea319"
+  }
+}

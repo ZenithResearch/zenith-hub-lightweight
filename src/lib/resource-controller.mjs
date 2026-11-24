@@ -1,4 +1,4 @@
-import {randomBytes} from "node:crypto";
+import {operatorCsrf} from './operator-session.mjs';
 import {OperatorError} from "./pilot-controller.mjs";
 import {readAction} from "./operator-http.mjs";
 import {readRegistry,privateBytes,publicResource,changeRegistry} from "./resource-registry.mjs";
@@ -6,9 +6,11 @@ const empty=r=>({...publicResource(r),ready:false,connected:false,
   state:r.enabled?"checking":"disconnected",observedAt:null});
 export function createResourceController({env=process.env,fetcher=fetch,now=Date.now}={}) {
   const file=env.ZENITH_HUB_RESOURCES_FILE;
+  const database=async()=>{const owner=await import('./application/owner.mjs');return env.ZENITH_HUB_APPLICATION_DB==='1'||await owner.activation(owner.setupRoot(env))?owner.applicationForEnv(env):null;};
+  const applicationStore={async read(){const app=await database();return app?app.readResources():readRegistry(file);},async change(action){const app=await database();return app?app.changeResources(action):changeRegistry(file,action);}};
   const enabled=!!file && (env.ZENITH_NATIVE_DEMO==="1" || env.ZENITH_LOCAL_OPERATOR==="1");
   const origin=env.ZENITH_OPERATOR_ORIGIN || "http://127.0.0.1:4218";
-  const expected=new URL(origin),csrf=randomBytes(24).toString("hex");
+  const expected=new URL(origin),csrf=operatorCsrf('connections',env);
   if(expected.origin!==origin || expected.protocol!=="http:" || expected.hostname!=="127.0.0.1" || !expected.port)
     throw new OperatorError("invalid_resource_operator_origin");
   const cache=new Map();let refreshing=null,lastRefresh=0;
@@ -55,7 +57,7 @@ export function createResourceController({env=process.env,fetcher=fetch,now=Date
   async function snapshot(force=false) {
     if(!enabled)return {schema:"zenith.hub-resource-snapshot.v1",mode:"disabled",revision:null,resources:[]};
     let registry;
-    try {registry=await readRegistry(file);}
+    try {registry=applicationStore?await applicationStore.read():await readRegistry(file);}
     catch {return {schema:"zenith.hub-resource-snapshot.v1",mode:"local",registryState:"configuration_unavailable",revision:null,resources:[]};}
     const missing=registry.resources.some(r=>r.enabled && cache.get(r.id)?.revision!==registry.revision);
     if(!refreshing && (force || missing || !lastRefresh || now()-lastRefresh>=10000)) {
@@ -81,10 +83,10 @@ export function createResourceController({env=process.env,fetcher=fetch,now=Date
       if(!body || body.schema!=="zenith.hub-resource-action.v1")throw new OperatorError("invalid_resource_action");
       if(body.operation==="refresh" && Object.keys(body).sort().join(",")==="operation,schema")
         return {...await snapshot(true),applied:true};
-      if(body.operation!=="set-enabled" || Object.keys(body).sort().join(",")!=="enabled,expectedRevision,operation,resourceId,schema" ||
+      if(body.operation!=="set-enabled" || !["enabled,expectedRevision,operation,resourceId,schema","enabled,expectedGeneration,expectedRevision,operation,resourceId,schema"].includes(Object.keys(body).sort().join(",")) ||
          typeof body.enabled!=="boolean" || !Number.isSafeInteger(body.expectedRevision) || typeof body.resourceId!=="string")
         throw new OperatorError("invalid_resource_action");
-      await changeRegistry(file,body);
+      await (applicationStore?applicationStore.change(body):changeRegistry(file,body));
       cache.clear();lastRefresh=0;
       return {...await snapshot(),applied:true};
     }

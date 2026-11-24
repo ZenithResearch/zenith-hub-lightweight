@@ -1,0 +1,45 @@
+{
+  "status": "review-fixture-validation-only",
+  "objectCount": 4,
+  "documentCount": 4,
+  "checks": [
+    {
+      "name": "typed records resolve to real JSON-LD files and exact pinned definitions",
+      "passed": true
+    },
+    {
+      "name": "typed row requires objectRef",
+      "passed": true
+    },
+    {
+      "name": "typed row cannot reference a missing stored object",
+      "passed": true
+    },
+    {
+      "name": "file content hashes are checked",
+      "passed": true
+    },
+    {
+      "name": "JSON-LD type must match the database type metadata",
+      "passed": true
+    },
+    {
+      "name": "definition fragments must actually exist",
+      "passed": true
+    },
+    {
+      "name": "application and ontology object identities must agree",
+      "passed": true
+    },
+    {
+      "name": "runtime state cannot substitute for software presence",
+      "passed": true
+    }
+  ],
+  "limitations": [
+    "Application field-to-RDF/profile mappings and full application round trips remain unimplemented.",
+    "This does not implement the live per-object JSON-LD file repository or app database migration.",
+    "Entity invocation admission and service reachability are not established by these observation fixtures."
+  ],
+  "liveDataTouched": false
+}

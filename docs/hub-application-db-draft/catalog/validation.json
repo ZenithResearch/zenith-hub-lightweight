@@ -1,0 +1,213 @@
+{
+  "schema": "zenith.hub-catalog-validation.v1",
+  "at": "2026-11-23T20:26:59.573295+00:00",
+  "branch": "codex/hub-repository-foundation",
+  "head": "efe521340efe90697b29ad18752dcf9aec512916",
+  "changesCommitted": false,
+  "package": {
+    "id": "urn:zenith:hub:catalog-package:builtin",
+    "version": "2026.11.23.1",
+    "digest": "61032dd9cfafe063702368cc2071f4f91509358b1d6facf8c74a69d1abddcd43",
+    "manifestSha256": "6b20450f8d4488676fe224fd4b6cb1cc673cfeb514a98cf2b05465bd2b3e3331",
+    "definitionsSha256": "9cee1ccac7b8c35ef791d87b63ad483869c4af54c0edec5818e450ed64cf4f14",
+    "software": [
+      {
+        "id": "urn:zenith:software:service-management",
+        "publisher": "ZenithResearch"
+      },
+      {
+        "id": "urn:zenith:software:process-runtime",
+        "publisher": "ZenithResearch"
+      },
+      {
+        "id": "urn:zenith:software:frank",
+        "publisher": "ZenithResearch"
+      },
+      {
+        "id": "urn:zenith:software:devgraph",
+        "publisher": "ZenithResearch"
+      },
+      {
+        "id": "urn:zenith:software:matrix",
+        "publisher": "element-hq"
+      },
+      {
+        "id": "urn:zenith:software:hermes",
+        "publisher": "NousResearch"
+      }
+    ],
+    "recipes": [
+      {
+        "id": "urn:zenith:hub:recipe:service-management-install",
+        "software": "urn:zenith:software:service-management",
+        "mode": "install",
+        "qualification": "supported"
+      },
+      {
+        "id": "urn:zenith:hub:recipe:service-management-connect",
+        "software": "urn:zenith:software:service-management",
+        "mode": "connect",
+        "qualification": "supported"
+      },
+      {
+        "id": "urn:zenith:hub:recipe:process-runtime-install",
+        "software": "urn:zenith:software:process-runtime",
+        "mode": "install",
+        "qualification": "supported"
+      },
+      {
+        "id": "urn:zenith:hub:recipe:process-runtime-connect",
+        "software": "urn:zenith:software:process-runtime",
+        "mode": "connect",
+        "qualification": "supported"
+      },
+      {
+        "id": "urn:zenith:hub:recipe:frank-install",
+        "software": "urn:zenith:software:frank",
+        "mode": "install",
+        "qualification": "supported"
+      },
+      {
+        "id": "urn:zenith:hub:recipe:devgraph-connect",
+        "software": "urn:zenith:software:devgraph",
+        "mode": "connect",
+        "qualification": "supported"
+      },
+      {
+        "id": "urn:zenith:hub:recipe:matrix-install",
+        "software": "urn:zenith:software:matrix",
+        "mode": "install",
+        "qualification": "supported"
+      },
+      {
+        "id": "urn:zenith:hub:recipe:matrix-connect",
+        "software": "urn:zenith:software:matrix",
+        "mode": "connect",
+        "qualification": "supported"
+      },
+      {
+        "id": "urn:zenith:hub:recipe:matrix-vps",
+        "software": "urn:zenith:software:matrix",
+        "mode": "vps",
+        "qualification": "unqualified"
+      },
+      {
+        "id": "urn:zenith:hub:recipe:hermes-connect",
+        "software": "urn:zenith:software:hermes",
+        "mode": "connect",
+        "qualification": "supported"
+      },
+      {
+        "id": "urn:zenith:hub:recipe:hermes-install",
+        "software": "urn:zenith:software:hermes",
+        "mode": "install",
+        "qualification": "supported"
+      }
+    ],
+    "entries": [
+      {
+        "id": "urn:zenith:hub:catalog-entry:20b15999cc06d57ab033ec2b0e69537099f1d834d5e1a9a4f35b1548dd48d3b2",
+        "catalogId": "urn:zenith:hub:catalog:builtin-software",
+        "softwareId": "urn:zenith:software:service-management"
+      },
+      {
+        "id": "urn:zenith:hub:catalog-entry:a5f675663b71ca4a2c900334fdb7c2f7cc16094c6cfdee22f24e67f1bca53090",
+        "catalogId": "urn:zenith:hub:catalog:builtin-software",
+        "softwareId": "urn:zenith:software:process-runtime"
+      },
+      {
+        "id": "urn:zenith:hub:catalog-entry:77646f5a4f3166637627abe998e7a1470fe72d8b430f067dafa86263f1f23f94",
+        "catalogId": "urn:zenith:hub:catalog:builtin-software",
+        "softwareId": "urn:zenith:software:frank"
+      },
+      {
+        "id": "urn:zenith:hub:catalog-entry:49655c0f801e7ff82df0ca14cdcebd2fe4ae6c357c23cd6e196198184ea519a8",
+        "catalogId": "urn:zenith:hub:catalog:builtin-software",
+        "softwareId": "urn:zenith:software:devgraph"
+      },
+      {
+        "id": "urn:zenith:hub:catalog-entry:6e00cd562cc2d88e238dfb81d9439de7ec843ee9d0c9879d549cb1436786f975",
+        "catalogId": "urn:zenith:hub:catalog:builtin-software",
+        "softwareId": "urn:zenith:software:matrix"
+      },
+      {
+        "id": "urn:zenith:hub:catalog-entry:8cfde6efdfc4ed5ab1f6acbbd1ba49bf31932f84d0a4c090eb41c7d151e8b180",
+        "catalogId": "urn:zenith:hub:catalog:builtin-software",
+        "softwareId": "urn:zenith:software:hermes"
+      }
+    ]
+  },
+  "checks": {
+    "javascript": {
+      "command": "node --test tests/application/*.test.mjs tests/setup/*.test.mjs tests/hub/*.test.mjs tests/objects/*.test.mjs tests/deployer/*.test.mjs tests/catalog/*.test.mjs",
+      "passed": 293,
+      "failed": 0,
+      "catalogSubset": 28
+    },
+    "producer": "catalog:check passed; derived compatibility mirror equals established six-component catalog",
+    "sourcePins": "check-source passed",
+    "gitDiffCheck": "passed",
+    "designContracts": 68,
+    "designChecks": 32,
+    "productionBuild": "passed: Node 24.20.0, Next 16.4.6, Webpack, TypeScript; isolated copy with its own dependencies",
+    "http": {
+      "production": {
+        "passed": true,
+        "fixturesOnly": true
+      },
+      "standalone": {
+        "passed": true,
+        "fixturesOnly": true
+      },
+      "development": {
+        "passed": true,
+        "fixturesOnly": true
+      }
+    }
+  },
+  "coverage": [
+    "CSV quoting/newlines; JSON-LD references, closed fields, bounds, hashes and path/context rejection",
+    "Trusted extension and exact release-contract pins; six stable software and entry identities and unchanged modes/defaults",
+    "Fresh and initialized-root synchronization; repeated prepare/import is a database no-op",
+    "Atomic import/update, pre-commit interruption and lost-ack retry without duplicates",
+    "Last-good fallback, explicit first-load failure, local object/membership conflicts and diagnostic failure isolation",
+    "Retirement preserves history, ordinary objects, installations, profiles, services, connections, operations, settings and native fixture files",
+    "Exact recipe/software/source/contract/package/driver pins in retained review; changed package requires re-review",
+    "Retired suggestions cannot authorize new installation; explicit retained instances can still be reviewed for control",
+    "SQLite-owned setup and connections, generic object persistence, stale-generation rejection, fixture credentials and durable review/restart in development, production and standalone",
+    "Base application definition bytes/identity, published ontologies, native adapters and ongoing UI preserved"
+  ],
+  "live": {
+    "previewRestarted": false,
+    "databaseOpenedOrModified": false,
+    "backupsModified": false,
+    "nativeDataModified": false,
+    "servicesInstalledOrStarted": false,
+    "modelDownloads": false,
+    "remoteRetrieval": false
+  },
+  "existingFilesChangedWithinCatalogBaseline": [
+    "src/lib/setup/controller.mjs",
+    "src/lib/setup/catalog.mjs",
+    "src/lib/objects/repository.mjs",
+    "src/lib/objects/application.mjs",
+    "src/lib/objects/versions.mjs",
+    "src/lib/objects/repository-state.mjs",
+    "src/lib/application/compiler.mjs",
+    "src/lib/application/migration.mjs",
+    "src/lib/application/database.mjs",
+    "src/lib/hub/controller.mjs",
+    "profiles/setup/catalog.schema.json",
+    "scripts/hub.mjs",
+    "next.config.ts",
+    "package.json"
+  ],
+  "limits": [
+    "No live rollout or migration of the current preview; legacy compatibility remains until explicit restart with the new launcher",
+    "No actual software installation, inference, provider authentication or model qualification performed for this catalog slice",
+    "Cross-release extension trust/definition migration and broad storage-platform/power-loss faults are not qualified",
+    "Remote retrieval, signatures/remote trust, ontology-package installation, CMS editing UI and multi-source overlays are deferred",
+    "One active local catalog package at a time; general user-defined runtime indexes are not implemented",
+    "Local divergence requires explicit resolution; no force-overwrite or automatic downgrade mechanism is provided"
+  ]
+}

@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import type { ReactNode } from 'react'
 import './globals.css'
+import { GlobalHermesChat } from '@/components/hub/GlobalHermesChat'
 
 export const metadata: Metadata = {
   title: 'Zenith Hub',
@@ -10,7 +11,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
   return (
     <html lang="en" data-theme="light">
-      <body>{children}</body>
+      <body>{children}<GlobalHermesChat /></body>
     </html>
   )
 }

@@ -1,0 +1,47 @@
+{
+  "date": "2026-11-20",
+  "uiSourceCommit": "e2b9a55755c24291d675ac80b06bf72bf2207308",
+  "scope": "Latest-only glass response and 80-word-per-minute visible reading interval",
+  "checks": {
+    "canonicalUiBuild": "passed",
+    "canonicalUiSource": "passed",
+    "replyTimingTests": {
+      "passed": 3,
+      "failed": 0
+    },
+    "hubTypecheck": "passed",
+    "browser": {
+      "fixture": "Temporary isolated callback, no native model calls",
+      "visualHeadingsAndRoleLabels": 0,
+      "latestOnly": "New reply replaced previous response; no user transcript shown",
+      "glass": {
+        "fill": "rgba(3, 26, 74, 0.7)",
+        "text": "rgb(255, 255, 255)",
+        "blur": "2px"
+      },
+      "readingRateWpm": 80,
+      "observedLongReply": {
+        "words": 22,
+        "expectedReadingMs": 16500,
+        "observedReadingMs": 16506.1,
+        "observedFadeMs": 401.9
+      },
+      "observedShortReply": {
+        "words": 3,
+        "expectedReadingMs": 2250,
+        "observedReadingMs": 2256.9,
+        "observedFadeMs": 401.5
+      },
+      "minimizedPause": "Reply remained available after over 61 seconds minimized; remaining visible interval resumed on expansion",
+      "explicitReopen": "Caret reopened latest reply with fresh interval",
+      "sceneIntegration": "Scene paused with reply visible and resumed after automatic dismissal while focus remained outside guide",
+      "modelMessagesSent": 0
+    }
+  },
+  "evidence": "evidence/timed-glass-reply.jpg",
+  "temporaryFixture": "removed",
+  "limitations": [
+    "Tab visibility pause and reduced-motion transition behavior were implemented but not toggled at OS/browser level during this check",
+    "Legacy children-based HUD and native chat contracts were unchanged"
+  ]
+}

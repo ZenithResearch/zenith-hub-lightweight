@@ -1,0 +1,1 @@
+export const APPLICATION_MANIFEST_SHA256='53e59c10fddfa86f3a7e3a4cb4260f43e9c91554a52a25aad6b090fad3fec6ae';

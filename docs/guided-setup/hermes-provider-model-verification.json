@@ -1,0 +1,11 @@
+{
+  "checkedAt": "2026-11-20T19:24:57.213Z",
+  "provider": "openai-codex",
+  "signedIn": true,
+  "modelCount": 17,
+  "recommendedModel": "gpt-6.2-sol",
+  "currentProviderModel": "",
+  "activeBackendUnchanged": true,
+  "activeBackend": "custom",
+  "activeModel": "hub-local-guide"
+}

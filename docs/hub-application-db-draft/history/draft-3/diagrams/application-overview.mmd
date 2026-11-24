@@ -1,0 +1,58 @@
+erDiagram
+    HubSettings {
+        IRI id PK
+    }
+    Host {
+        IRI id PK
+        ObjectVersion objectVersion FK
+    }
+    SoftwareDescriptor {
+        IRI id PK
+        ObjectVersion objectVersion FK
+    }
+    SoftwareCatalogEntry {
+        IRI id PK
+    }
+    SoftwareSourceSnapshot {
+        IRI id PK
+        ObjectVersion objectVersion FK
+    }
+    SoftwareBuild {
+        IRI id PK
+        ObjectVersion objectVersion FK
+    }
+    SoftwareInstallationRecord {
+        IRI id PK
+        ObjectVersion objectVersion FK
+    }
+    ConfigurationProfile {
+        IRI id PK
+        ObjectVersion objectVersion FK
+    }
+    ServiceInstance {
+        IRI id PK
+        ObjectVersion objectVersion FK
+    }
+    Connection {
+        IRI id PK
+    }
+    SetupOperation {
+        IRI id PK
+    }
+    Host o|--o{ HubSettings : localHostRef
+    ConfigurationProfile o|--o{ HubSettings : selectedGuideProfileRef
+    SoftwareDescriptor ||--o{ SoftwareCatalogEntry : softwareRef
+    SoftwareDescriptor ||--o{ SoftwareSourceSnapshot : softwareRef
+    SoftwareDescriptor ||--o{ SoftwareBuild : softwareRef
+    SoftwareSourceSnapshot o|--o{ SoftwareBuild : sourceSnapshotRef
+    SoftwareDescriptor ||--o{ SoftwareInstallationRecord : softwareRef
+    Host ||--o{ SoftwareInstallationRecord : hostRef
+    SoftwareSourceSnapshot o|--o{ SoftwareInstallationRecord : sourceSnapshotRef
+    SoftwareBuild o|--o{ SoftwareInstallationRecord : buildRef
+    SoftwareDescriptor ||--o{ ConfigurationProfile : softwareRef
+    SoftwareInstallationRecord o|--o{ ConfigurationProfile : installationRef
+    SoftwareDescriptor ||--o{ ServiceInstance : softwareRef
+    SoftwareInstallationRecord o|--o{ ServiceInstance : installationRef
+    ConfigurationProfile o|--o{ ServiceInstance : profileRef
+    Host }o--o{ ServiceInstance : hostRefs
+    Connection o|--o{ ConfigurationProfile : Hermes_model_server

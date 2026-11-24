@@ -1,0 +1,17 @@
+{
+  "date": "2026-11-20",
+  "checks": {
+    "uiBuild": true,
+    "sourceProvenance": true,
+    "browserCollapseToCircle": true,
+    "browserReopenRestoresDraft": true,
+    "testDraftCleared": true,
+    "modelMessageSent": false
+  },
+  "controls": {
+    "collapse": "Minus button or Minimize; Escape from input-only pill",
+    "reopen": "Click circular message icon"
+  },
+  "evidence": "evidence/hermes-collapsed-circle.jpg",
+  "uiLibraryCommit": "1645220"
+}

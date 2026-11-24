@@ -1,0 +1,53 @@
+{
+  "date": "2026-11-20",
+  "uiSourceCommit": "dd4588a925fc3eeacc13f5a5db7397938fb7c521",
+  "scope": "Code-native cloud background and bounded ambient motion",
+  "checks": {
+    "canonicalUiBuild": "passed",
+    "canonicalUiSource": "passed",
+    "motionTests": {
+      "passed": 3,
+      "failed": 0
+    },
+    "hubTypecheck": "passed",
+    "hubImportedSource": "passed",
+    "setupTests": {
+      "passed": 56,
+      "failed": 0
+    },
+    "browser": {
+      "url": "http://127.0.0.1:4318/",
+      "cloudFormations": 10,
+      "runtimeBitmapBackground": "none",
+      "svgImageNodes": 0,
+      "motion": "running after fresh load",
+      "wordmarkTransform": "none",
+      "modalPause": "All cloud transforms unchanged across the configuration interval",
+      "modalResume": "Resumed from the same recorded pose",
+      "guidePause": "Paused while input focused; resumed after minimize",
+      "guideInitialState": "collapsed",
+      "responsive": [
+        {
+          "width": 390,
+          "height": 844
+        },
+        {
+          "width": 1000,
+          "height": 500
+        }
+      ],
+      "horizontalOverflow": false,
+      "viewportOverride": "reset",
+      "modelMessagesSent": 0
+    }
+  },
+  "evidence": [
+    "evidence/animated-cloud-scene.jpg",
+    "evidence/cloud-scene-portrait.jpg"
+  ],
+  "limitations": [
+    "Authored reconstruction; pixel-identical agreement or numerical silhouette-overlap target not claimed",
+    "Direct 200% browser zoom, additional physical DPRs and an OS reduced-motion toggle were not exercised",
+    "No detailed device performance trace or production Hub packaging build was run"
+  ]
+}

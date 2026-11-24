@@ -1,0 +1,11 @@
+{
+  "@id": "urn:example:host:one",
+  "@type": [
+    "https://zenith-research.ca/ontology/hub/infrastructure/terms/Machine"
+  ],
+  "http://www.w3.org/2000/01/rdf-schema#label": [
+    {
+      "@value": "Example machine"
+    }
+  ]
+}

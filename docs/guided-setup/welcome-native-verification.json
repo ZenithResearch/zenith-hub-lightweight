@@ -1,0 +1,23 @@
+{
+  "bootstrap": "Hub-managed pinned Python; no ZENITH_SETUP_PYTHON",
+  "checks": [
+    "Retained fresh managed-bootstrap source installation verified",
+    "Native provider catalog and machine-sized model options loaded from installed source",
+    "Reviewed composite configured the private API/model and started Hermes while staying on welcome",
+    "Explicit question traversed the real Hermes API/agent and local protocol fixture",
+    "Controller reload retained completion evidence"
+  ],
+  "model": "Local deterministic protocol fixture, no cloud account or model-quality claim",
+  "passed": true,
+  "sourceRepository": "NousResearch/hermes-agent",
+  "sourceCommit": "e5a86d08d3d8c5e2f61bc2e5354d96ba25a56f97",
+  "officialArchiveVerifiedFiles": 4475,
+  "sourceCacheUsedForBuild": true,
+  "bootstrapAndRuntimesDownloaded": true,
+  "officialArchiveSha256": "1781487d4ed551d109acb5c5ae00827ccb980e92eb0c4fe134b680fbb969a3e1",
+  "nativeAdapterTests": {
+    "passed": 9,
+    "skipped": 0
+  },
+  "testServicesStopped": true
+}

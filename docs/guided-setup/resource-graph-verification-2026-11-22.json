@@ -1,0 +1,64 @@
+{
+  "date": "2026-11-22",
+  "scope": "Resource graph, reconciliation and on-page Your Hub gallery",
+  "localChecks": {
+    "regressionTests": {
+      "passed": 188,
+      "failed": 0
+    },
+    "canonicalUiTests": {
+      "passed": 8,
+      "failed": 0
+    },
+    "typecheck": "passed",
+    "productionBuild": "passed",
+    "sourceProvenance": "passed",
+    "productionHttpChecks": [
+      "objects",
+      "setup",
+      "hub"
+    ],
+    "standaloneHttpChecks": [
+      "objects",
+      "setup",
+      "hub"
+    ],
+    "preservation": [
+      "matching-ID ordinary objects isolated from projections",
+      "setup selections and connections preserved in integration fixtures",
+      "production and standalone setup/draft bytes unchanged during review/cancel",
+      "ordinary object revision unchanged by reconciliation"
+    ]
+  },
+  "uiSourceCommit": "525a9120509965564954daec6f06ac719052ac8e",
+  "browserChecks": [
+    "gallery shows all six supported resource kinds",
+    "configuration and review expand on page",
+    "unapplied connection review cancelled",
+    "global Hermes input remains available",
+    "resource graph includes indexed hosting, placement and data relationships"
+  ],
+  "live": {
+    "url": "http://127.0.0.1:4318/hub",
+    "registeredResources": 1,
+    "graphNodes": 5,
+    "graphEdges": 5,
+    "sourceWarnings": 0,
+    "setupRevision": 37,
+    "liveApplyPerformed": false,
+    "servicesStartedOrInstalled": false,
+    "modelDownloads": false
+  },
+  "machinePrerequisite": {
+    "path": "/Volumes/home",
+    "previousMode": "0775",
+    "mode": "0755",
+    "reason": "Existing private object-store ancestor guard rejected group-write access on reconnected user-owned mount directory; data files and guard unchanged."
+  },
+  "limitations": [
+    "Local checks only; hosted CI was not triggered.",
+    "Resource graph is observational and reconciles on demand/while the Hub is open; stored health is not an always-on monitor.",
+    "External authenticated Add uses existing owner-configured credential references.",
+    "Infrastructure extension remains proposed/unpublished; normalized ontology release assets unchanged."
+  ]
+}

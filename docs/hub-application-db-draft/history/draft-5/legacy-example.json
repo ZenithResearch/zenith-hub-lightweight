@@ -1,0 +1,11 @@
+{
+  "schema":"zenith.hub-legacy-example.synthetic.v1",
+  "repositoryId":"urn:example:repository:sai",
+  "setup":{"schema":"zenith.hub-setup-state.v1","revision":7,"step":"welcome","selection":[],"instances":[{"instanceId":"hermes-local","componentId":"hermes","mode":"install","installed":true,"partial":false},{"instanceId":"runtime-partial","componentId":"process-runtime","mode":"install","installed":false,"partial":true}],"operations":{"legacy-unknown":{"state":"reconciliation-required","outcomeUnknown":true}}},
+  "receipts":[{"instanceId":"hermes-local","componentId":"hermes","installed":true,"source":{"commit":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}},{"instanceId":"runtime-partial","componentId":"process-runtime","installed":false}],
+  "nativeProfiles":[{"nativeKey":"private-hermes/team","name":"team","credentialHandle":"legacy-private:hermes-team","historyOwner":"hermes"}],
+  "catalog":[{"key":"hermes","softwareRef":"urn:zenith:software:hermes"},{"key":"process-runtime","softwareRef":"urn:zenith:software:process-runtime"}],
+  "connections":[{"id":"sai-devgraph","kind":"devgraph","endpoint":"http://127.0.0.1:4220","lifecycle":"external","enabled":true,"credentialHandle":"legacy-private:sai-devgraph"}],
+  "ordinaryObjects":[{"id":"urn:example:ordinary","types":["https://zenith-research.ca/ontology/terms/Artifact"],"revision":3}],
+  "legacyProjectionObjects":[{"id":"urn:zenith:hub:instance:hermes-local","type":"ServiceInstance","source":"hub-setup-observation"}]
+}
