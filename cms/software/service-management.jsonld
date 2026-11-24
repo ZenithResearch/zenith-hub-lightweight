@@ -1,0 +1,16 @@
+{
+  "@context": {
+    "zn": "https://zenith-research.ca/ontology/terms/",
+    "cms": "urn:zenith:hub:catalog:",
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#"
+  },
+  "@id": "urn:zenith:software:service-management",
+  "@type": "zn:Artifact",
+  "rdfs:label": "Service Management",
+  "cms:key": "service-management",
+  "rdfs:comment": "Requests, Cases and CasePlans.",
+  "cms:publisher": "ZenithResearch",
+  "cms:repository": {
+    "@id": "https://github.com/ZenithResearch/service-management"
+  }
+}

@@ -1,0 +1,12 @@
+recipeId,softwareId,path
+urn:zenith:hub:recipe:service-management-install,urn:zenith:software:service-management,recipes/service-management-install.jsonld
+urn:zenith:hub:recipe:service-management-connect,urn:zenith:software:service-management,recipes/service-management-connect.jsonld
+urn:zenith:hub:recipe:process-runtime-install,urn:zenith:software:process-runtime,recipes/process-runtime-install.jsonld
+urn:zenith:hub:recipe:process-runtime-connect,urn:zenith:software:process-runtime,recipes/process-runtime-connect.jsonld
+urn:zenith:hub:recipe:frank-install,urn:zenith:software:frank,recipes/frank-install.jsonld
+urn:zenith:hub:recipe:devgraph-connect,urn:zenith:software:devgraph,recipes/devgraph-connect.jsonld
+urn:zenith:hub:recipe:matrix-install,urn:zenith:software:matrix,recipes/matrix-install.jsonld
+urn:zenith:hub:recipe:matrix-connect,urn:zenith:software:matrix,recipes/matrix-connect.jsonld
+urn:zenith:hub:recipe:matrix-vps,urn:zenith:software:matrix,recipes/matrix-vps.jsonld
+urn:zenith:hub:recipe:hermes-connect,urn:zenith:software:hermes,recipes/hermes-connect.jsonld
+urn:zenith:hub:recipe:hermes-install,urn:zenith:software:hermes,recipes/hermes-install.jsonld

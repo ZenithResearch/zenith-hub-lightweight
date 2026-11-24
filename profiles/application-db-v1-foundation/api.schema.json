@@ -1,0 +1,874 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:zenith:hub:application-api:v1",
+  "title": "Review-only Hub application API contracts",
+  "$defs": {
+    "ExpectedObject": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "urn:zenith:hub:application-db:v1#/$defs/IRI"
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "id",
+        "revision"
+      ],
+      "additionalProperties": false
+    },
+    "ExpectedRecord": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "id": {
+          "$ref": "urn:zenith:hub:application-db:v1#/$defs/IRI"
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "kind",
+        "id",
+        "revision"
+      ],
+      "additionalProperties": false
+    },
+    "EntryEligibility": {
+      "type": "object",
+      "properties": {
+        "allowed": {
+          "type": "boolean"
+        },
+        "reason": {
+          "enum": [
+            "verified-local-software",
+            "software-absent",
+            "presence-unknown",
+            "inspection-expired"
+          ]
+        }
+      },
+      "required": [
+        "allowed",
+        "reason"
+      ],
+      "additionalProperties": false
+    },
+    "InspectionRequest": {
+      "type": "object",
+      "properties": {
+        "schema": {
+          "const": "zenith.hub.inspection-request.v2"
+        },
+        "softwareRef": {
+          "$ref": "urn:zenith:hub:application-db:v1#/$defs/IRI"
+        },
+        "hostRef": {
+          "$ref": "urn:zenith:hub:application-db:v1#/$defs/IRI"
+        },
+        "candidateHandle": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "scopeHandle": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "installationRef": {
+          "$ref": "urn:zenith:hub:application-db:v1#/$defs/IRI"
+        }
+      },
+      "required": [
+        "schema",
+        "softwareRef",
+        "hostRef"
+      ],
+      "additionalProperties": false
+    },
+    "InspectionProof": {
+      "$ref": "urn:zenith:hub:application-db:v1#/$defs/InspectionProof"
+    },
+    "InspectionResponse": {
+      "type": "object",
+      "properties": {
+        "schema": {
+          "const": "zenith.hub.inspection-response.v2"
+        },
+        "proof": {
+          "$ref": "#/$defs/InspectionProof"
+        },
+        "persisted": {
+          "const": false
+        },
+        "inspectionHandle": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        }
+      },
+      "required": [
+        "schema",
+        "proof",
+        "persisted",
+        "inspectionHandle"
+      ],
+      "additionalProperties": false
+    },
+    "ModelBinding": {
+      "type": "object",
+      "properties": {
+        "providerId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "modelName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "serverConnectionRef": {
+          "$ref": "urn:zenith:hub:application-db:v1#/$defs/IRI"
+        }
+      },
+      "required": [
+        "modelName"
+      ],
+      "additionalProperties": false,
+      "anyOf": [
+        {
+          "required": [
+            "providerId"
+          ]
+        },
+        {
+          "required": [
+            "serverConnectionRef"
+          ]
+        }
+      ]
+    },
+    "ProfileInput": {
+      "type": "object",
+      "properties": {
+        "softwareRef": {
+          "$ref": "urn:zenith:hub:application-db:v1#/$defs/IRI"
+        },
+        "profileId": {
+          "$ref": "urn:zenith:hub:application-db:v1#/$defs/IRI"
+        },
+        "installationRef": {
+          "$ref": "urn:zenith:hub:application-db:v1#/$defs/IRI"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "profileKind": {
+          "enum": [
+            "generic",
+            "hermes"
+          ]
+        },
+        "mode": {
+          "enum": [
+            "describe-existing",
+            "create-managed",
+            "update-managed"
+          ]
+        },
+        "nativeProfileHandle": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "credentialRefs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          }
+        },
+        "modelBinding": {
+          "$ref": "#/$defs/ModelBinding"
+        }
+      },
+      "required": [
+        "softwareRef",
+        "name",
+        "profileKind",
+        "mode"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "profileKind": {
+                "const": "generic"
+              }
+            }
+          },
+          "then": {
+            "not": {
+              "required": [
+                "modelBinding"
+              ]
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "mode": {
+                "const": "describe-existing"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "nativeProfileHandle"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "mode": {
+                "const": "update-managed"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "profileId"
+            ]
+          }
+        }
+      ]
+    },
+    "Command": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "action": {
+              "const": "register-existing"
+            },
+            "payload": {
+              "type": "object",
+              "properties": {
+                "softwareRef": {
+                  "$ref": "urn:zenith:hub:application-db:v1#/$defs/IRI"
+                },
+                "inspectionHandle": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                }
+              },
+              "required": [
+                "softwareRef",
+                "inspectionHandle"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "action",
+            "payload"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "action": {
+              "const": "install-software"
+            },
+            "payload": {
+              "type": "object",
+              "properties": {
+                "catalogEntryId": {
+                  "$ref": "urn:zenith:hub:application-db:v1#/$defs/IRI"
+                }
+              },
+              "required": [
+                "catalogEntryId"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "action",
+            "payload"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "action": {
+              "const": "upsert-profile"
+            },
+            "payload": {
+              "$ref": "#/$defs/ProfileInput"
+            }
+          },
+          "required": [
+            "action",
+            "payload"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "action": {
+              "const": "register-service"
+            },
+            "payload": {
+              "type": "object",
+              "properties": {
+                "softwareRef": {
+                  "$ref": "urn:zenith:hub:application-db:v1#/$defs/IRI"
+                },
+                "label": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                },
+                "installationRef": {
+                  "$ref": "urn:zenith:hub:application-db:v1#/$defs/IRI"
+                },
+                "profileRef": {
+                  "$ref": "urn:zenith:hub:application-db:v1#/$defs/IRI"
+                },
+                "hostRefs": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "urn:zenith:hub:application-db:v1#/$defs/IRI"
+                  }
+                }
+              },
+              "required": [
+                "softwareRef",
+                "label"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "action",
+            "payload"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "action": {
+              "const": "save-connection"
+            },
+            "payload": {
+              "type": "object",
+              "properties": {
+                "connectionId": {
+                  "$ref": "urn:zenith:hub:application-db:v1#/$defs/IRI"
+                },
+                "label": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                },
+                "targetRef": {
+                  "$ref": "urn:zenith:hub:application-db:v1#/$defs/IRI"
+                },
+                "targetScope": {
+                  "enum": [
+                    "local",
+                    "external-unresolved"
+                  ]
+                },
+                "adapterRef": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                },
+                "endpoint": {
+                  "type": "string",
+                  "format": "uri"
+                },
+                "enabled": {
+                  "type": "boolean"
+                },
+                "credentialRef": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                },
+                "endpointPolicyRef": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                }
+              },
+              "required": [
+                "label",
+                "targetRef",
+                "targetScope",
+                "adapterRef",
+                "endpoint",
+                "enabled"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "action",
+            "payload"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "action": {
+              "const": "enter-hub"
+            },
+            "payload": {
+              "type": "object",
+              "properties": {
+                "inspectionHandle": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                }
+              },
+              "required": [
+                "inspectionHandle"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "action",
+            "payload"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "ReviewRequest": {
+      "type": "object",
+      "properties": {
+        "schema": {
+          "const": "zenith.hub.review-request.v2"
+        },
+        "idempotencyKey": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9:._-]{0,127}$"
+        },
+        "expectedGeneration": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "expectedObjects": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ExpectedObject"
+          }
+        },
+        "expectedRecords": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ExpectedRecord"
+          }
+        },
+        "command": {
+          "$ref": "#/$defs/Command"
+        }
+      },
+      "required": [
+        "schema",
+        "idempotencyKey",
+        "expectedGeneration",
+        "expectedObjects",
+        "expectedRecords",
+        "command"
+      ],
+      "additionalProperties": false
+    },
+    "ReviewResponse": {
+      "type": "object",
+      "properties": {
+        "schema": {
+          "const": "zenith.hub.review-response.v2"
+        },
+        "planId": {
+          "$ref": "urn:zenith:hub:application-db:v1#/$defs/IRI"
+        },
+        "planDigest": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "expiresAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "generation": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "planArtifact": {
+          "$ref": "urn:zenith:hub:application-db:v1#/$defs/ObjectSelection"
+        },
+        "effects": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          }
+        },
+        "allocatedObjectIds": {
+          "type": "array",
+          "items": {
+            "$ref": "urn:zenith:hub:application-db:v1#/$defs/IRI"
+          }
+        }
+      },
+      "required": [
+        "schema",
+        "planId",
+        "planDigest",
+        "expiresAt",
+        "generation",
+        "planArtifact",
+        "effects",
+        "allocatedObjectIds"
+      ],
+      "additionalProperties": false
+    },
+    "ApplyRequest": {
+      "type": "object",
+      "properties": {
+        "schema": {
+          "const": "zenith.hub.apply-request.v2"
+        },
+        "planId": {
+          "$ref": "urn:zenith:hub:application-db:v1#/$defs/IRI"
+        },
+        "planDigest": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "idempotencyKey": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9:._-]{0,127}$"
+        }
+      },
+      "required": [
+        "schema",
+        "planId",
+        "planDigest",
+        "idempotencyKey"
+      ],
+      "additionalProperties": false
+    },
+    "MutationResponse": {
+      "type": "object",
+      "properties": {
+        "schema": {
+          "const": "zenith.hub.mutation-response.v2"
+        },
+        "state": {
+          "enum": [
+            "committed",
+            "applying",
+            "reconciliation-required"
+          ]
+        },
+        "operationId": {
+          "$ref": "urn:zenith:hub:application-db:v1#/$defs/IRI"
+        },
+        "generation": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "replayed": {
+          "type": "boolean"
+        },
+        "objectVersions": {
+          "type": "array",
+          "items": {
+            "$ref": "urn:zenith:hub:application-db:v1#/$defs/ObjectSelection"
+          }
+        },
+        "recordRevisions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ExpectedRecord"
+          }
+        }
+      },
+      "required": [
+        "schema",
+        "state",
+        "operationId",
+        "generation",
+        "replayed",
+        "objectVersions",
+        "recordRevisions"
+      ],
+      "additionalProperties": false
+    },
+    "InventoryResponse": {
+      "type": "object",
+      "properties": {
+        "schema": {
+          "const": "zenith.hub.inventory.v2"
+        },
+        "generation": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "validation": {
+          "const": "committed-verified"
+        },
+        "softwareDescriptors": {
+          "type": "array",
+          "items": {
+            "$ref": "urn:zenith:hub:application-db:v1#/$defs/SoftwareDescriptor"
+          }
+        },
+        "installations": {
+          "type": "array",
+          "items": {
+            "$ref": "urn:zenith:hub:application-db:v1#/$defs/SoftwareInstallationRecord"
+          }
+        },
+        "entry": {
+          "$ref": "#/$defs/EntryEligibility"
+        },
+        "next": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "schema",
+        "generation",
+        "validation",
+        "softwareDescriptors",
+        "installations",
+        "entry",
+        "next"
+      ],
+      "additionalProperties": false
+    },
+    "OverviewResponse": {
+      "type": "object",
+      "properties": {
+        "schema": {
+          "const": "zenith.hub.overview.v2"
+        },
+        "generation": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "validation": {
+          "const": "committed-verified"
+        },
+        "entry": {
+          "$ref": "#/$defs/EntryEligibility"
+        },
+        "softwareDescriptors": {
+          "type": "array",
+          "items": {
+            "$ref": "urn:zenith:hub:application-db:v1#/$defs/SoftwareDescriptor"
+          }
+        },
+        "installations": {
+          "type": "array",
+          "items": {
+            "$ref": "urn:zenith:hub:application-db:v1#/$defs/SoftwareInstallationRecord"
+          }
+        },
+        "profiles": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "urn:zenith:hub:application-db:v1#/$defs/ConfigurationProfile"
+              },
+              {
+                "$ref": "urn:zenith:hub:application-db:v1#/$defs/HermesConfigurationProfile"
+              }
+            ]
+          }
+        },
+        "services": {
+          "type": "array",
+          "items": {
+            "$ref": "urn:zenith:hub:application-db:v1#/$defs/ServiceInstance"
+          }
+        },
+        "connections": {
+          "type": "array",
+          "items": {
+            "$ref": "urn:zenith:hub:application-db:v1#/$defs/Connection"
+          }
+        },
+        "operations": {
+          "type": "array",
+          "items": {
+            "$ref": "urn:zenith:hub:application-db:v1#/$defs/SetupOperation"
+          }
+        },
+        "warnings": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          }
+        }
+      },
+      "required": [
+        "schema",
+        "generation",
+        "validation",
+        "entry",
+        "softwareDescriptors",
+        "installations",
+        "profiles",
+        "services",
+        "connections",
+        "operations",
+        "warnings"
+      ],
+      "additionalProperties": false
+    },
+    "ErrorResponse": {
+      "type": "object",
+      "properties": {
+        "schema": {
+          "const": "zenith.hub.error.v2"
+        },
+        "error": {
+          "type": "object",
+          "properties": {
+            "code": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            },
+            "retryable": {
+              "type": "boolean"
+            },
+            "details": {
+              "type": "object"
+            }
+          },
+          "required": [
+            "code",
+            "retryable"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "schema",
+        "error"
+      ],
+      "additionalProperties": false
+    },
+    "ReviewPlan": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "urn:zenith:hub:application-db:v1#/$defs/IRI"
+        },
+        "types": {
+          "type": "array",
+          "items": {
+            "const": "https://zenith-research.ca/ontology/terms/Artifact"
+          },
+          "minItems": 1,
+          "maxItems": 1
+        },
+        "command": {
+          "$ref": "#/$defs/Command"
+        },
+        "expectedGeneration": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "expectedObjects": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ExpectedObject"
+          }
+        },
+        "expectedRecords": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ExpectedRecord"
+          }
+        },
+        "catalogDigest": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "adapterDigest": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "definitionSetId": {
+          "$ref": "urn:zenith:hub:application-db:v1#/$defs/IRI"
+        },
+        "allocatedObjectIds": {
+          "type": "array",
+          "items": {
+            "$ref": "urn:zenith:hub:application-db:v1#/$defs/IRI"
+          }
+        },
+        "expiresAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "types",
+        "command",
+        "expectedGeneration",
+        "expectedObjects",
+        "expectedRecords",
+        "catalogDigest",
+        "adapterDigest",
+        "definitionSetId",
+        "allocatedObjectIds",
+        "expiresAt"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

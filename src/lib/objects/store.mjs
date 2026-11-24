@@ -41,14 +41,15 @@ function privateDatabase(dataDir) {
   return file;
 }
 export class ObjectStore {
-  constructor({dataDir, registry, memory = false}) {
+  constructor({dataDir, registry, memory = false, readOnly = false}) {
     this.registry = registry;
-    this.db = new DatabaseSync(memory ? ':memory:' : privateDatabase(dataDir), {timeout: 2000, allowExtension: false});
+    this.db = new DatabaseSync(memory ? ':memory:' : privateDatabase(dataDir), {timeout: 2000, allowExtension: false, readOnly});
     try {
       const application = this.db.prepare('PRAGMA application_id').get().application_id;
       const version = this.db.prepare('PRAGMA user_version').get().user_version;
       const tables = this.db.prepare("SELECT name FROM sqlite_master WHERE name NOT LIKE 'sqlite_%'").all();
       if ((application !== APPLICATION_ID && (application !== 0 || tables.length)) || version > 2) reject('not_a_supported_hub_database', 503);
+      if(readOnly){this.readOnly=true;return;}
       this.db.exec('PRAGMA foreign_keys=ON; PRAGMA journal_mode=WAL; PRAGMA synchronous=FULL;');
       this.db.exec(`BEGIN IMMEDIATE;
         CREATE TABLE IF NOT EXISTS units(id TEXT PRIMARY KEY, nquads TEXT NOT NULL, semantic_sha256 TEXT NOT NULL);
@@ -86,6 +87,7 @@ export class ObjectStore {
     }
   }
   rebuildIndexes() {
+    if(this.readOnly)reject('repository_migration_required',409);
     this.db.exec('BEGIN IMMEDIATE');
     try {
       this.db.exec('DELETE FROM object_types; DELETE FROM object_links;');
@@ -100,6 +102,7 @@ export class ObjectStore {
     } catch (error) {this.db.exec('ROLLBACK'); throw error;}
   }
   async importDocument(document, options = {}) {
+    if(this.readOnly)reject('repository_migration_required',409);
     closed(options, ['importKey'], ['expectedRevisions', 'source', 'projections', 'intent', 'objectId','admission','admissions']);
     const {importKey, source = null, expectedRevisions = {}, projections = {}, intent = 'import', objectId, admission, admissions = {}} = options;
     if (typeof importKey !== 'string' || !/^[A-Za-z0-9][A-Za-z0-9:._-]{0,127}$/.test(importKey) ||

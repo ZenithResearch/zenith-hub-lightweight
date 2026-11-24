@@ -1,0 +1,153 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "version",
+    "components"
+  ],
+  "properties": {
+    "schema": {
+      "const": "zenith.hub-component-catalog.v1"
+    },
+    "version": {
+      "const": 1
+    },
+    "components": {
+      "type": "array",
+      "minItems": 0,
+      "maxItems": 32,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "label",
+          "description",
+          "category",
+          "source",
+          "adapter",
+          "modes",
+          "packageDependencies",
+          "serviceRequirements",
+          "defaultPort",
+          "module",
+          "configurationSchema",
+          "health",
+          "prerequisites",
+          "artifacts",
+          "minDiskMiB"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "category": {
+            "enum": [
+              "communications",
+              "work"
+            ]
+          },
+          "source": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "repository"
+            ],
+            "properties": {
+              "repository": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$"
+              },
+              "commit": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{40}$"
+              },
+              "version": {
+                "type": "string"
+              }
+            }
+          },
+          "adapter": {
+            "enum": [
+              "python-bundle",
+              "external",
+              "synapse",
+              "hermes"
+            ]
+          },
+          "modes": {
+            "type": "array",
+            "items": {
+              "enum": [
+                "install",
+                "connect",
+                "vps"
+              ]
+            },
+            "uniqueItems": true
+          },
+          "packageDependencies": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "serviceRequirements": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "defaultPort": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "module": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "configurationSchema": {
+            "type": "object"
+          },
+          "health": {
+            "enum": [
+              "service",
+              "runtime",
+              "none",
+              "devgraph",
+              "matrix",
+              "hermes"
+            ]
+          },
+          "prerequisites": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "artifacts": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "minDiskMiB": {
+            "type": "integer"
+          }
+        }
+      }
+    }
+  }
+}

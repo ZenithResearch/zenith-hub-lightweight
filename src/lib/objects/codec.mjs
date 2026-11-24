@@ -1,4 +1,5 @@
 import {Worker} from 'node:worker_threads';
+import path from 'node:path';
 import {reject} from './registry.mjs';
 let active = 0;
 export async function processDataset(operation, input, registry) {
@@ -6,7 +7,7 @@ export async function processDataset(operation, input, registry) {
   active++;
   try {
     return await new Promise((resolve, rejectPromise) => {
-      const worker = new Worker(new URL('./codec-worker.mjs', import.meta.url), {
+      const worker = new Worker(path.join(process.cwd(), 'src/lib/objects/codec-worker.mjs'), {
         execArgv: [],
         workerData: {operation, ...input, documents: registry?.documents || {}},
         resourceLimits: {maxOldGenerationSizeMb: 128, stackSizeMb: 4},

@@ -353,5 +353,74 @@
       }
     ],
     "build": "SOURCE_DATE_EPOCH=1767225600; Python 3.12; setuptools 84.0.0; two matching component-wheel builds; pinned Apple-silicon provider runtime dependency closure; reproducible native builds"
+  },
+  {
+    "repository": "https://github.com/ZenithResearch/zenith-ui-deployment",
+    "commit": "2dfcd038b3efeabf86b5e41bcd99eec33238d65f",
+    "files": [
+      {
+        "path": "src/vendor/zenith-ui/HubSetup/HubSetup.tsx",
+        "upstream_path": "src/HubSetup/HubSetup.tsx",
+        "sha256": "9b0fa079bda4956d7ab97b809ad3f3ed2316f01fb05e0ca9bbcc56d037387b74"
+      },
+      {
+        "path": "src/vendor/zenith-ui/HubSetup/HubSetup.css",
+        "upstream_path": "src/HubSetup/HubSetup.css",
+        "sha256": "4ca0b4e7914347349c7ee48745be1abde0bcf0ec41ba4e02b2879bd7c3c631cd"
+      },
+      {
+        "path": "src/vendor/zenith-ui/HubSetup/HermesModelPicker.tsx",
+        "upstream_path": "src/HubSetup/HermesModelPicker.tsx",
+        "sha256": "c8ef88329b77d47de81de08aeccd3939fff42a714d931b8cc5121295aff18112"
+      },
+      {
+        "path": "src/vendor/zenith-ui/HubSetup/assets/zenith-cloud-reveal-castalia-bitmap-v1.png",
+        "upstream_path": "src/HubSetup/assets/zenith-cloud-reveal-castalia-bitmap-v1.png",
+        "sha256": "476fa2526cab00074223fc292d6980de55c144f43e91c9ad069c01dd205a2f35"
+      },
+      {
+        "path": "src/vendor/zenith-ui/HubSetup/ZenithCloudScene.tsx",
+        "upstream_path": "src/HubSetup/ZenithCloudScene.tsx",
+        "sha256": "547a6b8020746b2e4b1005564e0afbd42e63eb4c88eef38a1a16ca3894760487"
+      },
+      {
+        "path": "src/vendor/zenith-ui/HubSetup/cloud-scene-geometry.ts",
+        "upstream_path": "src/HubSetup/cloud-scene-geometry.ts",
+        "sha256": "11a88523ace1942c6982e8b251c527f5edd3a99a3a0e282d044fae972d5bd37c"
+      },
+      {
+        "path": "src/vendor/zenith-ui/HubSetup/reply-timing.ts",
+        "upstream_path": "src/HubSetup/reply-timing.ts",
+        "sha256": "590dbea99966dc22ff05187d09578793999482abfc208973643cd1318811123b"
+      }
+    ]
+  },
+  {
+    "repository": "https://github.com/ZenithResearch/zenith-ui-deployment",
+    "commit": "4fc513d373c48903c1eeb0215eaac66bd5cfbe00",
+    "scope": "Compact Apps & services gallery with separate configured-instance and available-app sections",
+    "files": [
+      {
+        "path": "src/vendor/zenith-ui/YourHub/YourHub.tsx",
+        "upstream_path": "src/YourHub/YourHub.tsx",
+        "sha256": "1e1562b634465b5f06a0db78ddd96ba8730df2060d60b35c7109257d8b03850c"
+      },
+      {
+        "path": "src/vendor/zenith-ui/YourHub/YourHub.css",
+        "upstream_path": "src/YourHub/YourHub.css",
+        "sha256": "ccc9cb2e46dbe25d126be66a2840e5c0094856d7cb43b61b17d4cfef7f2832c8"
+      }
+    ]
+  },
+  {
+    "repository": "https://github.com/ZenithResearch/zenith-ui-deployment",
+    "commit": "05a1a1aced007066cb06738bed5b861ecf1b2433",
+    "files": [
+      {
+        "path": "src/vendor/zenith-ui/HubSetup/HermesWelcome.tsx",
+        "upstream_path": "src/HubSetup/HermesWelcome.tsx",
+        "sha256": "de138b9440d84fcfff75589f091cb1358a37b8c0242f28dc2621ba02b26ec3ca"
+      }
+    ]
   }
 ]

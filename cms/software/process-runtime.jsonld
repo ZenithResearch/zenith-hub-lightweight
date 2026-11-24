@@ -1,0 +1,16 @@
+{
+  "@context": {
+    "zn": "https://zenith-research.ca/ontology/terms/",
+    "cms": "urn:zenith:hub:catalog:",
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#"
+  },
+  "@id": "urn:zenith:software:process-runtime",
+  "@type": "zn:Artifact",
+  "rdfs:label": "Process Runtime",
+  "cms:key": "process-runtime",
+  "rdfs:comment": "Runs, steps and committed outputs.",
+  "cms:publisher": "ZenithResearch",
+  "cms:repository": {
+    "@id": "https://github.com/ZenithResearch/process-runtime"
+  }
+}

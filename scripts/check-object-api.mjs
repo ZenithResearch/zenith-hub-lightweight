@@ -8,11 +8,12 @@ import assert from 'node:assert/strict';
 import jsonld from 'jsonld';
 import {loadOntologyRegistry} from '../src/lib/objects/registry.mjs';
 const standalone = process.argv.includes('--standalone');
+const foundation=process.argv.includes('--foundation');
 const reservation=createServer();await new Promise(resolve=>reservation.listen(0,'127.0.0.1',resolve));
 const port=reservation.address().port;await new Promise(resolve=>reservation.close(resolve));
 const directory=await realpath(await mkdtemp(path.join(os.tmpdir(),'hub-object-api-')));
 const origin=`http://127.0.0.1:${port}`;
-const env={...process.env,ZENITH_OPERATOR_PORT:String(port),ZENITH_OPERATOR_ORIGIN:origin,
+const env={...process.env,ZENITH_HUB_REPOSITORY_FOUNDATION:foundation?'1':'0',ZENITH_OPERATOR_PORT:String(port),ZENITH_OPERATOR_ORIGIN:origin,
   ZENITH_LOCAL_OPERATOR:'1',ZENITH_NATIVE_DEMO:'0',ZENITH_CONTAINER_DEMO:'0',ZENITH_PROCESS_PROFILE:'installation',
   ZENITH_PROCESS_ROOT:path.join(directory,'not-installed'),ZENITH_HUB_DATA_DIR:path.join(directory,'objects'),
   ZENITH_HUB_ONTOLOGY_REGISTRY_FILE:path.join(process.cwd(),'profiles/object-store/registry.json'),
@@ -56,6 +57,16 @@ try {
       body:JSON.stringify({schema:'zenith.hub-object-action.v1',...body}),signal:AbortSignal.timeout(20000)});
     const result=await response.json();assert.equal(response.status,200,JSON.stringify(result));return result;
   }
+  if(foundation){
+    const rejected=await fetch(origin+'/api/objects',{method:'POST',headers:{Origin:origin,'Content-Type':'application/json','X-Zenith-CSRF':session.csrf},body:JSON.stringify({schema:'zenith.hub-object-action.v1',operation:'import',importKey:'foundation-admission',document:infrastructure,projections,admission:'infrastructure'})});
+    assert.equal(rejected.status,422);assert.equal((await rejected.json()).error,'foundation_admission_unsupported');
+    const original={'@id':'urn:built:revision','@type':'https://zenith-research.ca/ontology/terms/Artifact','http://www.w3.org/2000/01/rdf-schema#label':'Original'};
+    await mutate({operation:'create',id:original['@id'],importKey:'foundation-create',document:original});
+    await mutate({operation:'update',id:original['@id'],expectedRevision:1,importKey:'foundation-update',document:{...original,'http://www.w3.org/2000/01/rdf-schema#label':'Revised'}});
+    assert.equal((await read('operation=get&id=urn:built:revision&revision=1')).document[0]['http://www.w3.org/2000/01/rdf-schema#label'][0]['@value'],'Original');
+    const portable=await fetch(origin+'/api/objects?operation=export-bundle'),bundle=await portable.json();assert.equal(portable.headers.get('content-type'),'application/vnd.zenith.hub-object-bundle+json');
+    await mutate({operation:'import-bundle',importKey:'foundation-portable',document:bundle,expectedBundleSha256:bundle.integrity.sha256});assert.equal((await mutate({operation:'import-bundle',importKey:'foundation-portable',document:bundle})).replayed,true);
+  }else{
   const added=await mutate({operation:'import',importKey:'built-infrastructure',document:infrastructure,projections,admission:'infrastructure'});
   assert.equal(added.created.length,20);
   const entities=await read('operation=list&type='+encodeURIComponent('https://zenith-research.ca/ontology/terms/Entity')+'&includeSubclasses=true');
@@ -65,9 +76,10 @@ try {
   const bundle=await portable.json();assert.ok(Object.keys(bundle.projections).length>=20);
   await mutate({operation:'import-bundle',importKey:'built-portable',document:bundle,expectedBundleSha256:bundle.integrity.sha256});
   assert.equal((await mutate({operation:'import-bundle',importKey:'built-portable',document:bundle})).replayed,true);
+  }
   const denied=await fetch(origin+'/api/objects',{method:'POST',headers:{Origin:'https://invalid.example','Content-Type':'application/json'},body:'malformed JSON'});
   assert.equal(denied.status,403);
-  console.log(JSON.stringify({passed:true,builtOperator:true,standalone,semanticRoundTrip:true,objectCount:22,infrastructureAdmission:true,subclassQuery:true,portableBindings:true,exportMediaType:'application/ld+json',crossOriginRejected:true}));
+  console.log(JSON.stringify({passed:true,builtOperator:true,standalone,semanticRoundTrip:true,foundation,objectCount:foundation?3:22,infrastructureAdmission:!foundation,historicalVersionRead:foundation,subclassQuery:!foundation,portableBindings:true,exportMediaType:'application/ld+json',crossOriginRejected:true}));
 } catch(error) {console.error(logs);throw error;}
 finally {
   child.kill('SIGTERM');

@@ -1,0 +1,13 @@
+import test from 'node:test';import assert from 'node:assert/strict';
+import {operatorCsrf} from '../../src/lib/operator-session.mjs';
+import {createHubController} from '../../src/lib/hub/controller.mjs';
+const env={ZENITH_OPERATOR_ORIGIN:'http://127.0.0.1:4318',ZENITH_HUB_SETUP_DIR:'/fixture/session-a',ZENITH_HUB_APPLICATION_DB:'1',ZENITH_HUB_SERVER_INSTANCE:'test-session'};
+test('operator tokens survive module reload while remaining scoped by API, root and server',async()=>{const first=operatorCsrf('gallery',env),reloaded=await import('../../src/lib/operator-session.mjs?new-route-bundle');assert.equal(reloaded.operatorCsrf('gallery',env),first);for(const changed of [{...env,ZENITH_HUB_SETUP_DIR:'/fixture/session-b'},{...env,ZENITH_HUB_SERVER_INSTANCE:'other-server'}])assert.notEqual(operatorCsrf('gallery',changed),first);assert.notEqual(operatorCsrf('objects',env),first);});
+test('a gallery POST remains valid after its route controller is recreated',async()=>{
+ const runtimeEnv={...env,ZENITH_LOCAL_OPERATOR:'1',ZENITH_GUIDED_SETUP:'1'},setup={async get(){return {mode:'local',revision:1,instances:[],operations:[],catalog:{components:[]}};}},connections={async snapshot(){return {mode:'local',registryState:'configured',revision:1,resources:[]};}};
+ const first=createHubController({env:runtimeEnv,setup,connections}),second=createHubController({env:runtimeEnv,setup,connections}),url=env.ZENITH_OPERATOR_ORIGIN+'/api/hub',request={url,headers:new Headers({host:'127.0.0.1:4318'})},session=await first.get(request);
+ const out=await second.post({url,headers:new Headers({host:'127.0.0.1:4318',origin:env.ZENITH_OPERATOR_ORIGIN,'content-type':'application/json','x-zenith-csrf':session.csrf})},{schema:'zenith.hub-action.v1',operation:'refresh'});assert.equal(out.schema,'zenith.hub-overview.v1');
+});
+
+test('repository error status survives a different JavaScript realm',async()=>{const {runInNewContext}=await import('node:vm'),{operatorFailure}=await import('../../src/lib/operator-error.mjs'),error=runInNewContext("Object.assign(new Error('rejected'),{code:'foundation_admission_unsupported',status:422})");assert.equal(error instanceof Error,false);assert.equal(operatorFailure(error).status,422);assert.equal(operatorFailure(error).code,'foundation_admission_unsupported');});
+test('unexpected system errors cannot become public operator failures',async()=>{const {operatorFailure}=await import('../../src/lib/operator-error.mjs');for(const error of [null,new Error('private details'),{code:'ENOENT',status:503},{code:'invalid_request',status:200},{code:'invalid_request',status:'400'}])assert.equal(operatorFailure(error),null);});

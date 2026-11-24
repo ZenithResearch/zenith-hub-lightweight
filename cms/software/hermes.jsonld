@@ -1,0 +1,16 @@
+{
+  "@context": {
+    "zn": "https://zenith-research.ca/ontology/terms/",
+    "cms": "urn:zenith:hub:catalog:",
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#"
+  },
+  "@id": "urn:zenith:software:hermes",
+  "@type": "zn:Artifact",
+  "rdfs:label": "Hermes",
+  "cms:key": "hermes",
+  "rdfs:comment": "An agent powered by your configured model backend, running locally or on a connected service.",
+  "cms:publisher": "NousResearch",
+  "cms:repository": {
+    "@id": "https://github.com/NousResearch/hermes-agent"
+  }
+}

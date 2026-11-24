@@ -3,6 +3,9 @@
 ## [Unreleased]
 
 ### Added
+- Add the single-writer object repository, application persistence, pinned software catalog and native inspection contracts — Hub records must resolve to committed object revisions while preserving legacy readers and source/build provenance.
+
+### Added
 - Add the Hub-owned Infrastructure extension, verified offline module closure, inherited admission profiles, portable bundles and optional subclass queries — environment records can share normalized Core semantics without duplicating classes or adopting service databases.
 
 ### Fixed

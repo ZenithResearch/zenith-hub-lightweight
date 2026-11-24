@@ -1,0 +1,413 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:zenith:hub:repository-commit:v1",
+  "title": "Internal repository batch design; never a browser endpoint",
+  "type": "object",
+  "properties": {
+    "schema": {
+      "const": "zenith.hub-repository-batch.v1"
+    },
+    "idempotencyKey": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9:._-]{0,127}$"
+    },
+    "expectedGeneration": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "definitionSetId": {
+      "$ref": "urn:zenith:hub:application-db:v1#/$defs/IRI"
+    },
+    "unitWrites": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/UnitWrite"
+      }
+    },
+    "retireUnits": {
+      "type": "array",
+      "items": {
+        "$ref": "urn:zenith:hub:application-db:v1#/$defs/AtomicUnitVersion"
+      }
+    },
+    "objectWrites": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/ObjectWrite"
+      }
+    },
+    "appWrites": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/AppWrite"
+      }
+    },
+    "referenceBindings": {
+      "type": "array",
+      "items": {
+        "$ref": "urn:zenith:hub:application-db:v1#/$defs/ReferenceBinding"
+      }
+    },
+    "inspectionWrites": {
+      "type": "array",
+      "items": {
+        "$ref": "urn:zenith:hub:application-db:v1#/$defs/InspectionWrite"
+      }
+    }
+  },
+  "$defs": {
+    "UnitWrite": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "urn:zenith:hub:application-db:v1#/$defs/IRI"
+        },
+        "expectedRevision": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "members": {
+          "type": "array",
+          "items": {
+            "$ref": "urn:zenith:hub:application-db:v1#/$defs/IRI"
+          }
+        },
+        "document": {
+          "type": [
+            "object",
+            "array"
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "expectedRevision",
+        "revision",
+        "members",
+        "document"
+      ],
+      "additionalProperties": false
+    },
+    "ObjectWrite": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "urn:zenith:hub:application-db:v1#/$defs/IRI"
+        },
+        "expectedRevision": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "objectRevision": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "atomicUnit": {
+          "$ref": "urn:zenith:hub:application-db:v1#/$defs/AtomicUnitVersion"
+        },
+        "types": {
+          "type": "array",
+          "items": {
+            "$ref": "urn:zenith:hub:application-db:v1#/$defs/IRI"
+          }
+        },
+        "bindings": {
+          "$ref": "urn:zenith:hub:application-db:v1#/$defs/ProfileBindingsFile"
+        },
+        "definitionSetId": {
+          "$ref": "urn:zenith:hub:application-db:v1#/$defs/IRI"
+        },
+        "mappingRef": {
+          "$ref": "urn:zenith:hub:application-db:v1#/$defs/MappingRef"
+        },
+        "admission": {
+          "const": "observation"
+        }
+      },
+      "required": [
+        "id",
+        "expectedRevision",
+        "objectRevision",
+        "atomicUnit",
+        "types",
+        "bindings",
+        "definitionSetId",
+        "admission"
+      ],
+      "additionalProperties": false
+    },
+    "AppWrite": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "HubSettings"
+            },
+            "expectedRevision": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "value": {
+              "$ref": "urn:zenith:hub:application-db:v1#/$defs/HubSettings"
+            }
+          },
+          "required": [
+            "kind",
+            "expectedRevision",
+            "value"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "Host"
+            },
+            "expectedRevision": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "value": {
+              "$ref": "urn:zenith:hub:application-db:v1#/$defs/Host"
+            }
+          },
+          "required": [
+            "kind",
+            "expectedRevision",
+            "value"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "SoftwareDescriptor"
+            },
+            "expectedRevision": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "value": {
+              "$ref": "urn:zenith:hub:application-db:v1#/$defs/SoftwareDescriptor"
+            }
+          },
+          "required": [
+            "kind",
+            "expectedRevision",
+            "value"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "SoftwareCatalogEntry"
+            },
+            "expectedRevision": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "value": {
+              "$ref": "urn:zenith:hub:application-db:v1#/$defs/SoftwareCatalogEntry"
+            }
+          },
+          "required": [
+            "kind",
+            "expectedRevision",
+            "value"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "SoftwareSourceSnapshot"
+            },
+            "expectedRevision": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "value": {
+              "$ref": "urn:zenith:hub:application-db:v1#/$defs/SoftwareSourceSnapshot"
+            }
+          },
+          "required": [
+            "kind",
+            "expectedRevision",
+            "value"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "SoftwareBuild"
+            },
+            "expectedRevision": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "value": {
+              "$ref": "urn:zenith:hub:application-db:v1#/$defs/SoftwareBuild"
+            }
+          },
+          "required": [
+            "kind",
+            "expectedRevision",
+            "value"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "SoftwareInstallationRecord"
+            },
+            "expectedRevision": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "value": {
+              "$ref": "urn:zenith:hub:application-db:v1#/$defs/SoftwareInstallationRecord"
+            }
+          },
+          "required": [
+            "kind",
+            "expectedRevision",
+            "value"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "ConfigurationProfile"
+            },
+            "expectedRevision": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "value": {
+              "$ref": "urn:zenith:hub:application-db:v1#/$defs/ConfigurationProfile"
+            }
+          },
+          "required": [
+            "kind",
+            "expectedRevision",
+            "value"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "HermesConfigurationProfile"
+            },
+            "expectedRevision": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "value": {
+              "$ref": "urn:zenith:hub:application-db:v1#/$defs/HermesConfigurationProfile"
+            }
+          },
+          "required": [
+            "kind",
+            "expectedRevision",
+            "value"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "ServiceInstance"
+            },
+            "expectedRevision": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "value": {
+              "$ref": "urn:zenith:hub:application-db:v1#/$defs/ServiceInstance"
+            }
+          },
+          "required": [
+            "kind",
+            "expectedRevision",
+            "value"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "Connection"
+            },
+            "expectedRevision": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "value": {
+              "$ref": "urn:zenith:hub:application-db:v1#/$defs/Connection"
+            }
+          },
+          "required": [
+            "kind",
+            "expectedRevision",
+            "value"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "SetupOperation"
+            },
+            "expectedRevision": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "value": {
+              "$ref": "urn:zenith:hub:application-db:v1#/$defs/SetupOperation"
+            }
+          },
+          "required": [
+            "kind",
+            "expectedRevision",
+            "value"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "idempotencyKey",
+    "expectedGeneration",
+    "definitionSetId",
+    "unitWrites",
+    "retireUnits",
+    "objectWrites",
+    "appWrites",
+    "referenceBindings",
+    "inspectionWrites"
+  ]
+}

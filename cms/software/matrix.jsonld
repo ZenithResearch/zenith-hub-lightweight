@@ -1,0 +1,16 @@
+{
+  "@context": {
+    "zn": "https://zenith-research.ca/ontology/terms/",
+    "cms": "urn:zenith:hub:catalog:",
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#"
+  },
+  "@id": "urn:zenith:software:matrix",
+  "@type": "zn:Artifact",
+  "rdfs:label": "Matrix homeserver",
+  "cms:key": "matrix",
+  "rdfs:comment": "Your stable communication identity and message history.",
+  "cms:publisher": "element-hq",
+  "cms:repository": {
+    "@id": "https://github.com/element-hq/synapse"
+  }
+}

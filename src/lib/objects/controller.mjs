@@ -1,13 +1,13 @@
+import {operatorCsrf} from '../operator-session.mjs';
 /** One local operator API; request documents cannot configure storage or loaders. */
 import {exportBundle,importBundle} from './bundle.mjs';
 import path from 'node:path';
-import {randomBytes} from 'node:crypto';
-import {ObjectStore} from './store.mjs';
+import {openObjectStore} from './open-store.mjs';
 import {loadOntologyRegistry, closed, reject} from './registry.mjs';
 export function createObjectController({env = process.env, registryFile = path.join(process.cwd(), 'profiles/object-store/registry.json'), storeFactory} = {}) {
   const enabled = env.ZENITH_LOCAL_OPERATOR === '1' && !!env.ZENITH_HUB_DATA_DIR;
   const origin = env.ZENITH_OPERATOR_ORIGIN || 'http://127.0.0.1:4208';
-  const expected = new URL(origin), csrf = randomBytes(24).toString('hex');
+  const expected = new URL(origin), csrf = operatorCsrf('objects',env);
   if (expected.origin !== origin || expected.hostname !== '127.0.0.1' || expected.protocol !== 'http:' || !expected.port) reject('invalid_operator_origin', 503);
   let storePromise;
   function admit(request, mutation = false) {
@@ -21,7 +21,7 @@ export function createObjectController({env = process.env, registryFile = path.j
   async function store() {
     if (!storePromise) storePromise = (async () => {
       const registry = await loadOntologyRegistry(env.ZENITH_HUB_ONTOLOGY_REGISTRY_FILE || registryFile);
-      return storeFactory ? storeFactory(registry) : new ObjectStore({dataDir: env.ZENITH_HUB_DATA_DIR, registry});
+      return storeFactory ? storeFactory(registry) : await openObjectStore({env,registry,registryFile:env.ZENITH_HUB_ONTOLOGY_REGISTRY_FILE||registryFile});
     })().catch(error => {storePromise = null; throw error;});
     return storePromise;
   }
@@ -44,14 +44,14 @@ export function createObjectController({env = process.env, registryFile = path.j
         if(query.includeSubclasses!==undefined&&!['true','false'].includes(query.includeSubclasses))reject('invalid_list_query',400);
         return {schema: 'zenith.hub-object-list.v1', ...s.list({...query,includeSubclasses:query.includeSubclasses==='true', limit: query.limit === undefined ? 100 : Number(query.limit)})};
       }
-      if (operation === 'get') {closed(query, ['operation', 'id']); return {schema: 'zenith.hub-object.v1', ...await s.get(query.id)};}
+      if (operation === 'get') {closed(query, ['operation', 'id'],['revision']);if(query.revision!==undefined){const revision=Number(query.revision);if(!Number.isSafeInteger(revision)||revision<1)reject('invalid_object_revision',400);if(!s.getVersion)reject('historical_revision_unavailable',404);return {schema:'zenith.hub-object.v1',...await s.getVersion(query.id,revision)};}return {schema:'zenith.hub-object.v1',...await s.get(query.id)};}
       if (operation === 'relationships') {
         closed(query, ['operation', 'id'], ['direction', 'predicate', 'limit']);
-        return {schema: 'zenith.hub-object-relationships.v1', ...s.relationships({...query, limit: query.limit === undefined ? 1000 : Number(query.limit)})};
+        return {schema: 'zenith.hub-object-relationships.v1', ...await s.relationships({...query, limit: query.limit === undefined ? 1000 : Number(query.limit)})};
       }
       if (operation === 'connected') {
         closed(query, ['operation', 'id'], ['depth', 'limit']);
-        const connected = s.connected({...query, depth: query.depth === undefined ? 1 : Number(query.depth), limit: query.limit === undefined ? 100 : Number(query.limit)});
+        const connected = await s.connected({...query, depth: query.depth === undefined ? 1 : Number(query.depth), limit: query.limit === undefined ? 100 : Number(query.limit)});
         return {schema: 'zenith.hub-object-set.v1', ...connected, document: await s.exportDocument({ids: connected.ids})};
       }
       if (['export','export-bundle'].includes(operation)) {
@@ -64,11 +64,11 @@ export function createObjectController({env = process.env, registryFile = path.j
     },
     async post(request, body) {
       admit(request, true);
-      closed(body, ['schema', 'operation', 'document', 'importKey'], ['expectedRevisions', 'source', 'projections', 'id', 'expectedRevision','admission','expectedBundleSha256']);
+      closed(body, ['schema', 'operation', 'document', 'importKey'], ['expectedRevisions', 'source', 'projections', 'id', 'expectedRevision','admission','expectedBundleSha256','referenceBindings']);
       if (body.schema !== 'zenith.hub-object-action.v1' || !['create', 'update', 'import','import-bundle'].includes(body.operation)) reject('invalid_object_operation', 400);
       if(body.operation==='import-bundle') {
         if(['id','expectedRevision','admission','projections'].some(k=>Object.hasOwn(body,k)))reject('invalid_request',400);
-        return importBundle(await store(),body.document,{importKey:body.importKey,expectedBundleSha256:body.expectedBundleSha256,expectedRevisions:body.expectedRevisions??{},source:body.source??null});
+        return importBundle(await store(),body.document,{importKey:body.importKey,expectedBundleSha256:body.expectedBundleSha256,expectedRevisions:body.expectedRevisions??{},source:body.source??null,...(body.referenceBindings!==undefined?{referenceBindings:body.referenceBindings}:{})});
       }
       if(Object.hasOwn(body,'expectedBundleSha256'))reject('invalid_request',400);
       if (body.operation === 'import' && (body.id !== undefined || body.expectedRevision !== undefined) ||
@@ -79,8 +79,8 @@ export function createObjectController({env = process.env, registryFile = path.j
         ...(body.operation === 'import' ? {expectedRevisions: body.expectedRevisions ?? {}} : {objectId: body.id,
           expectedRevisions: body.operation === 'update' ? {[body.id]: body.expectedRevision} : {}}),
         ...(body.admission!==undefined?{admission:body.admission}:{}),
-        source: body.source ?? null, projections: body.projections ?? {}});
+        source: body.source ?? null, projections: body.projections ?? {},...(body.referenceBindings!==undefined?{referenceBindings:body.referenceBindings}:{})});
     },
-    async close() {if (storePromise) (await storePromise).close();},
+    async close() {if(storePromise){const s=await storePromise;if(!s.applicationOwned)await s.close();}},
   };
 }
