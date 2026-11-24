@@ -1,4 +1,5 @@
 import { CHAT_MESSAGE_LIMIT } from "./chat-message.mjs";
+import {softwareFromSynapseReceipt} from "./synapse-receipt.mjs";
 import { softwareFromHermesReceipt } from "./hermes-receipt.mjs";
 import { projectEnvironment } from "./objects.mjs";
 import path from "node:path";
@@ -106,6 +107,9 @@ export function createSetupController({
     "src/lib/setup/adapters.mjs",
     "src/lib/setup/hermes.mjs",
     "src/lib/setup/matrix.mjs",
+    "src/lib/setup/synapse-receipt.mjs",
+    "src/lib/setup/matrix-contract.mjs",
+    "profiles/setup/matrix.schema.json",
     "src/lib/setup/preflight.mjs",
     "src/lib/setup/vps.mjs",
     "src/lib/setup/tailscale.mjs",
@@ -240,8 +244,8 @@ export function createSetupController({
             // uses the source installer's relative layout rather than guide-era bindings.
             const software = rec.componentId === "hermes" && rec.installed && (rec.software || i.software?.source)
               ? await softwareFromHermesReceipt(path.join(root, "instances", i.instanceId), rec)
-              : rec.software;
-            i.software = software ? { source: software.source } : null;
+              : rec.componentId === "matrix" && rec.installed ? await softwareFromSynapseReceipt(path.join(root,"instances",i.instanceId),rec) : rec.software;
+            i.software = software ? (i.componentId==="matrix" ? software : {source:software.source}) : null;
             i.configured = rec.configured === true;
             i.backendConfigured =
               rec.backendConfigured === true && i.backendNeedsApply !== true;
@@ -401,6 +405,7 @@ export function createSetupController({
             ].includes(plan.action)
           ) {
             i.configured = true;
+            if(item.componentId==="matrix"&&plan.action==="configure")for(const previous of Object.values(s.operations))if(previous.id!==plan.id&&previous.action==="configure"&&previous.state==="retryable"&&previous.instanceIds?.includes(item.instanceId)){previous.state="complete";previous.completedByOperation=plan.id;previous.updatedAt=new Date(clock()).toISOString();}
             i.config = item.config;
             i.guideProof = null;
             i.setupCompletion = null;
@@ -784,7 +789,7 @@ export function createSetupController({
             .filter((i) => i.endpoint),
           { componentId: "matrix", endpoint: "http://127.0.0.1:8008" },
           { componentId: "matrix", endpoint: "http://127.0.0.1:18008" },
-          { componentId: "hermes", endpoint: "http://127.0.0.1:8642" },
+          ...((await currentRegistry()).catalog.components.filter(c=>["matrix","hermes"].includes(c.id)&&c.defaultPort).map(c=>({componentId:c.id,endpoint:"http://127.0.0.1:"+c.defaultPort}))),
         ].filter(
           (item, index, all) =>
             all.findIndex(
@@ -1300,7 +1305,20 @@ export function createSetupController({
           }
           await observe(s);
           for (const op of Object.values(s.operations))
-            if (
+            if (op.action==="configure"&&["applying","reconciliation-required"].includes(op.state)&&op.instanceIds?.length&&op.instanceIds.every(id=>s.instances.some(i=>i.instanceId===id&&i.componentId==="matrix"&&i.mode==="install"))) {
+              let complete=true;
+              for(const id of op.instanceIds){
+                const i=s.instances.find(i=>i.instanceId===id),instanceRoot=path.join(root,"instances",id);
+                check(i,i.root===instanceRoot,"matrix_configuration_identity_unresolved");
+                const active=adapter.configurationActive?await adapter.configurationActive(i):null;
+                check(i,active===false,active===true?"matrix_configuration_still_running":"matrix_configuration_process_unknown");
+                const receipt=JSON.parse(await readPrivate(path.join(instanceRoot,"receipt.json"))),intent=JSON.parse(await readPrivate(path.join(instanceRoot,"config/matrix-identity.json")));
+                check(receipt,receipt.instanceId===id&&receipt.componentId==="matrix"&&receipt.installed===true&&intent.instanceId===id&&intent.root===instanceRoot&&intent.serverName===i.config.serverName&&digest(intent.configuration)===digest(i.config),"matrix_configuration_identity_unresolved");
+                complete &&= receipt.configured===true;
+              }
+              op.state=complete?"complete":"retryable";
+              op.updatedAt=new Date(clock()).toISOString();
+            } else if (
               op.welcome &&
               ["applying", "reconciliation-required"].includes(op.state)
             ) {

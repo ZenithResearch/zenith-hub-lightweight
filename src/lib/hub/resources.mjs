@@ -8,6 +8,7 @@ export function resourceStatus(item,now=Date.now()) {
   if(item.mode==='install' && item.running===false)return 'Stopped';
   const o=item.observation,age=now-Date.parse(o?.observedAt);
   if(!o || !Number.isFinite(age) || age>30000 || age< -5000)return 'Status needs refresh';
+  if(item.componentId==='matrix'){if(!o.reachable)return 'Connection saved · unavailable';if(o.permission==='authenticated'&&o.applicationReady===true)return 'Account authenticated';if(o.permission==='session-expired')return 'Session expired · sign in';return o.permission==='access_denied'?'Access denied':'API available · sign in required';}
   if(['credential-required','authentication_failed','access_denied'].includes(o.permission))return 'Credentials required';
   if(!o.reachable)return 'Connection saved · unavailable';
   if(item.componentId==='hermes')return o.chatAvailable===true?'Ready':'Needs configuration';

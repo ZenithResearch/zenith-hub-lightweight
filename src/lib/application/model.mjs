@@ -1,5 +1,6 @@
 /** Semantic fields have one authority. Compatibility documents retain only application/native bindings. */
 import path from 'node:path';
+import {validateMatrixBinding} from '../setup/matrix-contract.mjs';
 import {recordGroups} from '../objects/application-rows.mjs';
 import {identity,softwareId,unknown,timestamp} from './compiler.mjs';
 import {reject} from '../objects/registry.mjs';
@@ -12,6 +13,7 @@ export const emptySetup=()=>({schema:'zenith.hub-setup-state.v1',revision:0,step
 export const emptyResources=()=>({schema:'zenith.hub-resources.v1',revision:1,resources:[]});
 export function validateSetup(s) {
  if(s?.schema!=='zenith.hub-setup-state.v1'||!Number.isSafeInteger(s.revision)||s.revision<0||!Array.isArray(s.instances)||!Array.isArray(s.selection)||!s.operations||typeof s.operations!=='object'||Array.isArray(s.operations))reject('invalid_setup_state',422);
+ for(const i of s.instances)if(i.matrix)validateMatrixBinding(i.matrix);
  if(new Set(s.instances.map(i=>i.instanceId)).size!==s.instances.length)reject('duplicate_setup_instance',422);
  return s;
 }
@@ -36,6 +38,14 @@ export async function compileSetup(compiler,setup,catalog,{hostRef,root,installa
    const prior=row(compiler.read,'installations',installationRef);
    if(!installationOverrides.has(i.instanceId))await compiler.typed('SoftwareInstallationRecord',{id:installationRef,softwareRef:refs.software,hostRef,management:prior?.management||'hub-managed',locations:prior?.locations||{source},...(prior?.sourceSnapshotRef?{sourceSnapshotRef:prior.sourceSnapshotRef}:{}),...(prior?.buildRef?{buildRef:prior.buildRef}:{}),presence:prior?.presence||unknown('Legacy registration is not fresh inspection evidence.'),compatibility:prior?.compatibility||unknown('Adapter qualification is independent of installation presence.')});
    const {source:ignored,...nativeSoftware}=i.software;i.software=nativeSoftware; // Reconstructed from the selected installation description, not a second semantic owner.
+  }
+  if(local&&i.componentId==='matrix'&&i.software?.environment&&i.software?.copyId){
+   const native=i.software,build=native.build,buildId=build?identity('build',refs.software+'|'+build.content.sha256+'|'+build.platform):null;
+   if(buildId&&!row(compiler.read,'builds',buildId))await compiler.typed('SoftwareBuild',{id:buildId,softwareRef:refs.software,...build,content:{...build.content,id:buildId}});
+   installationRef=identity('installation',refs.software+'|'+hostRef+'|'+native.copyId+'|'+(buildId||'unknown'));
+   const prior=row(compiler.read,'installations',installationRef),priorPin=prior&&compiler.read.state.referenceBindings.find(b=>b.ownerKind==='object'&&b.ownerRef===installationRef&&b.ownerRevision===prior.objectVersion.objectRevision&&b.field==='/buildRef'&&b.targetRef===buildId),buildVersion=buildId?(priorPin?.objectRevision||row(compiler.read,'builds',buildId)?.objectVersion.objectRevision||1):null;
+   await compiler.typed('SoftwareInstallationRecord',{id:installationRef,softwareRef:refs.software,hostRef,management:'hub-managed',locations:{environment:native.environment,launcher:native.launcher},...(buildId?{buildRef:buildId}:{}),presence:prior?.presence||unknown('Verified retained wheel closure and receipt; environment-wide presence inspection is not implemented.'),compatibility:prior?.compatibility||unknown('Matrix API and account authentication are separate checks.')}, {references:buildId?[{field:'/buildRef',targetRef:buildId,mode:'object-version',objectRevision:buildVersion}]:[]});
+   refs.installation=installationRef;refs.installationLayout='environment';
   }
   const profileId=identity('profile',i.instanceId),nativeName=i.configurationHome?'default':i.profile?.name||i.instanceId,hermes=i.componentId==='hermes'&&typeof config.modelName==='string'&&!!config.modelName&&typeof config.providerId==='string'&&!!config.providerId;
   const profile={id:profileId,softwareRef:refs.software,...(installationRef?{installationRef}:{}),name:nativeName,profileKind:hermes?'hermes':'generic',...(path.isAbsolute(i.configurationHome||i.profile?.home||'')?{nativeHome:i.configurationHome||i.profile.home}:{}),...(config.secretRef?{credentialRefs:[config.secretRef]}:{}),...(hermes?{modelBinding:{providerId:config.providerId,modelName:config.modelName}}:{})};
@@ -74,7 +84,7 @@ export function decodeSetup(read) {
   const config=i.config||{};if(profile.profileKind==='hermes'){config.providerId=profile.modelBinding.providerId;config.modelName=profile.modelBinding.modelName;}
   if(refs.configurationHome&&profile.nativeHome)i.configurationHome=profile.nativeHome;
   if(i.profile){if(refs.profileHome&&profile.nativeHome)i.profile.home=profile.nativeHome;if(refs.profileName)i.profile.name=profile.name;}
-  if(refs.installation){const installation=row(read,'installations',refs.installation);if(!installation)reject('application_binding_integrity',503);i.software={...i.software,source:installation.locations.source};}
+  if(refs.installation){const installation=row(read,'installations',refs.installation);if(!installation)reject('application_binding_integrity',503);i.software=refs.installationLayout==='environment'?{...i.software,environment:installation.locations.environment,launcher:installation.locations.launcher}:{...i.software,source:installation.locations.source};}
   if(refs.service){const service=row(read,'services',refs.service);if(!service)reject('application_binding_integrity',503);if(refs.configLabel)config.label=service.label;}
   if(refs.connection){const connection=row(read,'connections',refs.connection);if(!connection)reject('application_binding_integrity',503);if(refs.configLabel)config.label=connection.label;config.endpoint=connection.endpoint;if(refs.enabledPresent||!connection.enabled)i.enabled=connection.enabled;}
   i.config=config;delete i.databaseRefs;

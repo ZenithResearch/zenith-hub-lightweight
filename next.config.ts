@@ -13,6 +13,7 @@ const nextConfig: NextConfig = {
     "/api/database": ["./profiles/application-db/**/*", "./profiles/object-store/**/*", "./src/lib/objects/codec-worker.mjs"],
     "/api/objects": ["./profiles/application-db/**/*", "./profiles/object-store/**/*", "./src/lib/objects/codec-worker.mjs"],
     "/api/hub": ["./profiles/application-db/**/*","./profiles/setup/**/*", "./scripts/setup/**/*", "./src/lib/setup/*.mjs", "./profiles/object-store/**/*", "./src/lib/objects/codec-worker.mjs"],
+    "/api/matrix": ["./profiles/application-db/**/*", "./profiles/setup/**/*", "./profiles/object-store/**/*", "./src/lib/application/*.mjs", "./src/lib/setup/*.mjs", "./scripts/setup/**/*", "./src/lib/objects/codec-worker.mjs"],
     "/api/setup": [
       "./src/lib/application/*.mjs",
       "./profiles/application-db/**/*",

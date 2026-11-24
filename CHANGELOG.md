@@ -2,6 +2,15 @@
 
 ## [Unreleased]
 
+### Added
+- Add generic reviewed Matrix account, space, room, membership, permission and explicit message-verification setup — users need a resumable product journey without application-specific templates or duplicating the homeserver database.
+- Persist opaque Matrix session bindings, retained reviews and partial outcomes in the existing application owner — reload/restart must preserve progress while passwords and tokens stay out of repository objects and review artifacts.
+
+### Fixed
+- Distinguish Matrix API availability from authenticated accounts across gallery and Communications, normalize safe root URLs, and derive default discovery ports from the catalog — a public API probe must not imply sign-in or omit the managed port.
+- Recover owned Synapse configuration without regenerating keys or redirecting retained data, provide explicit reviewed legacy-identity reconciliation, and map wheel receipts to exact build/installation versions — retries and later metadata changes must preserve server identity, accounts and original provenance.
+
+
 ### Fixed
 - Make Inkling job fixtures specify supported and unsupported hardware and assert the actual qualification failure — Linux CI must test context/inference handling without accidentally failing every path at the platform guard.
 

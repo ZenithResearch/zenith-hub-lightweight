@@ -11,7 +11,7 @@ import {
 } from "node:fs/promises";
 import path from "node:path";
 import os from "node:os";
-import { loadCatalog, resolveSelection } from "../../src/lib/setup/catalog.mjs";
+import { loadCatalog, resolveSelection, digest } from "../../src/lib/setup/catalog.mjs";
 import { createSetupController } from "../../src/lib/setup/controller.mjs";
 import {
   endpoint,
@@ -516,4 +516,23 @@ test("discovery includes saved custom ports, deduplicates endpoints and remains 
   assert.equal(probes.filter(([, endpoint]) => endpoint.endsWith(":8008")).length, 1);
   assert.deepEqual(await stateStore(f.root).read(), before);
   assert.deepEqual(f.calls, []);
+});
+
+test("retained Matrix configuration reconciles to retryable only after its writer has stopped",async t=>{
+ let active=false;const f=await fixture(t,{configurationActive:async()=>active,configure:async p=>{const file=path.join(p.root,"receipt.json"),receipt=JSON.parse(await readFile(file,"utf8"));receipt.configured=true;await writeFile(file,JSON.stringify(receipt),{mode:0o600});}});
+ const instanceRoot=path.join(f.root,"instances/matrix-recovery"),config={serverName:"recovery.invalid",port:19408,access:"private",federation:false,domainMode:"development",identityAcknowledged:true};
+ await mkdir(path.join(instanceRoot,"config"),{recursive:true,mode:0o700});
+ const write=async(name,value)=>writeFile(path.join(instanceRoot,name),JSON.stringify(value),{mode:0o600});
+ const wheel="matrix_synapse-1.165.0-cp312-cp312-macosx_11_0_arm64.whl",bytes="fixture wheel",controller="# fixture controller";
+ await mkdir(path.join(instanceRoot,"wheels"),{recursive:true});await writeFile(path.join(instanceRoot,"wheels",wheel),bytes);
+ await writeFile(path.join(instanceRoot,"controller.py"),controller,{mode:0o600});
+ const entry=path.join(instanceRoot,"venv/lib/python3.12/site-packages/synapse/app/homeserver.py");await mkdir(path.dirname(entry),{recursive:true});await writeFile(entry,"# fixture entry");
+ await write("receipt.json",{instanceId:"matrix-recovery",componentId:"matrix",root:instanceRoot,installed:true,configured:false,controllerSha256:digest(controller),artifacts:[{filename:wheel,sha256:digest(bytes)}]});
+ await write("config/matrix-identity.json",{root:instanceRoot,instanceId:"matrix-recovery",serverName:config.serverName,configuration:config});
+ const store=stateStore(f.root);await store.write(s=>{s.instances=[{instanceId:"matrix-recovery",componentId:"matrix",mode:"install",root:instanceRoot,config}];s.operations.old={id:"old",action:"configure",state:"applying",instanceIds:["matrix-recovery"]};});
+ active=true;await assert.rejects(f.post({operation:"reconcile"}),{code:"matrix_configuration_still_running"});
+ assert.equal((await store.read()).operations.old.state,"applying");
+ active=false;await f.post({operation:"reconcile"});assert.equal((await store.read()).operations.old.state,"retryable");
+ const current=await store.read(),review=await f.post({operation:"plan",action:"configure",instanceId:"matrix-recovery",expectedRevision:current.revision});await f.post({operation:"apply",planId:review.plan.id});
+ const after=await store.read();assert.equal(after.operations[review.plan.id].state,"complete");assert.equal(after.operations.old.state,"complete");assert.equal(after.operations.old.completedByOperation,review.plan.id);assert.equal(after.instances[0].configured,true);
 });

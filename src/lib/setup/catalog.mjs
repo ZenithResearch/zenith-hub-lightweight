@@ -2,6 +2,7 @@
 import { readFile } from "node:fs/promises";
 import { createHash } from "node:crypto";
 import path from "node:path";
+import {endpoint} from "./network.mjs";
 import Ajv from "ajv/dist/2020.js";
 export const digest = (value) =>
   createHash("sha256")
@@ -85,6 +86,7 @@ export function resolveSelection(registry, selection, { review = true, action } 
       : Object.fromEntries(Object.entries(config).filter(([, v]) => v !== ""));
     check(config, validator(candidate), "invalid_component_configuration");
     if (c.id === "hermes") config = normalizeHermesBackend(config);
+    if (item.mode === "connect" && config.endpoint) config = {...config, endpoint:endpoint(config.endpoint).origin};
     if (review && item.mode === "connect")
       check(
         item,

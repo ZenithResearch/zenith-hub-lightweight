@@ -1129,7 +1129,7 @@ export function SetupPage() {
             </button>
             <ConnectionList items={connectionRows} disabled={disabled}
               onChoose={(row) => chooseConnection(row as CommunicationRow)}
-              onManage={() => void navigate("environment")} />
+              onManage={(row) => {const target=connectionRows.find(c=>c.id===row.id);if(target?.componentId==="matrix"){window.location.href="/hub?matrix="+encodeURIComponent(target.instanceId||"");}else void navigate("environment");}} />
           </SetupPanel>
           {catalog.filter((c) => c.category === "communications").map(choice)}
           {selection.some(

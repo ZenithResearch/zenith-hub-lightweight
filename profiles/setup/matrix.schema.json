@@ -1,0 +1,143 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:zenith:hub:matrix-binding:v1",
+  "description": "Additive private operational binding in the existing setup document. Not an ontology class or a homeserver database.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema": {
+      "const": "zenith.hub-matrix-binding.v1"
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "account": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "credentialRef": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{48}$"
+        },
+        "userId": {
+          "type": "string",
+          "pattern": "^@[^:]+:.+"
+        },
+        "deviceId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "endpoint": {
+          "type": "string"
+        },
+        "externalSession": {
+          "type": "boolean"
+        },
+        "generation": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "credentialDigest": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      },
+      "required": [
+        "credentialRef",
+        "userId",
+        "deviceId",
+        "endpoint",
+        "externalSession",
+        "generation"
+      ]
+    },
+    "view": {
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "selected": {
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "reviewId": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "operations": {
+      "type": "array",
+      "maxItems": 30,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "action",
+          "args",
+          "binding",
+          "state",
+          "observedAt",
+          "completed",
+          "result"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "action": {
+            "type": "string"
+          },
+          "args": {
+            "type": "object"
+          },
+          "binding": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "state": {
+            "enum": [
+              "applying",
+              "complete",
+              "partial",
+              "failed",
+              "unknown",
+              "acknowledged"
+            ]
+          },
+          "observedAt": {
+            "type": "string"
+          },
+          "completed": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "result": {
+            "type": "object"
+          },
+          "error": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "messageVerification": {
+      "type": [
+        "object",
+        "null"
+      ]
+    }
+  }
+}

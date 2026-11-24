@@ -1,0 +1,736 @@
+{
+  "schema": "zenith.hub-matrix-input-updates.v1",
+  "previousLedgerSha256": "e86f65c6a02f5a3241c3dc3ed3536c82f5d0289c55200a2b31a36473a667dc78",
+  "baselines": {
+    "integration-inputs.json": {
+      "sha256": "a4e8bd3c8d72dcd0b12403e7ad4db7231a588a3b9119ff624c009000728d20cd",
+      "updates": [
+        {
+          "path": "src/lib/resource-registry.mjs",
+          "previousSha256": "986d6b139baa56289a93db448619fcd99133e88bf19cabdef4c020d06fb42785",
+          "sha256": "d7764b4eb2f429b2ff6933c28f4ab8ac32a601c575bdc42230054b7247204bf6",
+          "reason": "Authorized generic Matrix setup, explicit API/account evidence and recoverable owned configuration/provenance bindings.",
+          "evidence": [
+            "docs/guided-setup/matrix-implementation.md",
+            "tests/setup/matrix.test.mjs",
+            "tests/setup/setup.test.mjs",
+            "tests/test_matrix_configuration.py"
+          ]
+        },
+        {
+          "path": "src/lib/resource-controller.mjs",
+          "previousSha256": "0fe2e50ed21ad8eb734ac6b8714a2a05c08a127a5cc8d1e6b6431fd180b339c5",
+          "sha256": "ee1f106d812a097e4088a7b64a4232a688ed9e48cf920391d6e3416c491337ee",
+          "reason": "Authorized generic Matrix setup, explicit API/account evidence and recoverable owned configuration/provenance bindings.",
+          "evidence": [
+            "docs/guided-setup/matrix-implementation.md",
+            "tests/setup/matrix.test.mjs",
+            "tests/setup/setup.test.mjs",
+            "tests/test_matrix_configuration.py"
+          ]
+        },
+        {
+          "path": "src/lib/setup/objects.mjs",
+          "previousSha256": "54b9f53a274ae4267dcf75eed9ac234d6717f19bd90d9997beca7eb32e69e753",
+          "sha256": "8b86ae5f2294957c9d1d87e1162235a83ac8bb7902eab19e96f36dc38e1ed803",
+          "reason": "Authorized generic Matrix setup, explicit API/account evidence and recoverable owned configuration/provenance bindings.",
+          "evidence": [
+            "docs/guided-setup/matrix-implementation.md",
+            "tests/setup/matrix.test.mjs",
+            "tests/setup/setup.test.mjs",
+            "tests/test_matrix_configuration.py"
+          ]
+        },
+        {
+          "path": "src/lib/setup/state.mjs",
+          "previousSha256": "3eaa5177d87269472fc3a52d1f17eb4461ecbfc19db83aa88890f225594534f6",
+          "sha256": "5a3be0ff23a5c555969187bc0f38ddceef919d359f913b05e500423a2ab3feb6",
+          "reason": "Authorized generic Matrix setup, explicit API/account evidence and recoverable owned configuration/provenance bindings.",
+          "evidence": [
+            "docs/guided-setup/matrix-implementation.md",
+            "tests/setup/matrix.test.mjs",
+            "tests/setup/setup.test.mjs",
+            "tests/test_matrix_configuration.py"
+          ]
+        },
+        {
+          "path": "src/lib/setup/controller.d.mts",
+          "previousSha256": "35dfa21c39127b33b3c8b99bb14723f1fbc91e56b14c70e634293ce1c613fe56",
+          "sha256": "a7107da3adb9d4937dc1398c1a95d871a83dba0e96e547d212d92961660acb2b",
+          "reason": "Authorized generic Matrix setup, explicit API/account evidence and recoverable owned configuration/provenance bindings.",
+          "evidence": [
+            "docs/guided-setup/matrix-implementation.md",
+            "tests/setup/matrix.test.mjs",
+            "tests/setup/setup.test.mjs",
+            "tests/test_matrix_configuration.py"
+          ]
+        },
+        {
+          "path": "src/lib/setup/network.mjs",
+          "previousSha256": "5dc6594164e578d016f65265bfd41ce474c6b96ab3f31ac2f37cc0c445296724",
+          "sha256": "30e312df82db26cad909740d9f9da4d76b20f65c54b8400c4eba52db99545e46",
+          "reason": "Authorized generic Matrix setup, explicit API/account evidence and recoverable owned configuration/provenance bindings.",
+          "evidence": [
+            "docs/guided-setup/matrix-implementation.md",
+            "tests/setup/matrix.test.mjs",
+            "tests/setup/setup.test.mjs",
+            "tests/test_matrix_configuration.py"
+          ]
+        },
+        {
+          "path": "src/lib/setup/controller.mjs",
+          "previousSha256": "832f7d86747c1fb3e7a30fccf93158e05ed9accf024a9c3398d5eebd43e00b45",
+          "sha256": "203c0115507ac778ebb6a02ee79a2f4b0d3ecc36c5a1c80a61dd9c5526f1c2c7",
+          "reason": "Authorized generic Matrix setup, explicit API/account evidence and recoverable owned configuration/provenance bindings.",
+          "evidence": [
+            "docs/guided-setup/matrix-implementation.md",
+            "tests/setup/matrix.test.mjs",
+            "tests/setup/setup.test.mjs",
+            "tests/test_matrix_configuration.py"
+          ]
+        },
+        {
+          "path": "src/lib/setup/runtime.ts",
+          "previousSha256": "84e0561ab48025d9eb393eb8cbb97918b9c4c792f73725fa490c1fd9f9d3eb54",
+          "sha256": "f58bc6638f6163c4dca6b2a54691934863099d65a2729401358ee0bfedc475d7",
+          "reason": "Authorized generic Matrix setup, explicit API/account evidence and recoverable owned configuration/provenance bindings.",
+          "evidence": [
+            "docs/guided-setup/matrix-implementation.md",
+            "tests/setup/matrix.test.mjs",
+            "tests/setup/setup.test.mjs",
+            "tests/test_matrix_configuration.py"
+          ]
+        },
+        {
+          "path": "src/lib/setup/catalog.mjs",
+          "previousSha256": "e478cbd04a0b2a0cec43b2d743e814051958a51174985b3eb001853fd638958d",
+          "sha256": "ff3cc5cdd924bee90a00f80316df94760b55698da0edc0f263b6b0d78832816a",
+          "reason": "Authorized generic Matrix setup, explicit API/account evidence and recoverable owned configuration/provenance bindings.",
+          "evidence": [
+            "docs/guided-setup/matrix-implementation.md",
+            "tests/setup/matrix.test.mjs",
+            "tests/setup/setup.test.mjs",
+            "tests/test_matrix_configuration.py"
+          ]
+        },
+        {
+          "path": "src/lib/setup/connections.mjs",
+          "previousSha256": "e70c2c913d82028be0617a080454d19d666403aac7a4b836b41a64475680f3c2",
+          "sha256": "79948b3e50cad409fd1144bf61fb1d1c16d9ec257382be5e5626e04da374baf1",
+          "reason": "Authorized generic Matrix setup, explicit API/account evidence and recoverable owned configuration/provenance bindings.",
+          "evidence": [
+            "docs/guided-setup/matrix-implementation.md",
+            "tests/setup/matrix.test.mjs",
+            "tests/setup/setup.test.mjs",
+            "tests/test_matrix_configuration.py"
+          ]
+        },
+        {
+          "path": "src/lib/setup/adapters.mjs",
+          "previousSha256": "8a5359279ac4589b193cec219f63310f2e86a15610a4b263b454de0444b65bb5",
+          "sha256": "ed23c135919c1b6abf484f6dfe3e69b51060223ceb6ec81a9f3cbac0d6470c06",
+          "reason": "Authorized generic Matrix setup, explicit API/account evidence and recoverable owned configuration/provenance bindings.",
+          "evidence": [
+            "docs/guided-setup/matrix-implementation.md",
+            "tests/setup/matrix.test.mjs",
+            "tests/setup/setup.test.mjs",
+            "tests/test_matrix_configuration.py"
+          ]
+        },
+        {
+          "path": "src/lib/objects/open-store.mjs",
+          "previousSha256": "483250e1a50993c217b491df956cd4bdc97e2237ff308956137bfa83c0eb8895",
+          "sha256": "e1cdc35361fd96afaca277d2eefbd9124da07a15a21b98e145fd92af4edc708a",
+          "reason": "Authorized generic Matrix setup, explicit API/account evidence and recoverable owned configuration/provenance bindings.",
+          "evidence": [
+            "docs/guided-setup/matrix-implementation.md",
+            "tests/setup/matrix.test.mjs",
+            "tests/setup/setup.test.mjs",
+            "tests/test_matrix_configuration.py"
+          ]
+        },
+        {
+          "path": "src/lib/objects/read-model.mjs",
+          "previousSha256": "123b2773686d6e94a4f0e5410ebbda30186e6d31e2185131bc7fd147ebed6e77",
+          "sha256": "b648366d19a1e52de681de8b7e573cc92140337d356d0d2bf5ff61dd2ca7393e",
+          "reason": "Authorized generic Matrix setup, explicit API/account evidence and recoverable owned configuration/provenance bindings.",
+          "evidence": [
+            "docs/guided-setup/matrix-implementation.md",
+            "tests/setup/matrix.test.mjs",
+            "tests/setup/setup.test.mjs",
+            "tests/test_matrix_configuration.py"
+          ]
+        },
+        {
+          "path": "src/lib/objects/repository.mjs",
+          "previousSha256": "322c786608aef993dcfe018fddf2138e8f5db6def1739335876579eec905fb0c",
+          "sha256": "0211a40f10e0857645fd2db68bd89b12c98def65c800fccd9da7be95f0af17f8",
+          "reason": "Authorized generic Matrix setup, explicit API/account evidence and recoverable owned configuration/provenance bindings.",
+          "evidence": [
+            "docs/guided-setup/matrix-implementation.md",
+            "tests/setup/matrix.test.mjs",
+            "tests/setup/setup.test.mjs",
+            "tests/test_matrix_configuration.py"
+          ]
+        },
+        {
+          "path": "src/lib/objects/controller.mjs",
+          "previousSha256": "d44e505d545e9de762b73ef537b297c37f4b4f0400aa2bdfed24cbe4fe22365a",
+          "sha256": "c4ecbd3781b2f079626929584aeafffd73154c3e6094ff325b57afde060b3b07",
+          "reason": "Authorized generic Matrix setup, explicit API/account evidence and recoverable owned configuration/provenance bindings.",
+          "evidence": [
+            "docs/guided-setup/matrix-implementation.md",
+            "tests/setup/matrix.test.mjs",
+            "tests/setup/setup.test.mjs",
+            "tests/test_matrix_configuration.py"
+          ]
+        },
+        {
+          "path": "src/lib/objects/application.mjs",
+          "previousSha256": "1cc8603f99f84eaee2e835b54c53dad3005eeaf8edcb40efaaa967368157e518",
+          "sha256": "51996f6ae12cef0b69bdf3a2f21efa2ef6573a912a4b2b8f1e39b851b63299cd",
+          "reason": "Authorized generic Matrix setup, explicit API/account evidence and recoverable owned configuration/provenance bindings.",
+          "evidence": [
+            "docs/guided-setup/matrix-implementation.md",
+            "tests/setup/matrix.test.mjs",
+            "tests/setup/setup.test.mjs",
+            "tests/test_matrix_configuration.py"
+          ]
+        },
+        {
+          "path": "src/lib/objects/versions.mjs",
+          "previousSha256": "984c770e1a3e18dc3486f08fc55a75597db29eff100dc5581d9cef81ec1f76db",
+          "sha256": "6ba3ed87e6ff9ca3863c48dcf0ddabf346d1fc97442e32c14791bf0947d81700",
+          "reason": "Authorized generic Matrix setup, explicit API/account evidence and recoverable owned configuration/provenance bindings.",
+          "evidence": [
+            "docs/guided-setup/matrix-implementation.md",
+            "tests/setup/matrix.test.mjs",
+            "tests/setup/setup.test.mjs",
+            "tests/test_matrix_configuration.py"
+          ]
+        },
+        {
+          "path": "src/lib/objects/repository-state.mjs",
+          "previousSha256": "ca42f44d7381b3573bc351cc4a3d583348d47815d4dc70ed1421e92009d26cf0",
+          "sha256": "d2a68c64195d0b20c9ea3327883ac52fe58a48872992301f915aa49da70762ed",
+          "reason": "Authorized generic Matrix setup, explicit API/account evidence and recoverable owned configuration/provenance bindings.",
+          "evidence": [
+            "docs/guided-setup/matrix-implementation.md",
+            "tests/setup/matrix.test.mjs",
+            "tests/setup/setup.test.mjs",
+            "tests/test_matrix_configuration.py"
+          ]
+        },
+        {
+          "path": "src/lib/objects/application-pin.mjs",
+          "previousSha256": "104cf84db6d280980b6ba03aaf505a70d3f01a5b24df457f5967faa88a4a7150",
+          "sha256": "ea58dfc0cc5ce685a68c9a033f25ccb71faf2ed398419e8937161f0d1441a2c2",
+          "reason": "Authorized generic Matrix setup, explicit API/account evidence and recoverable owned configuration/provenance bindings.",
+          "evidence": [
+            "docs/guided-setup/matrix-implementation.md",
+            "tests/setup/matrix.test.mjs",
+            "tests/setup/setup.test.mjs",
+            "tests/test_matrix_configuration.py"
+          ]
+        },
+        {
+          "path": "src/lib/hub/resources.mjs",
+          "previousSha256": "099cc0499cc9275a5a5f43631b715ad2dd61d338aa93d97a15ddaf9436b2634c",
+          "sha256": "94ca304a4ee1f1a0bbae0b3230503989b6915a9890a2e45b1d4d563aad56d2ac",
+          "reason": "Authorized generic Matrix setup, explicit API/account evidence and recoverable owned configuration/provenance bindings.",
+          "evidence": [
+            "docs/guided-setup/matrix-implementation.md",
+            "tests/setup/matrix.test.mjs",
+            "tests/setup/setup.test.mjs",
+            "tests/test_matrix_configuration.py"
+          ]
+        },
+        {
+          "path": "src/lib/hub/controller.mjs",
+          "previousSha256": "812c3a9540e2b2a7033820cf8186d1a6405dc4fd6358f22538e3567c68879b8a",
+          "sha256": "e7cb817ea72504fb03b136b5fee9a16e6e526b2ce1eed092f248a94d406e1cd9",
+          "reason": "Authorized generic Matrix setup, explicit API/account evidence and recoverable owned configuration/provenance bindings.",
+          "evidence": [
+            "docs/guided-setup/matrix-implementation.md",
+            "tests/setup/matrix.test.mjs",
+            "tests/setup/setup.test.mjs",
+            "tests/test_matrix_configuration.py"
+          ]
+        },
+        {
+          "path": "src/components/hub/YourHubPage.tsx",
+          "previousSha256": "2638b28167b524d69fe7dc2b7cd39455de04a4a161e701873dcf8e468925a6e0",
+          "sha256": "4f2e194b2411db4d557f3d8359f3fa509984e8204bdf2414d72ca1ddfc3461e5",
+          "reason": "Authorized generic Matrix setup, explicit API/account evidence and recoverable owned configuration/provenance bindings.",
+          "evidence": [
+            "docs/guided-setup/matrix-implementation.md",
+            "tests/setup/matrix.test.mjs",
+            "tests/setup/setup.test.mjs",
+            "tests/test_matrix_configuration.py"
+          ]
+        },
+        {
+          "path": "src/components/hub/SetupPage.tsx",
+          "previousSha256": "30da8c549680fed04591fb48ef127eafde8af711fa687643b4eb361d5a1b7f4b",
+          "sha256": "139e4f47d6922f3da6832d0c1803a285bdd92ba23fa29c23061c1af18fdff674",
+          "reason": "Authorized generic Matrix setup, explicit API/account evidence and recoverable owned configuration/provenance bindings.",
+          "evidence": [
+            "docs/guided-setup/matrix-implementation.md",
+            "tests/setup/matrix.test.mjs",
+            "tests/setup/setup.test.mjs",
+            "tests/test_matrix_configuration.py"
+          ]
+        },
+        {
+          "path": "src/app/api/resources/route.ts",
+          "previousSha256": "76f7a01bba57a3260d83b1a41ac55f29d35cb70b7c6ef7f23ac997cba43e812c",
+          "sha256": "c107f094ac542ac7c59df84df31ac41a2b307e2bd5aa820c5f447db492e89ab7",
+          "reason": "Authorized generic Matrix setup, explicit API/account evidence and recoverable owned configuration/provenance bindings.",
+          "evidence": [
+            "docs/guided-setup/matrix-implementation.md",
+            "tests/setup/matrix.test.mjs",
+            "tests/setup/setup.test.mjs",
+            "tests/test_matrix_configuration.py"
+          ]
+        },
+        {
+          "path": "src/app/api/objects/route.ts",
+          "previousSha256": "18d76beabedeac9c2da0812c43d44d56a0a14534b470a99acf361d4893fe4cfa",
+          "sha256": "c9b3e61e5a229cb47a7d7391025b4b880bc8b3b64423bbaaa796df462f4be1f5",
+          "reason": "Authorized generic Matrix setup, explicit API/account evidence and recoverable owned configuration/provenance bindings.",
+          "evidence": [
+            "docs/guided-setup/matrix-implementation.md",
+            "tests/setup/matrix.test.mjs",
+            "tests/setup/setup.test.mjs",
+            "tests/test_matrix_configuration.py"
+          ]
+        },
+        {
+          "path": "profiles/source-provenance.json",
+          "previousSha256": "2096b7d312715881d5c95bac3728e985c96df6fd468e992d7b43ab7c26ed8aea",
+          "sha256": "21e4ecba50c01335a0039e914e5a3f94403d43655d27ba3dd1f79aaa7ed5f2eb",
+          "reason": "Authorized generic Matrix setup, explicit API/account evidence and recoverable owned configuration/provenance bindings.",
+          "evidence": [
+            "docs/guided-setup/matrix-implementation.md",
+            "tests/setup/matrix.test.mjs",
+            "tests/setup/setup.test.mjs",
+            "tests/test_matrix_configuration.py"
+          ]
+        },
+        {
+          "path": "profiles/setup/catalog.schema.json",
+          "previousSha256": "60b3d672e592bd3929a2c525c494cff221ffbefe236712c8908dc82dcee1df44",
+          "sha256": "65dfba433c6ac8ec53535c2750bfadb350562dbd12d67f362538f01b05d1da18",
+          "reason": "Authorized generic Matrix setup, explicit API/account evidence and recoverable owned configuration/provenance bindings.",
+          "evidence": [
+            "docs/guided-setup/matrix-implementation.md",
+            "tests/setup/matrix.test.mjs",
+            "tests/setup/setup.test.mjs",
+            "tests/test_matrix_configuration.py"
+          ]
+        },
+        {
+          "path": "profiles/application-db/field-ownership.json",
+          "previousSha256": "ecd5df06d34ee47348912396f282e3138bf457c726548e318b1818437ff449fb",
+          "sha256": "87b0bac7526774360348b623addbe6bb7a7ca6b79237589f2d731e851c1ca5ce",
+          "reason": "Authorized generic Matrix setup, explicit API/account evidence and recoverable owned configuration/provenance bindings.",
+          "evidence": [
+            "docs/guided-setup/matrix-implementation.md",
+            "tests/setup/matrix.test.mjs",
+            "tests/setup/setup.test.mjs",
+            "tests/test_matrix_configuration.py"
+          ]
+        },
+        {
+          "path": "profiles/application-db/api.schema.json",
+          "previousSha256": "d3bd1fd9cca3ba26d6029e425d4bc53a647ac0535a5845c957b7a1a28952ea87",
+          "sha256": "2132e2652707b59053aceea1b5e7691948174a620383253173b55767c3db1ec7",
+          "reason": "Authorized generic Matrix setup, explicit API/account evidence and recoverable owned configuration/provenance bindings.",
+          "evidence": [
+            "docs/guided-setup/matrix-implementation.md",
+            "tests/setup/matrix.test.mjs",
+            "tests/setup/setup.test.mjs",
+            "tests/test_matrix_configuration.py"
+          ]
+        },
+        {
+          "path": "profiles/application-db/physical-mapping.json",
+          "previousSha256": "544f0c9b6e5083612513d83158c60bacc9bcf68328ca6f4ec6df7ea2ffbac2b5",
+          "sha256": "5cb5357406bf31c9bfd02c1b14496237a878f99136a0c356d9d0d652447b8f75",
+          "reason": "Authorized generic Matrix setup, explicit API/account evidence and recoverable owned configuration/provenance bindings.",
+          "evidence": [
+            "docs/guided-setup/matrix-implementation.md",
+            "tests/setup/matrix.test.mjs",
+            "tests/setup/setup.test.mjs",
+            "tests/test_matrix_configuration.py"
+          ]
+        },
+        {
+          "path": "profiles/application-db/commit.schema.json",
+          "previousSha256": "904092a8dd221ebe78cc31c8af0c76387dea217809ba5fe9ce7e2dc6fdc2010f",
+          "sha256": "cd6dd7aca9d53dc22981fefdf8edcf2ac7aeda7df9721d75f26a94d0382fb0bb",
+          "reason": "Authorized generic Matrix setup, explicit API/account evidence and recoverable owned configuration/provenance bindings.",
+          "evidence": [
+            "docs/guided-setup/matrix-implementation.md",
+            "tests/setup/matrix.test.mjs",
+            "tests/setup/setup.test.mjs",
+            "tests/test_matrix_configuration.py"
+          ]
+        },
+        {
+          "path": "profiles/application-db/004-application-projections.sql",
+          "previousSha256": "46ac6f8b2576f5baef2aec75beb1549a4e0f39cdcd929c2738770c663586d1de",
+          "sha256": "6b372958fe372d186d538ebc65a95d67b34932537c77c8c5ccd61392ccbe3294",
+          "reason": "Authorized generic Matrix setup, explicit API/account evidence and recoverable owned configuration/provenance bindings.",
+          "evidence": [
+            "docs/guided-setup/matrix-implementation.md",
+            "tests/setup/matrix.test.mjs",
+            "tests/setup/setup.test.mjs",
+            "tests/test_matrix_configuration.py"
+          ]
+        },
+        {
+          "path": "profiles/application-db/manifest.json",
+          "previousSha256": "cb1ad7feb228a952b9616f115c3c4d8ecc2a3b8ce0693b074dbb0f644b44799b",
+          "sha256": "53e59c10fddfa86f3a7e3a4cb4260f43e9c91554a52a25aad6b090fad3fec6ae",
+          "reason": "Authorized generic Matrix setup, explicit API/account evidence and recoverable owned configuration/provenance bindings.",
+          "evidence": [
+            "docs/guided-setup/matrix-implementation.md",
+            "tests/setup/matrix.test.mjs",
+            "tests/setup/setup.test.mjs",
+            "tests/test_matrix_configuration.py"
+          ]
+        },
+        {
+          "path": "profiles/application-db/schema.json",
+          "previousSha256": "065b9718985721a8ee1489a5a2814b3de7a3008700387c00e6f31cdf56e2f676",
+          "sha256": "23d474200ee8c6a04d757743d7545391102ba9e974a7f31e95a92b415f6ea319",
+          "reason": "Authorized generic Matrix setup, explicit API/account evidence and recoverable owned configuration/provenance bindings.",
+          "evidence": [
+            "docs/guided-setup/matrix-implementation.md",
+            "tests/setup/matrix.test.mjs",
+            "tests/setup/setup.test.mjs",
+            "tests/test_matrix_configuration.py"
+          ]
+        },
+        {
+          "path": "tests/setup/connections.test.mjs",
+          "previousSha256": "37bf35089d9342310372569da6d9ff2b089a133c800f1e91a929798d5a711410",
+          "sha256": "71b73acb02df8ee908eaeb8a5547671fb62362f360c875b008d1e38f9471243c",
+          "reason": "Authorized generic Matrix setup, explicit API/account evidence and recoverable owned configuration/provenance bindings.",
+          "evidence": [
+            "docs/guided-setup/matrix-implementation.md",
+            "tests/setup/matrix.test.mjs",
+            "tests/setup/setup.test.mjs",
+            "tests/test_matrix_configuration.py"
+          ]
+        },
+        {
+          "path": "tests/setup/setup.test.mjs",
+          "previousSha256": "ac8f50a3e8ba93a6152a75508aedde57f27178c7354c73d6571841b14f7f752b",
+          "sha256": "e57bd8e32584084159f5877daf6393c1065bdf7a2ee0f874ce96e737bdbb3d3f",
+          "reason": "Authorized generic Matrix setup, explicit API/account evidence and recoverable owned configuration/provenance bindings.",
+          "evidence": [
+            "docs/guided-setup/matrix-implementation.md",
+            "tests/setup/matrix.test.mjs",
+            "tests/setup/setup.test.mjs",
+            "tests/test_matrix_configuration.py"
+          ]
+        },
+        {
+          "path": "scripts/operator.mjs",
+          "previousSha256": "c46478c592170c0983d875b4a504c32572cbe961268dd0020bfb583af72e7d5d",
+          "sha256": "affa06c83df339edcf72edb1b8a0322a18d34ee3bbb011050cfeb895e0ed6ede",
+          "reason": "Authorized generic Matrix setup, explicit API/account evidence and recoverable owned configuration/provenance bindings.",
+          "evidence": [
+            "docs/guided-setup/matrix-implementation.md",
+            "tests/setup/matrix.test.mjs",
+            "tests/setup/setup.test.mjs",
+            "tests/test_matrix_configuration.py"
+          ]
+        },
+        {
+          "path": "scripts/setup/instance.py",
+          "previousSha256": "12ef2c86a42b915729ba51fff30abfe87f893c5057e9b10cc260bce2fcd6363d",
+          "sha256": "c203831496dc6da0daa225473ec51bb43e0bf6eb9642d9f4662be1fea2d6543e",
+          "reason": "Authorized generic Matrix setup, explicit API/account evidence and recoverable owned configuration/provenance bindings.",
+          "evidence": [
+            "docs/guided-setup/matrix-implementation.md",
+            "tests/setup/matrix.test.mjs",
+            "tests/setup/setup.test.mjs",
+            "tests/test_matrix_configuration.py"
+          ]
+        }
+      ]
+    },
+    "catalog/input-baseline.json": {
+      "sha256": "8d74a29bf207fc30ee73a62b2680f40525628a62faf0c14f825aa8d98a36aa25",
+      "updates": [
+        {
+          "path": "src/lib/setup/network.mjs",
+          "previousSha256": "5dc6594164e578d016f65265bfd41ce474c6b96ab3f31ac2f37cc0c445296724",
+          "sha256": "30e312df82db26cad909740d9f9da4d76b20f65c54b8400c4eba52db99545e46",
+          "reason": "Authorized generic Matrix setup, explicit API/account evidence and recoverable owned configuration/provenance bindings.",
+          "evidence": [
+            "docs/guided-setup/matrix-implementation.md",
+            "tests/setup/matrix.test.mjs",
+            "tests/setup/setup.test.mjs",
+            "tests/test_matrix_configuration.py"
+          ]
+        },
+        {
+          "path": "src/lib/setup/controller.mjs",
+          "previousSha256": "162050aa0a93f757603f6dbed3da5eae3961ce83bcb1800d64c67ef90edb8e9a",
+          "sha256": "203c0115507ac778ebb6a02ee79a2f4b0d3ecc36c5a1c80a61dd9c5526f1c2c7",
+          "reason": "Authorized generic Matrix setup, explicit API/account evidence and recoverable owned configuration/provenance bindings.",
+          "evidence": [
+            "docs/guided-setup/matrix-implementation.md",
+            "tests/setup/matrix.test.mjs",
+            "tests/setup/setup.test.mjs",
+            "tests/test_matrix_configuration.py"
+          ]
+        },
+        {
+          "path": "src/lib/setup/catalog.mjs",
+          "previousSha256": "e478cbd04a0b2a0cec43b2d743e814051958a51174985b3eb001853fd638958d",
+          "sha256": "ff3cc5cdd924bee90a00f80316df94760b55698da0edc0f263b6b0d78832816a",
+          "reason": "Authorized generic Matrix setup, explicit API/account evidence and recoverable owned configuration/provenance bindings.",
+          "evidence": [
+            "docs/guided-setup/matrix-implementation.md",
+            "tests/setup/matrix.test.mjs",
+            "tests/setup/setup.test.mjs",
+            "tests/test_matrix_configuration.py"
+          ]
+        },
+        {
+          "path": "src/lib/setup/connections.mjs",
+          "previousSha256": "e70c2c913d82028be0617a080454d19d666403aac7a4b836b41a64475680f3c2",
+          "sha256": "79948b3e50cad409fd1144bf61fb1d1c16d9ec257382be5e5626e04da374baf1",
+          "reason": "Authorized generic Matrix setup, explicit API/account evidence and recoverable owned configuration/provenance bindings.",
+          "evidence": [
+            "docs/guided-setup/matrix-implementation.md",
+            "tests/setup/matrix.test.mjs",
+            "tests/setup/setup.test.mjs",
+            "tests/test_matrix_configuration.py"
+          ]
+        },
+        {
+          "path": "src/lib/setup/adapters.mjs",
+          "previousSha256": "8a5359279ac4589b193cec219f63310f2e86a15610a4b263b454de0444b65bb5",
+          "sha256": "ed23c135919c1b6abf484f6dfe3e69b51060223ceb6ec81a9f3cbac0d6470c06",
+          "reason": "Authorized generic Matrix setup, explicit API/account evidence and recoverable owned configuration/provenance bindings.",
+          "evidence": [
+            "docs/guided-setup/matrix-implementation.md",
+            "tests/setup/matrix.test.mjs",
+            "tests/setup/setup.test.mjs",
+            "tests/test_matrix_configuration.py"
+          ]
+        },
+        {
+          "path": "src/lib/objects/repository.mjs",
+          "previousSha256": "aed16715a093e4a8303c653bb5be68d7e23c820df73acd8782f4994acda256bd",
+          "sha256": "0211a40f10e0857645fd2db68bd89b12c98def65c800fccd9da7be95f0af17f8",
+          "reason": "Authorized generic Matrix setup, explicit API/account evidence and recoverable owned configuration/provenance bindings.",
+          "evidence": [
+            "docs/guided-setup/matrix-implementation.md",
+            "tests/setup/matrix.test.mjs",
+            "tests/setup/setup.test.mjs",
+            "tests/test_matrix_configuration.py"
+          ]
+        },
+        {
+          "path": "src/lib/objects/application.mjs",
+          "previousSha256": "1cc8603f99f84eaee2e835b54c53dad3005eeaf8edcb40efaaa967368157e518",
+          "sha256": "51996f6ae12cef0b69bdf3a2f21efa2ef6573a912a4b2b8f1e39b851b63299cd",
+          "reason": "Authorized generic Matrix setup, explicit API/account evidence and recoverable owned configuration/provenance bindings.",
+          "evidence": [
+            "docs/guided-setup/matrix-implementation.md",
+            "tests/setup/matrix.test.mjs",
+            "tests/setup/setup.test.mjs",
+            "tests/test_matrix_configuration.py"
+          ]
+        },
+        {
+          "path": "src/lib/objects/versions.mjs",
+          "previousSha256": "be5d564b8a58f1f29c9c9c0affab1613bf1b29073d2674c5bc261331416bc3f7",
+          "sha256": "6ba3ed87e6ff9ca3863c48dcf0ddabf346d1fc97442e32c14791bf0947d81700",
+          "reason": "Authorized generic Matrix setup, explicit API/account evidence and recoverable owned configuration/provenance bindings.",
+          "evidence": [
+            "docs/guided-setup/matrix-implementation.md",
+            "tests/setup/matrix.test.mjs",
+            "tests/setup/setup.test.mjs",
+            "tests/test_matrix_configuration.py"
+          ]
+        },
+        {
+          "path": "src/lib/objects/repository-state.mjs",
+          "previousSha256": "69b33ca081231385612daad42946569b26502bdb3652a7f8e3a6158dc0e9c5f2",
+          "sha256": "d2a68c64195d0b20c9ea3327883ac52fe58a48872992301f915aa49da70762ed",
+          "reason": "Authorized generic Matrix setup, explicit API/account evidence and recoverable owned configuration/provenance bindings.",
+          "evidence": [
+            "docs/guided-setup/matrix-implementation.md",
+            "tests/setup/matrix.test.mjs",
+            "tests/setup/setup.test.mjs",
+            "tests/test_matrix_configuration.py"
+          ]
+        },
+        {
+          "path": "src/lib/application/compiler.mjs",
+          "previousSha256": "767cad5d83dadda67d4aae271cfc12d446bb8d4d79ba235b40e5d71eadfd5791",
+          "sha256": "0072e5933b563f5ad2681212e3af330a9225923acb049db2dbb21c783519b06d",
+          "reason": "Authorized generic Matrix setup, explicit API/account evidence and recoverable owned configuration/provenance bindings.",
+          "evidence": [
+            "docs/guided-setup/matrix-implementation.md",
+            "tests/setup/matrix.test.mjs",
+            "tests/setup/setup.test.mjs",
+            "tests/test_matrix_configuration.py"
+          ]
+        },
+        {
+          "path": "src/lib/application/migration.mjs",
+          "previousSha256": "ab05b73289dc799437f77cefd7ca7a6dede4d6c22398fbfc311fa32769de7d7e",
+          "sha256": "a1d91d169fba9c599e6a74ec9db1a6855c0cf45d21dd0dfff92df821895f667b",
+          "reason": "Authorized generic Matrix setup, explicit API/account evidence and recoverable owned configuration/provenance bindings.",
+          "evidence": [
+            "docs/guided-setup/matrix-implementation.md",
+            "tests/setup/matrix.test.mjs",
+            "tests/setup/setup.test.mjs",
+            "tests/test_matrix_configuration.py"
+          ]
+        },
+        {
+          "path": "src/lib/application/database.mjs",
+          "previousSha256": "f7836d817493150a1b8c6e0f5ea184f353710f7d7a215bcb25d650f243b6b7c3",
+          "sha256": "c9ee4923d8b96e2eb3fed46f56791ffef03f36f8f24a40ceda968cea7a2ae90d",
+          "reason": "Authorized generic Matrix setup, explicit API/account evidence and recoverable owned configuration/provenance bindings.",
+          "evidence": [
+            "docs/guided-setup/matrix-implementation.md",
+            "tests/setup/matrix.test.mjs",
+            "tests/setup/setup.test.mjs",
+            "tests/test_matrix_configuration.py"
+          ]
+        },
+        {
+          "path": "src/lib/application/model.mjs",
+          "previousSha256": "3ae3f18742fd25cbb7bac7a12e44c99220c0fab505c66948d09a415b2cce1035",
+          "sha256": "b33ea56c2dc4e4378d059ab047162f6227b64bb679851ec7b076b75cb06527ce",
+          "reason": "Authorized generic Matrix setup, explicit API/account evidence and recoverable owned configuration/provenance bindings.",
+          "evidence": [
+            "docs/guided-setup/matrix-implementation.md",
+            "tests/setup/matrix.test.mjs",
+            "tests/setup/setup.test.mjs",
+            "tests/test_matrix_configuration.py"
+          ]
+        },
+        {
+          "path": "src/lib/hub/resources.mjs",
+          "previousSha256": "099cc0499cc9275a5a5f43631b715ad2dd61d338aa93d97a15ddaf9436b2634c",
+          "sha256": "94ca304a4ee1f1a0bbae0b3230503989b6915a9890a2e45b1d4d563aad56d2ac",
+          "reason": "Authorized generic Matrix setup, explicit API/account evidence and recoverable owned configuration/provenance bindings.",
+          "evidence": [
+            "docs/guided-setup/matrix-implementation.md",
+            "tests/setup/matrix.test.mjs",
+            "tests/setup/setup.test.mjs",
+            "tests/test_matrix_configuration.py"
+          ]
+        },
+        {
+          "path": "src/lib/hub/controller.mjs",
+          "previousSha256": "ae4f80b6a15da2e4008c4bf091d2506f91dcec947eb7e59d885f096a73f09712",
+          "sha256": "e7cb817ea72504fb03b136b5fee9a16e6e526b2ce1eed092f248a94d406e1cd9",
+          "reason": "Authorized generic Matrix setup, explicit API/account evidence and recoverable owned configuration/provenance bindings.",
+          "evidence": [
+            "docs/guided-setup/matrix-implementation.md",
+            "tests/setup/matrix.test.mjs",
+            "tests/setup/setup.test.mjs",
+            "tests/test_matrix_configuration.py"
+          ]
+        },
+        {
+          "path": "src/components/hub/YourHubPage.tsx",
+          "previousSha256": "2638b28167b524d69fe7dc2b7cd39455de04a4a161e701873dcf8e468925a6e0",
+          "sha256": "4f2e194b2411db4d557f3d8359f3fa509984e8204bdf2414d72ca1ddfc3461e5",
+          "reason": "Authorized generic Matrix setup, explicit API/account evidence and recoverable owned configuration/provenance bindings.",
+          "evidence": [
+            "docs/guided-setup/matrix-implementation.md",
+            "tests/setup/matrix.test.mjs",
+            "tests/setup/setup.test.mjs",
+            "tests/test_matrix_configuration.py"
+          ]
+        },
+        {
+          "path": "src/components/hub/SetupPage.tsx",
+          "previousSha256": "30da8c549680fed04591fb48ef127eafde8af711fa687643b4eb361d5a1b7f4b",
+          "sha256": "139e4f47d6922f3da6832d0c1803a285bdd92ba23fa29c23061c1af18fdff674",
+          "reason": "Authorized generic Matrix setup, explicit API/account evidence and recoverable owned configuration/provenance bindings.",
+          "evidence": [
+            "docs/guided-setup/matrix-implementation.md",
+            "tests/setup/matrix.test.mjs",
+            "tests/setup/setup.test.mjs",
+            "tests/test_matrix_configuration.py"
+          ]
+        },
+        {
+          "path": "profiles/source-provenance.json",
+          "previousSha256": "2096b7d312715881d5c95bac3728e985c96df6fd468e992d7b43ab7c26ed8aea",
+          "sha256": "21e4ecba50c01335a0039e914e5a3f94403d43655d27ba3dd1f79aaa7ed5f2eb",
+          "reason": "Authorized generic Matrix setup, explicit API/account evidence and recoverable owned configuration/provenance bindings.",
+          "evidence": [
+            "docs/guided-setup/matrix-implementation.md",
+            "tests/setup/matrix.test.mjs",
+            "tests/setup/setup.test.mjs",
+            "tests/test_matrix_configuration.py"
+          ]
+        },
+        {
+          "path": "profiles/setup/catalog.schema.json",
+          "previousSha256": "60b3d672e592bd3929a2c525c494cff221ffbefe236712c8908dc82dcee1df44",
+          "sha256": "65dfba433c6ac8ec53535c2750bfadb350562dbd12d67f362538f01b05d1da18",
+          "reason": "Authorized generic Matrix setup, explicit API/account evidence and recoverable owned configuration/provenance bindings.",
+          "evidence": [
+            "docs/guided-setup/matrix-implementation.md",
+            "tests/setup/matrix.test.mjs",
+            "tests/setup/setup.test.mjs",
+            "tests/test_matrix_configuration.py"
+          ]
+        },
+        {
+          "path": "scripts/hub.mjs",
+          "previousSha256": "8e3ec4dbc680ca351643cea26b11aaa7f8c9688af9868020681ebf9584f5ed2f",
+          "sha256": "874f6814a4fdf6bc4872143d98f7f36a6a97360f584e6b587fc111709763f72d",
+          "reason": "Authorized generic Matrix setup, explicit API/account evidence and recoverable owned configuration/provenance bindings.",
+          "evidence": [
+            "docs/guided-setup/matrix-implementation.md",
+            "tests/setup/matrix.test.mjs",
+            "tests/setup/setup.test.mjs",
+            "tests/test_matrix_configuration.py"
+          ]
+        },
+        {
+          "path": "next.config.ts",
+          "previousSha256": "09b15e74827d05c653bf0e10722de48e8b5c8c27eb3e951950213275a1e80fdc",
+          "sha256": "7d1b54aaeb036815a64246225638775a52f77c4659767e98cda3d7acf7f75243",
+          "reason": "Authorized generic Matrix setup, explicit API/account evidence and recoverable owned configuration/provenance bindings.",
+          "evidence": [
+            "docs/guided-setup/matrix-implementation.md",
+            "tests/setup/matrix.test.mjs",
+            "tests/setup/setup.test.mjs",
+            "tests/test_matrix_configuration.py"
+          ]
+        },
+        {
+          "path": "package.json",
+          "previousSha256": "9c9ed40cc195b71d86f02b7f01fba18a5eb568372a7b59cc7005378a546ffd60",
+          "sha256": "651f117d09ceadb78577fa8260325f4d89c726dffd0132e2f59b2fcf8dd6a620",
+          "reason": "Authorized generic Matrix setup, explicit API/account evidence and recoverable owned configuration/provenance bindings.",
+          "evidence": [
+            "docs/guided-setup/matrix-implementation.md",
+            "tests/setup/matrix.test.mjs",
+            "tests/setup/setup.test.mjs",
+            "tests/test_matrix_configuration.py"
+          ]
+        }
+      ]
+    }
+  }
+}

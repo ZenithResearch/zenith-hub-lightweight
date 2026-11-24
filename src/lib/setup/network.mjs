@@ -14,7 +14,8 @@ export function endpoint(value) {
   check(
     u,
     typeof value === "string" &&
-      u.origin === value &&
+      value.trim() === value && /^https?:\/\//i.test(value) && !value.includes(String.fromCharCode(92)) &&
+      u.pathname === "/" &&
       !u.username &&
       !u.password &&
       !u.search &&
@@ -150,12 +151,21 @@ export async function probe(componentId, base, options = {}) {
       );
       check(
         login,
-        login.status === 200 && Array.isArray(login.value.flows),
+        (login.status === 200 && Array.isArray(login.value.flows)) || [404,405].includes(login.status),
         "matrix_login_unavailable",
       );
+      if (options.token) {
+        const who = await requestJSON(base, "/_matrix/client/v3/account/whoami", options);
+        if (who.status === 401) return {apiAvailable:true, applicationReady:false, permission:"session-expired", contract:"matrix-client-api"};
+        if (who.status === 403) return {apiAvailable:true, applicationReady:false, permission:"access_denied", contract:"matrix-client-api"};
+        check(who, who.status === 200 && typeof who.value.user_id === "string", "matrix_identity_unverified");
+        return {apiAvailable:true, applicationReady:true, permission:"authenticated", userId:who.value.user_id, deviceId:who.value.device_id, contract:"matrix-client-api", matrixVersions:a.value.versions, loginFlows:login.value.flows||[]};
+      }
       return {
         matrixVersions: a.value.versions,
-        applicationReady: true,
+        applicationReady: false,
+        apiAvailable: true,
+        loginFlows: login.value.flows || [],
         contract: "matrix-client-api",
         permission: "login-required",
       };

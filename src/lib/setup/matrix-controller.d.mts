@@ -1,0 +1,1 @@
+export function createMatrixController(options?:Record<string,unknown>):{admit(request:{url:string;headers:Headers},write?:boolean):void;get(request:{url:string;headers:Headers}):Promise<unknown>;post(request:{url:string;headers:Headers},body:unknown):Promise<unknown>};

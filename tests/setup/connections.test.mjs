@@ -8,11 +8,11 @@ const candidate = { componentId: "matrix", endpoint: "http://127.0.0.1:8008/", o
 test("registered endpoints are connected rows without duplicate connect actions", () => {
   const rows = communicationRows([saved], [candidate], [], { now });
   assert.equal(rows.length, 1);
-  assert.equal(rows[0].status, "Connected");
+  assert.equal(rows[0].status, "API available · sign in required");
   assert.equal(rows[0].action, "manage");
   const local = { ...saved, mode: "install", installed: true, running: true, config: { port: 19408 } };
   assert.equal(serviceEndpoint(local), "http://127.0.0.1:19408");
-  assert.equal(communicationRows([local], [], [], { now })[0].status, "Connected");
+  assert.equal(communicationRows([local], [], [], { now })[0].status, "API available · sign in required");
 });
 test("reachability is an available service, and a draft choice is selected rather than connected", () => {
   assert.equal(communicationRows([], [candidate], [], { now })[0].action, "choose");
@@ -28,7 +28,7 @@ test("saved offline, stopped, stale, unauthenticated and incomplete resources ne
     [{ ...saved, observation: { ...observation, reachable: false } }, "Connection saved · unavailable"],
     [{ ...saved, mode: "install", installed: true, running: false, config: { port: 19408 } }, "Stopped"],
     [{ ...saved, stale: true }, "Connection saved · checking"],
-    [{ ...saved, observation: { ...observation, permission: "credential-required" } }, "Credentials required"],
+    [{ ...saved, observation: { ...observation, permission: "credential-required" } }, "API available · sign in required"],
     [{ ...saved, partial: true }, "Setup incomplete"],
   ]) {
     const row = communicationRows([item], [], [], { now })[0];

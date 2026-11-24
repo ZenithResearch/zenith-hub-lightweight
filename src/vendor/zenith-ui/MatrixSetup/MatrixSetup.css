@@ -1,0 +1,19 @@
+.zn-matrix-setup { color:#153e86; font:13px/1.65 system-ui,sans-serif; overflow-wrap:anywhere; }
+.zn-matrix-setup header,.zn-matrix-setup__actions { display:flex;align-items:center;gap:12px;justify-content:space-between;flex-wrap:wrap; }
+.zn-matrix-setup h3,.zn-matrix-setup h4 { font-family:ui-monospace,monospace;color:#092f93; }
+.zn-matrix-setup label { display:grid;gap:6px;margin:14px 0; }
+.zn-matrix-setup input,.zn-matrix-setup select { max-width:100%;box-sizing:border-box;background:white;color:#153e86;border:1px solid #9ab6e7;padding:10px;font:inherit; }
+.zn-matrix-setup button { border:1px solid #174ac4;color:#092f93;background:#fff;padding:9px 13px;font:600 12px/1.5 ui-monospace,monospace;cursor:pointer; }
+.zn-matrix-setup button:disabled { opacity:.5;cursor:default; }
+.zn-matrix-setup button[aria-pressed=true] { background:#e2edff; }
+.zn-matrix-setup details,.zn-matrix-setup>section { border-top:1px solid #bdcdec;margin-top:20px;padding-top:14px; }
+.zn-matrix-setup summary { cursor:pointer;font-weight:600; }
+.zn-matrix-setup__evidence { list-style:none;padding:0;display:grid;gap:8px; }
+.zn-matrix-setup__evidence li { display:flex;justify-content:space-between;gap:12px;border-bottom:1px solid #d8e4f8;padding:6px 0; }
+.zn-matrix-setup__review { background:#f1f6ff;padding:18px;border:1px solid #9ab6e7; }
+.zn-matrix-setup .zn-matrix-setup__check { display:flex;align-items:start;gap:8px; }
+.zn-matrix-setup pre { white-space:pre-wrap;max-height:240px;overflow:auto;font-size:11px; }
+.zn-matrix-setup dl { display:grid;gap:8px; }.zn-matrix-setup dd { margin:0; }
+.zn-matrix-setup small { display:block; }.zn-matrix-setup__error { color:#8d3323;background:#fff0e9;padding:10px; }
+.zn-matrix-setup__rooms { list-style:none;padding:0; }.zn-matrix-setup__rooms li { margin:10px 0;display:grid;gap:5px; }.zn-matrix-setup__rooms button { text-align:left; }
+@media(max-width:600px){.zn-matrix-setup__evidence li{display:grid;gap:2px;}}

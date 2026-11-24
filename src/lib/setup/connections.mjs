@@ -32,9 +32,11 @@ export function communicationRows(instances, candidates, selection, { stale = fa
     let status, detail, action;
     if (instance) {
       action = "manage";
-      if (instance.partial || instance.mode !== "connect" && instance.installed !== true) status = "Setup incomplete";
+      if (instance.enabled === false) status = "Disconnected";
+      else if (instance.partial || instance.mode !== "connect" && instance.installed !== true) status = "Setup incomplete";
       else if (!fresh) status = "Connection saved · checking";
       else if (instance.mode === "install" && instance.running === false) status = "Stopped";
+      else if (row.componentId === "matrix" && observation?.reachable === true) status = observation.permission === "authenticated" && observation.applicationReady === true ? "Account authenticated" : observation.permission === "session-expired" ? "Session expired · sign in" : "API available · sign in required";
       else if (observation?.reachable === true) status = ["credential-required", "authentication_failed", "access_denied"].includes(observation.permission) ? "Credentials required" : "Connected";
       else status = "Connection saved · unavailable";
     } else {

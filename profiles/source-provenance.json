@@ -422,5 +422,22 @@
         "sha256": "de138b9440d84fcfff75589f091cb1358a37b8c0242f28dc2621ba02b26ec3ca"
       }
     ]
+  },
+  {
+    "repository": "https://github.com/ZenithResearch/zenith-ui-deployment",
+    "commit": "57b302248b777b9c9b4f726ca226a685bf0052e6",
+    "scope": "Generic reviewed Matrix setup presentation",
+    "files": [
+      {
+        "path": "src/vendor/zenith-ui/MatrixSetup/MatrixSetup.tsx",
+        "upstream_path": "src/MatrixSetup/MatrixSetup.tsx",
+        "sha256": "833403c5188127acf74d3110d12bec3b8a99f84ecf13f561bb016df69c6c24a3"
+      },
+      {
+        "path": "src/vendor/zenith-ui/MatrixSetup/MatrixSetup.css",
+        "upstream_path": "src/MatrixSetup/MatrixSetup.css",
+        "sha256": "b012e90f374deae855a86d09716feb8d06dd9273b072f1041a10905fa2c00d6c"
+      }
+    ]
   }
 ]

@@ -1,3 +1,4 @@
+import {endpoint} from '../setup/network.mjs';
 import {operatorCsrf} from '../operator-session.mjs';
 import {randomBytes} from 'node:crypto';
 import {check,digest} from '../setup/catalog.mjs';
@@ -88,7 +89,7 @@ export function createHubController({env=process.env,setup,connections=resourceC
         const current=await setup.get(request);check(current,current.revision===body.expectedRevision,'setup_revision_changed');
         const overview=await snapshot(request,true);
         check(body,!overview.resources.some(r=>r.instanceId===body.instanceId&&r.source==='setup'),'resource_already_registered');
-        const candidate=body.config?.endpoint;
+        const candidate=body.config?.endpoint?endpoint(body.config.endpoint).origin:null;
         check(body,!candidate||!overview.resources.some(r=>r.componentId===body.componentId&&r.endpoint===candidate),'connection_already_registered');
         const out=await setupPost(request,{operation:'plan',action:body.prepareArtifacts?'prepare-artifacts':body.mode==='connect'?'connect':'install',expectedRevision:current.revision,
           selection:[{instanceId:body.instanceId,componentId:body.componentId,mode:body.mode,config:body.config,...(body.recipeId?{recipeId:body.recipeId}:{})}]},current);

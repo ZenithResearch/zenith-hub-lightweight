@@ -1,5 +1,5 @@
 """Allowlisted per-instance native adapter. No shell commands or provider databases."""
-import argparse, hashlib, json, os, shutil, signal, subprocess, sys, time, uuid, venv, tarfile
+import argparse, hashlib, json, os, shutil, signal, subprocess, sys, time, uuid, venv, tarfile, secrets
 from pathlib import Path
 
 def digest(p): return hashlib.sha256(p.read_bytes()).hexdigest()
@@ -52,32 +52,82 @@ def install(plan, root):
     venv.EnvBuilder(with_pip=True).create(root/'venv')
     execute([root/'venv/bin/python','-I','-m','pip','install','--no-index','--no-deps','--no-compile',*sorted((root/'wheels').glob('*.whl'))],root)
     execute([root/'venv/bin/python','-I','-m','pip','check'],root)
-    save(root/'receipt.json', {'schema':'zenith.hub-component-receipt.v1','instanceId':plan['instanceId'],'componentId':plan['componentId'],'planDigest':plan['digest'],'installed':True,'configured':False,'root':str(root),'controllerSha256':digest(root/'controller.py'),'artifacts':artifacts})
+    save(root/'receipt.json', {'schema':'zenith.hub-component-receipt.v1','instanceId':plan['instanceId'],'componentId':plan['componentId'],'planDigest':plan['digest'],'installed':True,'copyId':uuid.uuid4().hex,'configured':False,'root':str(root),'controllerSha256':digest(root/'controller.py'),'artifacts':artifacts,**({'provenance':{'sourceArchive':plan['runtimePins']['source']}} if plan.get('componentId')=='matrix' and plan.get('runtimePins',{}).get('source') else {})})
     save(root/'operation.json', {'state':'installed','planDigest':plan['digest']})
 
-def configure(plan,root):
+def _configure(plan,root):
  receipt=read(root/'receipt.json');assert receipt['componentId']==plan['componentId'];config=plan['config'];kind=plan['componentId']
  if receipt['configured']:
   assert read(root/'config/selection.json')==config,'configuration_changed_requires_separate_migration'
   assert not owned(root),'stop_before_binding_refresh'
+  if kind=='matrix' and receipt.get('configProof'):
+   proof=receipt['configProof'];assert digest(root/'config/homeserver.yaml')==proof['configurationSha256'] and digest(Path(proof['signingKeyPath']))==proof['signingKeySha256'],'matrix_configuration_changed_reconcile'
   assert digest(root/'controller.py')==receipt['controllerSha256'],'existing_controller_changed'
   shutil.copyfile(__file__,root/'controller.py');receipt['controllerSha256']=digest(root/'controller.py');receipt['bindingPlanDigest']=plan['digest'];save(root/'receipt.json',receipt)
   return
  if kind=='matrix':
-  previous=root/'config/homeserver.yaml'
-  if previous.exists():raise RuntimeError('matrix_identity_partial_configuration_reconcile')
-  execute([root/'venv/bin/python','-m','synapse.app.homeserver','--server-name',config['serverName'],'--config-path',previous,'--generate-config','--report-stats=no'],root)
-  # PyYAML belongs to the installed Synapse environment, not the system interpreter.
-  execute([root/'venv/bin/python','-I',root/'controller.py','_matrix-config','--plan',plan['planFile']],root)
+  previous=root/'config/homeserver.yaml'; intent=root/'config/matrix-identity.json'
+  expected={'instanceId':plan['instanceId'],'componentId':'matrix','serverName':config['serverName'],'configuration':config,'root':str(root),'artifacts':receipt['artifacts']}
+  if intent.exists():
+   assert read(intent)==expected,'matrix_identity_changed_requires_reconciliation'
+  else:
+   assert not previous.exists() and not list(root.rglob('*.signing.key')) and not (root/'data/homeserver.db').exists(),'matrix_unowned_configuration_reconcile'
+   save(intent,expected)
+  assert not owned(root),'stop_before_configuration'
+  if not previous.exists():
+   assert not list(root.rglob('*.signing.key')) and not (root/'data/homeserver.db').exists(),'matrix_partial_identity_reconcile'
+   execute([root/'venv/bin/python','-m','synapse.app.homeserver','--server-name',config['serverName'],'--config-path',previous,'--generate-config','--report-stats=no'],root)
+  # Never regenerate retained signing material. Validate and resume this exact reviewed intent.
+  execute([root/'venv/bin/python','-I',Path(__file__).absolute(),'_matrix-config','--plan',plan['planFile']],root)
+  receipt['configProof']=read(root/'config/matrix-config-proof.json')
+  shutil.copyfile(__file__,root/'controller.py');receipt['controllerSha256']=digest(root/'controller.py')
  elif kind=='frank':
   save(root/'config/frank.json',{'schema':'frank.config.v1','environment':'production','runtime_endpoint':config.get('endpoint','http://127.0.0.1:18092'),'journal':str(root/'data/frank.db'),'allow_local_dev_untrusted':False,'integrations':{'schema':'frank.integrations.v1','integrations':[],'actors':[]}})
  save(root/'config/selection.json',config);receipt['configured']=True;save(root/'receipt.json',receipt)
+def configure(plan,root):
+ if plan['componentId']!='matrix':return _configure(plan,root)
+ lock=root/'config/configuration-lock.json';token=uuid.uuid4().hex
+ def stamp(pid):
+  result=subprocess.run(['/bin/ps','-p',str(pid),'-o','lstart=,comm='],capture_output=True,text=True)
+  assert result.returncode in (0,1),'matrix_configuration_process_unknown'
+  return result.stdout.strip() if result.returncode==0 else None
+ if lock.exists():
+  previous=read(lock);assert previous.get('root')==str(root) and previous.get('instanceId')==plan['instanceId'] and isinstance(previous.get('pid'),int),'matrix_configuration_lock_unresolved'
+  if stamp(previous['pid'])==previous.get('processStamp'):raise RuntimeError('matrix_configuration_still_running')
+  lock.unlink()
+ fd=os.open(lock,os.O_WRONLY|os.O_CREAT|os.O_EXCL,0o600)
+ with os.fdopen(fd,'w') as f:
+  json.dump({'schema':'zenith.hub-configure-lock.v1','root':str(root),'instanceId':plan['instanceId'],'pid':os.getpid(),'processStamp':stamp(os.getpid()),'token':token},f);f.flush();os.fsync(f.fileno())
+ try:return _configure(plan,root)
+ finally:
+  if lock.exists() and read(lock).get('token')==token:lock.unlink()
+
 def matrix_config(plan,root):
  import yaml
- p=root/'config/homeserver.yaml';y=yaml.safe_load(p.read_text());config=plan['config'];assert y['server_name']==config['serverName']
+ p=root/'config/homeserver.yaml';assert not p.is_symlink() and p.resolve().is_relative_to(root.resolve()),'matrix_configuration_outside_instance';y=yaml.safe_load(p.read_text());config=plan['config'];assert y['server_name']==config['serverName']
+ key=Path(y['signing_key_path']);key=key if key.is_absolute() else root/key
+ assert key.resolve().is_relative_to(root.resolve()) and key.is_file() and not key.is_symlink(),'matrix_signing_identity_unresolved'
+ key.chmod(0o600)
+ # An interrupted server may have been started outside the Hub. Never redirect
+ # its existing database/media to empty default locations during recovery.
+ database=y.get('database',{})
+ if database.get('name')=='sqlite3' and database.get('args',{}).get('database'):
+  old=Path(database['args']['database']);old=old if old.is_absolute() else root/old
+  assert old.resolve().is_relative_to(root.resolve()),'matrix_external_database_reconcile'
+  assert not old.is_symlink(),'matrix_unsafe_database'
+  assert not old.exists() or old==root/'data/homeserver.db','matrix_existing_database_location_reconcile'
+ if y.get('media_store_path'):
+  media=Path(y['media_store_path']);media=media if media.is_absolute() else root/media
+  assert media.resolve().is_relative_to(root.resolve()) and not media.is_symlink(),'matrix_external_media_reconcile'
+  assert not media.exists() or media==root/'data/media' or not any(media.iterdir()),'matrix_existing_media_location_reconcile'
+ if not y.get('registration_shared_secret'):y['registration_shared_secret']=secrets.token_hex(32)
  y.update({'pid_file':str(root/'data/homeserver.pid'),'media_store_path':str(root/'data/media'),'enable_registration':False,'report_stats':False,'database':{'name':'sqlite3','args':{'database':str(root/'data/homeserver.db')}},'listeners':[{'port':config['port'],'tls':False,'bind_addresses':['127.0.0.1'],'type':'http','x_forwarded':False,'resources':[{'names':['client']+(['federation'] if config.get('federation') else []),'compress':False}]}]})
  if not config.get('federation'):y['federation_domain_whitelist']=[]
- p.write_text(yaml.safe_dump(y));p.chmod(0o600)
+ # Atomic publication prevents a torn YAML file on retry.
+ temp=p.with_suffix('.yaml.next-'+uuid.uuid4().hex)
+ with temp.open('x') as f:temp.chmod(0o600);f.write(yaml.safe_dump(y));f.flush();os.fsync(f.fileno())
+ os.replace(temp,p)
+ save(root/'config/matrix-config-proof.json',{'serverName':config['serverName'],'configurationSha256':digest(p),'signingKeyPath':str(key),'signingKeySha256':digest(key)})
 def owned(root):
  marker=root/'process.json'
  if not marker.exists():return None

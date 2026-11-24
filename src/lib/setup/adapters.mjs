@@ -1,8 +1,9 @@
+import {readMatrixSession} from "./matrix-session.mjs";
 import { matrixAdapter } from "./matrix.mjs";
 import { pythonPreflight, verifyExecutable } from "./preflight.mjs";
 import { readFile, lstat, access, mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
-import { spawn } from "node:child_process";
+import { spawn, spawnSync } from "node:child_process";
 import { createServer } from "node:net";
 import { tailscaleAdapter } from "./tailscale.mjs";
 import { vpsAdapter } from "./vps.mjs";
@@ -384,12 +385,24 @@ export function adapters({
     return (await readPrivate(ref, 4096)).trim();
   }
   async function token(item) {
+    if(item.componentId==="matrix"){const session=await readMatrixSession(root,item);if(session)return session.token;}
     return item.componentId === "hermes" && item.mode !== "connect"
       ? hermes.token(item)
       : secret(item.config);
   }
   return {
     prepare,
+    async configurationActive(item) {
+      try {
+        const marker=JSON.parse(await readPrivate(path.join(item.root,"config/configuration-lock.json")));
+        check(marker,marker.schema==="zenith.hub-configure-lock.v1"&&marker.root===item.root&&marker.instanceId===item.instanceId&&Number.isSafeInteger(marker.pid)&&marker.pid>0,"matrix_configuration_lock_unresolved");
+        const result=spawnSync("/bin/ps",["-p",String(marker.pid),"-o","lstart=,comm="],{encoding:"utf8",timeout:5000});
+        if(result.error)return null;
+        if(result.status===1)return false;
+        if(result.status!==0||!result.stdout.trim())return null;
+        return result.stdout.trim()===marker.processStamp;
+      } catch(error) { if(error.code==="ENOENT")return false;throw error; }
+    },
     async installerActive(marker, instanceRoot) {
       if (
         !Number.isSafeInteger(marker.installerPid) ||

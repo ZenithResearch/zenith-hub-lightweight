@@ -1,0 +1,130 @@
+{
+  "schema": "zenith.hub-matrix-validation.v1",
+  "status": "implemented-and-fixture-qualified",
+  "checkedAt": "2026-11-24T06:14:14.925064+00:00",
+  "baseHubCommit": "a286cc0072ee1c0cc915934d59ef038f565b0967",
+  "branch": "codex/matrix-setup",
+  "canonicalUICommit": "57b302248b777b9c9b4f726ca226a685bf0052e6",
+  "checks": {
+    "javascript": {
+      "command": "node --test tests/*/*.test.mjs",
+      "passed": 344,
+      "failed": 0
+    },
+    "python": {
+      "command": "python -m unittest discover -s tests -p 'test_*.py'",
+      "run": 71,
+      "skipped": 1,
+      "failed": 0,
+      "skip": "Existing installed-Hermes opt-in fixture; no model inference requested."
+    },
+    "contractChecks": 68,
+    "designChecks": 32,
+    "hubTypecheckAndProductionBuild": "passed",
+    "uiTypecheckBuildAndSixExistingTests": "passed",
+    "sourceAndCatalogPins": "passed",
+    "npmAuditVulnerabilities": 0,
+    "httpModes": [
+      {
+        "mode": "production",
+        "passed": true,
+        "checks": [
+          "reviewed-save-normalized-endpoint",
+          "API-is-not-authentication",
+          "verified-account",
+          "room-selection",
+          "review-and-session-survive-server-restart",
+          "explicit-send-and-read",
+          "cross-origin-rejected",
+          "gallery-served"
+        ],
+        "liveServerTouched": false
+      },
+      {
+        "mode": "standalone",
+        "passed": true,
+        "checks": [
+          "reviewed-save-normalized-endpoint",
+          "API-is-not-authentication",
+          "verified-account",
+          "room-selection",
+          "review-and-session-survive-server-restart",
+          "explicit-send-and-read",
+          "cross-origin-rejected",
+          "gallery-served"
+        ],
+        "liveServerTouched": false
+      },
+      {
+        "mode": "development",
+        "passed": true,
+        "checks": [
+          "reviewed-save-normalized-endpoint",
+          "API-is-not-authentication",
+          "verified-account",
+          "room-selection",
+          "review-and-session-survive-server-restart",
+          "explicit-send-and-read",
+          "cross-origin-rejected",
+          "gallery-served"
+        ],
+        "liveServerTouched": false
+      }
+    ],
+    "legacyRecovery": {
+      "command": "node --test tests/setup/matrix-legacy.test.mjs",
+      "passed": 4,
+      "failed": 0,
+      "scope": "Retained-identity review/apply, changed-evidence rejection, unknown ownership/foreign-key rejection and concurrent writer exclusion; disposable filesystem fixtures."
+    }
+  },
+  "nativeConfigurationFixtures": [
+    "identity intent and atomic configuration publication",
+    "interrupted generation resumes without regenerating signing keys",
+    "database/media preserved; foreign locations and keys rejected",
+    "process-stamped exclusive configuration lock",
+    "Hub reconcile -> explicit reviewed configure retry -> completed prior intent",
+    "explicit legacy review/apply preserves YAML/key/database and shares the native writer lock"
+  ],
+  "managementFixtures": [
+    "owned wrapper start stamp and Synapse child/configuration verified",
+    "actual child listening-port ownership required before local administrative secret use",
+    "foreign listener and reused process identities rejected"
+  ],
+  "preservation": {
+    "preserved": true,
+    "tablesCompared": 33,
+    "changedTables": [],
+    "persistentSettingsAndCredentialsChanged": [],
+    "representationsCompared": 149,
+    "changedRepresentations": [],
+    "sqliteQuickCheck": "ok",
+    "hubAndHermesProcessIdentitiesUnchanged": true,
+    "schemaVersion": 5,
+    "generation": 37,
+    "repositoryIdentityUnchanged": true,
+    "noSchemaMigration": true,
+    "comparison": "Direct read-only comparison with the saved pre-update SQLite database and representation manifest; private settings/credentials compared to the pre-implementation hash baseline."
+  },
+  "compatibility": {
+    "mode": "additive private Matrix binding; existing v5 repository and trusted definitions unchanged",
+    "sqlSchemaVersion": 5,
+    "migrationRequired": false,
+    "ontologyChanges": false,
+    "unknownProvenance": "No fabricated Git snapshot for source archives; native archive facts retained and known wheel builds pinned exactly."
+  },
+  "liveQualification": {
+    "existingHub": "Read-only preservation verification; no deployment or migration.",
+    "existingMatrix8008": "Public versions/login discovery only; no adoption, account, room or message changes.",
+    "newNativeSynapseInstall": false,
+    "remoteHTTPSAuthentication": false,
+    "encryptedMessaging": false
+  },
+  "limitations": [
+    "Managed local source build/startup and real first-account provisioning were not rerun against a new native Synapse instance; native qualification here uses disposable file/process fixtures.",
+    "Delegated OAuth/SSO/interactive registration and automatic token refresh require a compatible external client; explicit access-token sessions are supported.",
+    "E2EE device, key and encrypted message handling requires an external Matrix client and remains unverified by this Hub.",
+    "Room projection is bounded to 100 joined rooms and 200 member states per room; incomplete or inaccessible views are marked.",
+    "No VPS, DNS, public TLS, federation rollout, application-specific templates, bots or intake workflows were added."
+  ]
+}
