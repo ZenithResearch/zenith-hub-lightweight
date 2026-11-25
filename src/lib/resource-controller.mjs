@@ -1,3 +1,4 @@
+import {serviceMonitor} from './hub/monitoring.mjs';
 import {operatorCsrf} from './operator-session.mjs';
 import {OperatorError} from "./pilot-controller.mjs";
 import {readAction} from "./operator-http.mjs";
@@ -36,15 +37,21 @@ export function createResourceController({env=process.env,fetcher=fetch,now=Date
   async function inspect(r) {
     let result=empty(r);
     if(!r.enabled)return result;
+    const monitor=serviceMonitor(env, 'connections:'+r.id);
     try {
-      const health=await read(r.endpoint+"/ready");
+      const health=await monitor('Readiness',()=>read(r.endpoint+"/ready"),r=>r.ready===true?null:'Service not ready');
       if(health.ready!==true)return {...result,state:"not_ready",observedAt:new Date(now()).toISOString()};
-      const token=(await privateBytes(r.credentialFile,128)).toString("utf8").trim();
-      if(!/^dgread1_[A-Za-z0-9_-]{43}$/.test(token))throw new OperatorError("unsafe_resource_credential");
+      const token=await monitor('Credential',async()=>{
+        const value=(await privateBytes(r.credentialFile,128)).toString("utf8").trim();
+        if(!/^dgread1_[A-Za-z0-9_-]{43}$/.test(value))throw new OperatorError("unsafe_resource_credential");
+        return value;
+      });
+      await monitor("Read work",async()=>{
       const page=await read(r.endpoint+"/work/Task?limit=1",{Accept:"application/json",Authorization:"Bearer "+token});
       if(!page || !Array.isArray(page.items) || page.items.length>1 ||
          page.items.some(v=>!v || typeof v!=="object" || Array.isArray(v)))
         throw Object.assign(new Error(),{resourceState:"incompatible_contract"});
+      });
       result={...result,ready:true,connected:true,state:"connected"};
     } catch(e) {
       const unsafe=e instanceof OperatorError && ["unsafe_resource_file","unsafe_resource_credential"].includes(e.code);

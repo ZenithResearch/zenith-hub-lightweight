@@ -1,4 +1,5 @@
 /** Bounded, redirect-free resource requests. Remote DNS is resolved and pinned per request. */
+import {unchecked} from "../hub/monitoring.mjs";
 import http from "node:http";
 import https from "node:https";
 import { lookup } from "node:dns/promises";
@@ -132,10 +133,25 @@ export async function probe(componentId, base, options = {}) {
       contract: "not-tested",
       error: null,
     };
+  const monitor = options.monitor || unchecked;
+  function read(step, route, opts, valid = () => true, optional = []) {
+    return monitor(step, () => requestJSON(base, route, opts), reply => {
+      if (optional.includes(reply.status)) return null;
+      if (reply.status !== 200) return 'HTTP ' + reply.status;
+      return valid(reply.value) ? null : 'Unexpected response';
+    });
+  }
+  const liveReady = async () => {
+    const live = await read('Liveness', '/live', options);
+    check(live, live.status === 200, 'service_unreachable');
+    const ready = await monitor('Readiness', () => requestJSON(base, '/ready', options), reply =>
+      reply.status !== 200 ? 'HTTP ' + reply.status : reply.value?.ready === true ? null : 'Service not ready');
+    return {applicationReady:ready.status === 200 && ready.value.ready === true, contract:'liveness-only'};
+  };
   const probes = {
     matrix: async () => {
       const matrixOptions = {timeout:15000, ...options};
-      const a = await requestJSON(base, "/_matrix/client/versions", matrixOptions);
+      const a = await read('Server versions', '/_matrix/client/versions', matrixOptions, v => Array.isArray(v?.versions) && v.versions.some(x => /^v\d+\.\d+$|^r0\./.test(x)));
       check(
         a,
         a.status === 200 &&
@@ -147,13 +163,13 @@ export async function probe(componentId, base, options = {}) {
       );
       // The identity endpoint proves a saved session independently of sign-in discovery.
       const readLogin = async () => {
-        const login = await requestJSON(base, "/_matrix/client/v3/login", matrixOptions);
+        const login = await read('Sign-in methods', '/_matrix/client/v3/login', matrixOptions, v => Array.isArray(v?.flows), [404,405]);
         check(login, (login.status === 200 && Array.isArray(login.value.flows)) ||
           [404,405].includes(login.status), "matrix_login_unavailable");
         return login.value.flows || [];
       };
       if (options.token) {
-        const who = await requestJSON(base, "/_matrix/client/v3/account/whoami", matrixOptions);
+        const who = await read('Account identity', '/_matrix/client/v3/account/whoami', matrixOptions, v => typeof v?.user_id === 'string');
         if (who.status === 401) return {apiAvailable:true, applicationReady:false, permission:"session-expired", contract:"matrix-client-api"};
         if (who.status === 403) return {apiAvailable:true, applicationReady:false, permission:"access_denied", contract:"matrix-client-api"};
         check(who, who.status === 200 && typeof who.value.user_id === "string", "matrix_identity_unverified");
@@ -169,7 +185,7 @@ export async function probe(componentId, base, options = {}) {
       };
     },
     hermes: async () => {
-      const a = await requestJSON(base, "/health", options);
+      const a = await read('Health', '/health', options, v => v?.platform === 'hermes-agent' && v.status === 'ok');
       check(
         a,
         a.status === 200 &&
@@ -177,7 +193,7 @@ export async function probe(componentId, base, options = {}) {
           a.value.status === "ok",
         "incompatible_hermes",
       );
-      const c = await requestJSON(base, "/v1/capabilities", options);
+      const c = await read('Capabilities', '/v1/capabilities', options, v => v?.object === 'hermes.api_server.capabilities');
       if (c.status === 401 || c.status === 403)
         return { applicationReady: false, permission: "credential-required" };
       check(
@@ -193,34 +209,18 @@ export async function probe(componentId, base, options = {}) {
         chatAvailable: true,
       };
     },
-    "service-management": async () => {
-      const a = await requestJSON(base, "/live", options);
-      const b = await requestJSON(base, "/ready", options);
-      check(a, a.status === 200, "service_unreachable");
-      return {
-        applicationReady: b.status === 200 && b.value.ready === true,
-        contract: "liveness-only",
-      };
-    },
-    "process-runtime": async () => {
-      const a = await requestJSON(base, "/live", options);
-      const b = await requestJSON(base, "/ready", options);
-      check(a, a.status === 200, "runtime_unreachable");
-      return {
-        applicationReady: b.status === 200 && b.value.ready === true,
-        contract: "liveness-only",
-      };
-    },
+    "service-management": liveReady,
+    "process-runtime": liveReady,
     devgraph: async () => {
-      const a = await requestJSON(base, "/ready", options);
+      const a = await read('Readiness', '/ready', options, v => v?.ready === true);
       check(
         a,
         a.status === 200 && a.value.ready === true,
         "devgraph_not_ready",
       );
       if (!options.token)
-        return { applicationReady: false, permission: "credential-required" };
-      const b = await requestJSON(base, "/work/Task?limit=1", options);
+        return monitor('Credential', async () => ({ applicationReady:false, permission:'credential-required' }), () => 'Credential required');
+      const b = await read('Read work', '/work/Task?limit=1', options, v => Array.isArray(v?.items));
       check(
         b,
         b.status === 200 && Array.isArray(b.value.items),

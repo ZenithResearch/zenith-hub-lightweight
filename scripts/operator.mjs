@@ -35,6 +35,19 @@ const child = spawn(
     shell: false,
   },
 );
+// Use the same coalesced, read-only overview as Settings when no browser is open.
+let checking=false;
+const monitorTimer=process.env.ZENITH_HUB_SERVER_INSTANCE ? setInterval(async()=>{
+  if(checking)return;
+  checking=true;
+  try {
+    const response=await fetch('http://127.0.0.1:'+port+'/api/hub',{redirect:'error',signal:AbortSignal.timeout(55000)});
+    await response.arrayBuffer();
+    if(!response.ok)console.warn('Scheduled Hub overview returned HTTP',response.status);
+  } catch { console.warn('Scheduled Hub overview unavailable'); }
+  finally { checking=false; }
+},60000) : null;
+monitorTimer?.unref();
 for (const signal of ["SIGTERM", "SIGINT"])
-  process.on(signal, () => child.kill(signal));
+  process.on(signal, () => {if(monitorTimer)clearInterval(monitorTimer);child.kill(signal);});
 child.on("exit", (code) => process.exit(code ?? 1));

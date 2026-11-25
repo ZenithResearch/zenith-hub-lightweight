@@ -416,16 +416,6 @@
         "path": "src/vendor/zenith-ui/MainHub/HubNavigation.tsx",
         "upstream_path": "src/MainHub/HubNavigation.tsx",
         "sha256": "0bf2d12a7d78c587cfaf6c791aed832d4ac85944ce6d0aa3de2638e7385ae343"
-      },
-      {
-        "path": "src/vendor/zenith-ui/YourHub/YourHub.tsx",
-        "upstream_path": "src/YourHub/YourHub.tsx",
-        "sha256": "77a281999e8116465321f7cf03301aa46c4761d198af4690da070f3afd616b1c"
-      },
-      {
-        "path": "src/vendor/zenith-ui/YourHub/YourHub.css",
-        "upstream_path": "src/YourHub/YourHub.css",
-        "sha256": "191d8eb7dbc3d167f0b0e930f82e40a06d6360225243918c12005c0be7d2020f"
       }
     ]
   },
@@ -517,6 +507,27 @@
         "path": "src/vendor/zenith-ui/MatrixChat/MatrixStart.tsx",
         "sha256": "7b2f4d38019478b1c89496582d1f58e5c9eee657a62395d200e622686f88200a",
         "upstream_path": "src/MatrixChat/MatrixStart.tsx"
+      }
+    ]
+  },
+  {
+    "repository": "https://github.com/ZenithResearch/zenith-ui-deployment",
+    "commit": "14e29b4c5fa3246ebacfd10e5808f8244fdc6cad",
+    "files": [
+      {
+        "path": "src/vendor/zenith-ui/YourHub/MonitoringHistory.tsx",
+        "upstream_path": "src/YourHub/MonitoringHistory.tsx",
+        "sha256": "c3b019911d7794051739deaa0bf1ce36a432a19504da2f3b4e55bf944d001fe0"
+      },
+      {
+        "path": "src/vendor/zenith-ui/YourHub/YourHub.tsx",
+        "upstream_path": "src/YourHub/YourHub.tsx",
+        "sha256": "aab8fcace5d04c96cbb7234725e9c650217b3fad459398534bf27aa4ff596888"
+      },
+      {
+        "path": "src/vendor/zenith-ui/YourHub/YourHub.css",
+        "upstream_path": "src/YourHub/YourHub.css",
+        "sha256": "a8635c1dd0d8926e5d9c02bc8fabd2003cbfc3b4199d91a5ddeb9d8c59567a0b"
       }
     ]
   }

@@ -2,6 +2,7 @@ import {readMatrixSession} from "./matrix-session.mjs";
 import { matrixAdapter } from "./matrix.mjs";
 import { pythonPreflight, verifyExecutable } from "./preflight.mjs";
 import { readFile, lstat, access, mkdir, writeFile } from "node:fs/promises";
+import {serviceMonitor} from "../hub/monitoring.mjs";
 import path from "node:path";
 import { spawn, spawnSync } from "node:child_process";
 import { createServer } from "node:net";
@@ -500,6 +501,7 @@ export function adapters({
           ? item.config.endpoint
           : "http://127.0.0.1:" + item.config.port;
       return netProbe(item.componentId, base, {
+        monitor:serviceMonitor(env, 'setup:' + item.instanceId),
         token: await token(item).catch(() => undefined),
         allowPrivateHosts: (env.ZENITH_SETUP_PRIVATE_HOSTS || "")
           .split(",")

@@ -1,3 +1,16 @@
+
+.zn-history {background:#fff;color:#15335d;padding:clamp(16px,3vw,32px);border:1px solid var(--hub-line);margin-top:1rem;}
+.zn-history > p:first-child {margin-top:0;}
+.zn-history__filters,.zn-history footer {display:flex;gap:1rem;align-items:center;flex-wrap:wrap;}
+.zn-history select {padding:.45rem;max-width:100%;font:inherit;}
+.zn-history__scroll {overflow:auto;margin:1rem 0;}
+.zn-history table {font-size:.9rem;width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;}
+.zn-history th,.zn-history td {padding:.65rem;text-align:left;vertical-align:top;border-bottom:1px solid var(--hub-line);}
+.zn-history th {color:var(--hub-ink);white-space:nowrap;}
+.zn-history td:nth-last-child(-n+2) {min-width:9rem;}
+.zn-history__failure {color:#8b2c18;font-weight:650;}
+.zn-history footer span {margin-right:auto;}
+
 /* The apps and services canvas carries the welcome scene and its white/blue controls. */
 .zn-your-hub {
   --hub-ink: #092f93;

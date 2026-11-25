@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+### Added
+- Record service checks and contemporaneous Hub-host CPU, memory and setup-volume usage in local monitoring history — operators can now inspect the failing step after a service recovers.
+
 ### Fixed
 
 - Prioritize Matrix joined membership over optional sync, allow slower server reads, and report which read failed — optional discovery failures previously obscured verified accounts and unsuccessful room reads appeared as an unexplained empty list.

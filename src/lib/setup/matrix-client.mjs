@@ -1,13 +1,14 @@
 /** Matrix Client-Server adapter over the existing DNS-pinned, redirect-free transport.
  * Device keys and encrypted messages belong to the separate conversation client.
  */
+import {unchecked} from '../hub/monitoring.mjs';
 import {createHmac} from 'node:crypto';
 import {requestJSON,endpoint} from './network.mjs';
 import {check} from './catalog.mjs';
 import {readDirectMap,recordDirectRoom,decorateDirectRooms,invitationRows,matrixRoom} from './matrix-direct.mjs';
 const enc=s=>encodeURIComponent(s).replace(/[!'()*]/g,c=>'%'+c.charCodeAt(0).toString(16).toUpperCase());
 const roomPath=id=>'/_matrix/client/v3/rooms/'+enc(id);
-export function matrixClient(base,{token,request=requestJSON,allowPrivateHosts=[]}={}) {
+export function matrixClient(base,{token,request=requestJSON,allowPrivateHosts=[],monitor=unchecked}={}) {
  base=endpoint(base).origin;
  async function call(route,{method='GET',body,auth=token,optional=false,timeout}={}){
   const r=await request(base,route,{method,body,token:auth,allowPrivateHosts,timeout});
@@ -18,7 +19,13 @@ export function matrixClient(base,{token,request=requestJSON,allowPrivateHosts=[
  }
  // Read diagnostics contain stage names only. Never include response bodies or credentials.
  async function observe(stage,route,options={}){
-  try{return await call(route,{timeout:15000,...options});}
+  try{return await monitor(stage.replaceAll('_',' '),()=>call(route,{timeout:15000,...options}), value=>{
+   if(stage==='joined_rooms'&&!Array.isArray(value?.joined_rooms))return 'Invalid room list';
+   if(stage==='room_state'&&!Array.isArray(value))return 'Invalid room state';
+   if(stage==='account'&&typeof value?.user_id!=='string')return 'Invalid account identity';
+   if(stage==='versions'&&!Array.isArray(value?.versions))return 'Invalid server versions';
+   return null;
+  });}
   catch(error){
    const reasons={probe_timeout:'timed_out',response_too_large:'response_too_large',incompatible_contract:'invalid_json'};
    if(error.code)throw error;
@@ -89,8 +96,8 @@ export function matrixClient(base,{token,request=requestJSON,allowPrivateHosts=[
   // Establish membership before an initial /sync competes for the homeserver.
   const joined=await observe('joined_rooms','/_matrix/client/v3/joined_rooms');
   check(joined,Array.isArray(joined?.joined_rooms),'matrix_rooms_incompatible');
-  const directRead=readDirectMap(call,userId).then(value=>({value,state:'verified',at:new Date().toISOString()}),()=>({value:{},state:'unverified',at:new Date().toISOString()}));
-  const inviteRead=invitationsFor(userId).then(value=>({value,state:'verified',at:new Date().toISOString()}),()=>({value:[],state:'unverified',at:new Date().toISOString()}));
+  const directRead=monitor('Direct room mapping',()=>readDirectMap(call,userId)).then(value=>({value,state:'verified',at:new Date().toISOString()}),()=>({value:{},state:'unverified',at:new Date().toISOString()}));
+  const inviteRead=monitor('Invitations',()=>invitationsFor(userId)).then(value=>({value,state:'verified',at:new Date().toISOString()}),()=>({value:[],state:'unverified',at:new Date().toISOString()}));
   const rows=[],failures=[];let cursor=0,rowsBytes=0;
   await Promise.all(Array.from({length:4},async()=>{while(cursor<Math.min(joined.joined_rooms.length,100)){const id=joined.joined_rooms[cursor++];try{const value=await room(id,userId),bytes=JSON.stringify(value).length;check(value,rowsBytes+bytes<=524288,'matrix_room_view_limit');rowsBytes+=bytes;rows.push(value);}catch(e){failures.push({roomId:id,error:e.code||'matrix_room_unverified'});}}}));
   const [direct,invited]=await Promise.all([directRead,inviteRead]);

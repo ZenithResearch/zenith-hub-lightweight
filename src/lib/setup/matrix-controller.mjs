@@ -1,4 +1,5 @@
 /** Generic Matrix setup. All writes are reviewed; remote authority is never inferred from reachability. */
+import {serviceMonitor} from '../hub/monitoring.mjs';
 import path from 'node:path';
 import {readFile} from 'node:fs/promises';
 import {randomBytes} from 'node:crypto';
@@ -35,7 +36,7 @@ export function createMatrixController({env=process.env,root=env.ZENITH_HUB_SETU
   if(write)check(r,r.headers.get('origin')===origin&&r.headers.get('content-type')==='application/json'&&r.headers.get('x-zenith-csrf')===csrf,'cross_site_action',403);
  }
  const instance=(s,id)=>check(s.instances.find(i=>i.instanceId===id&&i.componentId==='matrix'),s.instances.some(i=>i.instanceId===id&&i.componentId==='matrix'),'matrix_instance_missing',404);
- const api=async i=>{const session=await readMatrixSession(root,i);return clientFactory(serviceEndpoint(i),{...options,token:session?.token});};
+ const api=async (i,monitor)=>{const session=await readMatrixSession(root,i);return clientFactory(serviceEndpoint(i),{...options,token:session?.token,monitor});};
  async function update(id,fn){return store.write(s=>{const i=instance(s,id);const result=fn(i);if(i.matrix)i.matrix.schema='zenith.hub-matrix-binding.v1';return result;});}
  async function localSecret(i){
   check(i,i.mode==='install'&&i.root===path.join(root,'instances',i.instanceId)&&i.configured===true,'matrix_local_management_required',403);
@@ -51,12 +52,13 @@ export function createMatrixController({env=process.env,root=env.ZENITH_HUB_SETU
   const base=serviceEndpoint(i),at=new Date(clock()).toISOString();
   let view={endpoint:base,observedAt:at,apiAvailable:false,authentication:'unverified',rooms:[],invitations:[],roomsComplete:false};
   try{
-   const client=await api(i),discovery=await client.discover({allowPartialMetadata:i.matrix?.account?.endpoint===base});Object.assign(view,discovery,{apiAvailable:true,authentication:'sign-in-required'});
+   const monitor=serviceMonitor(env,'setup:'+i.instanceId);
+   const client=await api(i,monitor),discovery=await client.discover({allowPartialMetadata:i.matrix?.account?.endpoint===base});Object.assign(view,discovery,{apiAvailable:true,authentication:'sign-in-required'});
    if(i.matrix?.account?.endpoint===base){
     try{
      const who=await client.whoami();check(who,who.userId===i.matrix.account.userId,'matrix_account_changed');
      Object.assign(view,{authentication:'authenticated',account:who,credentialRef:i.matrix.account.credentialRef});const accountAt=clock();
-     try{const rooms=await client.rooms(who.userId);Object.assign(view,rooms,{roomsComplete:rooms.complete});}
+     try{const rooms=await monitor('Room inventory',()=>client.rooms(who.userId), r=>r.complete?null:'Incomplete room evidence');Object.assign(view,rooms,{roomsComplete:rooms.complete});}
      catch(e){view.error=e.code||'matrix_rooms_unverified';view.roomsComplete=false;}
      if(clock()-accountAt>10000){const finalWho=await client.whoami();check(finalWho,finalWho.userId===i.matrix.account.userId&&finalWho.deviceId===who.deviceId,'matrix_account_changed');view.account=finalWho;}
      completedRoomView(view,clock());
