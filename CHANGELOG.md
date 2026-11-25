@@ -3,6 +3,9 @@
 ## [Unreleased]
 
 ### Changed
+- Replace the floating HUD options with a rebuilt radial collar, a dedicated inbox segment and profile dots on the curved rail — the menu should behave and read as one compact control with stable hover and keyboard navigation.
+
+### Changed
 - Use a fine HUD arc with colored Hermes receiver dots and a small Matrix inbox glyph, retaining hover previews and click-to-pin — the control should remain minimal while selecting real configured receivers without changing their saved setup.
 
 

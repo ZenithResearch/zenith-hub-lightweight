@@ -482,19 +482,25 @@
     "commit": "99991743e0d756a6f6259c81067a85ddb77544fb",
     "files": [
       {
-        "path": "src/vendor/zenith-ui/HubSetup/HermesModeDial.tsx",
-        "upstream_path": "src/HubSetup/HermesModeDial.tsx",
-        "sha256": "315b989bdaab9270ac9468eb4070dd4b00946e990c73151b2a62ebd4784d5250"
-      },
-      {
         "path": "src/vendor/zenith-ui/HubSetup/HubSetup.tsx",
         "upstream_path": "src/HubSetup/HubSetup.tsx",
         "sha256": "1923de3a7119be18d8b42ec280878ae0d4da179c41c378f278510f205df751a5"
+      }
+    ]
+  },
+  {
+    "repository": "https://github.com/ZenithResearch/zenith-ui-deployment",
+    "commit": "680b3dcb978f0e7b27cc7a9ff93a4a7008685931",
+    "files": [
+      {
+        "path": "src/vendor/zenith-ui/HubSetup/HermesModeDial.tsx",
+        "upstream_path": "src/HubSetup/HermesModeDial.tsx",
+        "sha256": "e727c33bf6c99f166953085ad8a243fd449f054eb3db178fe7f439330090e9db"
       },
       {
         "path": "src/vendor/zenith-ui/HubSetup/HubSetup.css",
         "upstream_path": "src/HubSetup/HubSetup.css",
-        "sha256": "0f34d9fce0eea138a7f48825aeb07626e4fd99656e1c77deef021db5e3e7b32a"
+        "sha256": "6a9ee7358079454db7e0b9ab0c1dce200d43afd8ce76e15f11e3176b6a69673b"
       }
     ]
   }

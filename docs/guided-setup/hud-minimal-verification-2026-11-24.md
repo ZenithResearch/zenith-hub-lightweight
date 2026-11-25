@@ -1,53 +1,44 @@
-# Minimal HUD dial verification — 2026-11-24
+# Radial HUD menu verification — 2026-11-24
 
-The HUD keeps its existing glass circle. Hover/focus reveals a fine arc, an inbox
-glyph and small colored Hermes receiver dots. Names are available through
-native tooltips and accessible labels. Only actual configured Hermes receivers
-are listed; the local setup currently contains one. This does not create or
-configure Hermes profiles. The existing default receiver remains unchanged.
+The menu was rebuilt as a connected glass crescent around the existing HUD
+circle. A dedicated top segment opens Matrix inbox; colored receiver dots sit
+on the curved rail. Labels remain in tooltips and accessible names. Existing
+configured receivers supply the dots; the live setup contains one. The menu
+creates no profiles and does not change the default backend.
 
-## Ownership and compatibility
+## Contract and ownership
 
-- Shared presentation is committed in zenith-ui-deployment before import into the
-  Hub, with exact file hashes pinned in profiles/source-provenance.json.
-- Optional quick-target props preserve older component callers. The fallback dot
-  still opens the existing Hermes input when no target list is supplied.
-- Choosing a dot uses the existing instanceId chat contract. It is local UI state;
-  no setup, backend, credential, ontology or application-database schema changes.
-- Before sending, the Hub checks that the chosen receiver still exists and is
-  available. A removed or disabled receiver cannot silently select another one.
-- Matrix stays independent of Hermes. Hover opens a preview without taking
-  focus; a short leave grace period allows transfer into its floating panel.
-  Explicit activation or interaction pins it. The center dot minimizes it.
+The shared component retains its existing props and callbacks. Its pointer,
+keyboard and touch menu state is newly implemented. Pointer leave has a 140 ms
+grace period for crossing radial gaps; Matrix preview transfer retains the
+application's 280 ms grace. Arrow keys cycle targets, Home/End select endpoints,
+and Escape dismisses and returns focus after menu state settles. Initial hover
+is restored if receiver discovery mounts the control beneath the pointer.
 
-## Automated checks
+The shared UI is committed before import, with exact file hashes pinned in
+profiles/source-provenance.json. The Hub still owns receiver identity, Matrix
+account verification, preview/pinned state and navigation. The same application
+database and setup remain in use; no stored or HTTP contract changed.
 
-- Shared UI build/TypeScript and source-provenance checks passed.
-- Matrix spaces relationship fixture passed, including nested spaces and cycles.
-- Three Hermes response-timing checks passed.
-- 46 Hub fixture checks passed, including receiver routing/disappearance,
-  account/device/endpoint isolation, incomplete Matrix checks and onboarding.
-- Hub TypeScript, source-provenance and production build passed.
+## Validation
 
-## Live verification and limits
+- Shared UI build/TypeScript and authored-source hashes passed.
+- Matrix nested-space/cycle fixture and three response-timing checks passed.
+- 28 focused Hub fixture checks passed, including receiver disappearance and
+  Matrix account/device/endpoint isolation.
+- Hub TypeScript, imported-source hashes and production build passed.
+- Browser checks cover the connected crescent, real receiver input, Matrix hover
+  without focus capture, transfer into the panel, pinning, minimizing, keyboard
+  activation and Escape dismissal. No inference or Matrix message is sent.
 
-Browser checks cover the minimal unlabeled controls, existing Hermes input,
-Matrix hover without focus capture, pointer transfer, dismiss, explicit pin,
-keyboard activation and center-dot minimize. No inference request or Matrix
-message was sent. Additional profile routing is fixture-tested; there is only
-one configured Hermes receiver in the live setup.
+The existing Matrix joined room is visible beneath its spaces carousel. This
+account has no joined spaces, so nested-space filtering remains fixture-tested.
+The Hermes receiver is stopped in the existing setup; its input remains
+available while sending stays disabled. Additional receiver routing is covered
+by fixtures, not multiple live profiles. Encrypted timeline reading/sending is
+outside this rooms/spaces surface and still requires a capable Matrix client.
 
-The existing native Matrix homeserver on port 8008 intermittently timed out,
-then recovered without a restart or configuration change. Final live checks
-showed the existing joined encrypted room, the spaces carousel with no joined
-spaces, local room detail selection and retained selection after minimize/reopen.
-Hover dismissal was also verified with the center dot already focused, and
-explicit activation stayed pinned after clicking outside the panel. An incomplete
-account check now has a distinct unavailable message rather than claiming an
-identity mismatch. No encrypted timeline/client has been introduced. Nested
-space filtering remains fixture-tested because this live account has no spaces.
-
-The pre-change comparison confirmed unchanged installation, setup, connection,
-Matrix account/session-reference and saved room/space selection bindings, plus
-the same database identity and schema. Observation refreshes retain their
-existing owner. Private baseline and backup files are not committed.
+The preservation comparison verifies unchanged installation, configuration,
+connection, Matrix account/session-reference and saved-selection bindings, plus
+the same database identity and schema. The native server on port 8008 was left
+unchanged. Private baseline and backup files are not committed.

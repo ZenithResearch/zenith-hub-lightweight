@@ -707,22 +707,19 @@ body:has(:is(.zn-hermes-landing, .zn-your-hub)) > [data-zenith-hermes-portal] .z
   .zn-hermes-hud__loading-arc { animation: none; stroke-dasharray: none; opacity: .9; }
 }
 
-/* A quarter dial grows from the existing dot, without changing its default form. */
+/* A radial collar belongs to the HUD circle; it is not a row of floating buttons. */
 .zn-hermes-dial{position:relative;flex:0 0 32px;width:32px;height:32px;z-index:3}
-.is-collapsed .zn-hermes-dial{width:48px;height:48px}
-.zn-hermes-dial__choices{position:absolute;inset:0;visibility:hidden;opacity:0;transform:scale(.94);transform-origin:center;transition:opacity 140ms ease,transform 140ms ease,visibility 140ms}
-.zn-hermes-dial:not(.is-suppressed):is(:hover,:focus-within,.is-open) .zn-hermes-dial__choices{visibility:visible;opacity:1;transform:scale(1)}
-.zn-hermes-dial__choices::before{content:"";position:absolute;inset:-28px -4px -20px -28px;z-index:-1}
-.zn-hermes-dial__arc{position:absolute;width:80px;height:80px;left:-16px;top:-16px;fill:none;stroke:var(--hermes-glass-focus);stroke-width:.65;opacity:.4;pointer-events:none}
-.zn-hermes-hud .zn-hermes-dial__choice{position:absolute;display:grid;place-items:center;width:24px;height:24px;min-height:24px;padding:0;border:0;border-radius:50%;background:none;color:#e5f5ff;box-shadow:none;cursor:pointer;user-select:none;transform:translate(-50%,-50%)}
-.zn-hermes-dial__choice.is-quick{left:var(--dial-x);top:var(--dial-y)}
-.zn-hermes-dial__choice.is-quick>span{width:6px;height:6px;border-radius:50%;background:var(--dial-color);box-shadow:0 0 5px #00163445;transition:transform 120ms ease}
-.zn-hermes-dial__choice.is-quick[aria-pressed=true]>span{outline:1px solid var(--dial-color);outline-offset:3px}
-.zn-hermes-dial__choice.is-quick:hover>span{transform:scale(1.3)}
-.zn-hermes-hud .zn-hermes-dial__choice:focus-visible{outline:1px solid var(--hermes-glass-focus);outline-offset:0}
-.zn-hermes-dial__choice.is-chat{top:-10px;left:24px}
-.zn-hermes-dial__choice.is-chat svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:1.3;stroke-linejoin:round;stroke-linecap:round;opacity:.8}
-.zn-hermes-dial__choice.is-chat:hover svg,.zn-hermes-dial__choice.is-chat[aria-expanded=true] svg{opacity:1;color:#fff}
-.zn-hermes-hud__composer .zn-hermes-dial__choices{transform:translateY(-18px)}
-.zn-hermes-hud__composer .zn-hermes-dial:not(.is-suppressed):is(:hover,:focus-within,.is-open) .zn-hermes-dial__choices{transform:translateY(-18px)}
-@media(prefers-reduced-motion:reduce){.zn-hermes-dial__choices{transition:none}}
+.zn-hermes-dial[data-compact=true]{width:48px;height:48px}
+.zn-hermes-dial__menu{position:absolute;inset:0;visibility:hidden;opacity:0;pointer-events:none;transform:rotate(7deg) scale(.94);transform-origin:center;transition:opacity 140ms ease,transform 180ms ease,visibility 180ms}
+.zn-hermes-dial.is-open .zn-hermes-dial__menu{visibility:visible;opacity:1;transform:none}
+.zn-hermes-dial__collar{position:absolute;overflow:visible;fill:rgba(185,218,255,.12);stroke:rgba(220,239,255,.55);stroke-width:.65;filter:drop-shadow(0 2px 4px #001c4340);pointer-events:none}
+.zn-hermes-dial__rail{fill:rgba(190,225,255,.08)}
+.zn-hermes-dial__inbox-segment{fill:rgba(210,235,255,.2);transition:fill 120ms ease,stroke 120ms ease}
+.zn-hermes-dial__inbox-segment.is-active,.zn-hermes-dial__menu:has(.zn-hermes-dial__inbox:is(:hover,:focus-visible)) .zn-hermes-dial__inbox-segment{fill:rgba(215,242,255,.38);stroke:#e0f6ff}
+.zn-hermes-hud .zn-hermes-dial__choice{position:absolute;display:grid;place-items:center;width:24px;height:24px;min-height:24px;padding:0;border:0;border-radius:50%;background:transparent;color:#e7f7ff;box-shadow:none;cursor:pointer;user-select:none;transform:translate(-50%,-50%);pointer-events:auto}
+.zn-hermes-dial__receiver>span{width:7px;height:7px;border-radius:50%;background:var(--dial-color);box-shadow:0 0 0 2px #09376a45;transition:transform 120ms ease,box-shadow 120ms ease}
+.zn-hermes-dial__receiver[aria-pressed=true]>span{box-shadow:0 0 0 1.5px #164478,0 0 0 2.25px var(--dial-color)}
+.zn-hermes-dial__receiver:hover>span{transform:scale(1.25)}
+.zn-hermes-hud .zn-hermes-dial__choice:focus-visible{outline:1.5px solid #dff4ff;outline-offset:-2px}
+.zn-hermes-dial__inbox svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:1.35;stroke-linejoin:round;stroke-linecap:round}
+@media(prefers-reduced-motion:reduce){.zn-hermes-dial__menu,.zn-hermes-dial__receiver>span,.zn-hermes-dial__inbox-segment{transition:none;transform:none}}

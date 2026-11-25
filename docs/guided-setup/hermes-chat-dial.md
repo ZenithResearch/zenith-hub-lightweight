@@ -1,14 +1,16 @@
 # HUD dial: Hermes input and Matrix
 
 The HUD dot remains visible, including while Hermes is stopped or connection
-discovery is pending. Hover or keyboard focus reveals a fine arc, small colored
-Hermes receiver dots and an inbox glyph. Labels live in tooltips and accessible
+discovery is pending. Hover or keyboard focus reveals a connected glass crescent around the circle, with colored Hermes
+receiver dots on its rail and an inbox glyph inside its top segment. Labels live in tooltips and accessible
 names, with no labeled pills. Only configured receivers appear; no profiles are
 created by this view. The existing default remains selected until a dot is chosen.
 The dot opens the original Hermes quick input; its input dot minimizes it.
 Hovering the inbox previews the floating rooms/spaces panel without taking focus.
-The options sit a few pixels from the dot, and a 280 ms grace period lets the
-pointer cross into the panel. The preview closes after leaving both regions.
+The radial menu has a 140 ms leave grace period for crossing small gaps, and a
+280 ms preview grace period lets the pointer cross into the panel. Keyboard
+arrows cycle the available targets; Home/End select the first/last, and Escape
+dismisses the menu and returns focus to the circle. The preview closes after leaving both regions.
 Clicking the inbox or interacting with the panel pins it open until minimized.
 Touch and keyboard activation also open the pinned view. Selecting Matrix from
 the expanded Hermes input preserves its draft and collapses that input.
