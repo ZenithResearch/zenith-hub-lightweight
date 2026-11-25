@@ -123,6 +123,22 @@ export async function requestJSON(
     req.end();
   });
 }
+function readinessFailure(componentId, {status, value}) {
+  if (status === 200 && value?.ready === true) return null;
+  const reason = status === 200 ? 'Service not ready' : 'HTTP ' + status;
+  if (componentId !== 'process-runtime' || value?.service !== componentId ||
+      value.ready !== false || !value.checks || ![200, 503].includes(status)) return reason;
+  // History contains only recognized status values, never arbitrary upstream response text.
+  const {storage, authority, admission, verification} = value.checks;
+  const details = [];
+  if (storage === 'available' || storage === 'unavailable') details.push('storage ' + storage);
+  if (authority === 'default_deny') details.push('authority default-deny');
+  if (authority === 'unqualified' || authority === 'configured_native_unqualified') details.push('authority unqualified');
+  if (verification === 'unavailable') details.push('native verification unavailable');
+  if (admission?.new_runs === 'closed') details.push('new-run admission closed');
+  return [reason, ...details].join(' · ');
+}
+
 export async function probe(componentId, base, options = {}) {
   const observedAt = new Date().toISOString(),
     result = {
@@ -145,7 +161,7 @@ export async function probe(componentId, base, options = {}) {
     const live = await read('Liveness', '/live', options);
     check(live, live.status === 200, 'service_unreachable');
     const ready = await monitor('Readiness', () => requestJSON(base, '/ready', options), reply =>
-      reply.status !== 200 ? 'HTTP ' + reply.status : reply.value?.ready === true ? null : 'Service not ready');
+      readinessFailure(componentId, reply));
     return {applicationReady:ready.status === 200 && ready.value.ready === true, contract:'liveness-only'};
   };
   const probes = {

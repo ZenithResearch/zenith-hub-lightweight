@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+### Fixed
+- Show the Runtime’s reported storage, authority and admission checks in readiness failure history — an HTTP 503 alone concealed the production readiness blocker.
+
 ### Added
 - Record service checks and contemporaneous Hub-host CPU, memory and setup-volume usage in local monitoring history — operators can now inspect the failing step after a service recovers.
 
