@@ -4,6 +4,7 @@ import fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import http from 'node:http';
+import {randomUUID} from 'node:crypto';
 import {spawn,spawnSync} from 'node:child_process';
 import {matrixFixture} from '../tests/setup/matrix-fixture.mjs';
 const cleanup=[],remote=await matrixFixture({after:fn=>cleanup.push(fn)}),repo=process.cwd(),root=await fs.realpath(await fs.mkdtemp(path.join(os.tmpdir(),'hub-matrix-http-')));await fs.chmod(root,0o700);
@@ -39,8 +40,22 @@ try{
  const applied=await matrix(session,{operation:'apply',planId:retained.plan.id});assert.equal(applied.result.state,'complete');session=applied;
  await action('message-test',{roomId:'!lobby:fixture.invalid',acknowledgeSend:true});
  const proof=session.instances[0].operations.find(o=>o.action==='message-test').result;assert.equal(proof.sendVerified,true);assert.equal(proof.readVerified,true);
+ // The new chat capability uses the retained Hub session; all messages below go only to this disposable fixture.
+ const chat=(operation,roomId,extra={})=>post('/api/matrix/conversation',session,{schema:'zenith.hub-matrix-conversation-action.v1',operation,instanceId:'matrix-fixture',roomId,...extra});
+ const plain=await chat('timeline','!lobby:fixture.invalid');assert.equal(plain.canSend,true);assert.equal(plain.encrypted,false);
+ const draft='Fixture conversation message',transactionId='hub_'+randomUUID();
+ const sent=await chat('send',plain.roomId,{binding:plain.binding,message:draft,transactionId});
+ assert.equal((await chat('send',plain.roomId,{binding:plain.binding,message:draft,transactionId})).eventId,sent.eventId);
+ assert.equal((await chat('timeline',plain.roomId)).messages.find(m=>m.id===sent.eventId).body,draft);
+ const encrypted=await chat('timeline','!encrypted:fixture.invalid');assert.equal(encrypted.cryptoError,null,JSON.stringify(encrypted));assert.equal(encrypted.canSend,true);assert.equal(encrypted.encrypted,true);
+ const sealedText='Disposable native Megolm HTTP fixture',sealed=await chat('send',encrypted.roomId,{binding:encrypted.binding,message:sealedText,transactionId:'hub_'+randomUUID()});
+ const envelope=remote.events.get(sealed.eventId);assert.equal(envelope.type,'m.room.encrypted');assert.doesNotMatch(JSON.stringify(envelope.content),/Disposable native Megolm/);
+ assert.equal((await chat('timeline',encrypted.roomId)).messages.find(m=>m.id===sealed.eventId).body,sealedText);
+ const keys=JSON.stringify(remote.state.deviceKeys);await stop();await start();session=await get('/api/matrix');
+ assert.equal((await chat('timeline',encrypted.roomId)).messages.find(m=>m.id===sealed.eventId).body,sealedText);assert.equal(JSON.stringify(remote.state.deviceKeys),keys);
+ const badChat=await fetch(origin+'/api/matrix/conversation',{method:'POST',headers:{origin:'https://untrusted.invalid','content-type':'application/json'},body:'{}'});assert.equal(badChat.status,403);
  const cross=await fetch(origin+'/api/matrix',{method:'POST',headers:{origin:'https://untrusted.invalid','content-type':'application/json'},body:'{}'});assert.equal(cross.status,403);
  const page=await fetch(origin+'/hub?matrix=matrix-fixture');assert.equal(page.status,200);
- console.log(JSON.stringify({passed:true,mode:standalone?'standalone':process.argv.includes('--dev')?'development':'production',origin,root,checks:['reviewed-save-normalized-endpoint','API-is-not-authentication','verified-account','room-selection','review-and-session-survive-server-restart','explicit-send-and-read','cross-origin-rejected','gallery-served'],liveServerTouched:false}));
+ console.log(JSON.stringify({passed:true,mode:standalone?'standalone':process.argv.includes('--dev')?'development':'production',origin,root,checks:['reviewed-save-normalized-endpoint','API-is-not-authentication','verified-account','room-selection','review-and-session-survive-server-restart','explicit-send-and-read','cross-origin-rejected','gallery-served','in-window-chat-history','idempotent-chat-send','native-encrypted-send-read','device-and-room-keys-survive-restart'],liveServerTouched:false}));
  if(process.argv.includes('--keep')){await fs.writeFile('/tmp/hub-matrix-preview.json',JSON.stringify({origin,root,pid:process.pid}),{mode:0o600});await new Promise(resolve=>{process.once('SIGTERM',resolve);process.once('SIGINT',resolve);});}
 }finally{await stop();for(const fn of cleanup)await fn();if(!process.argv.includes('--keep'))await fs.rm(root,{recursive:true,force:true});}

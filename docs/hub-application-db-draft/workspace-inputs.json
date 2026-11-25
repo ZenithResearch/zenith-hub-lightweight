@@ -1,0 +1,394 @@
+{
+  "schema": "zenith.hub-workspace-input-updates.v1",
+  "previousLedgerSha256": "79cd52f591f294abcb2224d595a874dcec42bf30a1e81988df0a7bddbe448c69",
+  "baselines": {
+    "integration-inputs.json": {
+      "sha256": "a4e8bd3c8d72dcd0b12403e7ad4db7231a588a3b9119ff624c009000728d20cd",
+      "updates": [
+        {
+          "path": "src/vendor/zenith-ui/HubSetup/HubSetup.css",
+          "previousSha256": "4ca0b4e7914347349c7ee48745be1abde0bcf0ec41ba4e02b2879bd7c3c631cd",
+          "sha256": "6a9ee7358079454db7e0b9ab0c1dce200d43afd8ce76e15f11e3176b6a69673b",
+          "reason": "Approved main Hub/Settings navigation, radial Hermes and Matrix conversation follow-ups preserve existing setup owners; exact source pins retain the historical database review snapshots.",
+          "evidence": [
+            "profiles/source-provenance.json",
+            "tests/hub/main-view.test.mjs",
+            "tests/setup/hermes-chat-state.test.mjs",
+            "tests/matrix/conversations.test.mjs",
+            "scripts/check-matrix-api.mjs",
+            "docs/guided-setup/matrix-conversations.md"
+          ]
+        },
+        {
+          "path": "src/vendor/zenith-ui/HubSetup/HubSetup.tsx",
+          "previousSha256": "9b0fa079bda4956d7ab97b809ad3f3ed2316f01fb05e0ca9bbcc56d037387b74",
+          "sha256": "1923de3a7119be18d8b42ec280878ae0d4da179c41c378f278510f205df751a5",
+          "reason": "Approved main Hub/Settings navigation, radial Hermes and Matrix conversation follow-ups preserve existing setup owners; exact source pins retain the historical database review snapshots.",
+          "evidence": [
+            "profiles/source-provenance.json",
+            "tests/hub/main-view.test.mjs",
+            "tests/setup/hermes-chat-state.test.mjs",
+            "tests/matrix/conversations.test.mjs",
+            "scripts/check-matrix-api.mjs",
+            "docs/guided-setup/matrix-conversations.md"
+          ]
+        },
+        {
+          "path": "src/vendor/zenith-ui/YourHub/YourHub.css",
+          "previousSha256": "ccc9cb2e46dbe25d126be66a2840e5c0094856d7cb43b61b17d4cfef7f2832c8",
+          "sha256": "191d8eb7dbc3d167f0b0e930f82e40a06d6360225243918c12005c0be7d2020f",
+          "reason": "Approved main Hub/Settings navigation, radial Hermes and Matrix conversation follow-ups preserve existing setup owners; exact source pins retain the historical database review snapshots.",
+          "evidence": [
+            "profiles/source-provenance.json",
+            "tests/hub/main-view.test.mjs",
+            "tests/setup/hermes-chat-state.test.mjs",
+            "tests/matrix/conversations.test.mjs",
+            "scripts/check-matrix-api.mjs",
+            "docs/guided-setup/matrix-conversations.md"
+          ]
+        },
+        {
+          "path": "src/vendor/zenith-ui/YourHub/YourHub.tsx",
+          "previousSha256": "1e1562b634465b5f06a0db78ddd96ba8730df2060d60b35c7109257d8b03850c",
+          "sha256": "77a281999e8116465321f7cf03301aa46c4761d198af4690da070f3afd616b1c",
+          "reason": "Approved main Hub/Settings navigation, radial Hermes and Matrix conversation follow-ups preserve existing setup owners; exact source pins retain the historical database review snapshots.",
+          "evidence": [
+            "profiles/source-provenance.json",
+            "tests/hub/main-view.test.mjs",
+            "tests/setup/hermes-chat-state.test.mjs",
+            "tests/matrix/conversations.test.mjs",
+            "scripts/check-matrix-api.mjs",
+            "docs/guided-setup/matrix-conversations.md"
+          ]
+        },
+        {
+          "path": "src/lib/setup/page-context.ts",
+          "previousSha256": "dce181753360130c068f4e16031e52cd7f635e179f354bd6bcf644836cb39c88",
+          "sha256": "b1a334cda05ca43630d330f80293acb7ebfc00dd1ee5404123d4f73d0f528e13",
+          "reason": "Approved main Hub/Settings navigation, radial Hermes and Matrix conversation follow-ups preserve existing setup owners; exact source pins retain the historical database review snapshots.",
+          "evidence": [
+            "profiles/source-provenance.json",
+            "tests/hub/main-view.test.mjs",
+            "tests/setup/hermes-chat-state.test.mjs",
+            "tests/matrix/conversations.test.mjs",
+            "scripts/check-matrix-api.mjs",
+            "docs/guided-setup/matrix-conversations.md"
+          ]
+        },
+        {
+          "path": "src/lib/setup/hermes-chat-state.d.mts",
+          "previousSha256": "35819bdb1a12a746ede8dc14f5a12cebfc0bd62947f8943d3a6b0898ae8660ba",
+          "sha256": "5f54e840ff5da7c1bfd9caf6c4cac5008d0d66009e51e16eafa30cc257c1f82f",
+          "reason": "Approved main Hub/Settings navigation, radial Hermes and Matrix conversation follow-ups preserve existing setup owners; exact source pins retain the historical database review snapshots.",
+          "evidence": [
+            "profiles/source-provenance.json",
+            "tests/hub/main-view.test.mjs",
+            "tests/setup/hermes-chat-state.test.mjs",
+            "tests/matrix/conversations.test.mjs",
+            "scripts/check-matrix-api.mjs",
+            "docs/guided-setup/matrix-conversations.md"
+          ]
+        },
+        {
+          "path": "src/lib/setup/hermes-chat-state.mjs",
+          "previousSha256": "80592dfa183632b3c75a1606c9bd97a9ec45cb56d4dd91d8613ded071cb9bad4",
+          "sha256": "b555c0feae31d553d9d350cc5e5503861a7df8e7ae0fdc98c7a7e021b7b0abb0",
+          "reason": "Approved main Hub/Settings navigation, radial Hermes and Matrix conversation follow-ups preserve existing setup owners; exact source pins retain the historical database review snapshots.",
+          "evidence": [
+            "profiles/source-provenance.json",
+            "tests/hub/main-view.test.mjs",
+            "tests/setup/hermes-chat-state.test.mjs",
+            "tests/matrix/conversations.test.mjs",
+            "scripts/check-matrix-api.mjs",
+            "docs/guided-setup/matrix-conversations.md"
+          ]
+        },
+        {
+          "path": "src/components/hub/YourHubPage.tsx",
+          "previousSha256": "4f2e194b2411db4d557f3d8359f3fa509984e8204bdf2414d72ca1ddfc3461e5",
+          "sha256": "93fe0208cd866f88839885f26c5b2ee6aef9263a691245eab0fcc275c24481f7",
+          "reason": "Approved main Hub/Settings navigation, radial Hermes and Matrix conversation follow-ups preserve existing setup owners; exact source pins retain the historical database review snapshots.",
+          "evidence": [
+            "profiles/source-provenance.json",
+            "tests/hub/main-view.test.mjs",
+            "tests/setup/hermes-chat-state.test.mjs",
+            "tests/matrix/conversations.test.mjs",
+            "scripts/check-matrix-api.mjs",
+            "docs/guided-setup/matrix-conversations.md"
+          ]
+        },
+        {
+          "path": "src/components/hub/GlobalHermesChat.tsx",
+          "previousSha256": "f3e7e81b50f37df30122fd3201212ffdf5748d60dc5dffe3b0cc50a3469b1d8d",
+          "sha256": "cfa8453f41430359481f3407aad84d258b465efbf9ac78b1f68159958b3ded05",
+          "reason": "Approved main Hub/Settings navigation, radial Hermes and Matrix conversation follow-ups preserve existing setup owners; exact source pins retain the historical database review snapshots.",
+          "evidence": [
+            "profiles/source-provenance.json",
+            "tests/hub/main-view.test.mjs",
+            "tests/setup/hermes-chat-state.test.mjs",
+            "tests/matrix/conversations.test.mjs",
+            "scripts/check-matrix-api.mjs",
+            "docs/guided-setup/matrix-conversations.md"
+          ]
+        },
+        {
+          "path": "src/components/hub/SetupPage.tsx",
+          "previousSha256": "139e4f47d6922f3da6832d0c1803a285bdd92ba23fa29c23061c1af18fdff674",
+          "sha256": "13fd8a82196056e021cc19bc4d5f77b7c77bc35ac6401326927c34987a45211f",
+          "reason": "Approved main Hub/Settings navigation, radial Hermes and Matrix conversation follow-ups preserve existing setup owners; exact source pins retain the historical database review snapshots.",
+          "evidence": [
+            "profiles/source-provenance.json",
+            "tests/hub/main-view.test.mjs",
+            "tests/setup/hermes-chat-state.test.mjs",
+            "tests/matrix/conversations.test.mjs",
+            "scripts/check-matrix-api.mjs",
+            "docs/guided-setup/matrix-conversations.md"
+          ]
+        },
+        {
+          "path": "src/app/hub/page.tsx",
+          "previousSha256": "e93c7bd41e3af8ac9a87081f00e63472f2ef9330849770f689c37d4c7c2e84e6",
+          "sha256": "49e2d97193b777f46029b7379e1c28307fc20dbabf195a38352c38094e3d78b7",
+          "reason": "Approved main Hub/Settings navigation, radial Hermes and Matrix conversation follow-ups preserve existing setup owners; exact source pins retain the historical database review snapshots.",
+          "evidence": [
+            "profiles/source-provenance.json",
+            "tests/hub/main-view.test.mjs",
+            "tests/setup/hermes-chat-state.test.mjs",
+            "tests/matrix/conversations.test.mjs",
+            "scripts/check-matrix-api.mjs",
+            "docs/guided-setup/matrix-conversations.md"
+          ]
+        },
+        {
+          "path": "profiles/source-provenance.json",
+          "previousSha256": "21e4ecba50c01335a0039e914e5a3f94403d43655d27ba3dd1f79aaa7ed5f2eb",
+          "sha256": "97d18cee3b73599eafd30c8e1f90fc8e54efd97f2ed78419622e220d307711bc",
+          "reason": "Approved main Hub/Settings navigation, radial Hermes and Matrix conversation follow-ups preserve existing setup owners; exact source pins retain the historical database review snapshots.",
+          "evidence": [
+            "profiles/source-provenance.json",
+            "tests/hub/main-view.test.mjs",
+            "tests/setup/hermes-chat-state.test.mjs",
+            "tests/matrix/conversations.test.mjs",
+            "scripts/check-matrix-api.mjs",
+            "docs/guided-setup/matrix-conversations.md"
+          ]
+        },
+        {
+          "path": "tests/setup/hermes-chat-state.test.mjs",
+          "previousSha256": "8a03bc9a3e6618f4bedc9e5bf174d7c1f01f42e01cbe0de5c98e5467e21807c7",
+          "sha256": "2ba206eab88869cb3faafaeab78e30d2b3fe834864a7d3e61746ccc08d740ef8",
+          "reason": "Approved main Hub/Settings navigation, radial Hermes and Matrix conversation follow-ups preserve existing setup owners; exact source pins retain the historical database review snapshots.",
+          "evidence": [
+            "profiles/source-provenance.json",
+            "tests/hub/main-view.test.mjs",
+            "tests/setup/hermes-chat-state.test.mjs",
+            "tests/matrix/conversations.test.mjs",
+            "scripts/check-matrix-api.mjs",
+            "docs/guided-setup/matrix-conversations.md"
+          ]
+        }
+      ]
+    },
+    "catalog/input-baseline.json": {
+      "sha256": "8d74a29bf207fc30ee73a62b2680f40525628a62faf0c14f825aa8d98a36aa25",
+      "updates": [
+        {
+          "path": "src/vendor/zenith-ui/HubSetup/HubSetup.css",
+          "previousSha256": "4ca0b4e7914347349c7ee48745be1abde0bcf0ec41ba4e02b2879bd7c3c631cd",
+          "sha256": "6a9ee7358079454db7e0b9ab0c1dce200d43afd8ce76e15f11e3176b6a69673b",
+          "reason": "Approved main Hub/Settings navigation, radial Hermes and Matrix conversation follow-ups preserve existing setup owners; exact source pins retain the historical database review snapshots.",
+          "evidence": [
+            "profiles/source-provenance.json",
+            "tests/hub/main-view.test.mjs",
+            "tests/setup/hermes-chat-state.test.mjs",
+            "tests/matrix/conversations.test.mjs",
+            "scripts/check-matrix-api.mjs",
+            "docs/guided-setup/matrix-conversations.md"
+          ]
+        },
+        {
+          "path": "src/vendor/zenith-ui/HubSetup/HubSetup.tsx",
+          "previousSha256": "9b0fa079bda4956d7ab97b809ad3f3ed2316f01fb05e0ca9bbcc56d037387b74",
+          "sha256": "1923de3a7119be18d8b42ec280878ae0d4da179c41c378f278510f205df751a5",
+          "reason": "Approved main Hub/Settings navigation, radial Hermes and Matrix conversation follow-ups preserve existing setup owners; exact source pins retain the historical database review snapshots.",
+          "evidence": [
+            "profiles/source-provenance.json",
+            "tests/hub/main-view.test.mjs",
+            "tests/setup/hermes-chat-state.test.mjs",
+            "tests/matrix/conversations.test.mjs",
+            "scripts/check-matrix-api.mjs",
+            "docs/guided-setup/matrix-conversations.md"
+          ]
+        },
+        {
+          "path": "src/vendor/zenith-ui/YourHub/YourHub.css",
+          "previousSha256": "ccc9cb2e46dbe25d126be66a2840e5c0094856d7cb43b61b17d4cfef7f2832c8",
+          "sha256": "191d8eb7dbc3d167f0b0e930f82e40a06d6360225243918c12005c0be7d2020f",
+          "reason": "Approved main Hub/Settings navigation, radial Hermes and Matrix conversation follow-ups preserve existing setup owners; exact source pins retain the historical database review snapshots.",
+          "evidence": [
+            "profiles/source-provenance.json",
+            "tests/hub/main-view.test.mjs",
+            "tests/setup/hermes-chat-state.test.mjs",
+            "tests/matrix/conversations.test.mjs",
+            "scripts/check-matrix-api.mjs",
+            "docs/guided-setup/matrix-conversations.md"
+          ]
+        },
+        {
+          "path": "src/vendor/zenith-ui/YourHub/YourHub.tsx",
+          "previousSha256": "1e1562b634465b5f06a0db78ddd96ba8730df2060d60b35c7109257d8b03850c",
+          "sha256": "77a281999e8116465321f7cf03301aa46c4761d198af4690da070f3afd616b1c",
+          "reason": "Approved main Hub/Settings navigation, radial Hermes and Matrix conversation follow-ups preserve existing setup owners; exact source pins retain the historical database review snapshots.",
+          "evidence": [
+            "profiles/source-provenance.json",
+            "tests/hub/main-view.test.mjs",
+            "tests/setup/hermes-chat-state.test.mjs",
+            "tests/matrix/conversations.test.mjs",
+            "scripts/check-matrix-api.mjs",
+            "docs/guided-setup/matrix-conversations.md"
+          ]
+        },
+        {
+          "path": "src/lib/setup/page-context.ts",
+          "previousSha256": "dce181753360130c068f4e16031e52cd7f635e179f354bd6bcf644836cb39c88",
+          "sha256": "b1a334cda05ca43630d330f80293acb7ebfc00dd1ee5404123d4f73d0f528e13",
+          "reason": "Approved main Hub/Settings navigation, radial Hermes and Matrix conversation follow-ups preserve existing setup owners; exact source pins retain the historical database review snapshots.",
+          "evidence": [
+            "profiles/source-provenance.json",
+            "tests/hub/main-view.test.mjs",
+            "tests/setup/hermes-chat-state.test.mjs",
+            "tests/matrix/conversations.test.mjs",
+            "scripts/check-matrix-api.mjs",
+            "docs/guided-setup/matrix-conversations.md"
+          ]
+        },
+        {
+          "path": "src/lib/setup/hermes-chat-state.d.mts",
+          "previousSha256": "35819bdb1a12a746ede8dc14f5a12cebfc0bd62947f8943d3a6b0898ae8660ba",
+          "sha256": "5f54e840ff5da7c1bfd9caf6c4cac5008d0d66009e51e16eafa30cc257c1f82f",
+          "reason": "Approved main Hub/Settings navigation, radial Hermes and Matrix conversation follow-ups preserve existing setup owners; exact source pins retain the historical database review snapshots.",
+          "evidence": [
+            "profiles/source-provenance.json",
+            "tests/hub/main-view.test.mjs",
+            "tests/setup/hermes-chat-state.test.mjs",
+            "tests/matrix/conversations.test.mjs",
+            "scripts/check-matrix-api.mjs",
+            "docs/guided-setup/matrix-conversations.md"
+          ]
+        },
+        {
+          "path": "src/lib/setup/hermes-chat-state.mjs",
+          "previousSha256": "80592dfa183632b3c75a1606c9bd97a9ec45cb56d4dd91d8613ded071cb9bad4",
+          "sha256": "b555c0feae31d553d9d350cc5e5503861a7df8e7ae0fdc98c7a7e021b7b0abb0",
+          "reason": "Approved main Hub/Settings navigation, radial Hermes and Matrix conversation follow-ups preserve existing setup owners; exact source pins retain the historical database review snapshots.",
+          "evidence": [
+            "profiles/source-provenance.json",
+            "tests/hub/main-view.test.mjs",
+            "tests/setup/hermes-chat-state.test.mjs",
+            "tests/matrix/conversations.test.mjs",
+            "scripts/check-matrix-api.mjs",
+            "docs/guided-setup/matrix-conversations.md"
+          ]
+        },
+        {
+          "path": "src/components/hub/YourHubPage.tsx",
+          "previousSha256": "4f2e194b2411db4d557f3d8359f3fa509984e8204bdf2414d72ca1ddfc3461e5",
+          "sha256": "93fe0208cd866f88839885f26c5b2ee6aef9263a691245eab0fcc275c24481f7",
+          "reason": "Approved main Hub/Settings navigation, radial Hermes and Matrix conversation follow-ups preserve existing setup owners; exact source pins retain the historical database review snapshots.",
+          "evidence": [
+            "profiles/source-provenance.json",
+            "tests/hub/main-view.test.mjs",
+            "tests/setup/hermes-chat-state.test.mjs",
+            "tests/matrix/conversations.test.mjs",
+            "scripts/check-matrix-api.mjs",
+            "docs/guided-setup/matrix-conversations.md"
+          ]
+        },
+        {
+          "path": "src/components/hub/GlobalHermesChat.tsx",
+          "previousSha256": "f3e7e81b50f37df30122fd3201212ffdf5748d60dc5dffe3b0cc50a3469b1d8d",
+          "sha256": "cfa8453f41430359481f3407aad84d258b465efbf9ac78b1f68159958b3ded05",
+          "reason": "Approved main Hub/Settings navigation, radial Hermes and Matrix conversation follow-ups preserve existing setup owners; exact source pins retain the historical database review snapshots.",
+          "evidence": [
+            "profiles/source-provenance.json",
+            "tests/hub/main-view.test.mjs",
+            "tests/setup/hermes-chat-state.test.mjs",
+            "tests/matrix/conversations.test.mjs",
+            "scripts/check-matrix-api.mjs",
+            "docs/guided-setup/matrix-conversations.md"
+          ]
+        },
+        {
+          "path": "src/components/hub/SetupPage.tsx",
+          "previousSha256": "139e4f47d6922f3da6832d0c1803a285bdd92ba23fa29c23061c1af18fdff674",
+          "sha256": "13fd8a82196056e021cc19bc4d5f77b7c77bc35ac6401326927c34987a45211f",
+          "reason": "Approved main Hub/Settings navigation, radial Hermes and Matrix conversation follow-ups preserve existing setup owners; exact source pins retain the historical database review snapshots.",
+          "evidence": [
+            "profiles/source-provenance.json",
+            "tests/hub/main-view.test.mjs",
+            "tests/setup/hermes-chat-state.test.mjs",
+            "tests/matrix/conversations.test.mjs",
+            "scripts/check-matrix-api.mjs",
+            "docs/guided-setup/matrix-conversations.md"
+          ]
+        },
+        {
+          "path": "src/app/hub/page.tsx",
+          "previousSha256": "e93c7bd41e3af8ac9a87081f00e63472f2ef9330849770f689c37d4c7c2e84e6",
+          "sha256": "49e2d97193b777f46029b7379e1c28307fc20dbabf195a38352c38094e3d78b7",
+          "reason": "Approved main Hub/Settings navigation, radial Hermes and Matrix conversation follow-ups preserve existing setup owners; exact source pins retain the historical database review snapshots.",
+          "evidence": [
+            "profiles/source-provenance.json",
+            "tests/hub/main-view.test.mjs",
+            "tests/setup/hermes-chat-state.test.mjs",
+            "tests/matrix/conversations.test.mjs",
+            "scripts/check-matrix-api.mjs",
+            "docs/guided-setup/matrix-conversations.md"
+          ]
+        },
+        {
+          "path": "profiles/source-provenance.json",
+          "previousSha256": "21e4ecba50c01335a0039e914e5a3f94403d43655d27ba3dd1f79aaa7ed5f2eb",
+          "sha256": "97d18cee3b73599eafd30c8e1f90fc8e54efd97f2ed78419622e220d307711bc",
+          "reason": "Approved main Hub/Settings navigation, radial Hermes and Matrix conversation follow-ups preserve existing setup owners; exact source pins retain the historical database review snapshots.",
+          "evidence": [
+            "profiles/source-provenance.json",
+            "tests/hub/main-view.test.mjs",
+            "tests/setup/hermes-chat-state.test.mjs",
+            "tests/matrix/conversations.test.mjs",
+            "scripts/check-matrix-api.mjs",
+            "docs/guided-setup/matrix-conversations.md"
+          ]
+        },
+        {
+          "path": "next.config.ts",
+          "previousSha256": "7d1b54aaeb036815a64246225638775a52f77c4659767e98cda3d7acf7f75243",
+          "sha256": "18dd07711f706556b2823d78285a08631f0059542091c82a161ad1c5d3d11a8b",
+          "reason": "Approved main Hub/Settings navigation, radial Hermes and Matrix conversation follow-ups preserve existing setup owners; exact source pins retain the historical database review snapshots.",
+          "evidence": [
+            "profiles/source-provenance.json",
+            "tests/hub/main-view.test.mjs",
+            "tests/setup/hermes-chat-state.test.mjs",
+            "tests/matrix/conversations.test.mjs",
+            "scripts/check-matrix-api.mjs",
+            "docs/guided-setup/matrix-conversations.md"
+          ]
+        },
+        {
+          "path": "package.json",
+          "previousSha256": "651f117d09ceadb78577fa8260325f4d89c726dffd0132e2f59b2fcf8dd6a620",
+          "sha256": "a8fcea1fe90fd56aa72a2e81cc24b6e9b34ef7dff3cd7a358bbce48b3c3e8168",
+          "reason": "Approved main Hub/Settings navigation, radial Hermes and Matrix conversation follow-ups preserve existing setup owners; exact source pins retain the historical database review snapshots.",
+          "evidence": [
+            "profiles/source-provenance.json",
+            "tests/hub/main-view.test.mjs",
+            "tests/setup/hermes-chat-state.test.mjs",
+            "tests/matrix/conversations.test.mjs",
+            "scripts/check-matrix-api.mjs",
+            "docs/guided-setup/matrix-conversations.md"
+          ]
+        }
+      ]
+    }
+  }
+}

@@ -10,6 +10,6 @@ export function projectMatrixChat({snapshot=null,loading=false,error=false,now=D
   const raw=snapshot?.instances?.find(i=>i.instanceId===connection.key);
   const verified=['verified','partial'].includes(connection.state);
   const spaces=verified?(Array.isArray(raw?.view?.rooms)?raw.view.rooms:[]).filter(r=>r?.kind==='space'&&r.membership==='join'&&id(r.roomId)&&typeof r.encrypted==='boolean').slice(0,100).map(space=>({id:space.roomId,name:label(space.name,space.roomId),children:Array.isArray(space.children)?space.children.filter(id).slice(0,100):[]})):[];
-  return {key:connection.key+'/'+(connection.userId||'unsigned')+'/'+(raw?.account?.deviceId||''),label:connection.label,userId:connection.userId,state:connection.state,message:connection.message,settingsHref:connection.settingsHref,complete:connection.roomsComplete,spaces,rooms:connection.rooms.map(r=>({id:r.roomId,name:r.name,topic:r.topic,encrypted:r.encrypted,openHref:r.openHref})),invitations:connection.invitations};
+  return {instanceId:connection.key,key:connection.key+'/'+(connection.userId||'unsigned')+'/'+(raw?.account?.deviceId||''),label:connection.label,userId:connection.userId,state:connection.state,message:connection.message,settingsHref:connection.settingsHref,complete:connection.roomsComplete,spaces,rooms:connection.rooms.map(r=>({id:r.roomId,name:r.name,topic:r.topic,encrypted:r.encrypted,openHref:r.openHref})),invitations:connection.invitations};
  })};
 }

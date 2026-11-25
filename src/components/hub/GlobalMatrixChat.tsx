@@ -1,13 +1,15 @@
 "use client";
 import {useCallback,useEffect,useRef,useState} from "react";
 import {useRouter} from "next/navigation";
-import {MatrixChat} from "@/vendor/zenith-ui/MatrixChat/MatrixChat";
+import {useMatrixConversation} from "./useMatrixConversation";
+import {MatrixChat,type MatrixChatRoom} from "@/vendor/zenith-ui/MatrixChat/MatrixChat";
 import {projectMatrixChat} from "@/lib/hub/matrix-chat-view.mjs";
-type Snapshot={schema:string;csrf:string;busy:boolean;instances:{instanceId:string;enabled:boolean;evidence:string;view?:{observedAt?:string}|null}[]};
+type Snapshot={schema:string;csrf:string;busy:boolean;instances:{instanceId:string;enabled:boolean;evidence:string;account?:{userId:string;deviceId:string}|null;view?:{observedAt?:string}|null}[]};
 export function GlobalMatrixChat({open,onClose,preview=false,onHoverEnter,onHoverLeave,onInteract}:{open:boolean;onClose:()=>void;preview?:boolean;onHoverEnter?:()=>void;onHoverLeave?:()=>void;onInteract?:()=>void}){
  const router=useRouter(),[snapshot,setSnapshot]=useState<Snapshot|null>(null),[loading,setLoading]=useState(true),[busy,setBusy]=useState(false),[error,setError]=useState(false),[now,setNow]=useState(Date.now);
  const [selection,setSelection]=useState<{accountKey:string;spaceId:string|null;roomId:string|null}|null>(null);
  const request=useRef<AbortController|null>(null);
+ const [activeRoom,setActiveRoom]=useState<{accountKey:string;room:MatrixChatRoom}|null>(null);
  const load=useCallback(async(force=false)=>{
   if(request.current)return;
   const abort=new AbortController();request.current=abort;setBusy(true);
@@ -41,6 +43,13 @@ export function GlobalMatrixChat({open,onClose,preview=false,onHoverEnter,onHove
   document.addEventListener("visibilitychange",visible);window.addEventListener("focus",visible);
   return()=>{document.removeEventListener("visibilitychange",visible);window.removeEventListener("focus",visible);clearInterval(poll);clearInterval(tick);request.current?.abort();request.current=null;};
  },[open,load]);
+ const model=projectMatrixChat({snapshot,loading,error,now});
+ const account=model.accounts.find(a=>a.key===selection?.accountKey)||model.accounts[0];
+ const instance=snapshot?.instances.find(i=>i.instanceId===account?.instanceId);
+ const room=activeRoom&&account&&selection&&selection.accountKey===account.key&&selection.roomId===activeRoom.room.id&&activeRoom.accountKey===account.key?activeRoom.room:null;
+ const target=room&&account&&instance?.account?{key:account.key+"/"+room.id,accountKey:account.key,instanceId:instance.instanceId,userId:instance.account.userId,deviceId:instance.account.deviceId,room}:null;
+ const conversation=useMatrixConversation({open,csrf:snapshot?.csrf||"",target});
+ function select(value:{accountKey:string;spaceId:string|null;roomId:string|null}){const a=model.accounts.find(a=>a.key===value.accountKey),r=a?.rooms.find(r=>r.id===value.roomId);setActiveRoom(r?{accountKey:value.accountKey,room:r}:null);setSelection(value);}
  if(!open)return null;
- return <MatrixChat autoFocus={!preview} onHoverEnter={onHoverEnter} onHoverLeave={onHoverLeave} onInteract={onInteract} model={projectMatrixChat({snapshot,loading,error,now})} busy={busy} selection={selection} onSelect={setSelection} onClose={onClose} onRefresh={()=>void load(true)} onNavigate={href=>{onClose();router.push(href);}}/>;
+ return <MatrixChat autoFocus={!preview} onHoverEnter={onHoverEnter} onHoverLeave={onHoverLeave} onInteract={onInteract} model={model} conversation={conversation.model} draft={conversation.draft} onDraftChange={conversation.setDraft} onSendMessage={conversation.send} onRetryMessage={conversation.retry} onRefreshConversation={conversation.refresh} busy={busy} selection={selection} onSelect={select} onClose={onClose} onRefresh={()=>void load(true)} onNavigate={href=>{onClose();router.push(href);}}/>;
 }

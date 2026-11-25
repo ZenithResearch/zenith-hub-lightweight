@@ -26,7 +26,11 @@ API and approved page-context bridge. There is no Hermes transcript mode or
 follow-up-history field. The mistakenly added history implementation was removed.
 
 Matrix uses its own saved account, independently of Hermes availability. Its
-panel shows spaces in a horizontal carousel above the room list. Selecting a
+compact Messenger-inspired window uses blue glass chrome, a framed account
+avatar and a light room list. The account status light describes connection
+verification, not a person’s online presence. Room avatars and encryption marks
+come from the existing room model; no unread counts or presence are inferred.
+The panel shows spaces in a horizontal carousel above the room list. Selecting a
 space filters the rooms below it through verified
 m.space.child relationships, including nested spaces, and keeps local selection across navigation and
 minimizing. Account/device identities scope that selection. Matrix configuration
@@ -34,14 +38,19 @@ links open the matching Settings section. No selection is written merely by
 browsing the panel.
 
 Only while open, the panel reads the existing /api/matrix snapshot and refreshes
-stale observation evidence through its existing authenticated, CSRF-protected
-refresh action. It does not create sessions, join/create rooms, send messages or
-manage native services. Closed panels stop polling. Credentials remain server-side.
+stale observation evidence through the existing authenticated, CSRF-protected
+refresh action. Selecting a room opens its recent timeline and message input in
+this same window. Closed panels stop polling. Credentials remain server-side.
 
-The existing connector does not supply a message timeline or E2EE client. The
-panel makes that limitation explicit and offers a Matrix client room link,
-rather than exposing a plaintext composer in encrypted rooms. Building native
-message reading/sending requires a separately implemented client capability.
+The separately authorized conversation client uses the saved Hub account and a
+persistent encryption store for its own Matrix device. Reading does not send a
+room message. Messages are sent only by Send (or Enter in the composer); drafts
+remain in memory across minimizing and navigation. Ambiguous delivery offers an
+explicit retry of the same Matrix transaction rather than sending a new copy.
+Older encrypted messages may remain unreadable until this device has their room
+keys. The panel never disables encryption, joins rooms automatically or replaces
+another client's device keys. Matrix text is excluded from Hermes page context.
+See [Matrix conversations](matrix-conversations.md) for storage and qualification.
 
 No ontology or application-database migration is required. Existing setup,
 connections, credentials, Matrix accounts, room memberships and saved selections

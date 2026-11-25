@@ -97,3 +97,5 @@ Synthetic tests cover normalized mapping, persistence/reopen, stale plans, priva
 ## Publication qualification
 
 The original `integration-inputs.json` snapshot is retained. Later approved default-provider, installation-entry and Apps & services changes are recorded separately in `publication-inputs.json`, with previous/current file hashes, reasons and evidence. The design verifier checks that ledger against the original snapshot and exact current bytes; other inputs and all published ontology files retain their existing checks. This distinguishes authorized follow-up work from accidental source drift without rewriting the original integration baseline.
+
+The subsequent main Hub, Settings, radial HUD and embedded Matrix conversation work is pinned separately in `workspace-inputs.json`, chained to the unchanged Matrix follow-up ledger. Exact previous/current digests and verification evidence are required; neither historical input snapshot nor published ontology pins are rewritten.

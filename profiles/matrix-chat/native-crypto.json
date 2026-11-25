@@ -1,0 +1,31 @@
+{
+  "schema": "zenith.matrix-native-crypto.v1",
+  "version": "0.7.0",
+  "repository": "https://github.com/matrix-org/matrix-rust-sdk-crypto-nodejs",
+  "platforms": {
+    "darwin-arm64": {
+      "filename": "matrix-sdk-crypto.darwin-arm64.node",
+      "url": "https://github.com/matrix-org/matrix-rust-sdk-crypto-nodejs/releases/download/v0.7.0/matrix-sdk-crypto.darwin-arm64.node",
+      "size": 13486912,
+      "sha256": "84a805e11ab5cf65fdac62ae0841b6f898e5637dd25ec922d0be349ba570cee4"
+    },
+    "darwin-x64": {
+      "filename": "matrix-sdk-crypto.darwin-x64.node",
+      "url": "https://github.com/matrix-org/matrix-rust-sdk-crypto-nodejs/releases/download/v0.7.0/matrix-sdk-crypto.darwin-x64.node",
+      "size": 14636472,
+      "sha256": "30053cc1f3fd22a4b4d3c63fc8dd1949bd2d61c5ff94dde0786fa2b55848902e"
+    },
+    "linux-x64": {
+      "filename": "matrix-sdk-crypto.linux-x64-gnu.node",
+      "url": "https://github.com/matrix-org/matrix-rust-sdk-crypto-nodejs/releases/download/v0.7.0/matrix-sdk-crypto.linux-x64-gnu.node",
+      "size": 25678992,
+      "sha256": "5a880046c21d6e6997acda6b999e1bc07b0400ceb90be06554fefff6dfe45249"
+    },
+    "linux-arm64": {
+      "filename": "matrix-sdk-crypto.linux-arm64-gnu.node",
+      "url": "https://github.com/matrix-org/matrix-rust-sdk-crypto-nodejs/releases/download/v0.7.0/matrix-sdk-crypto.linux-arm64-gnu.node",
+      "size": 22703832,
+      "sha256": "31c181376af0298bbd91e64ede09685f6830971f41c6158404006c6907d2ddc1"
+    }
+  }
+}

@@ -2,6 +2,17 @@
 
 ## [Unreleased]
 
+### Added
+- Read recent Matrix messages and send from the same floating Messenger-style window, with persistent per-device native encryption, explicit Send and idempotent retry — conversations must stay in the Hub without replacing existing accounts, sessions or room encryption.
+
+### Fixed
+- Release idle native crypto workers with their owning Hub process and keep worker launch arguments independent — persistent encryption must not prevent clean server stops or inherit parent evaluation flags.
+- Chain exact main-Hub and Matrix follow-up source pins to the retained database review ledgers — historical evidence must remain reproducible while approved UI changes pass design verification.
+- Exclude floating Matrix conversation text from Hermes page-context capture — decrypted private messages must not enter the separately approved general-page context bridge.
+
+### Changed
+- Give the floating Matrix panel compact Messenger-inspired blue chrome, an account card and a light room list — the previous wide dark surface obscured the contact-window character and room hierarchy.
+
 ### Changed
 - Replace the floating HUD options with a rebuilt radial collar, a dedicated inbox segment and profile dots on the curved rail — the menu should behave and read as one compact control with stable hover and keyboard navigation.
 

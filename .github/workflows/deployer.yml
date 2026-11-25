@@ -15,6 +15,7 @@ jobs:
           node-version: '24'
           cache: npm
       - run: npm ci --ignore-scripts
+      - run: npm run matrix:prepare
       - uses: actions/setup-python@v6
         with:
           python-version: '3.12'
@@ -26,6 +27,7 @@ jobs:
       - run: npm run test:setup
       - run: npm run test:objects
       - run: npm run test:hub
+      - run: npm run test:matrix-chat
       - run: npm run test:application
       - run: npm run test:catalog
       - run: node scripts/verify-infrastructure.mjs

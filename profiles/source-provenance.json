@@ -402,11 +402,6 @@
     "scope": "Generic reviewed Matrix setup presentation",
     "files": [
       {
-        "path": "src/vendor/zenith-ui/MatrixSetup/MatrixSetup.tsx",
-        "upstream_path": "src/MatrixSetup/MatrixSetup.tsx",
-        "sha256": "833403c5188127acf74d3110d12bec3b8a99f84ecf13f561bb016df69c6c24a3"
-      },
-      {
         "path": "src/vendor/zenith-ui/MatrixSetup/MatrixSetup.css",
         "upstream_path": "src/MatrixSetup/MatrixSetup.css",
         "sha256": "b012e90f374deae855a86d09716feb8d06dd9273b072f1041a10905fa2c00d6c"
@@ -463,22 +458,6 @@
   },
   {
     "repository": "https://github.com/ZenithResearch/zenith-ui-deployment",
-    "commit": "85f56a2bc8ce70b2d053c74da570ecec849dc795",
-    "files": [
-      {
-        "path": "src/vendor/zenith-ui/MatrixChat/MatrixChat.tsx",
-        "upstream_path": "src/MatrixChat/MatrixChat.tsx",
-        "sha256": "0aa76aaadc248b9bed9cd173cfc97037650aafbc44a71c59a5a924ed746bc635"
-      },
-      {
-        "path": "src/vendor/zenith-ui/MatrixChat/MatrixChat.css",
-        "upstream_path": "src/MatrixChat/MatrixChat.css",
-        "sha256": "a219bd2a5e7a250b0084b1e3270554f55023ead01f237d9d1ed3247522c05f19"
-      }
-    ]
-  },
-  {
-    "repository": "https://github.com/ZenithResearch/zenith-ui-deployment",
     "commit": "99991743e0d756a6f6259c81067a85ddb77544fb",
     "files": [
       {
@@ -501,6 +480,32 @@
         "path": "src/vendor/zenith-ui/HubSetup/HubSetup.css",
         "upstream_path": "src/HubSetup/HubSetup.css",
         "sha256": "6a9ee7358079454db7e0b9ab0c1dce200d43afd8ce76e15f11e3176b6a69673b"
+      }
+    ]
+  },
+  {
+    "repository": "https://github.com/ZenithResearch/zenith-ui-deployment",
+    "commit": "cf58d50adbe8111242f917b632a83c28a1dc5db7",
+    "files": [
+      {
+        "path": "src/vendor/zenith-ui/MatrixChat/MatrixChat.tsx",
+        "sha256": "40fe3261d9cc8e0dbcbbd0e95fab523007c940460e288e1326c5fa117fc27dd1",
+        "upstream_path": "src/MatrixChat/MatrixChat.tsx"
+      },
+      {
+        "path": "src/vendor/zenith-ui/MatrixChat/MatrixChat.css",
+        "sha256": "7216d3ccf02f0320adc130a02679d0dca5f7f397b4b0dda37a6543bdb89ddf22",
+        "upstream_path": "src/MatrixChat/MatrixChat.css"
+      },
+      {
+        "path": "src/vendor/zenith-ui/MatrixChat/MatrixConversation.tsx",
+        "sha256": "8faf5ecb72d70a68bd31f10f47489c1c1deadb266b62842fe6aec51cbf8a17c0",
+        "upstream_path": "src/MatrixChat/MatrixConversation.tsx"
+      },
+      {
+        "path": "src/vendor/zenith-ui/MatrixSetup/MatrixSetup.tsx",
+        "sha256": "d804129c82294f6963a8056e58ba0c170a8f185eef9379a8cbd11aeb9011598b",
+        "upstream_path": "src/MatrixSetup/MatrixSetup.tsx"
       }
     ]
   }
