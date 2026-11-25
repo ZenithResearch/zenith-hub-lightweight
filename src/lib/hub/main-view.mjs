@@ -51,14 +51,14 @@ export function projectMainHub({hub=null,matrix=null,loading=false,errors={},now
   return {key,label:text(i.label,'Matrix'),userId:identity,state,message,settingsHref:'/settings?matrix='+encodeURIComponent(i.instanceId),rooms,roomsComplete:complete,invitations:canOpen&&v.invitationState==='verified'?rows(v.invitations).length:null};
  });
  if(includeConversations&&!loading&&matrixFailed&&!conversations.length)conversations.push({key:'matrix-unverified',label:'Matrix',userId:null,state:'unavailable',message:'Saved Matrix connections could not be read. Refresh or open Settings.',settingsHref:settingsHref('matrix'),rooms:[],roomsComplete:false,invitations:null});
- const descriptors=[{id:'service-management',name:'Service Management',description:'Requests and cases.'},{id:'devgraph',name:'Devgraph',description:'Tasks, issues and projects.'}];
+ const descriptors=[{id:'service-management',name:'Service Management',description:'Requests and cases.'},{id:'process-runtime',name:'Process Runtime',description:'Runs, steps and committed outputs.'},{id:'frank',name:'Frank',description:'Executes eligible work through configured providers.',worker:true},{id:'devgraph',name:'Devgraph',description:'Tasks, issues and projects.'}];
  const work=descriptors.flatMap(d=>{
   const found=rows(hub?.resources).filter(r=>r.componentId===d.id);
-  if(!found.length)return [{key:d.id,name:d.name,description:d.description,status:hubFailed?'Not verified':'Not configured',message:hubFailed?'Refresh to check this connection.':'Connect '+d.name+' in Settings to use it for your work.',settingsHref:settingsHref(d.id),openHref:null}];
+  if(!found.length)return [{key:d.id,name:d.name,description:d.description,status:hubFailed?'Not verified':'Not configured',message:hubFailed?'Refresh to check this connection.':'Set up '+d.name+' in Settings to use it for your work.',settingsHref:settingsHref(d.id),openHref:null}];
   return found.map(r=>{
    const ready=!hubFailed&&!r.stale&&r.enabled!==false&&fresh(r.observedAt,now)&&['Ready','Ready to read'].includes(r.status);
-   const openHref=ready?serviceHref(r.endpoint):null;
-   return {key:text(r.key,d.id),name:text(r.label,d.name),description:d.description,status:hubFailed?'Not verified':text(r.status,'Not verified'),message:openHref?'Open this service to use its work. Work items are not loaded into this Hub yet.':'Check this connection in Settings before using it for work.',settingsHref:settingsHref(d.id,r.key),openHref};
+   const openHref=ready&&!d.worker?serviceHref(r.endpoint):null;
+   return {key:text(r.key,d.id),name:text(r.label,d.name),description:d.description,status:hubFailed?'Not verified':text(r.status,'Not verified'),message:d.worker?(hubFailed||r.stale?'Refresh to check installation; worker readiness is not verified.':r.configured===false?'Installation needs configuration; worker readiness is not verified.':r.installed===true?'Installed; worker readiness and actor registration are not verified.':'Check installation and worker configuration in Settings.'):openHref?'Open this service to use its work. Work items are not loaded into this Hub yet.':'Check this connection in Settings before using it for work.',settingsHref:settingsHref(d.id,r.key),openHref};
   });
  });
  return {loading,warnings,conversations,work};

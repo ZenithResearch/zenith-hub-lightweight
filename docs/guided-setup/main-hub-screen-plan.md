@@ -22,7 +22,7 @@ Legacy /hub?matrix=INSTANCE links still forward to the matching Settings panel.
 
 ## Work
 
-Service Management and Devgraph summaries use /api/hub. Unconfigured services
+Service Management, Process Runtime, Frank and Devgraph summaries use /api/hub. Frank reports installation separately from unverified worker readiness. Unconfigured services
 open the relevant catalog form; configured services open their saved details.
 Launch links require fresh ready evidence and an allowed root service address.
 

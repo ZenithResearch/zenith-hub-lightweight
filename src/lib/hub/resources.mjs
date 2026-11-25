@@ -4,6 +4,7 @@ import {serviceEndpoint} from '../setup/connections.mjs';
 export function resourceStatus(item,now=Date.now()) {
   if(item.enabled===false)return 'Disconnected';
   if(item.partial || item.mode==='install' && item.installed===false)return 'Setup incomplete';
+  if(item.mode==='install' && item.installed===true && item.configured===false)return 'Needs configuration';
   if(item.componentId==='frank')return item.installed===true?'Installed':'Installation not verified';
   if(item.mode==='install' && item.running===false)return 'Stopped';
   const o=item.observation,age=now-Date.parse(o?.observedAt);

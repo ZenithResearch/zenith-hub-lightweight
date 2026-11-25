@@ -2,7 +2,14 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- Wait for a cancelled Settings review to retire before allowing another action — prevent its background database update from invalidating a newly reviewed operation.
+
 ### Added
+
+- Show Process Runtime and Frank in Work with direct setup links and explicit worker readiness limits — make the existing components discoverable without treating installation as execution readiness.
+- Identify installed components that still need configuration — distinguish incomplete setup from a stopped service.
 - Separate account-native Matrix direct messages from group rooms and add in-window reviewed DM, room creation/invitation, join and invitation-acceptance flows — both one-to-one and shared conversations should work without leaving the floating chat.
 
 ### Fixed

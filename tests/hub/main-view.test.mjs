@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {projectMainHub,settingsIntent} from '../../src/lib/hub/main-view.mjs';
+import {resourceStatus} from '../../src/lib/hub/resources.mjs';
 const now=Date.parse('2026-11-24T20:00:00Z'),at=new Date(now).toISOString();
 function fixture(){
  const account={userId:'@alice:example.org',deviceId:'HUB',endpoint:'http://127.0.0.1:8008'};
@@ -47,7 +48,7 @@ test('a verified empty room list is distinct from missing or unavailable Matrix 
 test('unconfigured work sources link directly to the appropriate settings with no invented counts',()=>{
  const m=projectMainHub(fixture());
  assert.equal(m.work[0].settingsHref,'/settings?component=service-management');
- assert.equal(m.work[1].settingsHref,'/settings?component=devgraph');
+ assert.deepEqual(m.work.map(s=>s.settingsHref),['/settings?component=service-management','/settings?component=process-runtime','/settings?component=frank','/settings?component=devgraph']);
  assert.ok(m.work.every(s=>s.status==='Not configured'&&s.openHref===null&&!Object.hasOwn(s,'count')));
 });
 test('only fresh, ready and safe configured work addresses are launchable',()=>{
@@ -79,7 +80,7 @@ test('an unavailable Matrix snapshot cannot look like a verified empty or unconf
 test('the work-only screen does not invent Matrix warnings or read conversation evidence',()=>{
  const model=projectMainHub({hub:fixture().hub,includeConversations:false,now});
  assert.deepEqual(model.conversations,[]);assert.deepEqual(model.warnings,[]);
- assert.equal(model.work.length,2);
+ assert.equal(model.work.length,4);
 });
 
 
@@ -88,4 +89,13 @@ test('an incomplete account check is unavailable without claiming an identity mi
  const c=projectMainHub(f).conversations[0];
  assert.equal(c.state,'unavailable');assert.match(c.message,/check could not be completed/);
  assert.doesNotMatch(c.message,/do not match/);assert.deepEqual(c.rooms,[]);assert.equal(c.roomsComplete,false);
+});
+
+test('Frank installation never implies worker readiness or a service link',()=>{
+ const f=fixture();f.hub.resources=[{key:'setup:frank',componentId:'frank',installed:true,status:'Installed',endpoint:'http://127.0.0.1:18092',observedAt:at}];
+ const s=projectMainHub(f).work.find(s=>s.key==='setup:frank');assert.equal(s.status,'Installed');assert.equal(s.openHref,null);assert.match(s.message,/readiness and actor registration are not verified/);assert.equal(s.settingsHref,'/settings?resource=setup%3Afrank');
+});
+
+test('installed components awaiting configuration are not presented as merely stopped',()=>{
+ for(const componentId of ['process-runtime','service-management','frank'])assert.equal(resourceStatus({componentId,mode:'install',installed:true,configured:false,running:false}),'Needs configuration');
 });
