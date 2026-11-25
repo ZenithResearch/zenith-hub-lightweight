@@ -40,7 +40,8 @@ export function projectMainHub({hub=null,matrix=null,loading=false,errors={},now
   else if(matrixFailed){message='This connection could not be checked. Its saved account is retained.';}
   else if(!account||['sign-in-required','expired','permission-denied'].includes(v?.authentication)){state='sign-in-required';message=v?.authentication==='expired'?'The saved session needs attention. Sign in through Matrix settings.':'Sign in to this Matrix connection to view its conversations.';}
   else if(i.evidence!=='fresh'||!fresh(v?.observedAt,now)){state='stale';message='Saved room information needs a fresh check.';}
-  else if(!identity||account.endpoint!==i.endpoint||v?.endpoint!==i.endpoint||v?.authentication!=='authenticated'||v?.account?.userId!==identity||account.deviceId&&account.deviceId!==v.account.deviceId){message='The saved account and latest verification do not match. Refresh before opening conversations.';}
+  else if(v?.authentication!=='authenticated'){message='The Matrix account check could not be completed. Refresh to try again; your saved session is retained.';}
+  else if(!identity||account.endpoint!==i.endpoint||v?.endpoint!==i.endpoint||v?.account?.userId!==identity||account.deviceId&&account.deviceId!==v.account.deviceId){message='The saved account and latest verification do not match. Refresh before opening conversations.';}
   else{state='verified';message='';}
   const validRoom=r=>roomId(r?.roomId)&&['room','space'].includes(r.kind)&&r.membership==='join'&&typeof r.encrypted==='boolean';
   const canOpen=state==='verified';

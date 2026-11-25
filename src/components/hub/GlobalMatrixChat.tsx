@@ -4,7 +4,7 @@ import {useRouter} from "next/navigation";
 import {MatrixChat} from "@/vendor/zenith-ui/MatrixChat/MatrixChat";
 import {projectMatrixChat} from "@/lib/hub/matrix-chat-view.mjs";
 type Snapshot={schema:string;csrf:string;busy:boolean;instances:{instanceId:string;enabled:boolean;evidence:string;view?:{observedAt?:string}|null}[]};
-export function GlobalMatrixChat({open,onClose}:{open:boolean;onClose:()=>void}){
+export function GlobalMatrixChat({open,onClose,preview=false,onHoverEnter,onHoverLeave,onInteract}:{open:boolean;onClose:()=>void;preview?:boolean;onHoverEnter?:()=>void;onHoverLeave?:()=>void;onInteract?:()=>void}){
  const router=useRouter(),[snapshot,setSnapshot]=useState<Snapshot|null>(null),[loading,setLoading]=useState(true),[busy,setBusy]=useState(false),[error,setError]=useState(false),[now,setNow]=useState(Date.now);
  const [selection,setSelection]=useState<{accountKey:string;spaceId:string|null;roomId:string|null}|null>(null);
  const request=useRef<AbortController|null>(null);
@@ -42,5 +42,5 @@ export function GlobalMatrixChat({open,onClose}:{open:boolean;onClose:()=>void})
   return()=>{document.removeEventListener("visibilitychange",visible);window.removeEventListener("focus",visible);clearInterval(poll);clearInterval(tick);request.current?.abort();request.current=null;};
  },[open,load]);
  if(!open)return null;
- return <MatrixChat model={projectMatrixChat({snapshot,loading,error,now})} busy={busy} selection={selection} onSelect={setSelection} onClose={onClose} onRefresh={()=>void load(true)} onNavigate={href=>{onClose();router.push(href);}}/>;
+ return <MatrixChat autoFocus={!preview} onHoverEnter={onHoverEnter} onHoverLeave={onHoverLeave} onInteract={onInteract} model={projectMatrixChat({snapshot,loading,error,now})} busy={busy} selection={selection} onSelect={setSelection} onClose={onClose} onRefresh={()=>void load(true)} onNavigate={href=>{onClose();router.push(href);}}/>;
 }

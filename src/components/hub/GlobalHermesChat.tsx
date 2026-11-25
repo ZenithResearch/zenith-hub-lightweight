@@ -6,6 +6,7 @@ import { capturePageContext } from "@/lib/setup/page-context";
 import { HermesChatHud } from "@/vendor/zenith-ui/HubSetup/HubSetup";
 import {
   hermesChatState,
+  hermesQuickTargets,
   type HermesChatSnapshot,
 } from "@/lib/setup/hermes-chat-state.mjs";
 import { GlobalMatrixChat } from "./GlobalMatrixChat";
@@ -14,7 +15,49 @@ const refreshEvent = "zenith:hub-setup-refresh";
 export function GlobalHermesChat() {
   const [snapshot, setSnapshot] = useState<HermesChatSnapshot | null>(null);
   const [openSignal, setOpenSignal] = useState(0);
-  const [matrixOpen, setMatrixOpen] = useState(false);
+  const [receiverId,setReceiverId] = useState<string|undefined>();
+  const [matrixMode, setMatrixMode] = useState<"closed"|"preview"|"pinned">("closed");
+  const matrixModeRef = useRef(matrixMode);
+  const matrixLeaveTimer = useRef<ReturnType<typeof setTimeout>|null>(null);
+  function cancelMatrixLeave(){
+    if(matrixLeaveTimer.current!==null){clearTimeout(matrixLeaveTimer.current);matrixLeaveTimer.current=null;}
+  }
+  function changeMatrixMode(mode:"closed"|"preview"|"pinned"){
+    matrixModeRef.current=mode;setMatrixMode(mode);
+  }
+  function previewMatrix(){
+    cancelMatrixLeave();
+    if(matrixModeRef.current==="closed")changeMatrixMode("preview");
+  }
+  function holdMatrix(){cancelMatrixLeave();}
+  function leaveMatrix(){
+    cancelMatrixLeave();
+    if(matrixModeRef.current!=="preview")return;
+    matrixLeaveTimer.current=setTimeout(()=>{
+      matrixLeaveTimer.current=null;
+      if(matrixModeRef.current!=="preview")return;
+      const active=document.activeElement;
+      const dial=active instanceof Element?active.closest(".zn-hermes-dial"):null;
+      if(active instanceof Element&&(active.closest("#zenith-matrix-chat")||active.matches(".zn-hermes-dial__choice")&&dial&&!dial.classList.contains("is-suppressed")))return;
+      changeMatrixMode("closed");
+    },280);
+  }
+  function pinMatrix(focus=false){
+    cancelMatrixLeave();changeMatrixMode("pinned");
+    if(focus)requestAnimationFrame(()=>document.getElementById("zenith-matrix-chat")?.focus());
+  }
+  useEffect(()=>{
+    const outside=(event:PointerEvent)=>{
+      if(matrixModeRef.current!=="preview")return;
+      if(!(event.target instanceof Element)||!event.target.closest(".zn-hermes-hud,#zenith-matrix-chat")){cancelMatrixLeave();changeMatrixMode("closed");}
+    };
+    const escape=(event:KeyboardEvent)=>{
+      if(!event.defaultPrevented&&event.key==="Escape"&&matrixModeRef.current==="preview"){cancelMatrixLeave();changeMatrixMode("closed");}
+    };
+    document.addEventListener("pointerdown",outside);
+    document.addEventListener("keydown",escape);
+    return()=>{document.removeEventListener("pointerdown",outside);document.removeEventListener("keydown",escape);cancelMatrixLeave();};
+  },[]);
   const [portalHost, setPortalHost] = useState<HTMLDivElement | null>(null);
   const [receivedAt, setReceivedAt] = useState(0);
   const [now, setNow] = useState(Date.now());
@@ -92,6 +135,7 @@ export function GlobalHermesChat() {
         receive(value);
     };
     const openChat = () => {
+      cancelMatrixLeave();changeMatrixMode("closed");
       setOpenSignal((n) => n + 1);
       void refresh();
     };
@@ -111,7 +155,8 @@ export function GlobalHermesChat() {
       window.removeEventListener(snapshotEvent, receiveEvent);
     };
   }, []);
-  const state = hermesChatState(snapshot, receivedAt, now);
+  const state = hermesChatState(snapshot, receivedAt, now, receiverId);
+  const quickTargets = hermesQuickTargets(snapshot);
   async function sendMessage(message: string) {
     // MVP ONLY: Appending page content is a temporary context bridge.
     // TODO: Improve context injection for agents and generalize inputs around the
@@ -119,7 +164,7 @@ export function GlobalHermesChat() {
     // Keep domain input, attached context and Hermes/provider bindings distinct.
     const contextualMessage = appendPageContext(message, capturePageContext());
     const fresh = await refresh();
-    const target = hermesChatState(fresh, Date.now());
+    const target = hermesChatState(fresh, Date.now(), Date.now(), state.instance?.instanceId);
     if (!fresh?.csrf || !target.available || target.identity !== state.identity)
       throw Error("hermes_unavailable");
     const response = await fetch("/api/setup", {
@@ -144,7 +189,7 @@ export function GlobalHermesChat() {
     return reply.message;
   }
   function closeMatrix(){
-    setMatrixOpen(false);
+    cancelMatrixLeave();changeMatrixMode("closed");
     requestAnimationFrame(()=>portalHost?.querySelector<HTMLButtonElement>(".zn-hermes-hud__orb")?.focus());
   }
   if (!portalHost) return null;
@@ -153,16 +198,22 @@ export function GlobalHermesChat() {
     <>
     <HermesChatHud
       key={state.identity || "hub-hud"}
+      quickTargets={quickTargets}
+      activeQuickId={state.instance?.instanceId}
+      onSelectQuick={id=>{if(quickTargets.some(t=>t.id===id)){setReceiverId(id);setOpenSignal(n=>n+1);}}}
       connected={state.available}
       openSignal={openSignal}
       busy={snapshot?.busy === true}
       status={hudStatus}
-      matrixOpen={matrixOpen}
-      onOpenMatrix={()=>setMatrixOpen(true)}
+      matrixOpen={matrixMode!=="closed"}
+      onOpenMatrix={()=>pinMatrix(true)}
+      onPreviewMatrix={previewMatrix}
+      matrixHover={{onEnter:holdMatrix,onLeave:leaveMatrix}}
       onCloseMatrix={closeMatrix}
       onSend={sendMessage}
     />
-    <GlobalMatrixChat open={matrixOpen} onClose={closeMatrix}/>
+    <GlobalMatrixChat open={matrixMode!=="closed"} preview={matrixMode==="preview"} onClose={closeMatrix}
+      onHoverEnter={holdMatrix} onHoverLeave={leaveMatrix} onInteract={()=>pinMatrix()}/>
     </>,
     portalHost,
   );

@@ -455,34 +455,46 @@
     "commit": "a0168f6301020f39cb1483af304c41b11aec855c",
     "files": [
       {
-        "path": "src/vendor/zenith-ui/HubSetup/HubSetup.tsx",
-        "upstream_path": "src/HubSetup/HubSetup.tsx",
-        "sha256": "1b1bacc4d9ca526c57e6b9f4de3bba56ff8d1766a3909aff14647f8211d77d97"
-      },
-      {
-        "path": "src/vendor/zenith-ui/HubSetup/HubSetup.css",
-        "upstream_path": "src/HubSetup/HubSetup.css",
-        "sha256": "22feccdcb5a9f76de81539d6b780ae6f4ace50d0e43f4fb3ce6ab69740c5a0ed"
-      },
-      {
-        "path": "src/vendor/zenith-ui/HubSetup/HermesModeDial.tsx",
-        "upstream_path": "src/HubSetup/HermesModeDial.tsx",
-        "sha256": "7b571f6c37c71f847d2ccee86c67392cb72625be28275666a3a0fcc5aa06f636"
-      },
+        "path": "src/vendor/zenith-ui/MatrixChat/matrix-spaces.ts",
+        "upstream_path": "src/MatrixChat/matrix-spaces.ts",
+        "sha256": "f032e2f65a3f19463a62ca06965555e85f277c7cf58249dd5a1d6f81ff2970ea"
+      }
+    ]
+  },
+  {
+    "repository": "https://github.com/ZenithResearch/zenith-ui-deployment",
+    "commit": "85f56a2bc8ce70b2d053c74da570ecec849dc795",
+    "files": [
       {
         "path": "src/vendor/zenith-ui/MatrixChat/MatrixChat.tsx",
         "upstream_path": "src/MatrixChat/MatrixChat.tsx",
-        "sha256": "6e7961707701606238ceefb449ca63389390d5b9cf1e73db3d8756abee5b9818"
+        "sha256": "0aa76aaadc248b9bed9cd173cfc97037650aafbc44a71c59a5a924ed746bc635"
       },
       {
         "path": "src/vendor/zenith-ui/MatrixChat/MatrixChat.css",
         "upstream_path": "src/MatrixChat/MatrixChat.css",
-        "sha256": "a2a62ab6a3ddd4323a55424e0bdfad290e64dbd8b7980740d644765ae3dc8f4a"
+        "sha256": "a219bd2a5e7a250b0084b1e3270554f55023ead01f237d9d1ed3247522c05f19"
+      }
+    ]
+  },
+  {
+    "repository": "https://github.com/ZenithResearch/zenith-ui-deployment",
+    "commit": "99991743e0d756a6f6259c81067a85ddb77544fb",
+    "files": [
+      {
+        "path": "src/vendor/zenith-ui/HubSetup/HermesModeDial.tsx",
+        "upstream_path": "src/HubSetup/HermesModeDial.tsx",
+        "sha256": "315b989bdaab9270ac9468eb4070dd4b00946e990c73151b2a62ebd4784d5250"
       },
       {
-        "path": "src/vendor/zenith-ui/MatrixChat/matrix-spaces.ts",
-        "upstream_path": "src/MatrixChat/matrix-spaces.ts",
-        "sha256": "f032e2f65a3f19463a62ca06965555e85f277c7cf58249dd5a1d6f81ff2970ea"
+        "path": "src/vendor/zenith-ui/HubSetup/HubSetup.tsx",
+        "upstream_path": "src/HubSetup/HubSetup.tsx",
+        "sha256": "1923de3a7119be18d8b42ec280878ae0d4da179c41c378f278510f205df751a5"
+      },
+      {
+        "path": "src/vendor/zenith-ui/HubSetup/HubSetup.css",
+        "upstream_path": "src/HubSetup/HubSetup.css",
+        "sha256": "0f34d9fce0eea138a7f48825aeb07626e4fd99656e1c77deef021db5e3e7b32a"
       }
     ]
   }

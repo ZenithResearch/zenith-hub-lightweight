@@ -81,3 +81,11 @@ test('the work-only screen does not invent Matrix warnings or read conversation 
  assert.deepEqual(model.conversations,[]);assert.deepEqual(model.warnings,[]);
  assert.equal(model.work.length,2);
 });
+
+
+test('an incomplete account check is unavailable without claiming an identity mismatch',()=>{
+ const f=fixture(),i=f.matrix.instances[0];i.view.authentication='unverified';i.view.error='matrix_api_unavailable';delete i.view.account;
+ const c=projectMainHub(f).conversations[0];
+ assert.equal(c.state,'unavailable');assert.match(c.message,/check could not be completed/);
+ assert.doesNotMatch(c.message,/do not match/);assert.deepEqual(c.rooms,[]);assert.equal(c.roomsComplete,false);
+});

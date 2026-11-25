@@ -3,10 +3,15 @@
 ## [Unreleased]
 
 ### Changed
+- Use a fine HUD arc with colored Hermes receiver dots and a small Matrix inbox glyph, retaining hover previews and click-to-pin — the control should remain minimal while selecting real configured receivers without changing their saved setup.
+
+
+### Changed
 - Show Matrix spaces in a horizontal carousel above the selected space’s room list — the floating chat should group rooms by their actual space relationships.
 
 
 ### Fixed
+- Distinguish an incomplete Matrix account check from a verified identity mismatch — an unavailable homeserver must not imply that the saved account changed or expose unverified rooms.
 - Preserve the HUD dot independently of Hermes readiness and open floating Matrix rooms/spaces from its hover dial — the chat surface belongs to Matrix while the original Hermes input remains separate.
 
 ### Removed

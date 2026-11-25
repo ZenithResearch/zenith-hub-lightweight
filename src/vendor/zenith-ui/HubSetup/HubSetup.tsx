@@ -9,7 +9,7 @@ import React, {
 import "./HubSetup.css";
 import { ZenithCloudScene } from "./ZenithCloudScene.tsx";
 import { REPLY_FADE_MS, replyDisplayMs } from "./reply-timing.ts";
-import {HermesModeDial} from "./HermesModeDial.tsx";
+import {HermesModeDial,type MatrixHoverHandlers,type HermesQuickOptions} from "./HermesModeDial.tsx";
 export type HermesEntryState =
   | "install"
   | "configure"
@@ -444,9 +444,17 @@ export function HermesChatHud({
   matrixOpen = false,
   onOpenMatrix,
   onCloseMatrix,
+  onPreviewMatrix,
+  matrixHover,
+  quickTargets,
+  activeQuickId,
+  onSelectQuick,
 }: {
   children?: ReactNode;
   connected: boolean;
+  quickTargets?: HermesQuickOptions["quickTargets"];
+  activeQuickId?: string;
+  onSelectQuick?: (id:string)=>void;
   openSignal?: number;
   onSend?: (message: string) => Promise<string>;
   busy?: boolean;
@@ -454,6 +462,8 @@ export function HermesChatHud({
   matrixOpen?: boolean;
   onOpenMatrix?: ()=>void;
   onCloseMatrix?: ()=>void;
+  onPreviewMatrix?: ()=>void;
+  matrixHover?: MatrixHoverHandlers;
 }) {
   if (onSend)
     return (
@@ -466,6 +476,9 @@ export function HermesChatHud({
         matrixOpen={matrixOpen}
         onOpenMatrix={onOpenMatrix}
         onCloseMatrix={onCloseMatrix}
+        onPreviewMatrix={onPreviewMatrix}
+        matrixHover={matrixHover}
+        quickTargets={quickTargets} activeQuickId={activeQuickId} onSelectQuick={onSelectQuick}
       />
     );
   return (
@@ -556,15 +569,25 @@ function HermesMessagePill({
   matrixOpen,
   onOpenMatrix,
   onCloseMatrix,
+  onPreviewMatrix,
+  matrixHover,
+  quickTargets,
+  activeQuickId,
+  onSelectQuick,
 }: {
   available: boolean;
   busy: boolean;
   status: string;
+  quickTargets?: HermesQuickOptions["quickTargets"];
+  activeQuickId?: string;
+  onSelectQuick?: (id:string)=>void;
   onSend: (message: string) => Promise<string>;
   openSignal: number;
   matrixOpen: boolean;
   onOpenMatrix?: ()=>void;
   onCloseMatrix?: ()=>void;
+  onPreviewMatrix?: ()=>void;
+  matrixHover?: MatrixHoverHandlers;
 }) {
   const [message, setMessage] = useState(""),
     [open, setOpen] = useState(false),
@@ -713,7 +736,7 @@ function HermesMessagePill({
       }}
     >
       {collapsed && (
-        <HermesModeDial compact available={available} loading={sending} matrixOpen={matrixOpen}
+        <HermesModeDial quickTargets={quickTargets} activeQuickId={activeQuickId} onSelectQuick={onSelectQuick} compact onPreviewMatrix={onPreviewMatrix} matrixHover={matrixHover} available={available} loading={sending} matrixOpen={matrixOpen}
           buttonRef={orb} controls={responseId+"-composer"}
           onActivate={()=>matrixOpen?onCloseMatrix?.():expand()} onInput={expand}
           onMatrix={onOpenMatrix?()=>{collapse();onOpenMatrix();}:undefined}>
@@ -744,7 +767,7 @@ function HermesMessagePill({
         <span id={responseId + "-connection"} className="zn-hermes-hud__sr-only" role="status">
           {sending ? "Hermes is replying." : status}
         </span>
-        <HermesModeDial compact={false} available={available} loading={false} matrixOpen={matrixOpen}
+        <HermesModeDial quickTargets={quickTargets} activeQuickId={activeQuickId} onSelectQuick={onSelectQuick} compact={false} matrixHover={matrixHover} available={available} loading={false} matrixOpen={matrixOpen}
           controls={responseId+"-composer"} onActivate={collapse} onInput={expand}
           onMatrix={onOpenMatrix?()=>{collapse();onOpenMatrix();}:undefined}/>
         <input

@@ -7,16 +7,20 @@ export type MatrixChatAccount={key:string;label:string;userId:string|null;state:
 export type MatrixChatModel={loading:boolean;error:string;accounts:MatrixChatAccount[]};
 import {roomsInSpace} from "./matrix-spaces.ts";
 export {roomsInSpace} from "./matrix-spaces.ts";
-export function MatrixChat({model,busy,selection,onSelect,onClose,onRefresh,onNavigate}:{model:MatrixChatModel;busy:boolean;selection:{accountKey:string;spaceId:string|null;roomId:string|null}|null;onSelect:(value:{accountKey:string;spaceId:string|null;roomId:string|null})=>void;onClose:()=>void;onRefresh:()=>void;onNavigate:(href:string)=>void}){
+export function MatrixChat({model,busy,selection,onSelect,onClose,onRefresh,onNavigate,autoFocus=true,onHoverEnter,onHoverLeave,onInteract}:{autoFocus?:boolean;onHoverEnter?:()=>void;onHoverLeave?:()=>void;onInteract?:()=>void;model:MatrixChatModel;busy:boolean;selection:{accountKey:string;spaceId:string|null;roomId:string|null}|null;onSelect:(value:{accountKey:string;spaceId:string|null;roomId:string|null})=>void;onClose:()=>void;onRefresh:()=>void;onNavigate:(href:string)=>void}){
  const dialog=useRef<HTMLElement>(null);
- useEffect(()=>{dialog.current?.focus();},[]);
+ // Hover previews must not take focus from another input.
+ useEffect(()=>{if(autoFocus)dialog.current?.focus();},[]);
  const titleId=useId(),account=model.accounts.find(a=>a.key===selection?.accountKey)||model.accounts[0];
  const spaceId=selection&&account?.key===selection.accountKey?selection.spaceId:null;
  const room=selection&&account?.key===selection.accountKey?account.rooms.find(r=>r.id===selection.roomId):undefined;
  const valid=account&&["verified","partial"].includes(account.state);
  const selectedSpace=account?.spaces.find(s=>s.id===spaceId);
  const rooms=account?roomsInSpace(account,selectedSpace?.id||null):[];
- return <section ref={dialog} tabIndex={-1} id="zenith-matrix-chat" className="zn-matrix-chat" role="dialog" aria-modal="false" aria-labelledby={titleId} onKeyDown={event=>{if(event.key==="Escape"){event.preventDefault();onClose();}}}>
+ return <section ref={dialog} tabIndex={-1} id="zenith-matrix-chat" className="zn-matrix-chat" onPointerEnter={onHoverEnter} onPointerLeave={onHoverLeave}
+   onPointerDown={()=>onInteract?.()} onClickCapture={()=>onInteract?.()} onFocusCapture={()=>onHoverEnter?.()}
+   onBlur={event=>{if(!event.currentTarget.contains(event.relatedTarget as Node|null))onHoverLeave?.();}}
+   role="dialog" aria-modal="false" aria-labelledby={titleId} onKeyDown={event=>{if(event.key==="Escape"){event.preventDefault();onClose();}}}>
   <header className="zn-matrix-chat__header"><h2 id={titleId}>Matrix</h2><div><button type="button" onClick={onRefresh} disabled={busy} aria-label="Refresh Matrix rooms and spaces">↻</button><button type="button" onClick={onClose} aria-label="Minimize Matrix chat">−</button></div></header>
   {model.error&&<p className="zn-matrix-chat__notice" role="status">{model.error}</p>}
   {model.loading&&!account?<p role="status" className="zn-matrix-chat__notice">Reading your Matrix connections…</p>:!account?<div className="zn-matrix-chat__notice"><p>Connect a Matrix account to see its rooms and spaces.</p><a href="/settings?component=matrix" onClick={event=>{if(!event.metaKey&&!event.ctrlKey&&!event.shiftKey&&!event.altKey){event.preventDefault();onNavigate("/settings?component=matrix");}}}>Configure Matrix →</a></div>:<>
