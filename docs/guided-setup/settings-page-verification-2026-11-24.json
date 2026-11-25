@@ -1,0 +1,36 @@
+{
+  "date": "2026-11-24",
+  "scope": "Settings & configuration presentation and main-Hub review plan",
+  "uiLibraryCommit": "e54fe8062a015b32a18d44b07c69c473feecff6e",
+  "checks": {
+    "uiLibraryBuild": "passed",
+    "uiLibraryProvenance": "passed",
+    "hubTypecheck": "passed",
+    "hubProvenance": "passed",
+    "productionBuild": "passed",
+    "liveCanonicalRoute": "/settings",
+    "liveCompatibilityRoute": "/hub",
+    "bothRoutesHTTPStatus": 200,
+    "matrixConfigurationDeepLinks": "verified for the retained instance on both routes",
+    "visualReview": "Same cloud theme, compact cards, accessible settings heading, refresh icon and collapsed Hermes input observed in the live browser"
+  },
+  "preservation": {
+    "configuredInstanceCount": 2,
+    "instanceIdentityConfigurationAndEndpointUnchanged": true,
+    "matrixAccountAndDeviceBindingsUnchanged": true,
+    "databaseSchemaVersion": 5,
+    "databaseMigrationRequired": false,
+    "productionModePreserved": true,
+    "nativeServiceControlRequested": false,
+    "sourceOrCredentialStorageMoved": false
+  },
+  "mainHub": {
+    "status": "proposal for review",
+    "implemented": false,
+    "plan": "main-hub-screen-plan.md",
+    "continueDestinationUnchanged": "/hub",
+    "transitionalBehavior": "The existing settings gallery remains available after Continue until the reviewed main screen is implemented."
+  },
+  "runtimeNote": "The Hub web process required completion of a stuck graceful shutdown before relaunch. The prior production build was retained privately for rollback; the existing database and native services were preserved.",
+  "privacy": "Live account identifiers, credentials, device identifiers, private storage paths and raw connection snapshots are excluded from this repository record."
+}

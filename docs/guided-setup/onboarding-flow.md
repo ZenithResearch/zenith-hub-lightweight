@@ -21,7 +21,7 @@ flowchart TD
     Entry -. optional .-> Chat
 ```
 
-**Continue** opens `/hub`, the compact resource gallery. It requires an installed Hermes, with no provider sign-in or chat test as an entry gate. The initial Continue and secondary Configure controls sit directly on the cloud background. When Hermes is absent, Install Hermes occupies the same background action area. No initial card or modal is shown.
+**Continue** opens `/hub`. During the workspace-design transition this remains a compatibility view of **Settings & configuration**, whose canonical address is `/settings`. It requires an installed Hermes, with no provider sign-in or chat test as an entry gate. The initial Continue and secondary Configure controls sit directly on the cloud background. When Hermes is absent, Install Hermes occupies the same background action area. No initial card or modal is shown.
 
 An explicit Install, Configure, installation-selection or retained-progress action opens one native modal over the persistent artwork. Install review, installation selection, model configuration and operation progress remain inside that dialog. Closing it retains applied work and setup drafts; it discards only an unapplied review plan. Completing install or setup returns to the background actions. The dialog places focus on Close, contains keyboard focus and restores the activating control on dismissal. It can be closed while applied work continues; View progress reopens it. No previous wizard page is embedded.
 
@@ -79,6 +79,19 @@ Bootstrap still clones and launches the released Hub only. No Matrix, Devgraph o
 
 The welcome surfaces now render the code-native scene described in the [background recreation roundtable](background-rebuild-plan.md). Its custom glyphs and central plaque remain fixed while outer cloud groups drift slowly. Setup, active guide use, document visibility and reduced-motion preference govern pauses. The original bitmap remains reference evidence, with no runtime image dependency.
 
-## Resource gallery after Continue
+## Settings & configuration
 
-The gallery reads existing setup and external connection records directly, without a resource graph index. Use an available resource card to expand configuration and review on the page. The top toolbar contains the resource count and an accessible refresh icon. See the [rollback record](resource-gallery-rollback-2026-11-22.md).
+The existing gallery is now Settings & configuration at /settings. Apps &
+services is its current section, retaining configured instances, available apps,
+inline configuration and the accessible refresh icon. It reads the same setup
+and external connection records without introducing a resource graph index.
+
+The /hub compatibility view, Continue action and older Matrix query links still
+work. New Matrix configuration links use /settings?matrix=INSTANCE. No setup,
+account, credential or instance migration is required.
+
+See the [main Hub screen plan](main-hub-screen-plan.md) for the proposed everyday
+workspace after Continue. Its layout and new use-oriented actions are proposals
+for review, not implemented by this settings change. The earlier
+[gallery rollback record](resource-gallery-rollback-2026-11-22.md) remains
+historical evidence.

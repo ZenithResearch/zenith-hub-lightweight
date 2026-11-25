@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+### Changed
+- Make the existing gallery Settings & configuration at /settings, retain /hub as a compatibility view and direct Matrix configuration links to settings — setup needs a clear home while the main Hub screen is planned, with all existing instance and session bindings retained.
+
+### Added
+- Document the proposed main Hub screen after Continue, including navigation, real-data ownership, conversation limitations and a staged implementation — the everyday workspace should be reviewed before replacing the working configuration surface.
+
 ### Added
 - Add generic reviewed Matrix account, space, room, membership, permission and explicit message-verification setup — users need a resumable product journey without application-specific templates or duplicating the homeserver database.
 - Persist opaque Matrix session bindings, retained reviews and partial outcomes in the existing application owner — reload/restart must preserve progress while passwords and tokens stay out of repository objects and review artifacts.

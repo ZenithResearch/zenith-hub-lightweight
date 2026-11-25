@@ -150,3 +150,12 @@ installing or starting software. See the [gallery behavior](docs/guided-setup/RE
 and run `npm run test:hub` for focused checks.
 
 The local launcher validates the integrated application database before starting the Hub. Existing legacy storage requires an explicit, backed-up migration; app and service data remain with their existing owners. See the [application database integration](docs/hub-application-db-draft/integration.md) and [implementation plan](docs/hub-application-db-draft/implementation-plan.md).
+
+## Settings and main Hub planning
+
+Settings & configuration is available at /settings. The existing /hub address
+continues to show the same settings surface while the main workspace is planned.
+Both read the existing application data and retain configured connections and
+Matrix account sessions. Continue keeps its existing /hub destination and entry
+checks. See [the main-screen review plan](docs/guided-setup/main-hub-screen-plan.md)
+for the proposed next screen.

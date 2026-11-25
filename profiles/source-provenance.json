@@ -397,18 +397,18 @@
   },
   {
     "repository": "https://github.com/ZenithResearch/zenith-ui-deployment",
-    "commit": "4fc513d373c48903c1eeb0215eaac66bd5cfbe00",
-    "scope": "Compact Apps & services gallery with separate configured-instance and available-app sections",
+    "commit": "e54fe8062a015b32a18d44b07c69c473feecff6e",
+    "scope": "Settings & configuration with the retained Apps & services gallery",
     "files": [
       {
         "path": "src/vendor/zenith-ui/YourHub/YourHub.tsx",
         "upstream_path": "src/YourHub/YourHub.tsx",
-        "sha256": "1e1562b634465b5f06a0db78ddd96ba8730df2060d60b35c7109257d8b03850c"
+        "sha256": "fd79125b70285518cc1a0e3331ec993be284316eb7e062367b1890284ca57fba"
       },
       {
         "path": "src/vendor/zenith-ui/YourHub/YourHub.css",
         "upstream_path": "src/YourHub/YourHub.css",
-        "sha256": "ccc9cb2e46dbe25d126be66a2840e5c0094856d7cb43b61b17d4cfef7f2832c8"
+        "sha256": "f87adce34daa6a9ea1e53e7e0bed208027f81b38f1ea72f74307d6eec91c9922"
       }
     ]
   },

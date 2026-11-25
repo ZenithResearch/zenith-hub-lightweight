@@ -3,7 +3,7 @@ import React,{useEffect,useId,useRef,type ReactNode} from 'react';
 import {ZenithCloudScene} from '../HubSetup/ZenithCloudScene.tsx';
 import './YourHub.css';
 export type HubResource = {key:string;label:string;purpose:string;componentId:string;status:string;managed:boolean;mode:string;observedAt?:string|null;endpoint?:string|null;actions:string[];enabled:boolean;stale?:boolean};
-export function YourHub({resources,onSelect,onRefresh,busy=false,refreshing=false,selectedKey,children,notices,catalog=[],onChoose,flowContent}: {
+export function HubSettings({resources,onSelect,onRefresh,busy=false,refreshing=false,selectedKey,children,notices,catalog=[],onChoose,flowContent}: {
  resources:HubResource[];onSelect:(key:string)=>void;onRefresh:()=>void;busy?:boolean;refreshing?:boolean;
  catalog?:{id:string;label:string;description:string}[];onChoose?:(id:string)=>void;flowContent?:ReactNode;
  selectedKey?:string;children?:ReactNode;notices?:ReactNode;
@@ -12,9 +12,10 @@ export function YourHub({resources,onSelect,onRefresh,busy=false,refreshing=fals
  const available=catalog.filter(c=>!resources.some(r=>r.componentId===c.id));
  const configuredId=useId(),availableId=useId();
  return <ResourceCanvas paused={Boolean(flowContent)||Boolean(selectedKey)}>
-  <main id="hub-main"><h1 className="zn-your-hub__sr-only">Apps &amp; services</h1>
+  <main id="hub-main">
    {notices}{flowContent}
-   <div className="zn-your-hub__toolbar"><div className="zn-your-hub__count">Apps &amp; services</div><button className="zn-your-hub__refresh" type="button" aria-label="Refresh apps and services" title="Refresh apps and services" disabled={refreshing} aria-busy={refreshing} onClick={onRefresh}><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M20 7v5h-5M4 17v-5h5"/><path d="M6.1 7a7 7 0 0 1 11.6-1L20 9M4 15l2.3 3A7 7 0 0 0 17.9 17"/></svg></button></div>
+   <div className="zn-your-hub__toolbar"><h1 className="zn-your-hub__count">Settings &amp; configuration</h1><button className="zn-your-hub__refresh" type="button" aria-label="Refresh apps and services" title="Refresh apps and services" disabled={refreshing} aria-busy={refreshing} onClick={onRefresh}><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M20 7v5h-5M4 17v-5h5"/><path d="M6.1 7a7 7 0 0 1 11.6-1L20 9M4 15l2.3 3A7 7 0 0 0 17.9 17"/></svg></button></div>
+   <p className="zn-your-hub__section-context">Apps &amp; services</p>
    <div className={selectedKey?'zn-your-hub__workspace has-detail':'zn-your-hub__workspace'}>
     <div className="zn-your-hub__groups">
      <section aria-labelledby={configuredId}>
@@ -31,6 +32,9 @@ export function YourHub({resources,onSelect,onRefresh,busy=false,refreshing=fals
   </main>
  </ResourceCanvas>;
 }
+/** Compatibility name for existing gallery consumers; props and callbacks are unchanged. */
+export {HubSettings as YourHub};
+
 function ResourceCard({resource:r,selected,onSelect}:{resource:HubResource;selected:boolean;onSelect:()=>void}) {
  const ready=['Ready','Ready to read','Guide available','API reachable','Installed'].includes(r.status);
  return <button className={'zn-your-hub__card'+(selected?' is-selected':'')} onClick={onSelect} aria-pressed={selected}><h3>{r.label}</h3><p>{r.purpose}</p><span className="zn-your-hub__card-foot"><span className="zn-your-hub__card-status"><span className={'zn-your-hub__dot'+(ready?' is-ready':'')}/>{r.status}</span><span className="zn-your-hub__card-action">Details <span aria-hidden="true">→</span></span></span></button>;
