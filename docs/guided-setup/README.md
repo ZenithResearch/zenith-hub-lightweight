@@ -87,3 +87,13 @@ Hermes is the installed or connected Hermes agent, rather than a separate guide 
 ## Generic Matrix setup
 
 [Matrix onboarding, records and recovery](matrix-implementation.md) describes the generic on-page server/account/space/room flow and its exact qualification limits. [Validation results](matrix-validation.json) distinguish disposable protocol/native-file fixtures from live service qualification.
+
+## Process Runtime candidate upgrade
+
+In Settings, open the Hub-managed Process Runtime and select **Review Runtime upgrade**. Review the current and target commits, wheel hashes, database, port, rollback target and production configuration. The first supported transition is from `2efdf96` to local candidate `fbbe560` on Apple silicon macOS. Both artifacts report package version 0.1.0. The Hub distinguishes them by pinned bytes.
+
+Place the reviewed wheels together in `<setup-root>/cache/runtime-upgrades/<full-target-commit>/`, or set the Hub operator's `ZENITH_SETUP_RUNTIME_WHEELHOUSE` to their absolute directory. The [release manifest](../../profiles/setup/process-runtime-upgrade.json) lists the exact filenames and hashes. Missing or changed wheels appear as prerequisites. To use the production profile, provision owner-private `receiver.json`, `admission.json` and `readiness-trust.json` in the instance's `config` directory before review. The upgrade requires closed new-run admission. With the profile absent, the candidate starts with default-deny authority.
+
+Preview while running, then stop the Runtime and review again to apply. Hub stages the new environment separately, checks its dependencies and CLI, backs up the stopped instance, and switches the installer receipt. Start the instance from Settings and inspect its monitoring history. To revert, stop it, review and apply **Review Runtime rollback**, then start it. Rollback reselects the previous software against the same database. The tar backup and its receipt are available under `backups/<instance-id>/` for a separately reviewed data restore. After an interrupted switch, use Hub reconciliation to read the durable receipt before retrying.
+
+Transfer approval is a separate operation. The available connector supports read-only calls to its qualified provider. This software upgrade issues no Runtime command credential.

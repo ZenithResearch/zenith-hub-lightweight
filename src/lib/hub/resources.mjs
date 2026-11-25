@@ -32,6 +32,8 @@ export function setupResources(snapshot,now=Date.now()) {
     if(local && !item.partial && daemon && item.running===false && item.configured===true)actions.push('start');
     if(local && !item.partial && daemon && item.running===true)actions.push('stop');
     if(local && !item.partial && item.componentId!=='hermes' && item.running===false)actions.push('configure');
+    if(local && !item.partial && item.componentId==='process-runtime' && item.configured===true && typeof item.running==='boolean')
+      actions.push(item.runtimeReleaseCommit ? 'rollback-runtime' : 'upgrade-runtime');
     if(local && item.partial)actions.push('resume-install');
     const label=instanceLabel(item,descriptor);
     return {key:'setup:'+item.instanceId,source:'setup',instanceId:item.instanceId,componentId:item.componentId,

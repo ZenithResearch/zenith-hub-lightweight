@@ -27,7 +27,7 @@ const messages:Record<string,string>={
 };
 const friendly=(e:unknown)=>{const code=e instanceof Error?e.message:String(e);return messages[code]||code.replaceAll('_',' ');};
 const when=(value?:string|null)=>value&&Number.isFinite(Date.parse(value))?new Date(value).toLocaleString():'Not checked';
-const actionNames:Record<string,string>={start:'Start',stop:'Stop',configure:'Configure', 'resume-install':'Resume installation',disconnect:'Disconnect',reconnect:'Reconnect'};
+const actionNames:Record<string,string>={start:'Start',stop:'Stop','upgrade-runtime':'Review Runtime upgrade','rollback-runtime':'Review Runtime rollback',configure:'Configure', 'resume-install':'Resume installation',disconnect:'Disconnect',reconnect:'Reconnect'};
 export function HubSettingsPage() {
  const router=useRouter(),searchParams=useSearchParams(),appliedIntent=useRef<string|null>(null);
  const onNavigate=useCallback((href:string)=>router.push(href),[router]);

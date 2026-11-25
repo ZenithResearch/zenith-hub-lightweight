@@ -1,4 +1,5 @@
 """Allowlisted per-instance native adapter. No shell commands or provider databases."""
+import fcntl, re
 import argparse, hashlib, json, os, shutil, signal, subprocess, sys, time, uuid, venv, tarfile, secrets
 from pathlib import Path
 
@@ -63,6 +64,9 @@ def _configure(plan,root):
   if kind=='matrix' and receipt.get('configProof'):
    proof=receipt['configProof'];assert digest(root/'config/homeserver.yaml')==proof['configurationSha256'] and digest(Path(proof['signingKeyPath']))==proof['signingKeySha256'],'matrix_configuration_changed_reconcile'
   assert digest(root/'controller.py')==receipt['controllerSha256'],'existing_controller_changed'
+  if kind=='process-runtime' and receipt.get('runtimeRelease'):
+   runtime_controller(root,receipt)
+   return
   shutil.copyfile(__file__,root/'controller.py');receipt['controllerSha256']=digest(root/'controller.py');receipt['bindingPlanDigest']=plan['digest'];save(root/'receipt.json',receipt)
   return
  if kind=='matrix':
@@ -128,6 +132,125 @@ def matrix_config(plan,root):
  with temp.open('x') as f:temp.chmod(0o600);f.write(yaml.safe_dump(y));f.flush();os.fsync(f.fileno())
  os.replace(temp,p)
  save(root/'config/matrix-config-proof.json',{'serverName':config['serverName'],'configurationSha256':digest(p),'signingKeyPath':str(key),'signingKeySha256':digest(key)})
+def runtime_directory(root, receipt):
+    release = receipt.get('runtimeRelease')
+    if release is None:
+        return root
+    generation = release['generation']
+    if not isinstance(generation, str) or not re.fullmatch('[a-f0-9]{64}', generation):
+        raise ValueError('invalid_runtime_generation')
+    directory = root/'runtime-releases'/generation
+    if directory.parent.is_symlink() or directory.is_symlink() or not directory.is_dir():
+        raise ValueError('unsafe_runtime_generation')
+    return directory
+
+
+def runtime_controller(root, receipt):
+    directory = runtime_directory(root, receipt)
+    controller = directory/'controller.py'
+    expected = receipt.get('runtimeRelease', {}).get('controllerSha256', receipt['controllerSha256'])
+    if controller.is_symlink() or digest(controller) != expected:
+        raise ValueError('installed_controller_changed')
+    return controller
+
+
+def check_runtime_profile(root, profile):
+    names = {'receiver.json', 'admission.json', 'readiness-trust.json'}
+    found = {name for name in names if os.path.lexists(root/'config'/name)}
+    if set(profile) != found or (found and found != names):
+        raise ValueError('runtime_profile_changed')
+    for name, expected in profile.items():
+        value = read(root/'config'/name)
+        if digest(root/'config'/name) != expected:
+            raise ValueError('runtime_profile_changed')
+        if name == 'admission.json' and value.get('enabled') is not False:
+            raise ValueError('close_admission_before_runtime_change')
+
+
+def change_runtime(action, plan, root):
+    receipt_path = root/'receipt.json'
+    change = plan['runtimeChange']
+    receipt = read(receipt_path)
+    if (receipt['componentId'] != 'process-runtime' or plan['componentId'] != 'process-runtime'
+            or receipt['instanceId'] != plan['instanceId'] or receipt['root'] != str(root)
+            or not receipt['installed'] or not receipt['configured'] or plan['mode'] != 'install'
+            or change['action'] != action or not re.fullmatch('[a-f0-9]{64}', plan['digest'])):
+        raise ValueError('runtime_identity_changed')
+    if receipt.get('lastRuntimeChange') == plan['digest']:
+        return
+    if digest(receipt_path) != change['receiptSha256'] or read(root/'config/selection.json') != plan['config']:
+        raise ValueError('runtime_review_stale')
+    if owned(root):
+        raise ValueError('stop_before_runtime_change')
+    runtime_controller(root, receipt)
+    if action == 'rollback-runtime':
+        generation = runtime_directory(root, receipt)
+        original = generation/'previous-receipt.json'
+        if generation == root or digest(original) != receipt['runtimeRelease']['previousReceiptSha256']:
+            raise ValueError('rollback_receipt_changed')
+        replacement = read(original)
+        runtime_controller(root, replacement)
+        for row in replacement['artifacts']:
+            if digest(root/'wheels'/row['filename']) != row['sha256']:
+                raise ValueError('rollback_artifact_changed')
+        if not (root/'venv/bin/python').is_file():
+            raise ValueError('rollback_environment_missing')
+    else:
+        if receipt.get('runtimeRelease'):
+            raise ValueError('unexpected_runtime_generation')
+        profile = change['config']
+        check_runtime_profile(root, profile)
+        parent = root/'runtime-releases'
+        if parent.is_symlink():
+            raise ValueError('unsafe_runtime_generation')
+        parent.mkdir(mode=0o700, exist_ok=True)
+        generation = parent/plan['digest']
+        if generation.is_symlink():
+            raise ValueError('unsafe_runtime_generation')
+        # The active receipt still selects the previous environment under this lock.
+        # Only this exact plan's unpublished staging directory can be retried.
+        if generation.exists():
+            shutil.rmtree(generation)
+        generation.mkdir(mode=0o700)
+        wheelhouse = generation/'wheels'
+        wheelhouse.mkdir(mode=0o700)
+        staged = []
+        for row in plan['artifacts']:
+            source = Path(row['path'])
+            if source.name != row['filename'] or not source.name.endswith('.whl') or source.is_symlink():
+                raise ValueError('unexpected_runtime_wheel')
+            dest = wheelhouse/source.name
+            shutil.copyfile(source, dest)
+            if dest.stat().st_size != row['bytes'] or digest(dest) != row['sha256']:
+                raise ValueError('runtime_wheel_changed')
+            staged.append(dest)
+        venv.EnvBuilder(with_pip=True).create(generation/'venv')
+        python = generation/'venv/bin/python'
+        execute([python,'-I','-m','pip','install','--no-index','--no-deps','--no-compile',*staged],root)
+        execute([python,'-I','-m','pip','check'],root)
+        execute([python,'-I','-m','process_runtime','--help'],root)
+        if profile:
+            execute([python,'-I','-m','process_runtime.readiness','--database',root/'data/runtime.db',
+                     '--receiver-config',root/'config/receiver.json','--admission-policy',root/'config/admission.json'],root)
+            execute([python,'-I','-c','from process_runtime.readiness import DeploymentQualification; import sys; DeploymentQualification(sys.argv[1])',
+                     root/'config/readiness-trust.json'],root)
+        shutil.copyfile(__file__, generation/'controller.py')
+        original = generation/'previous-receipt.json'
+        shutil.copyfile(receipt_path, original)
+        original.chmod(0o600)
+        replacement = {**receipt, 'artifacts':[{'filename':p.name,'sha256':digest(p)} for p in staged],
+                       'runtimeRelease':{'commit':change['target'], 'generation':generation.name,
+                                         'controllerSha256':digest(generation/'controller.py'),
+                                         'previousReceiptSha256':digest(original), 'profile':bool(profile)}}
+    backup = lifecycle('backup',plan,root)
+    if action == 'upgrade-runtime':
+        check_runtime_profile(root, change['config'])
+    replacement.update(lastRuntimeChange=plan['digest'], runtimeBackupId=backup['backupId'])
+    if digest(receipt_path) != change['receiptSha256']:
+        raise ValueError('runtime_review_stale')
+    save(receipt_path, replacement)
+
+
 def owned(root):
  marker=root/'process.json'
  if not marker.exists():return None
@@ -135,7 +258,10 @@ def owned(root):
  p=subprocess.run(['/bin/ps','-ww','-p',str(m['pid']),'-o','command='],capture_output=True,text=True)
  if p.returncode:return None
  started=subprocess.run(['/bin/ps','-p',str(m['pid']),'-o','lstart='],capture_output=True,text=True).stdout.strip()
- if str(root/'controller.py') not in p.stdout or '_serve' not in p.stdout or m['started'] != started:raise RuntimeError('process_ownership_unresolved')
+ controller = root/'controller.py'
+ if str(controller) not in p.stdout and (root/'receipt.json').exists():
+  controller = runtime_controller(root,read(root/'receipt.json'))
+ if str(controller) not in p.stdout or '_serve' not in p.stdout or m['started'] != started:raise RuntimeError('process_ownership_unresolved')
  return m
 
 def serve(plan,root):
@@ -156,6 +282,10 @@ def serve(plan,root):
  elif kind=='hermes':pass
  elif kind=='matrix':argv+=['--config-path',root/'config/homeserver.yaml']
  else:argv+=['--database',root/'data'/('runtime.db' if kind=='process-runtime' else 'service.db'),'--port',str(config['port']),'--environment','production']
+ if kind=='process-runtime' and receipt.get('runtimeRelease'):
+  argv[0] = runtime_directory(root,receipt)/'venv/bin/python'
+  if receipt['runtimeRelease']['profile']:
+   argv.extend(['--receiver-config',root/'config/receiver.json','--admission-policy',root/'config/admission.json','--readiness-trust',root/'config/readiness-trust.json'])
  with (root/'logs/service.log').open('ab') as log:
   child=subprocess.Popen([str(x) for x in argv],cwd=child_cwd,env=child_env,stdin=subprocess.DEVNULL,stdout=log,stderr=log)
   stopping={'deadline':None}
@@ -196,15 +326,23 @@ def lifecycle(action,plan,root):
  if owned(root):return {'running':True}
  receipt=read(root/'receipt.json');assert receipt['configured'] and digest(root/'controller.py')==receipt['controllerSha256']
  wrapper_python=(Path(receipt['software']['environment'])/'bin/python' if receipt.get('software') else root/receipt['environment']/'bin/python') if receipt['componentId']=='hermes' else root/'venv/bin/python'
- with (root/'logs/wrapper.log').open('ab') as log:subprocess.Popen([str(wrapper_python),'-I','-B',str(root/'controller.py'),'_serve','--plan',plan['planFile']],cwd=root,stdin=subprocess.DEVNULL,stdout=log,stderr=log,start_new_session=True,env=environment(root))
+ controller = runtime_controller(root,receipt) if receipt.get('runtimeRelease') else root/'controller.py'
+ if receipt.get('runtimeRelease'):wrapper_python=controller.parent/'venv/bin/python'
+ with (root/'logs/wrapper.log').open('ab') as log:subprocess.Popen([str(wrapper_python),'-I','-B',str(controller),'_serve','--plan',plan['planFile']],cwd=root,stdin=subprocess.DEVNULL,stdout=log,stderr=log,start_new_session=True,env=environment(root))
  deadline=time.monotonic()+10
  while not owned(root):
   if time.monotonic()>deadline:raise RuntimeError('start_outcome_unknown_inspect_receipt')
   time.sleep(.1)
  return {'running':True}
 def main():
- p=argparse.ArgumentParser();p.add_argument('action',choices=['install','configure','start','stop','status','backup','_serve','_matrix-config']);p.add_argument('--plan',type=Path,required=True);a=p.parse_args();plan=read(a.plan);root=Path(plan['root']).absolute();assert root.name==plan['instanceId'] and not root.is_symlink()
- if a.action=='install':install(plan,root)
+ p=argparse.ArgumentParser();p.add_argument('action',choices=['install','configure','start','stop','status','backup','upgrade-runtime','rollback-runtime','runtime-change-idle','_serve','_matrix-config']);p.add_argument('--plan',type=Path,required=True);a=p.parse_args();plan=read(a.plan);root=Path(plan['root']).absolute();assert root.name==plan['instanceId'] and not root.is_symlink()
+ guard=None
+ if plan['componentId']=='process-runtime' and a.action in ('upgrade-runtime','rollback-runtime','runtime-change-idle','start','stop','configure','backup'):
+  guard=os.open(root,os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
+  fcntl.flock(guard,fcntl.LOCK_EX | fcntl.LOCK_NB)
+ if a.action=='runtime-change-idle':return
+ if a.action in ('upgrade-runtime','rollback-runtime'):change_runtime(a.action,plan,root)
+ elif a.action=='install':install(plan,root)
  elif a.action=='configure':configure(plan,root)
  elif a.action=='_matrix-config':matrix_config(plan,root)
  elif a.action=='_serve':serve(plan,root)

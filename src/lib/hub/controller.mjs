@@ -69,7 +69,7 @@ export function createHubController({env=process.env,setup,connections=resourceC
   }
   function publicPlan(plan) {
     return {id:plan.id,action:plan.action,expiresAt:plan.expiresAt,...(plan.catalogPackage?{catalogPackage:plan.catalogPackage}:{}),items:plan.items.map(i=>({instanceId:i.instanceId,componentId:i.componentId,label:instanceLabel(i,i.descriptor),
-      mode:i.mode,...(i.recipeRef?{recipeRef:i.recipeRef}:{}),source:i.descriptor?.source,endpoint:i.config?.endpoint||null,destination:i.mode==='connect'?null:i.destination,dataPath:i.dataPath,
+      mode:i.mode,...(i.recipeRef?{recipeRef:i.recipeRef}:{}),source:i.runtimeChange?{...i.descriptor.source,commit:i.runtimeChange.target}:i.descriptor?.source,endpoint:i.config?.endpoint||null,destination:i.mode==='connect'?null:i.destination,dataPath:i.dataPath,
       prerequisites:i.prerequisites||[],effects:i.effects||[],downloadBytes:(i.artifacts||[]).reduce((sum,a)=>sum+(a.bytes||0),0),
       serviceRequirements:i.serviceRequirements||[],startBehavior:i.startBehavior,preparationRequired:i.preparation?.ready===false,requiredMiB:i.preparation?.requiredMiB||null}))};
   }

@@ -1,3 +1,4 @@
+import {runtimeChange} from "./runtime-upgrade.mjs";
 import { CHAT_MESSAGE_LIMIT } from "./chat-message.mjs";
 import {softwareFromSynapseReceipt} from "./synapse-receipt.mjs";
 import { softwareFromHermesReceipt } from "./hermes-receipt.mjs";
@@ -80,6 +81,8 @@ export function createSetupController({
   };
   const driverFiles = [
     "scripts/setup/instance.py",
+    "profiles/setup/process-runtime-upgrade.json",
+    "src/lib/setup/runtime-upgrade.mjs",
     "scripts/setup/hermes-install.py",
     "scripts/setup/hermes-models.py",
     "scripts/setup/hermes-profile.py",
@@ -237,6 +240,7 @@ export function createSetupController({
                 path.join(root, "instances", i.instanceId, "receipt.json"),
               ),
             );
+            if (i.componentId === "process-runtime") i.runtimeReleaseCommit = rec.runtimeRelease?.commit || null;
             i.installed = rec.installed === true;
             i.profile = rec.profile || null;
             if (rec.configurationHome) i.configurationHome = rec.configurationHome;
@@ -412,6 +416,7 @@ export function createSetupController({
           }
           if (["start", "setup-hermes"].includes(plan.action)) i.running = true;
           if (plan.action === "stop") i.running = false;
+          if (runtimeChange(plan.action)) i.source = {...item.descriptor.source,commit:item.runtimeChange.target};
         });
       }
       await state.write(async (s) => {
@@ -936,6 +941,8 @@ export function createSetupController({
             "create-guide-profile",
             "setup-local-model",
             "enable-network",
+            "upgrade-runtime",
+            "rollback-runtime",
             "backup",
             "start",
             "stop",
@@ -1001,8 +1008,16 @@ export function createSetupController({
         // Retired suggestions cannot authorize new installs. An explicit retained instance
         // may still be controlled with its retained, pinned application recipe.
         const existingTarget=body.instanceId&&s.instances.find(i=>i.instanceId===body.instanceId),allowRetired=!!existingTarget&&!['install','connect','prepare-artifacts','create-guide-profile'].includes(body.action);
-        const reviewRegistry=allowRetired&&reg.retainedById?{...reg,byId:new Map([...reg.byId,[existingTarget.componentId,reg.retainedById.get(existingTarget.componentId)]]),resolveRecipe:(...args)=>reg.resolveRecipe(...args,{allowRetired:true})}:reg;
-        const resolved = resolveSelection(reviewRegistry, selection, {action:body.action}),
+        if (runtimeChange(body.action)) check(existingTarget, existingTarget?.componentId === "process-runtime" && existingTarget.mode === "install" && reg.byId.has("process-runtime"), "managed_runtime_required");
+        const reviewRegistry=allowRetired&&!runtimeChange(body.action)&&reg.retainedById?{...reg,byId:new Map([...reg.byId,[existingTarget.componentId,reg.retainedById.get(existingTarget.componentId)]]),resolveRecipe:(...args)=>reg.resolveRecipe(...args,{allowRetired:true})}:reg;
+        // A Runtime change composes the active native install, backup and configure
+        // capabilities. Its separate release manifest pins the proposed wheel bytes.
+        if (runtimeChange(body.action) && reg.resolveRecipe) {
+          const install = reg.resolveRecipe("process-runtime","install","install");
+          for (const step of ["backup","configure"])
+            reg.resolveRecipe("process-runtime","install",step,install.id);
+        }
+        const resolved = resolveSelection(reviewRegistry, selection, {action:runtimeChange(body.action) ? "install" : body.action}),
           items = [];
         if (body.welcome)
           check(
@@ -1105,6 +1120,11 @@ export function createSetupController({
                   existing,
                 })
               : await adapter.prepare(item, body.action);
+          if (runtimeChange(body.action)) {
+            const managed = {...existing, root:path.join(root, "instances", item.instanceId)};
+            if (await adapter.status(managed) !== false)
+              prepared.prerequisites.push("Stop this Runtime through Hub, then review the switch again.");
+          }
           if (item.mode === "connect") endpoint(item.config.endpoint);
           if (
             ["install", "start"].includes(body.action) &&
@@ -1188,7 +1208,7 @@ export function createSetupController({
           plan.catalogSha256 === reg.sha256 && plan.revision === prior.revision,
           "setup_plan_changed",
         );
-        if(plan.catalogPackage){check(plan,reg.package?.digest===plan.catalogPackage.digest,'setup_plan_changed');for(const item of plan.items){const current=reg.resolveRecipe?.(item.componentId,item.mode,plan.action,item.recipeRef?.id,{allowRetired:!['install','connect','prepare-artifacts','create-guide-profile'].includes(plan.action)&&prior.instances.some(i=>i.instanceId===item.instanceId&&i.componentId===item.componentId)});check(plan,current&&digest(current)===digest(item.recipeRef),'setup_plan_changed');}}
+        if(plan.catalogPackage){check(plan,reg.package?.digest===plan.catalogPackage.digest,'setup_plan_changed');for(const item of plan.items){const current=reg.resolveRecipe?.(item.componentId,item.mode,runtimeChange(plan.action) ? "install" : plan.action,item.recipeRef?.id,{allowRetired:!runtimeChange(plan.action)&&!['install','connect','prepare-artifacts','create-guide-profile'].includes(plan.action)&&prior.instances.some(i=>i.instanceId===item.instanceId&&i.componentId===item.componentId)});check(plan,current&&digest(current)===digest(item.recipeRef),'setup_plan_changed');}}
         check(
           plan,
           plan.driverDigest === (await driverDigest()),
@@ -1305,7 +1325,22 @@ export function createSetupController({
           }
           await observe(s);
           for (const op of Object.values(s.operations))
-            if (op.action==="configure"&&["applying","reconciliation-required"].includes(op.state)&&op.instanceIds?.length&&op.instanceIds.every(id=>s.instances.some(i=>i.instanceId===id&&i.componentId==="matrix"&&i.mode==="install"))) {
+            if (runtimeChange(op.action) && ["applying","reconciliation-required"].includes(op.state)) {
+              check(op, !busy && op.instanceIds?.length === 1, "runtime_change_unresolved");
+              const id = op.instanceIds[0], instance = s.instances.find(i => i.instanceId === id);
+              check(instance, instance?.componentId === "process-runtime" && instance.mode === "install", "managed_runtime_required");
+              const local = JSON.parse(await readPrivate(path.join(root,"plans",op.id+"-"+id+".json")));
+              await adapter.runtimeChangeIdle(local);
+              const receipt = JSON.parse(await readPrivate(path.join(root,"instances",id,"receipt.json")));
+              check(receipt, receipt.instanceId === id && local.digest === op.digest, "runtime_identity_changed");
+              if (receipt.lastRuntimeChange === op.digest) {
+                instance.source = {...local.descriptor.source, commit:local.runtimeChange.target};
+                op.state = "complete";
+              } else {
+                check(receipt, digest(await readPrivate(path.join(root,"instances",id,"receipt.json"))) === local.runtimeChange.receiptSha256, "runtime_change_unresolved");
+                op.state = "retryable";
+              }
+            } else if (op.action==="configure"&&["applying","reconciliation-required"].includes(op.state)&&op.instanceIds?.length&&op.instanceIds.every(id=>s.instances.some(i=>i.instanceId===id&&i.componentId==="matrix"&&i.mode==="install"))) {
               let complete=true;
               for(const id of op.instanceIds){
                 const i=s.instances.find(i=>i.instanceId===id),instanceRoot=path.join(root,"instances",id);

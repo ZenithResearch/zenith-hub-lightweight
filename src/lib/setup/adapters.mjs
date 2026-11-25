@@ -13,6 +13,7 @@ import { hermesAdapter } from "./hermes.mjs";
 import { hermesModels } from "./hermes-models.mjs";
 import { check, digest } from "./catalog.mjs";
 import { readPrivate } from "./state.mjs";
+import { prepareRuntimeChange, runtimeChange } from "./runtime-upgrade.mjs";
 import { probe, endpoint } from "./network.mjs";
 export async function runOwned(
   executable,
@@ -161,6 +162,11 @@ export function adapters({
     return rows;
   }
   async function prepare(item, action = "install") {
+    if (runtimeChange(action)) {
+      const review = await prepareRuntimeChange(root,item,action,env);
+      const base = await pythonPreflight(python,run);
+      return {...review,bootstrap:base.bootstrap,prerequisites:[...review.prerequisites,...base.prerequisites]};
+    }
     if (action === "setup-hermes") {
       check(
         item,
@@ -318,6 +324,10 @@ export function adapters({
         ),
       },
     );
+  }
+  async function applyRuntimeChange(plan) {
+    await verifyExecutable(plan.bootstrap);
+    return run(python, ["-I", "-B", script, plan.runtimeChange.action, "--plan", plan.planFile]);
   }
   async function configure(plan) {
     if (plan.mode === "vps") return vps.execute(plan, "configure");
@@ -477,6 +487,9 @@ export function adapters({
     configure,
     token,
     "enable-network": (p) => network.enable(p),
+    runtimeChangeIdle: (p) => run(python, ["-I", "-B", script, "runtime-change-idle", "--plan", p.planFile]),
+    "upgrade-runtime": applyRuntimeChange,
+    "rollback-runtime": applyRuntimeChange,
     backup: (p) => lifecycle(p, "backup"),
     status: async (p) => JSON.parse(await lifecycle(p, "status")).running,
     start: async (p) => {
