@@ -94,3 +94,27 @@
 .zn-matrix-conversation__composer>div>span{font-size:8px;color:#7b96ab}
 .zn-matrix-conversation__composer button{min-width:63px;min-height:27px;padding:3px 12px;border:1px solid #85aecc;border-radius:4px;background:linear-gradient(#fff,#cce6f8);box-shadow:inset 0 1px #fff;font-size:11px;color:#315d80}
 .zn-matrix-conversation__composer button:hover:enabled{background:linear-gradient(#fff,#b8ddf6)}
+
+/* Conversation actions stay in the contact window; no second modal or launcher. */
+.zn-matrix-chat__new{align-self:flex-start;flex:none;width:22px;height:22px;border:1px solid #9dbfd6!important;background:linear-gradient(#fff,#d6ebf9)!important;color:#356a91;font-size:17px;line-height:1}
+.zn-matrix-chat__room-avatar.is-direct{border-radius:50%;background:linear-gradient(#effff5,#b9e5cf);color:#4a906b}
+.zn-matrix-chat__rooms ul+h3,.zn-matrix-chat__rooms p+h3{margin-top:12px}
+.zn-matrix-chat__invitations{border-top:1px solid #d6e5ef;margin-top:12px;padding-top:8px}
+.zn-matrix-chat__invitations h3{font-size:10px;color:#587d98;margin:0 3px 5px}
+.zn-matrix-chat__invitations>div{display:flex;align-items:center;gap:5px;margin:5px 3px;font-size:10px}
+.zn-matrix-chat__invitations>div>span{flex:1;min-width:0;overflow-wrap:anywhere}
+.zn-matrix-chat__invitations button{border-color:#a2c4dc;background:#eff8ff;padding:3px 5px;flex:none;font-size:9px}
+.zn-matrix-start{min-height:0;overflow-y:auto;padding:10px 12px;background:#f8fcff;font-size:11px}
+.zn-matrix-start__heading{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;color:#315e7e}
+.zn-matrix-start button{border-color:#a2c3da;background:linear-gradient(#fff,#ddecf8);padding:4px 8px;color:#315f81;font-size:10px}
+.zn-matrix-start__kinds{display:flex;gap:4px;margin-bottom:12px;flex-wrap:wrap}
+.zn-matrix-start__kinds [aria-pressed=true]{background:#d1e9fa;border-color:#7aadd0}
+.zn-matrix-start label{display:flex;flex-direction:column;gap:4px;margin:9px 0;color:#466e8a}
+.zn-matrix-start :is(input,textarea){width:100%;padding:6px;border:1px solid #9dbed5;border-radius:3px;background:#fff;color:#244a6d;font:inherit;font-size:11px;resize:vertical}
+.zn-matrix-start small{font-size:9px;color:#7893a7}
+.zn-matrix-start p{margin:10px 0;line-height:1.5;color:#6e879a;font-size:10px}
+.zn-matrix-start p[role=alert]{padding:7px;background:#fff6de;color:#866d33;border-radius:3px}
+.zn-matrix-start ul{margin:8px 0;padding-left:15px;line-height:1.5;font-size:10px;color:#68869b}
+.zn-matrix-start dl{margin:10px 0;font-size:10px;overflow-wrap:anywhere}
+.zn-matrix-start dl>div{display:grid;grid-template-columns:65px 1fr;gap:5px;margin:5px 0}
+.zn-matrix-start dt{color:#7b95a7}.zn-matrix-start dd{margin:0;color:#355d79}

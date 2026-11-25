@@ -3,6 +3,14 @@
 ## [Unreleased]
 
 ### Added
+- Separate account-native Matrix direct messages from group rooms and add in-window reviewed DM, room creation/invitation, join and invitation-acceptance flows — both one-to-one and shared conversations should work without leaving the floating chat.
+
+### Fixed
+- Batch independent Matrix discovery and account-data reads — slower existing homeservers should not exhaust the floating list’s refresh window through sequential probes.
+- Retain unrelated m.direct mappings, reuse verified encrypted DMs and resume a retained room after a mapping failure — partial or uncertain outcomes must not silently create duplicate rooms or invitations.
+- Check the actual encrypted-message event permission in encrypted rooms — the composer must respect the homeserver’s permission for the event it sends.
+
+### Added
 - Read recent Matrix messages and send from the same floating Messenger-style window, with persistent per-device native encryption, explicit Send and idempotent retry — conversations must stay in the Hub without replacing existing accounts, sessions or room encryption.
 
 ### Fixed

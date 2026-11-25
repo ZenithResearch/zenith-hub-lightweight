@@ -92,3 +92,48 @@ account and encrypted store reopened after a drive-unmount interruption; the
 unsent browser draft survived. That draft was cleared. No live test message was
 sent. Existing installations, profiles, connections and Matrix account/selection
 bindings compare unchanged against the pre-change private baseline.
+
+## Rooms and direct messages
+
+The floating window separately lists **Direct messages** and **Rooms**, with the
+existing spaces carousel filtering group rooms. Direct status comes from this
+account's Matrix `m.direct` data; member count and application labels do not define
+it. A failed account-data read is shown as unverified, never verified empty.
+The protocol is the [Matrix Direct Messaging convention](https://spec.matrix.org/latest/client-server-api/#direct-messaging).
+
+The **+** control opens three small forms in the same window: **New message**,
+**Create room**, and **Join room**. New messages take a full Matrix user ID. New
+group rooms take a name and up to 20 optional full Matrix IDs to invite; this
+shortcut creates private, invite-only, encrypted rooms. Existing Settings controls
+retain advanced room configuration. Joining accepts a full room ID or alias;
+verified invitations also have a **Review join** action in the list.
+
+All creation, joining and invitation effects use the existing persisted
+`/api/matrix` review/apply contract. Review alone sends no invitation. The user
+confirms the recipient or room before applying. No welcome/test message is sent.
+New DMs reuse a verified existing encrypted DM where possible; otherwise
+`createRoom` uses `is_direct`, the named invitee and explicit encryption. Unrelated
+`m.direct` mappings are merged from a fresh read, never replaced by a one-room map.
+Accepting a genuine direct invitation records its actual inviting user.
+
+The controller retains a created room ID before subsequent account-data writes.
+A failed mapping step stays partial and blocks unchecked replay. After the user
+reconciles the retained outcome in Settings, a new review for the same recipient
+resumes that exact retained room and its mapping instead of creating another.
+Unknown network outcomes offer **Check result**, which reads retained operations
+and never automatically repeats a creation. Existing room/account identifiers,
+credentials and database owners remain unchanged; no ontology changes or schema
+migration are required. Pending setup reviews remain accessible in Settings.
+
+Qualification adds room/DM discovery and projection tests, closed and bounded
+recipient inputs, mapping preservation/reuse, genuine incoming DM invitations,
+alias joins, partial mapping recovery and existing account isolation. A real
+native-crypto fixture has two different Matrix users/devices exchange encrypted
+messages in both directions. Production, standalone and development HTTP checks
+cover reviewed room invites, DM creation/reuse and encrypted message send/read.
+All write qualification uses disposable fixtures; no live room, invitation or
+message is created for these checks. Cross-client account-data writes use Matrix's
+last-write-wins protocol; the immediate fresh merge cannot provide a server-side
+compare-and-swap guarantee against another client writing at the same instant.
+
+Independent discovery/account-data reads run concurrently. Slow refreshes recheck the account before publication, retain original per-room timestamps, and omit expired room, DM-map or invitation evidence. The UI permits a bounded longer refresh instead of reporting a premature timeout; stale evidence does not authorize new chat actions.

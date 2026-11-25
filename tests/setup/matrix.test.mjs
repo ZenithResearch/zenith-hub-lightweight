@@ -184,3 +184,19 @@ test('custom Matrix power levels accept safe integers and reject lossy values',a
  for(const level of [150,Number.MIN_SAFE_INTEGER,Number.MAX_SAFE_INTEGER])assert.equal(validateMatrixAction('permissions',{roomId:'!room:fixture.invalid',userId:'@user:fixture.invalid',level}).level,level);
  for(const level of [Number.MAX_SAFE_INTEGER+1,NaN,Infinity,1.5])assert.throws(()=>validateMatrixAction('permissions',{roomId:'!room:fixture.invalid',userId:'@user:fixture.invalid',level}),{code:'matrix_invalid_power_level'});
 });
+
+test('reviewed DMs survive restart and recover mapping failures without duplicate rooms or test messages',async t=>{
+ const f=await fixture(t);await f.login();f.remote.state.directMap={'@keep:x':['!keep:x']};
+ const args={userId:'@bob:fixture.invalid',acknowledgeEncryption:true},review=await f.review('start-dm',args);
+ assert.equal(f.remote.state.creations,0);assert.equal(f.remote.events.size,0);
+ const sent=await f.post({operation:'apply',planId:review.plan.id});assert.equal(sent.result.state,'complete');const first=sent.result.result.roomId;
+ await f.reopenController();assert.equal((await f.apply('start-dm',args)).result.result.roomId,first);assert.equal(f.remote.state.creations,1);
+ f.remote.state.denyDirectWrite=true;const next={userId:'@carol:fixture.invalid',acknowledgeEncryption:true},partial=await f.apply('start-dm',next);
+ assert.equal(partial.result.state,'partial');assert.ok(partial.result.result.roomId);
+ const op=partial.instances.find(i=>i.instanceId==='matrix-test').operations.find(o=>o.action==='start-dm'&&o.state==='partial');
+ await assert.rejects(f.apply('start-dm',next),{code:'matrix_reconciliation_required'});
+ f.remote.state.denyDirectWrite=false;await f.apply('acknowledge-outcome',{operationId:op.id,acknowledge:true});
+ const recovery=await f.review('start-dm',next);assert.equal(recovery.plan.dmRecoveryRoomId,partial.result.result.roomId);
+ const done=await f.post({operation:'apply',planId:recovery.plan.id});assert.equal(done.result.state,'complete');assert.equal(f.remote.state.creations,2);
+ assert.deepEqual(f.remote.state.directMap['@keep:x'],['!keep:x']);assert.equal(f.remote.events.size,0);
+});

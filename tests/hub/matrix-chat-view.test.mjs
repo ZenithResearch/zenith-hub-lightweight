@@ -34,3 +34,10 @@ test('malformed or unavailable snapshots remain an unavailable connection, not a
   const model=projectMatrixChat({snapshot,now});assert.ok(model.error);assert.equal(model.accounts[0].state,"unavailable");assert.deepEqual(model.accounts[0].rooms,[]);
  }
 });
+
+test('direct messages and invitations are account-native and remain scoped to verified evidence',()=>{
+ const snapshot=fixture(),v=snapshot.instances[0].view;v.directState='verified';v.rooms[1].directWith=['@bob:example.org'];v.invitations=[{roomId:'!invite:example.org',name:'Bob',directWith:['@bob:example.org']}];
+ const a=projectMatrixChat({snapshot,now}).accounts[0];assert.deepEqual(a.rooms[0].directWith,['@bob:example.org']);assert.equal(a.invitationRooms[0].id,'!invite:example.org');
+ v.directState='unverified';assert.deepEqual(projectMatrixChat({snapshot,now}).accounts[0].rooms[0].directWith,[]);
+ snapshot.instances[0].enabled=false;const disabled=projectMatrixChat({snapshot,now}).accounts[0];assert.deepEqual(disabled.rooms,[]);assert.deepEqual(disabled.invitationRooms,[]);
+});

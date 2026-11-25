@@ -14,9 +14,19 @@ import {runOwned} from './adapters.mjs';
 import {verifyMatrixListener} from './matrix-management.mjs';
 const closed=(v,required,optional=[])=>check(v,v&&typeof v==='object'&&!Array.isArray(v)&&required.every(k=>Object.hasOwn(v,k))&&Object.keys(v).every(k=>[...required,...optional].includes(k)),'matrix_invalid_action',400);
 const bound=i=>digest({endpoint:serviceEndpoint(i),enabled:i.enabled!==false,mode:i.mode,root:i.root||null,serverName:i.config?.serverName||null,configured:i.configured??null,account:i.matrix?.account||null,version:i.matrix?.version||0});
+/** Composite snapshots may finish late; retain only evidence that is still fresh. */
+export function completedRoomView(view,now){
+ const fresh=at=>{const age=now-Date.parse(at);return Number.isFinite(age)&&age>=-5000&&age<=30000;};
+ const expired=(view.rooms||[]).filter(r=>!fresh(r.observedAt));
+ view.rooms=(view.rooms||[]).filter(r=>fresh(r.observedAt));
+ if(expired.length){view.roomsComplete=false;view.failures=[...(view.failures||[]),...expired.map(r=>({roomId:r.roomId,error:'matrix_room_evidence_expired'}))];}
+ if(!fresh(view.directObservedAt)){view.directState='unverified';view.rooms=view.rooms.map(r=>({...r,directWith:[]}));}
+ if(!fresh(view.invitationObservedAt)){view.invitationState='unverified';view.invitations=[];}
+ view.observedAt=new Date(now).toISOString();return view;
+}
 export function createMatrixController({env=process.env,root=env.ZENITH_HUB_SETUP_DIR,store=stateStore(root),clientFactory=matrixClient,clock=Date.now,bootstrapSecret,run=runOwned}={}){
  const origin=env.ZENITH_OPERATOR_ORIGIN||'http://127.0.0.1:4208',u=endpoint(origin),csrf=operatorCsrf('matrix',env);
- const driverDigest=async()=>digest(await Promise.all(['matrix-controller.mjs','matrix-client.mjs','matrix-contract.mjs','matrix-session.mjs','matrix-management.mjs','network.mjs','../../../profiles/setup/matrix.schema.json'].map(async f=>digest(await readFile(path.join(process.cwd(),'src/lib/setup',f))))));
+ const driverDigest=async()=>digest(await Promise.all(['matrix-controller.mjs','matrix-direct.mjs','matrix-client.mjs','matrix-contract.mjs','matrix-session.mjs','matrix-management.mjs','network.mjs','../../../profiles/setup/matrix.schema.json'].map(async f=>digest(await readFile(path.join(process.cwd(),'src/lib/setup',f))))));
  let busy=false;
  const options={allowPrivateHosts:(env.ZENITH_SETUP_PRIVATE_HOSTS||'').split(',').filter(Boolean)};
  function admit(r,write=false){
@@ -45,9 +55,11 @@ export function createMatrixController({env=process.env,root=env.ZENITH_HUB_SETU
    if(i.matrix?.account?.endpoint===base){
     try{
      const who=await client.whoami();check(who,who.userId===i.matrix.account.userId,'matrix_account_changed');
-     Object.assign(view,{authentication:'authenticated',account:who,credentialRef:i.matrix.account.credentialRef});
+     Object.assign(view,{authentication:'authenticated',account:who,credentialRef:i.matrix.account.credentialRef});const accountAt=clock();
      try{const rooms=await client.rooms(who.userId);Object.assign(view,rooms,{roomsComplete:rooms.complete});}
      catch(e){view.error=e.code||'matrix_rooms_unverified';view.roomsComplete=false;}
+     if(clock()-accountAt>10000){const finalWho=await client.whoami();check(finalWho,finalWho.userId===i.matrix.account.userId&&finalWho.deviceId===who.deviceId,'matrix_account_changed');view.account=finalWho;}
+     completedRoomView(view,clock());
     }catch(e){view.authentication=e.code==='matrix_session_expired'?'expired':e.code==='matrix_permission_denied'?'permission-denied':'unverified';view.error=e.code||'matrix_account_unverified';}
    }
   }catch(e){view.error=e.code||'matrix_api_unavailable';}
@@ -100,7 +112,7 @@ export function createMatrixController({env=process.env,root=env.ZENITH_HUB_SETU
      result={state:'complete',completed:['membership-verified','selection-saved'],result:{}};
     }else{
      if(plan.action==='message-test')check(initial,initial.matrix.selected?.roomId===plan.args.roomId&&initial.matrix.selected?.credentialRef===initial.matrix.account.credentialRef,'matrix_select_test_room_first');
-     result=await client.execute(plan.action,plan.args,{userId:who.userId,operationId:plan.id,checkpoint});
+     result=await client.execute(plan.action,plan.args,{userId:who.userId,operationId:plan.id,recoveryRoomId:plan.dmRecoveryRoomId,checkpoint});
      if(plan.action==='message-test')await update(plan.instanceId,i=>{i.matrix.messageVerification={...result.result,endpoint:serviceEndpoint(initial),userId:who.userId,credentialRef:initial.matrix.account.credentialRef,observedAt:at};});
     }
    }
@@ -121,6 +133,10 @@ export function createMatrixController({env=process.env,root=env.ZENITH_HUB_SETU
      const i=instance(await store.read(),body.instanceId);check(i,i.enabled!==false,'matrix_connection_disabled');
      if(body.action==='bootstrap')check(i,i.mode==='install'&&i.configured===true,'matrix_local_management_required',403);
      const plan={id:'matrix-'+randomBytes(18).toString('hex'),action:body.action,args:body.args,instanceId:i.instanceId,binding:bound(i),endpoint:serviceEndpoint(i),account:i.matrix?.account?.userId||null,driverDigest:await driverDigest(),expiresAt:clock()+120000,effects:[matrixActionEffects[body.action]]};
+     if(body.action==='start-dm'){
+      const prior=i.matrix?.operations?.find(o=>o.action==='start-dm'&&o.args.userId===body.args.userId&&o.binding===bound(i)&&['partial','acknowledged'].includes(o.state)&&typeof o.result?.roomId==='string');
+      if(prior){plan.dmRecoveryRoomId=prior.result.roomId;plan.effects=['Finish the direct-message mapping for retained room '+prior.result.roomId+'. No new room or invitation will be created.'];}
+     }
      await store.saveReview(plan);await update(i.instanceId,current=>{current.matrix={...current.matrix,reviewId:plan.id};});return {schema:'zenith.hub-matrix-review.v1',plan};
     }
     if(body.operation==='read-review'){closed(body,['schema','operation','planId']);const plan=await store.getReview(body.planId);check(plan,plan?.id?.startsWith('matrix-'),'matrix_review_missing');return {schema:'zenith.hub-matrix-review.v1',plan};}

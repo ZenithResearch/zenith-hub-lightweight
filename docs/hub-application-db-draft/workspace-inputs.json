@@ -162,7 +162,7 @@
         {
           "path": "profiles/source-provenance.json",
           "previousSha256": "21e4ecba50c01335a0039e914e5a3f94403d43655d27ba3dd1f79aaa7ed5f2eb",
-          "sha256": "97d18cee3b73599eafd30c8e1f90fc8e54efd97f2ed78419622e220d307711bc",
+          "sha256": "518e319a9a0dc58767a7d845c43e32629f3afa9302afea6b1c9941a0f7f16ce8",
           "reason": "Approved main Hub/Settings navigation, radial Hermes and Matrix conversation follow-ups preserve existing setup owners; exact source pins retain the historical database review snapshots.",
           "evidence": [
             "profiles/source-provenance.json",
@@ -349,7 +349,7 @@
         {
           "path": "profiles/source-provenance.json",
           "previousSha256": "21e4ecba50c01335a0039e914e5a3f94403d43655d27ba3dd1f79aaa7ed5f2eb",
-          "sha256": "97d18cee3b73599eafd30c8e1f90fc8e54efd97f2ed78419622e220d307711bc",
+          "sha256": "518e319a9a0dc58767a7d845c43e32629f3afa9302afea6b1c9941a0f7f16ce8",
           "reason": "Approved main Hub/Settings navigation, radial Hermes and Matrix conversation follow-ups preserve existing setup owners; exact source pins retain the historical database review snapshots.",
           "evidence": [
             "profiles/source-provenance.json",

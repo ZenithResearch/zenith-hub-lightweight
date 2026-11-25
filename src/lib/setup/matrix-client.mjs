@@ -1,24 +1,29 @@
 /** Matrix Client-Server adapter over the existing DNS-pinned, redirect-free transport.
- * No E2EE device/key implementation: never send plaintext into encrypted rooms.
+ * Device keys and encrypted messages belong to the separate conversation client.
  */
 import {createHmac} from 'node:crypto';
 import {requestJSON,endpoint} from './network.mjs';
 import {check} from './catalog.mjs';
+import {readDirectMap,recordDirectRoom,decorateDirectRooms,invitationRows,matrixRoom} from './matrix-direct.mjs';
 const enc=s=>encodeURIComponent(s).replace(/[!'()*]/g,c=>'%'+c.charCodeAt(0).toString(16).toUpperCase());
 const roomPath=id=>'/_matrix/client/v3/rooms/'+enc(id);
 export function matrixClient(base,{token,request=requestJSON,allowPrivateHosts=[]}={}) {
  base=endpoint(base).origin;
  async function call(route,{method='GET',body,auth=token,optional=false}={}){
   const r=await request(base,route,{method,body,token:auth,allowPrivateHosts});
-  if(optional&&[404,405].includes(r.status))return null;
+  if(optional&&(Array.isArray(optional)?optional:[404,405]).includes(r.status))return null;
   const codes={401:'matrix_session_expired',403:'matrix_permission_denied',404:'matrix_not_found',429:'matrix_rate_limited'};
   check(r,r.status>=200&&r.status<300,codes[r.status]||(r.status>=500?'matrix_outcome_unknown':'matrix_request_rejected'),r.status===401?401:409);
   return r.value;
  }
  async function discover(){
-  const versions=await call('/_matrix/client/versions',{auth:null}),login=await call('/_matrix/client/v3/login',{auth:null,optional:true}),oauth=await call('/_matrix/client/v1/auth_metadata',{auth:null,optional:true});
+  const [versions,login,oauth,caps]=await Promise.all([
+   call('/_matrix/client/versions',{auth:null}),
+   call('/_matrix/client/v3/login',{auth:null,optional:true}),
+   call('/_matrix/client/v1/auth_metadata',{auth:null,optional:true}),
+   call('/_matrix/client/v3/capabilities',{optional:true}).catch(e=>e.code==='matrix_session_expired'||e.code==='matrix_permission_denied'?null:Promise.reject(e))
+  ]);
   check(login,Array.isArray(versions.versions)&&(!login||Array.isArray(login.flows)),'matrix_discovery_incompatible');
-  const caps=await call('/_matrix/client/v3/capabilities',{optional:true}).catch(e=>e.code==='matrix_session_expired'||e.code==='matrix_permission_denied'?null:Promise.reject(e));
   return {versions:versions.versions,loginFlows:(oauth?[{type:'oauth2.external-client-required'}]:(login?.flows||[])).map(f=>({type:f.type,...(Array.isArray(f.identity_providers)?{identityProviders:f.identity_providers.map(p=>({id:p.id,name:p.name}))}:{})})),capabilities:caps?.capabilities||{},encryptedMessaging:'external-client-required'};
  }
  async function whoami(auth=token){const who=await call('/_matrix/client/v3/account/whoami',{auth});check(who,typeof who.user_id==='string'&&/^@[^:]+:.+/.test(who.user_id),'matrix_identity_unverified');return {userId:who.user_id,deviceId:who.device_id||null};}
@@ -54,30 +59,49 @@ export function matrixClient(base,{token,request=requestJSON,allowPrivateHosts=[
   const meets=required=>creatorPrivilege||numericLevel>=required;
   const needed=t=>power.events?.[t]??power.state_default??50;
   const membership=get('m.room.member',userId)?.membership||'unknown',joined=membership==='join';
-  return {roomId:id,roomVersion:create.room_version||'1',creators,kind:create.type==='m.space'?'space':'room',name:get('m.room.name')?.name||id,topic:get('m.room.topic')?.topic||'',membership,joinRule:get('m.room.join_rules')?.join_rule||'invite',encrypted:!!get('m.room.encryption'),children:state.filter(e=>e.type==='m.space.child'&&Array.isArray(e.content?.via)&&e.content.via.length).map(e=>e.state_key),parents:state.filter(e=>e.type==='m.space.parent'&&Array.isArray(e.content?.via)&&e.content.via.length).map(e=>e.state_key),powerLevels:power,members:state.filter(e=>e.type==='m.room.member').slice(0,200).map(e=>({userId:e.state_key,membership:e.content.membership})),permissions:{level,canConfigure:joined&&meets(needed('m.room.name')),canSetJoinRule:joined&&meets(needed('m.room.join_rules')),canLink:joined&&meets(needed('m.space.child')),canSetPermissions:joined&&meets(needed('m.room.power_levels')),canInvite:joined&&meets(power.invite??0),canKick:joined&&meets(power.kick??50),canBan:joined&&meets(power.ban??50),canEncrypt:joined&&meets(needed('m.room.encryption')),canSend:joined&&meets(power.events?.['m.room.message']??power.events_default??0)},observedAt:new Date().toISOString()};
+  return {roomId:id,roomVersion:create.room_version||'1',creators,kind:create.type==='m.space'?'space':'room',name:get('m.room.name')?.name||id,topic:get('m.room.topic')?.topic||'',membership,joinRule:get('m.room.join_rules')?.join_rule||'invite',encrypted:!!get('m.room.encryption'),children:state.filter(e=>e.type==='m.space.child'&&Array.isArray(e.content?.via)&&e.content.via.length).map(e=>e.state_key),parents:state.filter(e=>e.type==='m.space.parent'&&Array.isArray(e.content?.via)&&e.content.via.length).map(e=>e.state_key),powerLevels:power,members:state.filter(e=>e.type==='m.room.member').slice(0,200).map(e=>({userId:e.state_key,membership:e.content.membership,displayName:typeof e.content.displayname==='string'?e.content.displayname.slice(0,200):null})),permissions:{level,canConfigure:joined&&meets(needed('m.room.name')),canSetJoinRule:joined&&meets(needed('m.room.join_rules')),canLink:joined&&meets(needed('m.space.child')),canSetPermissions:joined&&meets(needed('m.room.power_levels')),canInvite:joined&&meets(power.invite??0),canKick:joined&&meets(power.kick??50),canBan:joined&&meets(power.ban??50),canEncrypt:joined&&meets(needed('m.room.encryption')),canSend:joined&&meets(power.events?.[get('m.room.encryption')?'m.room.encrypted':'m.room.message']??power.events_default??0)},observedAt:new Date().toISOString()};
+ }
+ async function invitationsFor(userId){
+  const filter=enc(JSON.stringify({presence:{types:[]},account_data:{types:[]},room:{timeline:{limit:0},state:{types:['m.room.name','m.room.create','m.room.member']},ephemeral:{types:[]},account_data:{types:[]}}}));
+  return invitationRows(await call('/_matrix/client/v3/sync?timeout=0&filter='+filter),userId);
  }
  async function rooms(userId){
+  // These account-scoped reads are independent of the joined-room state traversal.
+  const directRead=readDirectMap(call,userId).then(value=>({value,state:'verified',at:new Date().toISOString()}),()=>({value:{},state:'unverified',at:new Date().toISOString()}));
+  const inviteRead=invitationsFor(userId).then(value=>({value,state:'verified',at:new Date().toISOString()}),()=>({value:[],state:'unverified',at:new Date().toISOString()}));
   const joined=await call('/_matrix/client/v3/joined_rooms');check(joined,Array.isArray(joined.joined_rooms),'matrix_rooms_incompatible');
   const rows=[],failures=[];let cursor=0,rowsBytes=0;
   await Promise.all(Array.from({length:4},async()=>{while(cursor<Math.min(joined.joined_rooms.length,100)){const id=joined.joined_rooms[cursor++];try{const value=await room(id,userId),bytes=JSON.stringify(value).length;check(value,rowsBytes+bytes<=524288,'matrix_room_view_limit');rowsBytes+=bytes;rows.push(value);}catch(e){failures.push({roomId:id,error:e.code||'matrix_room_unverified'});}}}));
-  let invitations=[],invitationState='verified';
-  try{
-   const filter=enc(JSON.stringify({presence:{limit:0},account_data:{limit:0},room:{timeline:{limit:0},state:{types:['m.room.name','m.room.create','m.room.member']},ephemeral:{limit:0},account_data:{limit:0}}}));
-   const sync=await call('/_matrix/client/v3/sync?timeout=0&filter='+filter);
-   invitations=Object.entries(sync.rooms?.invite||{}).slice(0,100).map(([roomId,v])=>({roomId,name:v.invite_state?.events?.find(e=>e.type==='m.room.name')?.content?.name||roomId}));
-  }catch{invitationState='unverified';}
-  return {rooms:rows.sort((a,b)=>a.name.localeCompare(b.name)),failures,invitations,invitationState,complete:joined.joined_rooms.length<=100&&!failures.length,limit:100};
+  const [direct,invited]=await Promise.all([directRead,inviteRead]);
+  const directMap=direct.value,directState=direct.state,invitations=invited.value,invitationState=invited.state;
+  return {rooms:decorateDirectRooms(rows,directMap,userId).sort((a,b)=>a.name.localeCompare(b.name)),directState,directObservedAt:direct.at,failures,invitations,invitationState,invitationObservedAt:invited.at,complete:joined.joined_rooms.length<=100&&!failures.length,limit:100};
  }
- async function execute(action,args,{userId,operationId,checkpoint=async()=>{}}={}){
+ async function execute(action,args,{userId,operationId,recoveryRoomId,checkpoint=async()=>{}}={}){
   const completed=[];let result={};
   async function step(name,fn){const value=await fn();completed.push(name);await checkpoint({completed:[...completed],result:{...result}});return value;}
   const state=(id,type,content,key='')=>call(roomPath(id)+'/state/'+enc(type)+'/'+enc(key),{method:'PUT',body:content});
   try{
-   if(action==='create-room'||action==='create-space'){
-    const value=await step('created',()=>call('/_matrix/client/v3/createRoom',{method:'POST',body:{name:args.name,topic:args.topic||'',visibility:args.visibility||'private',preset:args.joinRule==='public'?'public_chat':'private_chat',...(action==='create-space'?{creation_content:{type:'m.space'}}:{}),initial_state:[{type:'m.room.join_rules',state_key:'',content:{join_rule:args.joinRule||'invite'}},...(args.encryption?[{type:'m.room.encryption',state_key:'',content:{algorithm:'m.megolm.v1.aes-sha2'}}]:[])]}}));
+   if(action==='start-dm'){
+    check(args,args.userId!==userId,'matrix_direct_self_unsupported');
+    const map=await readDirectMap(call,userId);
+    const candidates=recoveryRoomId?[recoveryRoomId]:Array.isArray(map[args.userId])?map[args.userId].filter(matrixRoom).slice(0,50):[];
+    for(const id of candidates){
+     let existing;try{existing=await room(id,userId);}catch(e){if(['matrix_not_found','matrix_permission_denied'].includes(e.code)&&!recoveryRoomId)continue;throw e;}
+     const eligible=existing.kind==='room'&&existing.membership==='join'&&existing.encrypted&&existing.members.some(m=>m.userId===args.userId&&['join','invite'].includes(m.membership));
+     if(recoveryRoomId)check(existing,eligible,'matrix_direct_recovery_changed');
+     if(eligible){result={roomId:id,reused:true};await checkpoint({completed:[...completed],result});if(recoveryRoomId)await step('direct-mapping-saved',()=>recordDirectRoom(call,userId,args.userId,id));return {state:'complete',completed:[...completed,'direct-chat-opened'],result};}
+    }
+    check(recoveryRoomId,!recoveryRoomId,'matrix_direct_recovery_changed');
+    const created=await step('created',()=>call('/_matrix/client/v3/createRoom',{method:'POST',body:{is_direct:true,invite:[args.userId],visibility:'private',preset:'private_chat',initial_state:[{type:'m.room.join_rules',state_key:'',content:{join_rule:'invite'}},{type:'m.room.encryption',state_key:'',content:{algorithm:'m.megolm.v1.aes-sha2'}},{type:'m.room.history_visibility',state_key:'',content:{history_visibility:'invited'}}]}}));
+    check(created,matrixRoom(created.room_id),'matrix_room_creation_unverified');result={roomId:created.room_id,reused:false};await checkpoint({completed:[...completed],result});
+    await step('direct-mapping-saved',()=>recordDirectRoom(call,userId,args.userId,result.roomId));
+   }else if(action==='create-room'||action==='create-space'){
+    const value=await step('created',()=>call('/_matrix/client/v3/createRoom',{method:'POST',body:{name:args.name,topic:args.topic||'',...(args.invite?.length?{invite:[...new Set(args.invite)].filter(id=>id!==userId)}:{}),visibility:args.visibility||'private',preset:args.joinRule==='public'?'public_chat':'private_chat',...(action==='create-space'?{creation_content:{type:'m.space'}}:{}),initial_state:[{type:'m.room.join_rules',state_key:'',content:{join_rule:args.joinRule||'invite'}},...(args.encryption?[{type:'m.room.encryption',state_key:'',content:{algorithm:'m.megolm.v1.aes-sha2'}}]:[])]}}));
     result.roomId=value.room_id;check(value,typeof value.room_id==='string','matrix_room_creation_unverified');await checkpoint({completed:[...completed],result});
    }else if(action==='join-room'){
-    const value=await step('joined',()=>call('/_matrix/client/v3/join/'+enc(args.roomId),{method:'POST',body:{}}));result.roomId=value.room_id;
+    let directInvite=null;if(args.roomId.startsWith('!'))try{directInvite=(await invitationsFor(userId)).find(i=>i.roomId===args.roomId&&i.directWith?.length===1);}catch{}
+    const value=await step('joined',()=>call('/_matrix/client/v3/join/'+enc(args.roomId),{method:'POST',body:{}}));result.roomId=value.room_id;check(value,matrixRoom(result.roomId),'matrix_room_join_unverified');await checkpoint({completed:[...completed],result});
+    if(directInvite){const joined=await room(result.roomId,userId);check(joined,joined.kind==='room'&&joined.membership==='join'&&joined.members.some(m=>m.userId===directInvite.directWith[0]&&['join','invite'].includes(m.membership)),'matrix_direct_invitation_changed');await step('direct-mapping-saved',()=>recordDirectRoom(call,userId,directInvite.directWith[0],result.roomId));}
    }else if(action==='configure-room'){
     await room(args.roomId,userId); // Re-read actual state; the server remains the permission authority.
     if(args.name!==undefined)await step('name-updated',()=>state(args.roomId,'m.room.name',{name:args.name}));

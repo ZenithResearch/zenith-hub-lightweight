@@ -30,7 +30,7 @@ compact Messenger-inspired window uses blue glass chrome, a framed account
 avatar and a light room list. The account status light describes connection
 verification, not a person’s online presence. Room avatars and encryption marks
 come from the existing room model; no unread counts or presence are inferred.
-The panel shows spaces in a horizontal carousel above the room list. Selecting a
+The panel separately lists account-native direct messages and group rooms, with spaces in a horizontal carousel above the room list. The + control opens reviewed new-message, create-room and join flows inside the same window; verified invitations can be accepted there too. Selecting a
 space filters the rooms below it through verified
 m.space.child relationships, including nested spaces, and keeps local selection across navigation and
 minimizing. Account/device identities scope that selection. Matrix configuration

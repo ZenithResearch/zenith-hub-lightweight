@@ -2,7 +2,7 @@ import {createServer} from 'node:http';
 import {randomBytes,createHmac} from 'node:crypto';
 export async function matrixFixture(t){
  const userId='@reviewer:fixture.invalid',password='fixture-password-never-persist',tokens=new Set(['external-session']),rooms=new Map(),events=new Map(),requests=[];
- const state={userId,password,tokens,rooms,events,requests,deniedType:null,denyRead:false,denyRooms:false,dropCreation:false,oauthOnly:false,loginFlows:[{type:'m.login.password'},{type:'m.login.token'}],creations:0,logouts:0,bootstrapAdmin:null,deviceKeys:null};
+ const state={userId,password,tokens,rooms,events,requests,deniedType:null,denyRead:false,denyRooms:false,dropCreation:false,oauthOnly:false,loginFlows:[{type:'m.login.password'},{type:'m.login.token'}],creations:0,logouts:0,bootstrapAdmin:null,deviceKeys:null,directMap:{},denyDirectRead:false,denyDirectWrite:false,createBodies:[],invitations:null};
  const event=(type,content,state_key='')=>({type,content,state_key,sender:userId});
  function makeRoom(id,name,kind='room',encrypted=false){
   const data=[event('m.room.create',{creator:userId,room_version:'11',...(kind==='space'?{type:'m.space'}:{})}),event('m.room.name',{name}),event('m.room.member',{membership:'join'},userId),event('m.room.power_levels',{users:{[userId]:100},state_default:50}),event('m.room.join_rules',{join_rule:'invite'})];
@@ -31,20 +31,21 @@ export async function matrixFixture(t){
   const token=req.headers.authorization?.replace(/^Bearer /,'');
   if(!tokens.has(token))return send(401,{errcode:'M_UNKNOWN_TOKEN'});
   if(p==='/_matrix/client/v3/account/whoami')return send(200,{user_id:userId,device_id:'HUBFIXTURE'});
+  if(p==='/_matrix/client/v3/user/'+userId+'/account_data/m.direct'){if(req.method==='GET')return state.denyDirectRead?send(403,{errcode:'M_FORBIDDEN'}):send(200,state.directMap);if(req.method==='PUT'){if(state.denyDirectWrite)return send(403,{errcode:'M_FORBIDDEN'});state.directMap=body;return send(200,{});}}
   if(p==='/_matrix/client/v3/capabilities')return send(200,{capabilities:{'m.room_versions':{available:{'11':'stable','12':'stable'},default:'11'}}});
   if(p==='/_matrix/client/v3/joined_rooms')return state.denyRooms?send(403,{errcode:'M_FORBIDDEN'}):send(200,{joined_rooms:[...rooms.keys()]});
   if(p==='/_matrix/client/v3/keys/query')return send(200,{device_keys:{[userId]:state.deviceKeys?{HUBFIXTURE:state.deviceKeys}:{}},master_keys:{},self_signing_keys:{},user_signing_keys:{},failures:{}});
   if(p==='/_matrix/client/v3/keys/upload'){if(body.device_keys)state.deviceKeys=body.device_keys;return send(200,{one_time_key_counts:{signed_curve25519:100}});}
   if(p==='/_matrix/client/v3/keys/claim')return send(200,{one_time_keys:{},failures:{}});
   if(p.startsWith('/_matrix/client/v3/sendToDevice/'))return send(200,{});
-  if(p==='/_matrix/client/v3/sync')return send(200,{next_batch:'fixture',to_device:{events:[]},device_one_time_keys_count:{signed_curve25519:100},device_lists:{changed:[userId],left:[]},rooms:{join:Object.fromEntries([...rooms].map(([id,data])=>[id,{state:{events:data}}])),invite:{'!invited:fixture.invalid':{invite_state:{events:[event('m.room.name',{name:'Invitation'})]}}}}});
+  if(p==='/_matrix/client/v3/sync')return send(200,{next_batch:'fixture',to_device:{events:[]},device_one_time_keys_count:{signed_curve25519:100},device_lists:{changed:[userId],left:[]},rooms:{join:Object.fromEntries([...rooms].map(([id,data])=>[id,{state:{events:data}}])),invite:state.invitations||{'!invited:fixture.invalid':{invite_state:{events:[event('m.room.name',{name:'Invitation'})]}}}}});
   if(p==='/_matrix/client/v3/createRoom'){
-   state.creations++;const id=makeRoom('!new'+state.creations+':fixture.invalid',body.name,body.creation_content?.type==='m.space'?'space':'room');
-   rooms.get(id).push(...(body.initial_state||[]));
+   state.createBodies.push(body);state.creations++;const id=makeRoom('!new'+state.creations+':fixture.invalid',body.name,body.creation_content?.type==='m.space'?'space':'room');
+   rooms.get(id).push(...(body.initial_state||[]),...(body.invite||[]).map(peer=>event('m.room.member',{membership:'invite',is_direct:body.is_direct===true},peer)));
    if(state.dropCreation){req.socket.destroy();return;}
    return send(200,{room_id:id});
   }
-  if(p.startsWith('/_matrix/client/v3/join/')){const id=route[5];if(!rooms.has(id))makeRoom(id,'Joined by identifier');return send(200,{room_id:id});}
+  if(p.startsWith('/_matrix/client/v3/join/')){const id=route[5].startsWith('#')?'!joined-alias:fixture.invalid':route[5];if(!rooms.has(id))makeRoom(id,'Joined by identifier');else{const data=rooms.get(id),at=data.findIndex(e=>e.type==='m.room.member'&&e.state_key===userId);if(at>=0)data[at]=event('m.room.member',{membership:'join'},userId);else data.push(event('m.room.member',{membership:'join'},userId));}return send(200,{room_id:id});}
   if(p==='/_matrix/client/v3/logout'){state.logouts++;tokens.delete(token);return send(200,{});}
   if(route[4]==='rooms'){
    const id=route[5],data=rooms.get(id);if(!data)return send(404,{errcode:'M_NOT_FOUND'});

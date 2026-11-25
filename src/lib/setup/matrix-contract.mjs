@@ -3,13 +3,15 @@ import schema from '../../../profiles/setup/matrix.schema.json' with {type:'json
 const bindingValidator=new Ajv({strict:true}).compile(schema);
 export const validateMatrixBinding=value=>check(value,bindingValidator(value),'matrix_binding_invalid',422);
 import {check} from './catalog.mjs';
+import {matrixUser} from './matrix-direct.mjs';
 const closed=(v,required,optional=[])=>check(v,v&&typeof v==='object'&&!Array.isArray(v)&&required.every(k=>Object.hasOwn(v,k))&&Object.keys(v).every(k=>[...required,...optional].includes(k)),'matrix_invalid_action',400);
 const text=(v,max=512)=>typeof v==='string'&&v.length>0&&v.length<=max&&!/[\0\r\n]/.test(v);
 export function validateMatrixAction(action,args){
  const rules={
   login:[['method'],['username']],
   bootstrap:[['username','admin'],[]],
-  'create-room':[['name','visibility','joinRule','encryption'],['topic','acknowledgeEncryption']],
+  'create-room':[['name','visibility','joinRule','encryption'],['topic','acknowledgeEncryption','invite']],
+  'start-dm':[['userId','acknowledgeEncryption'],[]],
   'create-space':[['name','visibility','joinRule','encryption'],['topic','acknowledgeEncryption']],
   'join-room':[['roomId'],[]],
   'select-room':[['roomId'],['spaceId']],
@@ -26,7 +28,9 @@ export function validateMatrixAction(action,args){
  };
  check(action,Object.hasOwn(rules,action),'matrix_action_unsupported',400);closed(args,...rules[action]);
  for(const key of ['roomId','spaceId'])if(args[key]!==undefined)check(args,text(args[key])&&(/^[!#][^:]+:.+/.test(args[key])),'matrix_invalid_room',400);
- if(args.userId!==undefined)check(args,text(args.userId)&&/^@[^:]+:.+/.test(args.userId),'matrix_invalid_user',400);
+ if(args.userId!==undefined)check(args,matrixUser(args.userId),'matrix_invalid_user',400);
+ if(args.invite!==undefined)check(args,Array.isArray(args.invite)&&args.invite.length<=20&&args.invite.every(matrixUser),'matrix_invalid_invitees',400);
+ if(action==='start-dm')check(args,args.acknowledgeEncryption===true,'matrix_encryption_acknowledgement_required',400);
  if(args.name!==undefined)check(args,text(args.name,200),'matrix_invalid_name',400);
  if(args.topic!==undefined)check(args,typeof args.topic==='string'&&args.topic.length<=1000&&!args.topic.includes('\0'),'matrix_invalid_topic',400);
  if(args.reason!==undefined)check(args,text(args.reason,500),'matrix_invalid_reason',400);
@@ -47,7 +51,8 @@ export function validateMatrixAction(action,args){
 export const matrixActionEffects={
  login:'Authenticate the account with this server and retain its session in the private credential store. No account is created.',
  bootstrap:'Create the selected account on this Hub-managed local Synapse server. Administrative privileges are exactly those selected. Public registration stays disabled.',
- 'create-room':'Create a room on the Matrix homeserver with the reviewed name, directory visibility, join rule and encryption.',
+ 'start-dm':'Open a verified existing encrypted direct chat when available; otherwise create a private encrypted room and invite the named person. Preserve existing direct-message mappings. No message is sent.',
+ 'create-room':'Create a room on the Matrix homeserver with the reviewed name, directory visibility, join rule, encryption and any named invitees.',
  'create-space':'Create a Matrix space with the reviewed name and join rule.',
  'join-room':'Join the selected room or accept its invitation using this account.',
  'select-space':'Save the verified joined space in the Hub without changing its membership.',
