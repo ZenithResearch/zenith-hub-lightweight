@@ -21,7 +21,7 @@ flowchart TD
     Entry -. optional .-> Chat
 ```
 
-**Continue** opens `/hub`. During the workspace-design transition this remains a compatibility view of **Settings & configuration**, whose canonical address is `/settings`. It requires an installed Hermes, with no provider sign-in or chat test as an entry gate. The initial Continue and secondary Configure controls sit directly on the cloud background. When Hermes is absent, Install Hermes occupies the same background action area. No initial card or modal is shown.
+**Continue** opens `/hub`. It shows Conversations and Work; **Settings & configuration** is at `/settings`. It requires an installed Hermes, with no provider sign-in or chat test as an entry gate. The initial Continue and secondary Configure controls sit directly on the cloud background. When Hermes is absent, Install Hermes occupies the same background action area. No initial card or modal is shown.
 
 An explicit Install, Configure, installation-selection or retained-progress action opens one native modal over the persistent artwork. Install review, installation selection, model configuration and operation progress remain inside that dialog. Closing it retains applied work and setup drafts; it discards only an unapplied review plan. Completing install or setup returns to the background actions. The dialog places focus on Close, contains keyboard focus and restores the activating control on dismissal. It can be closed while applied work continues; View progress reopens it. No previous wizard page is embedded.
 
@@ -86,12 +86,12 @@ services is its current section, retaining configured instances, available apps,
 inline configuration and the accessible refresh icon. It reads the same setup
 and external connection records without introducing a resource graph index.
 
-The /hub compatibility view, Continue action and older Matrix query links still
-work. New Matrix configuration links use /settings?matrix=INSTANCE. No setup,
-account, credential or instance migration is required.
+Continue opens the main /hub workspace. Older /hub?matrix=INSTANCE links forward
+to /settings?matrix=INSTANCE. Configuration prompts open the relevant saved
+instance or catalog setup form. No setup, account, credential or instance
+migration is required.
 
-See the [main Hub screen plan](main-hub-screen-plan.md) for the proposed everyday
-workspace after Continue. Its layout and new use-oriented actions are proposals
-for review, not implemented by this settings change. The earlier
+See the [main Hub implementation record](main-hub-screen-plan.md) for Conversations,
+Work and their current client/data limits. The earlier
 [gallery rollback record](resource-gallery-rollback-2026-11-22.md) remains
 historical evidence.

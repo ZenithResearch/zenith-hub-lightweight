@@ -2,11 +2,12 @@
 import React,{useEffect,useId,useRef,type ReactNode} from 'react';
 import {ZenithCloudScene} from '../HubSetup/ZenithCloudScene.tsx';
 import './YourHub.css';
+import {HubNavigationLink,type HubNavigate} from '../MainHub/HubNavigation.tsx';
 export type HubResource = {key:string;label:string;purpose:string;componentId:string;status:string;managed:boolean;mode:string;observedAt?:string|null;endpoint?:string|null;actions:string[];enabled:boolean;stale?:boolean};
-export function HubSettings({resources,onSelect,onRefresh,busy=false,refreshing=false,selectedKey,children,notices,catalog=[],onChoose,flowContent}: {
+export function HubSettings({resources,onSelect,onRefresh,busy=false,refreshing=false,selectedKey,children,notices,catalog=[],onChoose,flowContent,onNavigate}: {
  resources:HubResource[];onSelect:(key:string)=>void;onRefresh:()=>void;busy?:boolean;refreshing?:boolean;
  catalog?:{id:string;label:string;description:string}[];onChoose?:(id:string)=>void;flowContent?:ReactNode;
- selectedKey?:string;children?:ReactNode;notices?:ReactNode;
+ selectedKey?:string;children?:ReactNode;notices?:ReactNode;onNavigate?:HubNavigate;
 }) {
  const entries=resources;
  const available=catalog.filter(c=>!resources.some(r=>r.componentId===c.id));
@@ -14,7 +15,7 @@ export function HubSettings({resources,onSelect,onRefresh,busy=false,refreshing=
  return <ResourceCanvas paused={Boolean(flowContent)||Boolean(selectedKey)}>
   <main id="hub-main">
    {notices}{flowContent}
-   <div className="zn-your-hub__toolbar"><h1 className="zn-your-hub__count">Settings &amp; configuration</h1><button className="zn-your-hub__refresh" type="button" aria-label="Refresh apps and services" title="Refresh apps and services" disabled={refreshing} aria-busy={refreshing} onClick={onRefresh}><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M20 7v5h-5M4 17v-5h5"/><path d="M6.1 7a7 7 0 0 1 11.6-1L20 9M4 15l2.3 3A7 7 0 0 0 17.9 17"/></svg></button></div>
+   <div className="zn-your-hub__toolbar"><h1 className="zn-your-hub__count">Settings &amp; configuration</h1><div className="zn-your-hub__toolbar-actions"><HubNavigationLink className="zn-your-hub__back" href="/hub" onNavigate={onNavigate}>← Hub</HubNavigationLink><button className="zn-your-hub__refresh" type="button" aria-label="Refresh apps and services" title="Refresh apps and services" disabled={refreshing} aria-busy={refreshing} onClick={onRefresh}><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M20 7v5h-5M4 17v-5h5"/><path d="M6.1 7a7 7 0 0 1 11.6-1L20 9M4 15l2.3 3A7 7 0 0 0 17.9 17"/></svg></button></div></div>
    <p className="zn-your-hub__section-context">Apps &amp; services</p>
    <div className={selectedKey?'zn-your-hub__workspace has-detail':'zn-your-hub__workspace'}>
     <div className="zn-your-hub__groups">

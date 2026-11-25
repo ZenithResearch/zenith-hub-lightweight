@@ -125,3 +125,6 @@
 @media (max-width:1000px) { .zn-your-hub__workspace.has-detail { grid-template-columns: 1fr; } .zn-your-hub__detail { grid-row: 1; } }
 @media (max-width:600px) { .zn-your-hub main { padding-top: 22px; } .zn-your-hub__toolbar { gap: 12px; padding-bottom: 24px; } .zn-resource-dialog { padding: 22px; } .zn-your-hub .zn-your-hub__card { padding: 15px; } }
 @media (prefers-reduced-motion:reduce) { .zn-your-hub__sky [data-cloud] { transform: none !important; } }
+
+.zn-your-hub__toolbar-actions{display:flex;align-items:center;gap:14px}
+.zn-your-hub .zn-your-hub__back{color:#fff;font:700 12px/1.4 ui-monospace,Menlo,Consolas,monospace;text-underline-offset:4px}

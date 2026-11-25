@@ -137,7 +137,7 @@ Optional experimental Hermes inference: [Inkling setup and qualification record]
 
 ### Apps & services gallery
 
-After Continue, `/hub` opens the compact Apps & services gallery using the welcome
+At `/settings`, the compact Apps & services gallery uses the welcome
 cloud theme. **Configured instances** and **Available apps** have separate sections
 and counts. Instance cards open details and existing controls; available app cards
 open inline configuration and a review before applying changes. Hermes is shown as
@@ -151,11 +151,17 @@ and run `npm run test:hub` for focused checks.
 
 The local launcher validates the integrated application database before starting the Hub. Existing legacy storage requires an explicit, backed-up migration; app and service data remain with their existing owners. See the [application database integration](docs/hub-application-db-draft/integration.md) and [implementation plan](docs/hub-application-db-draft/implementation-plan.md).
 
-## Settings and main Hub planning
+## Main Hub and Settings
 
-Settings & configuration is available at /settings. The existing /hub address
-continues to show the same settings surface while the main workspace is planned.
-Both read the existing application data and retain configured connections and
-Matrix account sessions. Continue keeps its existing /hub destination and entry
-checks. See [the main-screen review plan](docs/guided-setup/main-hub-screen-plan.md)
-for the proposed next screen.
+Continue opens /hub with Conversations and Work, a settings gear and the existing
+global Hermes input. Conversations shows freshly verified joined Matrix rooms
+and opens them in a compatible Matrix client; there is no in-Hub message timeline
+or sending yet. Work shows saved Service Management and Devgraph connection
+summaries and configuration prompts; it does not aggregate work items yet.
+
+Settings & configuration lives at /settings. Configuration prompts open the
+matching saved instance, or the app's blank setup form when none is configured.
+Old /hub?matrix=INSTANCE bookmarks forward to the corresponding Settings panel.
+Client-side navigation retains the selected conversation and Hermes input state.
+No setup, account, credential or instance migration is required.
+See [the implementation and review record](docs/guided-setup/main-hub-screen-plan.md).

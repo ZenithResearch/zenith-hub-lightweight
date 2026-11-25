@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+### Added
+- Add the main Hub workspace with verified Matrix conversations, work-service summaries and direct configuration prompts — Continue now opens everyday activity while installation and account controls stay in Settings.
+
+### Changed
+- Use client-side Hub/Settings navigation with one global Hermes input and an in-memory conversation selection — moving between work and configuration must preserve chat state and existing setup, connections and data.
+
+
 ### Changed
 - Make the existing gallery Settings & configuration at /settings, retain /hub as a compatibility view and direct Matrix configuration links to settings — setup needs a clear home while the main Hub screen is planned, with all existing instance and session bindings retained.
 

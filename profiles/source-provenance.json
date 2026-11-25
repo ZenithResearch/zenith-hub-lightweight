@@ -397,23 +397,6 @@
   },
   {
     "repository": "https://github.com/ZenithResearch/zenith-ui-deployment",
-    "commit": "e54fe8062a015b32a18d44b07c69c473feecff6e",
-    "scope": "Settings & configuration with the retained Apps & services gallery",
-    "files": [
-      {
-        "path": "src/vendor/zenith-ui/YourHub/YourHub.tsx",
-        "upstream_path": "src/YourHub/YourHub.tsx",
-        "sha256": "fd79125b70285518cc1a0e3331ec993be284316eb7e062367b1890284ca57fba"
-      },
-      {
-        "path": "src/vendor/zenith-ui/YourHub/YourHub.css",
-        "upstream_path": "src/YourHub/YourHub.css",
-        "sha256": "f87adce34daa6a9ea1e53e7e0bed208027f81b38f1ea72f74307d6eec91c9922"
-      }
-    ]
-  },
-  {
-    "repository": "https://github.com/ZenithResearch/zenith-ui-deployment",
     "commit": "05a1a1aced007066cb06738bed5b861ecf1b2433",
     "files": [
       {
@@ -437,6 +420,37 @@
         "path": "src/vendor/zenith-ui/MatrixSetup/MatrixSetup.css",
         "upstream_path": "src/MatrixSetup/MatrixSetup.css",
         "sha256": "b012e90f374deae855a86d09716feb8d06dd9273b072f1041a10905fa2c00d6c"
+      }
+    ]
+  },
+  {
+    "repository": "https://github.com/ZenithResearch/zenith-ui-deployment",
+    "commit": "d2ff29c3117f4d7389b0c8b079b18b27e4332de1",
+    "files": [
+      {
+        "path": "src/vendor/zenith-ui/MainHub/MainHub.tsx",
+        "upstream_path": "src/MainHub/MainHub.tsx",
+        "sha256": "f6106860b467b634144cac37e3594eff28c88ef7d8316184011568aa46f60982"
+      },
+      {
+        "path": "src/vendor/zenith-ui/MainHub/MainHub.css",
+        "upstream_path": "src/MainHub/MainHub.css",
+        "sha256": "1ed309dc6d5a67575b41674d55d6cd1748020251fc82d6ddac5e5a323387a429"
+      },
+      {
+        "path": "src/vendor/zenith-ui/MainHub/HubNavigation.tsx",
+        "upstream_path": "src/MainHub/HubNavigation.tsx",
+        "sha256": "0bf2d12a7d78c587cfaf6c791aed832d4ac85944ce6d0aa3de2638e7385ae343"
+      },
+      {
+        "path": "src/vendor/zenith-ui/YourHub/YourHub.tsx",
+        "upstream_path": "src/YourHub/YourHub.tsx",
+        "sha256": "77a281999e8116465321f7cf03301aa46c4761d198af4690da070f3afd616b1c"
+      },
+      {
+        "path": "src/vendor/zenith-ui/YourHub/YourHub.css",
+        "upstream_path": "src/YourHub/YourHub.css",
+        "sha256": "191d8eb7dbc3d167f0b0e930f82e40a06d6360225243918c12005c0be7d2020f"
       }
     ]
   }
