@@ -26,3 +26,34 @@ export function appendPageContext(message, context) {
   const text = String(context.text || "").replace(/\r\n?/g, "\n").trim() || "[No visible page text]";
   return message + heading + clip(text, budget) + ending;
 }
+
+
+// Optional chat-v1 history contains only complete previous owner/assistant exchanges.
+// It carries no roles with tool, system or developer authority.
+export const CHAT_HISTORY_LIMIT=12000;
+export const CHAT_HISTORY_MESSAGES=12;
+export function validateChatHistory(value){
+ const reject=()=>{throw Object.assign(Error("invalid_chat_history"),{code:"invalid_chat_history",status:400});};
+ if(value===undefined)return [];
+ if(!Array.isArray(value)||value.length>CHAT_HISTORY_MESSAGES||value.length%2!==0)reject();
+ let count=0;
+ return value.map((message,index)=>{
+  if(!message||typeof message!=="object"||Array.isArray(message)||Object.keys(message).length!==2||
+    !Object.hasOwn(message,"role")||!Object.hasOwn(message,"content")||
+    message.role!==(index%2===0?"user":"assistant")||
+    typeof message.content!=="string"||!message.content.trim())reject();
+  count+=message.content.length;
+  if(count>CHAT_HISTORY_LIMIT)reject();
+  return {role:message.role,content:message.content};
+ });
+}
+
+
+/** Keep whole recent exchanges within the existing 64 KiB HTTP body limit. */
+export function buildChatAction(instanceId,message,history){
+ const base={schema:"zenith.hub-setup-action.v1",operation:"chat",instanceId,message};
+ const retained=validateChatHistory(history);
+ const encoder=new TextEncoder();
+ while(retained.length&&encoder.encode(JSON.stringify({...base,history:retained})).length>65536)retained.splice(0,2);
+ return retained.length?{...base,history:retained}:base;
+}

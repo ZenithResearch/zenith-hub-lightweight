@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+### Changed
+- Remove Conversations and Matrix polling from the main Hub, keeping room/account controls in Settings — chat should open from the existing Hermes input rather than occupy a separate workspace area.
+
+### Added
+- Add a hover/focus dial for Quick and Chat modes, retaining chat exchanges and bounded follow-up context — users can turn the same glass control into a conversation without changing services, credentials or stored configuration.
+
+
 ### Added
 - Add the main Hub workspace with verified Matrix conversations, work-service summaries and direct configuration prompts — Continue now opens everyday activity while installation and account controls stay in Settings.
 

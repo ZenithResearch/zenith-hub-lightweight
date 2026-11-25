@@ -1,93 +1,57 @@
 # Main Hub after Continue
 
-Status: implemented. The shared presentation is owned by zenith-ui-deployment;
-the Hub supplies data and navigation through its existing public APIs.
+Current design: Work, Settings and the global Hermes control. The separate
+Conversations area was removed after review. Chat is a mode of the existing
+Hermes dot, rather than a separate main-screen section.
 
-## Routes and configuration
+## Routes and navigation
 
 | Address | Responsibility |
 | --- | --- |
-| / | Welcome, installed Hermes prerequisite and default-provider configuration. |
-| /hub | Everyday workspace with Conversations and Work. |
-| /settings | Settings & configuration, retaining the Apps & services gallery. |
-| /settings?matrix=INSTANCE | Existing saved Matrix instance, account and room controls. |
-| /settings?resource=KEY | Details of an actual saved service instance. |
-| /settings?component=ID | A saved instance, a choice among multiple instances, or the catalog setup form. |
+| / | Welcome, Hermes installation and default-provider configuration. |
+| /hub | Work summaries and the global Hermes Quick / Chat control. |
+| /settings | Settings & configuration, including configured/available apps. |
+| /settings?matrix=INSTANCE | The saved Matrix instance, account and room controls. |
+| /settings?resource=KEY | An actual saved service instance. |
+| /settings?component=ID | A saved instance, a choice among instances, or its catalog form. |
 
-Continue retains its installed-software check. Legacy /hub?matrix=INSTANCE links
-forward to Settings. Query parameters resolve against actual saved instances and
-catalog entries; they cannot supply a new endpoint, review or apply configuration.
-Prompts open the relevant Settings section, as requested. Setup forms remain
-subject to the existing review/apply and CSRF checks.
-
-## Conversations
-
-The main page reads /api/matrix and invokes the existing observation refresh to
-verify the retained account and room summaries. It distinguishes authenticated,
-partial, stale, disabled, sign-in-required and unavailable evidence; a failed or
-incomplete read is never described as a verified empty room list. Only current,
-joined rooms with matching account, endpoint and device evidence receive actions.
-Spaces are excluded from the conversation list. Invitation management stays in
-Settings.
-
-Selecting a room displays its verified name and topic. Selection is in-memory
-UI state, retained during client-side Settings navigation. It does not change
-the saved Matrix room selection, join rooms or send a message.
-
-Open in Matrix client uses a Matrix room permalink. The Hub does not implement
-an E2EE timeline or messaging client. That requires a separate client adapter,
-including session/key ownership and encryption review.
+Continue retains the installed-software gate. The settings gear and configuration
+prompts use client-side navigation. Query parameters resolve against existing
+records and catalog entries; they never review or apply an action themselves.
+Legacy /hub?matrix=INSTANCE links still forward to the matching Settings panel.
 
 ## Work
 
-Service Management and Devgraph cards use saved connection summaries from
-/api/hub. Unconfigured services link to their catalog setup form; configured
-instances link to their details. A launch link requires fresh ready evidence
-and a safe root service address, consistent with the existing endpoint policy.
+Service Management and Devgraph summaries use /api/hub. Unconfigured services
+open the relevant catalog form; configured services open their saved details.
+Launch links require fresh ready evidence and an allowed root service address.
 
-These are connection summaries, not an aggregate work-item list. The existing
-Hub APIs do not expose requests, cases, tasks or projects. No items, counts,
-health claims or feeds are fabricated. A future read adapter must preserve each
-service's ownership and stable object references. Process Runtime and Frank
-remain available in Settings.
+The existing API does not supply aggregate work items. No requests, tasks,
+counts or activity feeds are invented. Domain records retain their service
+owners. The main screen does not read or refresh /api/matrix.
 
-## Theme, navigation and Hermes
+## Hermes
 
-The screen retains the cloud background, white panels and monospace controls.
-Conversations and Work are side by side on desktop and stack on narrow screens.
-The settings gear has an accessible name. No large visible page title or navbar
-is added. Settings has a return-to-Hub link.
+The dot starts collapsed. Hover or focus reveals the radial Quick / Chat dial.
+Quick preserves the fading latest reply and loading-border behavior; Chat keeps
+the exchange in a scrollable glass panel. The same draft and backend are used.
+Switching modes, minimizing and client-side navigation retain UI state.
 
-One existing GlobalHermesChat remains in the root layout. Client-side links
-preserve its state and the selected conversation without storing credentials or
-drafts in a new browser store. No guide profile or chat CTA is introduced. The
-approved MVP page-context bridge is unchanged.
+See [the dial and chat contract](hermes-chat-dial.md) for keyboard/touch behavior,
+memory limits, bounded follow-up context and compatibility. The singleton root
+Hermes component remains; no guide profile, duplicate chat CTA or new persistent
+store is introduced.
 
-## Ownership, refresh and migration
+## Theme and ownership
 
-No backend or persisted contract changes are needed. The application database,
-setup instances, native installations, session/credential bindings and room
-selections keep their owners and identifiers. No migration or resource graph
-index is introduced.
+The cloud theme, white Work panel, monospace controls, settings gear and glass
+input remain. There is no visible page title or navbar. Settings retains its
+gallery and reviewed installation/configuration controls.
 
-Observation refresh reads the existing Matrix account and rooms and updates
-their local evidence only; it cannot log in, create/join rooms, send, install or
-configure. Saved summaries render before any remote verification finishes. Fresh evidence
-is reused on entry; checks refresh expired evidence, on explicit refresh and while
-visible, with bounded
-requests and freshness validation. Neither API reachability nor a retained view
-alone establishes a valid account.
+This UI change introduces no ontology or database migration. Existing setup,
+connections, installation provenance, credentials and Matrix account/room
+selections remain untouched. Native services retain their current running state.
 
-## Validation
-
-Fixture tests cover account/device/endpoint mismatches, expired and stale
-evidence, incomplete room lists, credential exclusion, safe service addresses,
-configuration intent resolution, unavailable sources and preserved input
-snapshots. Existing Hub controller checks still cover reviewed actions, retained
-connections and private data. Shared UI and consumer builds verify the additive
-presentation contract and source pins.
-
-Live verification must check Continue, the main screen, targeted Settings and
-return navigation, a retained conversation selection, the singleton Hermes input
-and unchanged saved setup/account bindings. It must not send messages or mutate
-rooms merely to verify the UI.
+The earlier [workspace verification record](main-hub-screen-verification-2026-11-24.md)
+documents the preceding Conversations-and-Work iteration; it is historical
+evidence, not the current layout.

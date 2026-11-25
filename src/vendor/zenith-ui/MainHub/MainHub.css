@@ -31,3 +31,9 @@
 .zn-main-hub__empty{padding:16px 0}
 .zn-main-hub__notice{padding:13px 18px;background:#fff;border:2px solid #082f93;box-shadow:3px 3px 0 #062879;color:#47618b;font-size:13px}
 @media(max-width:740px){.zn-main-hub__columns{grid-template-columns:minmax(0,1fr)}.zn-main-hub__panel{padding:20px}.zn-main-hub__identity{max-width:calc(100% - 106px);font-size:10px}.zn-main-hub__toolbar{margin-bottom:22px}.zn-main-hub__rooms small{font-size:10px}}
+
+.zn-main-hub--work-only .zn-main-hub__toolbar{justify-content:flex-end}
+.zn-main-hub--work-only .zn-main-hub__columns{grid-template-columns:minmax(0,1fr)}
+.zn-your-hub .zn-main-hub__icon:disabled{background:#00359fce;color:#fff;opacity:.5}
+
+.zn-main-hub__identity[hidden]{display:none}

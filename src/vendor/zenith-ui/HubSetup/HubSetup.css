@@ -706,3 +706,35 @@ body:has(:is(.zn-hermes-landing, .zn-your-hub)) > [data-zenith-hermes-portal] .z
 @media (prefers-reduced-motion: reduce) {
   .zn-hermes-hud__loading-arc { animation: none; stroke-dasharray: none; opacity: .9; }
 }
+
+/* A quarter dial grows from the existing dot, without changing its default form. */
+.zn-hermes-dial{position:relative;flex:0 0 32px;width:32px;height:32px;z-index:3}
+.is-collapsed .zn-hermes-dial{width:48px;height:48px}
+.zn-hermes-dial__choices{position:absolute;inset:0;visibility:hidden;opacity:0;transform:scale(.94);transform-origin:center;transition:opacity 140ms ease,transform 140ms ease,visibility 140ms}
+.zn-hermes-dial:not(.is-suppressed):is(:hover,:focus-within,.is-open) .zn-hermes-dial__choices{visibility:visible;opacity:1;transform:scale(1)}
+.zn-hermes-dial__choices::before{content:"";position:absolute;inset:-84px -2px -2px -96px;z-index:-1}
+.zn-hermes-dial__arc{position:absolute;width:124px;height:124px;left:-38px;top:-38px;border:1px solid var(--hermes-glass-focus);border-radius:50%;opacity:.65;clip-path:polygon(0 0,50% 0,50% 50%,0 50%)}
+.zn-hermes-hud .zn-hermes-dial__choice{position:absolute;display:grid;place-items:center;width:72px;min-height:40px;padding:8px 10px;border:1px solid #c8e2ff80;border-radius:24px;background:rgba(4,35,99,.88);color:#fff;box-shadow:inset 0 1px 1px #ffffff80,0 3px 10px #00184040;backdrop-filter:blur(8px);font:600 12px/1.2 system-ui,sans-serif;white-space:nowrap}
+.zn-hermes-hud .zn-hermes-dial__choice[aria-pressed=true]{border-color:var(--hermes-glass-dot);color:#90efd0}
+.zn-hermes-hud .zn-hermes-dial__choice:hover{background:#174ca3}
+.zn-hermes-hud .zn-hermes-dial__choice:focus-visible{outline:2px solid var(--hermes-glass-focus);outline-offset:3px}
+.zn-hermes-dial__choice.is-chat{top:-70px;left:-12px}
+.zn-hermes-dial__choice.is-quick{top:0;left:-94px}
+.zn-hermes-hud__composer .zn-hermes-dial__choice.is-chat{top:-52px;left:68px}
+.zn-hermes-hud__composer .zn-hermes-dial__choice.is-quick{top:-84px;left:-4px}
+.zn-hermes-hud__composer .zn-hermes-dial__arc{left:-46px;top:-46px;clip-path:polygon(50% 0,100% 0,100% 50%,50% 50%)}
+.zn-hermes-hud__composer .zn-hermes-dial__choices::before{inset:-88px -112px -2px -6px}
+.zn-hermes-hud--composer.is-chat:not(.is-collapsed){width:min(440px,calc(100vw - 32px))}
+.zn-hermes-hud--composer .zn-hermes-hud__chat{padding:16px 18px;overflow:visible}
+.zn-hermes-hud__chat-tools{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;font:600 12px/1.4 system-ui,sans-serif;color:var(--hermes-glass-ink)}
+.zn-hermes-hud .zn-hermes-hud__chat-tools button{min-height:32px;padding:4px 8px;border:1px solid #c8e2ff60;border-radius:20px;background:transparent;color:inherit;font:inherit}
+.zn-hermes-hud__transcript{height:min(380px,calc(100dvh - 220px));min-height:80px;overflow-y:auto;overscroll-behavior:contain;padding:2px 4px;scrollbar-width:thin;scrollbar-color:#b2d9ff70 transparent}
+.zn-hermes-hud__chat-message,.zn-hermes-hud__chat-empty,.zn-hermes-hud__chat-status{color:var(--hermes-glass-ink);font:400 14px/1.6 system-ui,sans-serif;white-space:pre-wrap;overflow-wrap:anywhere}
+.zn-hermes-hud__chat-message{margin:0 18px 18px 0}
+.zn-hermes-hud__chat-message.is-owner{margin:0 0 16px 28px;padding:9px 12px;border-radius:16px;background:#ffffff19}
+.zn-hermes-hud__chat-message.is-error{font-size:12px;opacity:.85}
+.zn-hermes-hud__chat-empty{opacity:.75}
+.zn-hermes-hud__chat-status{font-size:12px;margin:12px 0 0}
+@media(prefers-reduced-motion:reduce){.zn-hermes-dial__choices{transition:none}}
+
+.zn-hermes-hud--composer .zn-hermes-hud__chat p{color:var(--hermes-glass-ink)}

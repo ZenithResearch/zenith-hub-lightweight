@@ -24,15 +24,15 @@ export function settingsIntent(search,snapshot){
  }
  return null;
 }
-export function projectMainHub({hub=null,matrix=null,loading=false,errors={},now=Date.now()}={}){
+export function projectMainHub({hub=null,matrix=null,loading=false,errors={},now=Date.now(),includeConversations=true}={}){
  const hubValid=hub?.schema==='zenith.hub-overview.v1'&&Array.isArray(hub.resources);
  const matrixValid=matrix?.schema==='zenith.hub-matrix.v1'&&Array.isArray(matrix.instances);
  const hubFailed=Boolean(errors.hub)||!hubValid,matrixFailed=Boolean(errors.matrix)||!matrixValid;
  const warnings=[];
  if(!loading&&hubFailed)warnings.push('Work connections could not be verified. Your saved setup is still in Settings.');
- if(!loading&&matrixFailed)warnings.push('Matrix connections could not be verified. Refresh or open Matrix settings.');
+ if(includeConversations&&!loading&&matrixFailed)warnings.push('Matrix connections could not be verified. Refresh or open Matrix settings.');
  if(hubValid&&rows(hub.warnings).length)warnings.push('Some service connections need a fresh check. Their saved configuration is retained.');
- const conversations=rows(matrix?.instances).filter(i=>typeof i.instanceId==='string').slice(0,100).map(i=>{
+ const conversations=rows(includeConversations?matrix?.instances:[]).filter(i=>typeof i.instanceId==='string').slice(0,100).map(i=>{
   const v=i.view,account=i.account,identity=userId(account?.userId)?account.userId:null;
   const key=i.instanceId;
   let state='unavailable',message='The Matrix account could not be verified. Refresh or check its settings.';
@@ -49,7 +49,7 @@ export function projectMainHub({hub=null,matrix=null,loading=false,errors={},now
   if(canOpen&&!complete){state='partial';message='Only verified conversations are shown. The room list is incomplete.';}
   return {key,label:text(i.label,'Matrix'),userId:identity,state,message,settingsHref:'/settings?matrix='+encodeURIComponent(i.instanceId),rooms,roomsComplete:complete,invitations:canOpen&&v.invitationState==='verified'?rows(v.invitations).length:null};
  });
- if(!loading&&matrixFailed&&!conversations.length)conversations.push({key:'matrix-unverified',label:'Matrix',userId:null,state:'unavailable',message:'Saved Matrix connections could not be read. Refresh or open Settings.',settingsHref:settingsHref('matrix'),rooms:[],roomsComplete:false,invitations:null});
+ if(includeConversations&&!loading&&matrixFailed&&!conversations.length)conversations.push({key:'matrix-unverified',label:'Matrix',userId:null,state:'unavailable',message:'Saved Matrix connections could not be read. Refresh or open Settings.',settingsHref:settingsHref('matrix'),rooms:[],roomsComplete:false,invitations:null});
  const descriptors=[{id:'service-management',name:'Service Management',description:'Requests and cases.'},{id:'devgraph',name:'Devgraph',description:'Tasks, issues and projects.'}];
  const work=descriptors.flatMap(d=>{
   const found=rows(hub?.resources).filter(r=>r.componentId===d.id);

@@ -153,15 +153,18 @@ The local launcher validates the integrated application database before starting
 
 ## Main Hub and Settings
 
-Continue opens /hub with Conversations and Work, a settings gear and the existing
-global Hermes input. Conversations shows freshly verified joined Matrix rooms
-and opens them in a compatible Matrix client; there is no in-Hub message timeline
-or sending yet. Work shows saved Service Management and Devgraph connection
+Continue opens /hub with Work, a settings gear and the existing glass Hermes
+control. Hover or keyboard-focus the dot to reveal its Quick / Chat dial.
+Quick retains the transient latest reply. Chat shows the retained exchange and
+sends bounded completed turns as follow-up context. Collapsing or changing mode
+preserves the draft and transcript while the page remains open.
+The main screen no longer lists Matrix conversations or polls Matrix. Matrix
+account and room controls remain in Settings. Work shows real connection
 summaries and configuration prompts; it does not aggregate work items yet.
 
 Settings & configuration lives at /settings. Configuration prompts open the
 matching saved instance, or the app's blank setup form when none is configured.
 Old /hub?matrix=INSTANCE bookmarks forward to the corresponding Settings panel.
-Client-side navigation retains the selected conversation and Hermes input state.
+Client-side navigation retains Hermes input and chat state.
 No setup, account, credential or instance migration is required.
 See [the implementation and review record](docs/guided-setup/main-hub-screen-plan.md).

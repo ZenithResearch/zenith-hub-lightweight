@@ -1,9 +1,9 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { appendPageContext } from "@/lib/setup/chat-message.mjs";
+import { appendPageContext, buildChatAction } from "@/lib/setup/chat-message.mjs";
 import { capturePageContext } from "@/lib/setup/page-context";
-import { HermesChatHud } from "@/vendor/zenith-ui/HubSetup/HubSetup";
+import { HermesChatHud, type HermesChatMessage } from "@/vendor/zenith-ui/HubSetup/HubSetup";
 import {
   hermesChatState,
   type HermesChatSnapshot,
@@ -110,7 +110,7 @@ export function GlobalHermesChat() {
     };
   }, []);
   const state = hermesChatState(snapshot, receivedAt, now);
-  async function sendMessage(message: string) {
+  async function sendMessage(message: string, history?: readonly HermesChatMessage[]) {
     // MVP ONLY: Appending page content is a temporary context bridge.
     // TODO: Improve context injection for agents and generalize inputs around the
     // eventual secS message contract for both agent and non-agent receivers.
@@ -126,12 +126,7 @@ export function GlobalHermesChat() {
         "Content-Type": "application/json",
         "X-Zenith-CSRF": fresh.csrf,
       },
-      body: JSON.stringify({
-        schema: "zenith.hub-setup-action.v1",
-        operation: "chat",
-        instanceId: target.instance?.instanceId,
-        message: contextualMessage,
-      }),
+      body: JSON.stringify(buildChatAction(target.instance?.instanceId, contextualMessage, history)),
       signal: AbortSignal.timeout(180000),
     });
     const reply = await response.json();

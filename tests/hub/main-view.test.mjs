@@ -75,3 +75,9 @@ test('an unavailable Matrix snapshot cannot look like a verified empty or unconf
  assert.deepEqual(m.conversations[0].rooms,[]);
  assert.match(m.warnings.join(' '),/could not be verified/);
 });
+
+test('the work-only screen does not invent Matrix warnings or read conversation evidence',()=>{
+ const model=projectMainHub({hub:fixture().hub,includeConversations:false,now});
+ assert.deepEqual(model.conversations,[]);assert.deepEqual(model.warnings,[]);
+ assert.equal(model.work.length,2);
+});

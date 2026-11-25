@@ -359,16 +359,6 @@
     "commit": "2dfcd038b3efeabf86b5e41bcd99eec33238d65f",
     "files": [
       {
-        "path": "src/vendor/zenith-ui/HubSetup/HubSetup.tsx",
-        "upstream_path": "src/HubSetup/HubSetup.tsx",
-        "sha256": "9b0fa079bda4956d7ab97b809ad3f3ed2316f01fb05e0ca9bbcc56d037387b74"
-      },
-      {
-        "path": "src/vendor/zenith-ui/HubSetup/HubSetup.css",
-        "upstream_path": "src/HubSetup/HubSetup.css",
-        "sha256": "4ca0b4e7914347349c7ee48745be1abde0bcf0ec41ba4e02b2879bd7c3c631cd"
-      },
-      {
         "path": "src/vendor/zenith-ui/HubSetup/HermesModelPicker.tsx",
         "upstream_path": "src/HubSetup/HermesModelPicker.tsx",
         "sha256": "c8ef88329b77d47de81de08aeccd3939fff42a714d931b8cc5121295aff18112"
@@ -428,16 +418,6 @@
     "commit": "d2ff29c3117f4d7389b0c8b079b18b27e4332de1",
     "files": [
       {
-        "path": "src/vendor/zenith-ui/MainHub/MainHub.tsx",
-        "upstream_path": "src/MainHub/MainHub.tsx",
-        "sha256": "f6106860b467b634144cac37e3594eff28c88ef7d8316184011568aa46f60982"
-      },
-      {
-        "path": "src/vendor/zenith-ui/MainHub/MainHub.css",
-        "upstream_path": "src/MainHub/MainHub.css",
-        "sha256": "1ed309dc6d5a67575b41674d55d6cd1748020251fc82d6ddac5e5a323387a429"
-      },
-      {
         "path": "src/vendor/zenith-ui/MainHub/HubNavigation.tsx",
         "upstream_path": "src/MainHub/HubNavigation.tsx",
         "sha256": "0bf2d12a7d78c587cfaf6c791aed832d4ac85944ce6d0aa3de2638e7385ae343"
@@ -451,6 +431,42 @@
         "path": "src/vendor/zenith-ui/YourHub/YourHub.css",
         "upstream_path": "src/YourHub/YourHub.css",
         "sha256": "191d8eb7dbc3d167f0b0e930f82e40a06d6360225243918c12005c0be7d2020f"
+      }
+    ]
+  },
+  {
+    "repository": "https://github.com/ZenithResearch/zenith-ui-deployment",
+    "commit": "58128017ed176020ecb38e27ecd43e01c7a89c8d",
+    "files": [
+      {
+        "path": "src/vendor/zenith-ui/HubSetup/HubSetup.tsx",
+        "upstream_path": "src/HubSetup/HubSetup.tsx",
+        "sha256": "9216a2399ff518a29cc7fe17a4d60579d7b2fd6780df459018bb6b107022ddc5"
+      },
+      {
+        "path": "src/vendor/zenith-ui/HubSetup/HubSetup.css",
+        "upstream_path": "src/HubSetup/HubSetup.css",
+        "sha256": "1d5fa62732b3ca5c201f21e84a7467032a84092ebb1919dbfb64eec5ea1e4ddc"
+      },
+      {
+        "path": "src/vendor/zenith-ui/HubSetup/HermesModeDial.tsx",
+        "upstream_path": "src/HubSetup/HermesModeDial.tsx",
+        "sha256": "db3ea5ef99f801a4dcda7335a1b5dbe83c187c597598a580b6ff90f73e8156f7"
+      },
+      {
+        "path": "src/vendor/zenith-ui/HubSetup/chat-history.ts",
+        "upstream_path": "src/HubSetup/chat-history.ts",
+        "sha256": "df358cac7f3c43e4c92ec90800c6cd8624271994b9bc0b8900ac155366c61cfa"
+      },
+      {
+        "path": "src/vendor/zenith-ui/MainHub/MainHub.tsx",
+        "upstream_path": "src/MainHub/MainHub.tsx",
+        "sha256": "b522fc98797ab8c93d71f85e56d92bb2400bb40c3dded0c77255d48fd4fd852c"
+      },
+      {
+        "path": "src/vendor/zenith-ui/MainHub/MainHub.css",
+        "upstream_path": "src/MainHub/MainHub.css",
+        "sha256": "fd337c3ee0ac853a5be138c99e07ab29e0c18c9165035a8a1774eba78f37260f"
       }
     ]
   }

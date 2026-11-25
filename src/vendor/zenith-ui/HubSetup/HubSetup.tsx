@@ -9,6 +9,9 @@ import React, {
 import "./HubSetup.css";
 import { ZenithCloudScene } from "./ZenithCloudScene.tsx";
 import { REPLY_FADE_MS, replyDisplayMs } from "./reply-timing.ts";
+import { HermesModeDial, type HermesInputMode } from "./HermesModeDial.tsx";
+import { hermesChatHistory, retainHermesTurns, type HermesChatMessage, type HermesChatTurn } from "./chat-history.ts";
+export type { HermesChatMessage } from "./chat-history.ts";
 export type HermesEntryState =
   | "install"
   | "configure"
@@ -444,7 +447,7 @@ export function HermesChatHud({
   children?: ReactNode;
   connected: boolean;
   openSignal?: number;
-  onSend?: (message: string) => Promise<string>;
+  onSend?: (message: string, history?: readonly HermesChatMessage[]) => Promise<string>;
   busy?: boolean;
   status?: string;
 }) {
@@ -547,9 +550,12 @@ function HermesMessagePill({
   available: boolean;
   busy: boolean;
   status: string;
-  onSend: (message: string) => Promise<string>;
+  onSend: (message: string, history?: readonly HermesChatMessage[]) => Promise<string>;
   openSignal: number;
 }) {
+  const [mode, setMode] = useState<HermesInputMode>("quick"),
+    [turns, setTurns] = useState<HermesChatTurn[]>([]);
+  const transcript = useRef<HTMLDivElement>(null);
   const [message, setMessage] = useState(""),
     [open, setOpen] = useState(false),
     [collapsed, setCollapsed] = useState(true),
@@ -565,6 +571,10 @@ function HermesMessagePill({
     sequence = useRef(0),
     replyClock = useRef<{ id: number; remaining: number } | null>(null);
   const responseId = useId();
+  useEffect(() => {
+    if (mode === "chat" && open && !collapsed && transcript.current)
+      transcript.current.scrollTop = transcript.current.scrollHeight;
+  }, [turns, mode, open, collapsed]);
   useEffect(() => {
     mounted.current = true;
     const visibility = () => setPageVisible(!document.hidden);
@@ -587,6 +597,7 @@ function HermesMessagePill({
     if (openSignal > 0) {
       interacted.current = true;
       setCollapsed(false);
+      if (mode === "chat") setOpen(true);
       if (latestReply) {
         replyClock.current = { id: latestReply.id, remaining: replyDisplayMs(latestReply.text) };
         setFading(false);
@@ -600,7 +611,7 @@ function HermesMessagePill({
   // Each timer owns a clock object so a replaced reply cannot be hidden by it.
   useEffect(() => {
     const clock = replyClock.current;
-    if (!latestReply || !clock || clock.id !== latestReply.id ||
+    if (mode === "chat" || !latestReply || !clock || clock.id !== latestReply.id ||
         !open || collapsed || !pageVisible) return;
     const startedAt = performance.now();
     let didFade = false;
@@ -622,7 +633,7 @@ function HermesMessagePill({
       if (!didFade)
         clock.remaining = Math.max(0, clock.remaining - (performance.now() - startedAt));
     };
-  }, [latestReply, open, collapsed, pageVisible, openSignal]);
+  }, [latestReply, open, collapsed, pageVisible, openSignal, mode]);
 
   function publishReply(text: string) {
     const reply = { id: ++sequence.current, text: text.trim() };
@@ -640,14 +651,22 @@ function HermesMessagePill({
     setLatestReply(null);
     setFading(false);
     setMessage("");
-    setOpen(false);
+    setOpen(mode === "chat");
     setSending(true);
+    const id = ++sequence.current;
+    const history = mode === "chat" ? hermesChatHistory(turns) : undefined;
+    setTurns(current => retainHermesTurns([...current, {id, question:text}]));
     try {
-      const reply = await onSend(text);
-      if (mounted.current) publishReply(reply);
+      const reply = await onSend(text, history);
+      if (mounted.current) {
+        setTurns(current => retainHermesTurns(current.map(turn => turn.id === id ? {...turn, reply} : turn)));
+        publishReply(reply);
+      }
     } catch {
       if (mounted.current) {
-        publishReply("Hermes could not reply. Check the connection and try again.");
+        const failure = "Hermes could not reply. Check the connection and try again.";
+        setTurns(current => retainHermesTurns(current.map(turn => turn.id === id ? {...turn, reply:failure, failed:true} : turn)));
+        publishReply(failure);
         setMessage((current) => current || text);
       }
     } finally {
@@ -670,8 +689,22 @@ function HermesMessagePill({
   function expand() {
     interacted.current = true;
     setCollapsed(false);
+    if (mode === "chat") setOpen(true);
+  }
+  function chooseMode(next: HermesInputMode) {
+    interacted.current = true;
+    setMode(next);
+    setCollapsed(false);
+    setFading(false);
+    if (next === "chat") setOpen(true);
+    else if (latestReply) {
+      replyClock.current = {id:latestReply.id, remaining:replyDisplayMs(latestReply.text)};
+      setOpen(true);
+    } else setOpen(false);
+    requestAnimationFrame(() => input.current?.focus());
   }
   function toggleReply() {
+    if (mode === "chat") {setOpen(value => !value); input.current?.focus(); return;}
     if (open) dismissReply();
     else if (latestReply) {
       replyClock.current = { id: latestReply.id, remaining: replyDisplayMs(latestReply.text) };
@@ -685,7 +718,8 @@ function HermesMessagePill({
       className={
         "zn-setup zn-hermes-hud zn-hermes-hud--composer" +
         (collapsed ? " is-collapsed" : "") +
-        (sending ? " is-loading" : "")
+        (sending ? " is-loading" : "") +
+        (mode === "chat" ? " is-chat" : "")
       }
       onKeyDown={(event) => {
         if (event.key === "Escape" && !collapsed) {
@@ -696,27 +730,25 @@ function HermesMessagePill({
       }}
     >
       {collapsed && (
-        <button
-          ref={orb}
-          type="button"
-          className="zn-hermes-hud__orb"
-          aria-label="Open Hermes message input"
-          aria-expanded={false}
-          aria-busy={sending}
-          aria-controls={responseId + "-composer"}
-          title="Message Hermes"
-          onClick={expand}
-        >
-          {sending && <HermesLoadingBorder />}
-          <span
-            aria-hidden="true"
-            className={"zn-hermes-hud__dot" + (available ? " is-connected" : "")}
-          />
-        </button>
+        <HermesModeDial mode={mode} compact onMode={chooseMode} onActivate={expand}
+          buttonRef={orb} available={available} loading={sending} controls={responseId+"-composer"}>
+          {sending && <HermesLoadingBorder/>}
+        </HermesModeDial>
       )}
+      <section hidden={collapsed || mode !== "chat" || !open} role="region" aria-label="Hermes chat" className="zn-hermes-hud__panel zn-hermes-hud__chat">
+        <div className="zn-hermes-hud__chat-tools"><span>Chat</span><button type="button" onClick={()=>chooseMode("quick")}>Quick input</button></div>
+        <div ref={transcript} className="zn-hermes-hud__transcript" role="log" aria-label="Chat with Hermes" aria-live="polite" aria-relevant="additions text">
+          {!turns.length && <p className="zn-hermes-hud__chat-empty">What would you like to talk about?</p>}
+          {turns.map(turn=><div key={turn.id} className="zn-hermes-hud__exchange">
+            <p className="zn-hermes-hud__chat-message is-owner" aria-label="You">{turn.question}</p>
+            {turn.reply&&<p className={"zn-hermes-hud__chat-message"+(turn.failed?" is-error":"")} aria-label={turn.failed?"Reply failed":"Hermes"}>{turn.reply}</p>}
+          </div>)}
+        </div>
+        {!available && !sending && <p className="zn-hermes-hud__chat-status" role="status">{status}</p>}
+      </section>
       <section
         id={responseId}
-        hidden={collapsed || !open || !latestReply}
+        hidden={collapsed || mode === "chat" || !open || !latestReply}
         role="region"
         aria-label="Latest Hermes response"
         className={"zn-hermes-hud__panel" + (fading ? " is-fading" : "")}
@@ -738,20 +770,8 @@ function HermesMessagePill({
         <span id={responseId + "-connection"} className="zn-hermes-hud__sr-only" role="status">
           {sending ? "Hermes is replying." : status}
         </span>
-        <button
-          type="button"
-          className="zn-hermes-hud__dot-control"
-          aria-label="Minimize Hermes input"
-          aria-expanded={true}
-          aria-controls={responseId + "-composer"}
-          title="Minimize Hermes"
-          onClick={collapse}
-        >
-          <span
-            aria-hidden="true"
-            className={"zn-hermes-hud__dot" + (available ? " is-connected" : "")}
-          />
-        </button>
+        <HermesModeDial mode={mode} compact={false} onMode={chooseMode} onActivate={collapse}
+          available={available} loading={false} controls={responseId+"-composer"}/>
         <input
           ref={input}
           type="text"
@@ -769,10 +789,10 @@ function HermesMessagePill({
         <button
           type="button"
           className="zn-hermes-hud__history"
-          aria-label={open ? "Hide latest Hermes response" : "Show latest Hermes response"}
+          aria-label={mode === "chat" ? (open ? "Hide Hermes chat" : "Show Hermes chat") : (open ? "Hide latest Hermes response" : "Show latest Hermes response")}
           aria-expanded={open}
           aria-controls={responseId}
-          disabled={!latestReply}
+          disabled={mode !== "chat" && !latestReply}
           onClick={toggleReply}
         >
           ⌃
