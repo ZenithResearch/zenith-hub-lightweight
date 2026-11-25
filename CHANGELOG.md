@@ -4,6 +4,8 @@
 
 ### Fixed
 
+- Prioritize Matrix joined membership over optional sync, allow slower server reads, and report which read failed — optional discovery failures previously obscured verified accounts and unsuccessful room reads appeared as an unexplained empty list.
+
 - Wait for a cancelled Settings review to retire before allowing another action — prevent its background database update from invalidating a newly reviewed operation.
 
 ### Added

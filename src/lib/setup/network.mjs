@@ -134,7 +134,8 @@ export async function probe(componentId, base, options = {}) {
     };
   const probes = {
     matrix: async () => {
-      const a = await requestJSON(base, "/_matrix/client/versions", options);
+      const matrixOptions = {timeout:15000, ...options};
+      const a = await requestJSON(base, "/_matrix/client/versions", matrixOptions);
       check(
         a,
         a.status === 200 &&
@@ -144,28 +145,25 @@ export async function probe(componentId, base, options = {}) {
           ),
         "incompatible_matrix_versions",
       );
-      const login = await requestJSON(
-        base,
-        "/_matrix/client/v3/login",
-        options,
-      );
-      check(
-        login,
-        (login.status === 200 && Array.isArray(login.value.flows)) || [404,405].includes(login.status),
-        "matrix_login_unavailable",
-      );
+      // The identity endpoint proves a saved session independently of sign-in discovery.
+      const readLogin = async () => {
+        const login = await requestJSON(base, "/_matrix/client/v3/login", matrixOptions);
+        check(login, (login.status === 200 && Array.isArray(login.value.flows)) ||
+          [404,405].includes(login.status), "matrix_login_unavailable");
+        return login.value.flows || [];
+      };
       if (options.token) {
-        const who = await requestJSON(base, "/_matrix/client/v3/account/whoami", options);
+        const who = await requestJSON(base, "/_matrix/client/v3/account/whoami", matrixOptions);
         if (who.status === 401) return {apiAvailable:true, applicationReady:false, permission:"session-expired", contract:"matrix-client-api"};
         if (who.status === 403) return {apiAvailable:true, applicationReady:false, permission:"access_denied", contract:"matrix-client-api"};
         check(who, who.status === 200 && typeof who.value.user_id === "string", "matrix_identity_unverified");
-        return {apiAvailable:true, applicationReady:true, permission:"authenticated", userId:who.value.user_id, deviceId:who.value.device_id, contract:"matrix-client-api", matrixVersions:a.value.versions, loginFlows:login.value.flows||[]};
+        return {apiAvailable:true, applicationReady:true, permission:"authenticated", userId:who.value.user_id, deviceId:who.value.device_id, contract:"matrix-client-api", matrixVersions:a.value.versions, loginFlows:await readLogin().catch(()=>[])};
       }
       return {
         matrixVersions: a.value.versions,
         applicationReady: false,
         apiAvailable: true,
-        loginFlows: login.value.flows || [],
+        loginFlows: await readLogin(),
         contract: "matrix-client-api",
         permission: "login-required",
       };

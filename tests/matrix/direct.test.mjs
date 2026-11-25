@@ -12,6 +12,29 @@ test('DM classification comes from the signed-in account m.direct data, never me
  const result=decorateDirectRooms(rows,{[peer]:['!a:x']},'@me:x');assert.deepEqual(result[0].directWith,[peer]);assert.equal(result[0].name,'Bob');assert.deepEqual(result[1].directWith,[]);
  assert.equal(rows[0].directWith,undefined);
 });
+test('joined membership is checked before optional sync and a timeout stays unknown',async()=>{
+ const routes=[];
+ const c=matrixClient('http://127.0.0.1:8008',{request:async(_base,route,options)=>{
+  routes.push(route);
+  if(route.endsWith('/joined_rooms')){
+   assert.equal(options.timeout,15000);
+   throw Error('probe_timeout');
+  }
+  throw Error('unexpected request');
+ }});
+ await assert.rejects(c.rooms('@me:x'),{code:'matrix_joined_rooms_timed_out'});
+ assert.deepEqual(routes,['/_matrix/client/v3/joined_rooms']);
+});
+test('optional discovery timeout preserves live server evidence for a saved session',async()=>{
+ const c=matrixClient('http://127.0.0.1:8008',{request:async(_base,route)=>{
+  if(route.endsWith('/auth_metadata'))throw Error('probe_timeout');
+  return {status:200,value:{versions:['v1.10'],flows:[],capabilities:{}}};
+ }});
+ const partial=await c.discover({allowPartialMetadata:true});
+ assert.deepEqual(partial.versions,['v1.10']);
+ assert.equal(partial.error,'matrix_auth_metadata_timed_out');
+ await assert.rejects(c.discover(),{code:'matrix_auth_metadata_timed_out'});
+});
 test('new encrypted DMs preserve all existing mappings and reuse a verified existing chat',async t=>{
  const {remote,c,userId}=await client(t);remote.state.directMap={'@keep:x':['!old:x']};
  const args={userId:peer,acknowledgeEncryption:true};validateMatrixAction('start-dm',args);

@@ -51,7 +51,7 @@ export function createMatrixController({env=process.env,root=env.ZENITH_HUB_SETU
   const base=serviceEndpoint(i),at=new Date(clock()).toISOString();
   let view={endpoint:base,observedAt:at,apiAvailable:false,authentication:'unverified',rooms:[],invitations:[],roomsComplete:false};
   try{
-   const client=await api(i),discovery=await client.discover();Object.assign(view,discovery,{apiAvailable:true,authentication:'sign-in-required'});
+   const client=await api(i),discovery=await client.discover({allowPartialMetadata:i.matrix?.account?.endpoint===base});Object.assign(view,discovery,{apiAvailable:true,authentication:'sign-in-required'});
    if(i.matrix?.account?.endpoint===base){
     try{
      const who=await client.whoami();check(who,who.userId===i.matrix.account.userId,'matrix_account_changed');

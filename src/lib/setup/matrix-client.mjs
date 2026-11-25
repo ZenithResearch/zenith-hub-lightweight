@@ -9,24 +9,44 @@ const enc=s=>encodeURIComponent(s).replace(/[!'()*]/g,c=>'%'+c.charCodeAt(0).toS
 const roomPath=id=>'/_matrix/client/v3/rooms/'+enc(id);
 export function matrixClient(base,{token,request=requestJSON,allowPrivateHosts=[]}={}) {
  base=endpoint(base).origin;
- async function call(route,{method='GET',body,auth=token,optional=false}={}){
-  const r=await request(base,route,{method,body,token:auth,allowPrivateHosts});
+ async function call(route,{method='GET',body,auth=token,optional=false,timeout}={}){
+  const r=await request(base,route,{method,body,token:auth,allowPrivateHosts,timeout});
   if(optional&&(Array.isArray(optional)?optional:[404,405]).includes(r.status))return null;
   const codes={401:'matrix_session_expired',403:'matrix_permission_denied',404:'matrix_not_found',429:'matrix_rate_limited'};
   check(r,r.status>=200&&r.status<300,codes[r.status]||(r.status>=500?'matrix_outcome_unknown':'matrix_request_rejected'),r.status===401?401:409);
   return r.value;
  }
- async function discover(){
+ // Read diagnostics contain stage names only. Never include response bodies or credentials.
+ async function observe(stage,route,options={}){
+  try{return await call(route,{timeout:15000,...options});}
+  catch(error){
+   const reasons={probe_timeout:'timed_out',response_too_large:'response_too_large',incompatible_contract:'invalid_json'};
+   if(error.code)throw error;
+   const reason=Object.hasOwn(reasons,error.message)?reasons[error.message]:'request_failed';
+   const code='matrix_'+stage+'_'+reason;
+   throw Object.assign(new Error(code),{code});
+  }
+ }
+ async function discover({allowPartialMetadata=false}={}){
+  let metadataError;
+  async function metadata(stage,route,options){
+   try{return await observe(stage,route,options);}
+   catch(error){
+    if(!allowPartialMetadata)throw error;
+    metadataError ||= error.code;
+    return null;
+   }
+  }
   const [versions,login,oauth,caps]=await Promise.all([
-   call('/_matrix/client/versions',{auth:null}),
-   call('/_matrix/client/v3/login',{auth:null,optional:true}),
-   call('/_matrix/client/v1/auth_metadata',{auth:null,optional:true}),
-   call('/_matrix/client/v3/capabilities',{optional:true}).catch(e=>e.code==='matrix_session_expired'||e.code==='matrix_permission_denied'?null:Promise.reject(e))
+   observe('versions','/_matrix/client/versions',{auth:null}),
+   metadata('login_methods','/_matrix/client/v3/login',{auth:null,optional:true}),
+   metadata('auth_metadata','/_matrix/client/v1/auth_metadata',{auth:null,optional:true}),
+   metadata('capabilities','/_matrix/client/v3/capabilities',{optional:true}).catch(e=>e.code==='matrix_session_expired'||e.code==='matrix_permission_denied'?null:Promise.reject(e))
   ]);
   check(login,Array.isArray(versions.versions)&&(!login||Array.isArray(login.flows)),'matrix_discovery_incompatible');
-  return {versions:versions.versions,loginFlows:(oauth?[{type:'oauth2.external-client-required'}]:(login?.flows||[])).map(f=>({type:f.type,...(Array.isArray(f.identity_providers)?{identityProviders:f.identity_providers.map(p=>({id:p.id,name:p.name}))}:{})})),capabilities:caps?.capabilities||{},encryptedMessaging:'external-client-required'};
+  return {...(metadataError?{error:metadataError}:{}),versions:versions.versions,loginFlows:(oauth?[{type:'oauth2.external-client-required'}]:(login?.flows||[])).map(f=>({type:f.type,...(Array.isArray(f.identity_providers)?{identityProviders:f.identity_providers.map(p=>({id:p.id,name:p.name}))}:{})})),capabilities:caps?.capabilities||{},encryptedMessaging:'external-client-required'};
  }
- async function whoami(auth=token){const who=await call('/_matrix/client/v3/account/whoami',{auth});check(who,typeof who.user_id==='string'&&/^@[^:]+:.+/.test(who.user_id),'matrix_identity_unverified');return {userId:who.user_id,deviceId:who.device_id||null};}
+ async function whoami(auth=token){const who=await observe('account','/_matrix/client/v3/account/whoami',{auth});check(who,typeof who.user_id==='string'&&/^@[^:]+:.+/.test(who.user_id),'matrix_identity_unverified');return {userId:who.user_id,deviceId:who.device_id||null};}
  async function login(method,username,secret){
   const d=await discover();
   check(d,method==='access-token'||d.loginFlows.some(f=>f.type===method),'matrix_login_method_unsupported');
@@ -52,7 +72,7 @@ export function matrixClient(base,{token,request=requestJSON,allowPrivateHosts=[
   } catch {throw Object.assign(Error('matrix_account_created_authentication_unverified'),{code:'matrix_account_created_authentication_unverified',partial:true});}
  }
  async function room(id,userId){
-  const state=await call(roomPath(id)+'/state');
+  const state=await observe('room_state',roomPath(id)+'/state');
   check(state,Array.isArray(state),'matrix_room_state_incompatible');
   const get=(type,key='')=>state.find(e=>e.type===type&&e.state_key===key)?.content;
   const powerEvent=get('m.room.power_levels'),power=powerEvent||{},createEvent=state.find(e=>e.type==='m.room.create'&&e.state_key===''),create=createEvent?.content||{},creators=[createEvent?.sender||create.creator,...(create.additional_creators||[])].filter(Boolean),creatorPrivilege=Number(create.room_version)>=12&&creators.includes(userId),numericLevel=power.users?.[userId]??(!powerEvent&&creators.includes(userId)?100:power.users_default??0),level=creatorPrivilege?'creator':numericLevel;
@@ -66,10 +86,11 @@ export function matrixClient(base,{token,request=requestJSON,allowPrivateHosts=[
   return invitationRows(await call('/_matrix/client/v3/sync?timeout=0&filter='+filter),userId);
  }
  async function rooms(userId){
-  // These account-scoped reads are independent of the joined-room state traversal.
+  // Establish membership before an initial /sync competes for the homeserver.
+  const joined=await observe('joined_rooms','/_matrix/client/v3/joined_rooms');
+  check(joined,Array.isArray(joined?.joined_rooms),'matrix_rooms_incompatible');
   const directRead=readDirectMap(call,userId).then(value=>({value,state:'verified',at:new Date().toISOString()}),()=>({value:{},state:'unverified',at:new Date().toISOString()}));
   const inviteRead=invitationsFor(userId).then(value=>({value,state:'verified',at:new Date().toISOString()}),()=>({value:[],state:'unverified',at:new Date().toISOString()}));
-  const joined=await call('/_matrix/client/v3/joined_rooms');check(joined,Array.isArray(joined.joined_rooms),'matrix_rooms_incompatible');
   const rows=[],failures=[];let cursor=0,rowsBytes=0;
   await Promise.all(Array.from({length:4},async()=>{while(cursor<Math.min(joined.joined_rooms.length,100)){const id=joined.joined_rooms[cursor++];try{const value=await room(id,userId),bytes=JSON.stringify(value).length;check(value,rowsBytes+bytes<=524288,'matrix_room_view_limit');rowsBytes+=bytes;rows.push(value);}catch(e){failures.push({roomId:id,error:e.code||'matrix_room_unverified'});}}}));
   const [direct,invited]=await Promise.all([directRead,inviteRead]);
