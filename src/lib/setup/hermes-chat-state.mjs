@@ -1,4 +1,4 @@
-/** A saved Hermes profile enables the HUD; live capability enables sending. */
+/** Resolve the configured Hermes receiver. The persistent HUD shell and Matrix view are independent. */
 export function hermesChatState(snapshot, receivedAt, now = Date.now()) {
   const instance = snapshot?.instances?.find((i) => (!snapshot.welcomeTargetId || i.instanceId === snapshot.welcomeTargetId) && i.componentId === "hermes" && !i.partial && (i.mode === "connect" || i.installed === true && i.configured === true && i.backendConfigured !== false));
   if (!instance || snapshot.mode !== "local") return { visible: false, available: false, status: "" };

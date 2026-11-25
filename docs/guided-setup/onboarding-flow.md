@@ -21,7 +21,7 @@ flowchart TD
     Entry -. optional .-> Chat
 ```
 
-**Continue** opens `/hub`. It shows Work with the Hermes Quick / Chat dial; **Settings & configuration** is at `/settings`. It requires an installed Hermes, with no provider sign-in or chat test as an entry gate. The initial Continue and secondary Configure controls sit directly on the cloud background. When Hermes is absent, Install Hermes occupies the same background action area. No initial card or modal is shown.
+**Continue** opens `/hub`. It shows Work with the HUD dial for Hermes input and floating Matrix rooms/spaces; **Settings & configuration** is at `/settings`. It requires an installed Hermes, with no provider sign-in or chat test as an entry gate. The initial Continue and secondary Configure controls sit directly on the cloud background. When Hermes is absent, Install Hermes occupies the same background action area. No initial card or modal is shown.
 
 An explicit Install, Configure, installation-selection or retained-progress action opens one native modal over the persistent artwork. Install review, installation selection, model configuration and operation progress remain inside that dialog. Closing it retains applied work and setup drafts; it discards only an unapplied review plan. Completing install or setup returns to the background actions. The dialog places focus on Close, contains keyboard focus and restores the activating control on dismissal. It can be closed while applied work continues; View progress reopens it. No previous wizard page is embedded.
 
@@ -92,6 +92,6 @@ instance or catalog setup form. No setup, account, credential or instance
 migration is required.
 
 See the [main Hub implementation record](main-hub-screen-plan.md) for the original workspace history; [the Hermes dial](hermes-chat-dial.md) records
-the current Work-and-chat design. The earlier
+the current Work-and-Matrix design. The earlier
 [gallery rollback record](resource-gallery-rollback-2026-11-22.md) remains
 historical evidence.

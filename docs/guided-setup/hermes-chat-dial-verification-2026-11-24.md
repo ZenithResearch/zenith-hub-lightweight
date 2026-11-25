@@ -1,3 +1,5 @@
+> Historical verification of the superseded Hermes-chat interpretation. The current HUD opens Matrix instead; see [the corrected contract](hermes-chat-dial.md).
+
 # Hermes dial verification — 2026-11-24
 
 ## Automated checks

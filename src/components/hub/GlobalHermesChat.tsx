@@ -1,18 +1,20 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { appendPageContext, buildChatAction } from "@/lib/setup/chat-message.mjs";
+import { appendPageContext } from "@/lib/setup/chat-message.mjs";
 import { capturePageContext } from "@/lib/setup/page-context";
-import { HermesChatHud, type HermesChatMessage } from "@/vendor/zenith-ui/HubSetup/HubSetup";
+import { HermesChatHud } from "@/vendor/zenith-ui/HubSetup/HubSetup";
 import {
   hermesChatState,
   type HermesChatSnapshot,
 } from "@/lib/setup/hermes-chat-state.mjs";
+import { GlobalMatrixChat } from "./GlobalMatrixChat";
 const snapshotEvent = "zenith:hub-setup-snapshot";
 const refreshEvent = "zenith:hub-setup-refresh";
 export function GlobalHermesChat() {
   const [snapshot, setSnapshot] = useState<HermesChatSnapshot | null>(null);
   const [openSignal, setOpenSignal] = useState(0);
+  const [matrixOpen, setMatrixOpen] = useState(false);
   const [portalHost, setPortalHost] = useState<HTMLDivElement | null>(null);
   const [receivedAt, setReceivedAt] = useState(0);
   const [now, setNow] = useState(Date.now());
@@ -110,7 +112,7 @@ export function GlobalHermesChat() {
     };
   }, []);
   const state = hermesChatState(snapshot, receivedAt, now);
-  async function sendMessage(message: string, history?: readonly HermesChatMessage[]) {
+  async function sendMessage(message: string) {
     // MVP ONLY: Appending page content is a temporary context bridge.
     // TODO: Improve context injection for agents and generalize inputs around the
     // eventual secS message contract for both agent and non-agent receivers.
@@ -126,7 +128,12 @@ export function GlobalHermesChat() {
         "Content-Type": "application/json",
         "X-Zenith-CSRF": fresh.csrf,
       },
-      body: JSON.stringify(buildChatAction(target.instance?.instanceId, contextualMessage, history)),
+      body: JSON.stringify({
+        schema: "zenith.hub-setup-action.v1",
+        operation: "chat",
+        instanceId: target.instance?.instanceId,
+        message: contextualMessage,
+      }),
       signal: AbortSignal.timeout(180000),
     });
     const reply = await response.json();
@@ -136,16 +143,27 @@ export function GlobalHermesChat() {
     window.dispatchEvent(new Event(refreshEvent));
     return reply.message;
   }
-  if (!state.visible || !portalHost) return null;
+  function closeMatrix(){
+    setMatrixOpen(false);
+    requestAnimationFrame(()=>portalHost?.querySelector<HTMLButtonElement>(".zn-hermes-hud__orb")?.focus());
+  }
+  if (!portalHost) return null;
+  const hudStatus=state.status || (snapshot ? "Configure Hermes to use its input. Matrix is available from the dial." : "Checking the Hermes connection.");
   return createPortal(
+    <>
     <HermesChatHud
-      key={state.identity}
+      key={state.identity || "hub-hud"}
       connected={state.available}
       openSignal={openSignal}
       busy={snapshot?.busy === true}
-      status={state.status}
+      status={hudStatus}
+      matrixOpen={matrixOpen}
+      onOpenMatrix={()=>setMatrixOpen(true)}
+      onCloseMatrix={closeMatrix}
       onSend={sendMessage}
-    />,
+    />
+    <GlobalMatrixChat open={matrixOpen} onClose={closeMatrix}/>
+    </>,
     portalHost,
   );
 }

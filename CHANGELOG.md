@@ -3,6 +3,17 @@
 ## [Unreleased]
 
 ### Changed
+- Show Matrix spaces in a horizontal carousel above the selected space’s room list — the floating chat should group rooms by their actual space relationships.
+
+
+### Fixed
+- Preserve the HUD dot independently of Hermes readiness and open floating Matrix rooms/spaces from its hover dial — the chat surface belongs to Matrix while the original Hermes input remains separate.
+
+### Removed
+- Revert the mistakenly added Hermes transcript and follow-up-history API — switching the HUD to Matrix must not change agent conversations or introduce an unrelated chat protocol.
+
+
+### Changed
 - Remove Conversations and Matrix polling from the main Hub, keeping room/account controls in Settings — chat should open from the existing Hermes input rather than occupy a separate workspace area.
 
 ### Added

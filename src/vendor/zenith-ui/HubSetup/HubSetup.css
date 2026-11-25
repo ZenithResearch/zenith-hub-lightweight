@@ -724,17 +724,4 @@ body:has(:is(.zn-hermes-landing, .zn-your-hub)) > [data-zenith-hermes-portal] .z
 .zn-hermes-hud__composer .zn-hermes-dial__choice.is-quick{top:-84px;left:-4px}
 .zn-hermes-hud__composer .zn-hermes-dial__arc{left:-46px;top:-46px;clip-path:polygon(50% 0,100% 0,100% 50%,50% 50%)}
 .zn-hermes-hud__composer .zn-hermes-dial__choices::before{inset:-88px -112px -2px -6px}
-.zn-hermes-hud--composer.is-chat:not(.is-collapsed){width:min(440px,calc(100vw - 32px))}
-.zn-hermes-hud--composer .zn-hermes-hud__chat{padding:16px 18px;overflow:visible}
-.zn-hermes-hud__chat-tools{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;font:600 12px/1.4 system-ui,sans-serif;color:var(--hermes-glass-ink)}
-.zn-hermes-hud .zn-hermes-hud__chat-tools button{min-height:32px;padding:4px 8px;border:1px solid #c8e2ff60;border-radius:20px;background:transparent;color:inherit;font:inherit}
-.zn-hermes-hud__transcript{height:min(380px,calc(100dvh - 220px));min-height:80px;overflow-y:auto;overscroll-behavior:contain;padding:2px 4px;scrollbar-width:thin;scrollbar-color:#b2d9ff70 transparent}
-.zn-hermes-hud__chat-message,.zn-hermes-hud__chat-empty,.zn-hermes-hud__chat-status{color:var(--hermes-glass-ink);font:400 14px/1.6 system-ui,sans-serif;white-space:pre-wrap;overflow-wrap:anywhere}
-.zn-hermes-hud__chat-message{margin:0 18px 18px 0}
-.zn-hermes-hud__chat-message.is-owner{margin:0 0 16px 28px;padding:9px 12px;border-radius:16px;background:#ffffff19}
-.zn-hermes-hud__chat-message.is-error{font-size:12px;opacity:.85}
-.zn-hermes-hud__chat-empty{opacity:.75}
-.zn-hermes-hud__chat-status{font-size:12px;margin:12px 0 0}
 @media(prefers-reduced-motion:reduce){.zn-hermes-dial__choices{transition:none}}
-
-.zn-hermes-hud--composer .zn-hermes-hud__chat p{color:var(--hermes-glass-ink)}

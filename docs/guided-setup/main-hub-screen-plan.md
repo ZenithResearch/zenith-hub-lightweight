@@ -9,7 +9,7 @@ Hermes dot, rather than a separate main-screen section.
 | Address | Responsibility |
 | --- | --- |
 | / | Welcome, Hermes installation and default-provider configuration. |
-| /hub | Work summaries and the global Hermes Quick / Chat control. |
+| /hub | Work summaries and the global HUD with Hermes input and floating Matrix chat. |
 | /settings | Settings & configuration, including configured/available apps. |
 | /settings?matrix=INSTANCE | The saved Matrix instance, account and room controls. |
 | /settings?resource=KEY | An actual saved service instance. |
@@ -30,17 +30,16 @@ The existing API does not supply aggregate work items. No requests, tasks,
 counts or activity feeds are invented. Domain records retain their service
 owners. The main screen does not read or refresh /api/matrix.
 
-## Hermes
+## HUD and floating Matrix
 
-The dot starts collapsed. Hover or focus reveals the radial Quick / Chat dial.
-Quick preserves the fading latest reply and loading-border behavior; Chat keeps
-the exchange in a scrollable glass panel. The same draft and backend are used.
-Switching modes, minimizing and client-side navigation retain UI state.
+The dot remains a global collapsed control, independently of Hermes readiness.
+Its hover/focus dial opens either the original Hermes quick input or a separate
+floating Matrix panel. Matrix shows the connected account's rooms and spaces;
+the dot stays visible while the panel is open and minimizes it.
 
-See [the dial and chat contract](hermes-chat-dial.md) for keyboard/touch behavior,
-memory limits, bounded follow-up context and compatibility. The singleton root
-Hermes component remains; no guide profile, duplicate chat CTA or new persistent
-store is introduced.
+See [the corrected HUD contract](hermes-chat-dial.md). The original Hermes
+fading-response and page-context behavior remain. There is no Hermes transcript
+or new history protocol. Existing Matrix controls remain in Settings.
 
 ## Theme and ownership
 

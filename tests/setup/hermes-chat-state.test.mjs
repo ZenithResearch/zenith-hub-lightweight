@@ -4,7 +4,7 @@ import { hermesChatState } from "../../src/lib/setup/hermes-chat-state.mjs";
 const now = Date.now();
 const hermes = { instanceId: "guide", componentId: "hermes", mode: "install", installed: true, configured: true, running: true, config: { modelName: "selected-model" }, observation: { reachable: true, chatAvailable: true } };
 const snapshot = { mode: "local", root: "/fixture", instances: [hermes] };
-test("the chat HUD stays absent before Hermes configuration", () => {
+test("the Hermes receiver stays unavailable before configuration; the HUD shell is independent", () => {
   assert.equal(hermesChatState({ ...snapshot, instances: [] }, now).visible, false);
   assert.equal(hermesChatState({ ...snapshot, instances: [{ ...hermes, configured: false }] }, now).visible, false);
   assert.equal(hermesChatState({ ...snapshot, instances: [{ ...hermes, partial: true }] }, now).visible, false);
