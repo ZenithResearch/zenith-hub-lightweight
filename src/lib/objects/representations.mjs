@@ -2,6 +2,8 @@
 import fs from 'node:fs/promises';
 import {constants} from 'node:fs';
 import path from 'node:path';
+import {execFile} from 'node:child_process';
+import {promisify} from 'node:util';
 import {randomUUID} from 'node:crypto';
 import {sha256,reject} from './registry.mjs';
 export async function privateDirectory(directory) {
@@ -9,8 +11,23 @@ export async function privateDirectory(directory) {
   for(let p=directory;;p=path.dirname(p)){try{const s=await fs.lstat(p);if(!s.isDirectory()||s.isSymbolicLink()||![0,process.getuid()].includes(s.uid)||(s.mode&0o022)&&!(s.uid===0&&s.mode&0o1000))reject('unsafe_hub_data_directory',503);}catch(e){if(e.code!=='ENOENT')throw e;}if(path.dirname(p)===p)break;}
   await fs.mkdir(directory,{recursive:true,mode:0o700});const s=await fs.lstat(directory);if(s.uid!==process.getuid()||s.mode&0o077)reject('unsafe_hub_data_directory',503);return s;
 }
+const execFileAsync = promisify(execFile);
+async function assertRepositoryFilesystem(directory) {
+  if (process.platform === 'darwin') {
+    // Darwin assigns VFS type numbers at boot. df filters the actual backing mount by name.
+    try {
+      await execFileAsync('/bin/df', ['-n', '-P', '-l', '-T', 'apfs,hfs', directory], {timeout:5000});
+      return;
+    } catch { reject('unsupported_repository_filesystem',503); }
+  }
+  const localLinuxTypes = [0xef53,0x1021994,0x794c7630,0x58465342,0x9123683e];
+  if (process.platform !== 'linux' || !localLinuxTypes.includes((await fs.statfs(directory)).type))
+    reject('unsupported_repository_filesystem',503);
+}
 export async function privateDatabaseFile(directory,{create=true}={}) {
-  await privateDirectory(directory);const supported=process.platform==='darwin'?[17,26]:process.platform==='linux'?[0xef53,0x1021994,0x794c7630,0x58465342,0x9123683e]:[];if(!supported.includes((await fs.statfs(directory)).type))reject('unsupported_repository_filesystem',503);const file=path.join(directory,'objects.sqlite');
+  await privateDirectory(directory);
+  await assertRepositoryFilesystem(directory);
+  const file=path.join(directory,'objects.sqlite');
   if(create){try{const f=await fs.open(file,constants.O_WRONLY|constants.O_CREAT|constants.O_EXCL|constants.O_NOFOLLOW,0o600);await f.close();}catch(e){if(e.code!=='EEXIST')throw e;}}
   for(const suffix of ['','-wal','-shm']){try{const s=await fs.lstat(file+suffix);if(!s.isFile()||s.isSymbolicLink()||s.uid!==process.getuid()||s.nlink!==1||s.mode&0o077)reject('unsafe_hub_database',503);}catch(e){if(suffix&&e.code==='ENOENT')continue;throw e;}}
   return file;
