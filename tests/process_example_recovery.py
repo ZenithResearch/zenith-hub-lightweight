@@ -115,7 +115,7 @@ def test(scratch):
         key = str(uuid.uuid4())
         manage.new_action(root, key)
         if fault == "committed":
-            proc = subprocess.run([sys.executable, "-I", __file__, str(REPO), "service", str(root), key], timeout=35)
+            proc = subprocess.run([sys.executable, "-I", __file__, str(REPO), "service", str(root), key], timeout=150)
             assert proc.returncode == 71
             action = manage.read(manage.action_file(root,key))
             assert "request.convert" in action["intents"] and "request.convert" not in action["acks"]

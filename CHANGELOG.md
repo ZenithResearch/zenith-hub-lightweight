@@ -3,6 +3,7 @@
 ## [Unreleased]
 
 ### Fixed
+- Allow the clean-clone checks to wait for the full owner operation and retain browser evidence before crash testing — hosted receipt verification could outlast the monitoring assertion.
 - Retry a timed-out local service readiness read within the startup deadline and identify its owner on failure — one slow first probe could abort the reviewed example installation.
 - Detect local APFS and HFS mounts by filesystem name on macOS — boot-specific type numbers caused supported Macs to reject repository initialization.
 - Pin the headless Chromium used by the macOS clean-clone job and allow time for the first Settings navigation — the hosted desktop browser repeatedly timed out before the example could run.

@@ -5,12 +5,14 @@ import path from 'node:path';
 export async function exerciseExample({evaluate,navigate,until,root,restart,capture}) {
   const destination = path.join(root,'local-process-example');
   const evidence = {};
+  // The owner workflow allows 150 seconds to start its services and verify the receipt.
+  const ownerTimeout = 165000;
   const click = async (label) => until(label,()=>evaluate(`(() => {
     const el=[...document.querySelectorAll('a,button')].find(e=>e.textContent.trim() === ${JSON.stringify(label)} && !e.disabled);
     if(!el)return false; el.click();return true;
   })()`),120000);
   const body = ()=>evaluate('document.body?.innerText || ""');
-  async function waitFor(label, timeout=90000) {
+  async function waitFor(label, timeout=ownerTimeout) {
     await until(label,async()=>{
       const text = await body();
       if(text.includes(label)) return true;
@@ -24,7 +26,7 @@ export async function exerciseExample({evaluate,navigate,until,root,restart,capt
       if(outputs?.length===n){assert.ok(outputs.every(v=>v==='{"text":"HELLO HUB"}'));return true;}
       const error=await evaluate('document.querySelector(\'[role="alert"]\')?.textContent');
       if(error)throw Error(error);
-    },120000);
+    },ownerTimeout);
   }
   await click('Set up local process example');
   await click('Review setup');
@@ -45,7 +47,7 @@ export async function exerciseExample({evaluate,navigate,until,root,restart,capt
     return result;
   };return true;})()`);
   await click('Run example');
-  await until('lost browser response',()=>evaluate('window.exampleLostResponse === true'),120000);
+  await until('lost browser response',()=>evaluate('window.exampleLostResponse === true'),ownerTimeout);
   const state=()=>fs.readFile(path.join(destination,'workspace.json'),'utf8').then(JSON.parse);
   const first=(await state()).actions[0];
   const exampleUrl=await evaluate('location.href');
@@ -79,7 +81,7 @@ export async function exerciseExample({evaluate,navigate,until,root,restart,capt
   await until('both receipt checks in monitor history', async()=>{
     const h=await evaluate(`fetch('/api/hub/history?service=Local%20process%20example').then(r=>r.json())`);
     return h.events.filter(e=>!e.reason).length===2;
-  },30000);
+  },ownerTimeout);
   const history=await evaluate(`fetch('/api/hub/history?service=Local%20process%20example').then(r=>r.json())`);
   assert.ok(history.events.some(e=>!e.reason && e.step==='Verify Case, Frank effect and Runtime receipt'));
   evidence.monitor=history.events[0];
