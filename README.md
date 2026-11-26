@@ -48,6 +48,14 @@ installation. Status refreshes every 15 seconds while the tab is visible.
 Every operation requires a short-lived, one-use review. Start/stop target only
 the selected installation's owned user launchd jobs.
 
+## Run the local process example
+
+From **Settings**, open **Set up local process example**, select **Review setup**, check the source and private destination, then choose **Apply**. Hub verifies the Apple silicon release archive and installs its pinned Service Management, Process Runtime, and Frank wheels. For offline setup, set `ZENITH_PROCESS_BUNDLE` to the extracted release before launching Hub. Both paths verify the same bundle and wheel digests.
+
+Select **Run example**. Service creates a Case for `{"text":"hello hub"}` and hands it to Runtime. Frank executes the uppercase step. The page shows the Case, run, and committed `{"text":"HELLO HUB"}` with its Runtime receipt. **Verify receipt** reads back the evidence and records the check in Monitoring history.
+
+Reopen the page to inspect earlier results. **Retry example** continues the retained action. **Run new example** allocates another Case. The example runs its services on temporary loopback ports under development authority. Its stores and Frank journal live under `local-process-example` in the Hub setup directory.
+
 ## Application database and local launcher
 
 The normal development and production launch commands prepare and validate the embedded Hub database before serving the UI. Existing setup, profile/model bindings, connections, operations and generic stored objects share the repository. Native software data, credentials and process ownership stay in place.

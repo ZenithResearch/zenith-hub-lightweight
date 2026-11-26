@@ -3,6 +3,7 @@ on:
   pull_request:
   push:
     branches: [main]
+    tags: ['*']
 permissions:
   contents: read
 jobs:
@@ -17,7 +18,14 @@ jobs:
       - uses: actions/setup-python@v6
         with:
           python-version: '3.12'
-      - run: node scripts/smoke-clean-clone.mjs
+      - run: node scripts/smoke-clean-clone.mjs --process-example
+        env:
+          HUB_SMOKE_EVIDENCE: ${{ runner.temp }}/hub-example-evidence
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: local-process-example
+          path: ${{ runner.temp }}/hub-example-evidence
 
   source:
     runs-on: ubuntu-latest

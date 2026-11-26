@@ -12,7 +12,7 @@ const nextConfig: NextConfig = {
     "/api/hub/inventory": ["./profiles/application-db/**/*", "./profiles/setup/**/*", "./profiles/object-store/**/*", "./src/lib/application/*.mjs", "./src/lib/objects/codec-worker.mjs"],
     "/api/database": ["./profiles/application-db/**/*", "./profiles/object-store/**/*", "./src/lib/objects/codec-worker.mjs"],
     "/api/objects": ["./profiles/application-db/**/*", "./profiles/object-store/**/*", "./src/lib/objects/codec-worker.mjs"],
-    "/api/hub": ["./profiles/application-db/**/*","./profiles/setup/**/*", "./scripts/setup/**/*", "./src/lib/setup/*.mjs", "./profiles/object-store/**/*", "./src/lib/objects/codec-worker.mjs"],
+    "/api/hub": ["./profiles/process-example/**/*","./profiles/process-macos/{installer.v1.json,release.v1.json,installer_bundle.py,process_mac.py}","./profiles/application-db/**/*","./profiles/setup/**/*", "./scripts/setup/**/*", "./src/lib/setup/*.mjs", "./profiles/object-store/**/*", "./src/lib/objects/codec-worker.mjs"],
     "/api/matrix/conversation": ["./profiles/matrix-chat/**/*", "./node_modules/@vector-im/matrix-bot-sdk/**/*", "./profiles/application-db/**/*", "./profiles/setup/**/*", "./profiles/object-store/**/*", "./src/lib/application/*.mjs", "./src/lib/setup/*.mjs", "./src/lib/matrix/*.mjs", "./src/lib/objects/codec-worker.mjs", "./node_modules/@matrix-org/matrix-sdk-crypto-nodejs/**/*"],
     "/api/matrix": ["./profiles/application-db/**/*", "./profiles/setup/**/*", "./profiles/object-store/**/*", "./src/lib/application/*.mjs", "./src/lib/setup/*.mjs", "./scripts/setup/**/*", "./src/lib/objects/codec-worker.mjs"],
     "/api/setup": [

@@ -77,6 +77,15 @@ export function createHubController({env=process.env,setup,connections=resourceC
     async get(request){admit(request);return snapshot(request);},
     async post(request,body) {
       admit(request,true);check(body,body?.schema==='zenith.hub-action.v1','invalid_hub_action',400);
+      if (typeof body.operation==='string' && body.operation.startsWith('example-')) {
+        const operation=body.operation.slice(8);
+        check(body,['status','review','apply','run','new','verify'].includes(operation),'invalid_hub_action',400);
+        const keyed=['apply','run','new','verify'].includes(operation);
+        fields(body,keyed?['schema','operation','key']:['schema','operation']);
+        if(keyed)check(body,typeof body.key==='string' && /^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/.test(body.key),'invalid_hub_action',400);
+        const {localProcessExample}=await import('./process-example.mjs');
+        return localProcessExample(env,operation,body.key);
+      }
       if(body.operation==='refresh'){fields(body,['schema','operation']);return snapshot(request,true);}
       if(body.operation==='discover'){fields(body,['schema','operation']);return setupPost(request,{operation:'discover'});}
       if(body.operation==='reconcile-setup'){fields(body,['schema','operation']);await setupPost(request,{operation:'reconcile'});return snapshot(request,true);}

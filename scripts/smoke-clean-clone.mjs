@@ -14,6 +14,9 @@ const root = path.join(home, 'Library/Application Support/Zenith/Hub');
 const env = { PATH: process.env.PATH, HOME: home, npm_config_cache: path.join(scratch, 'npm cache'),
   TMPDIR: path.join(scratch, 'tmp'), NEXT_TELEMETRY_DISABLED: '1' };
 const children = [];
+const exampleGate = process.argv.includes('--process-example');
+const evidenceDir = process.env.HUB_SMOKE_EVIDENCE;
+if (evidenceDir) await fs.mkdir(evidenceDir,{recursive:true});
 let stage = 'clone';
 
 function launch(command, args, options = {}) {
@@ -60,8 +63,11 @@ async function browserSettings(url) {
   const {targetId} = await send('Target.createTarget',{url:'about:blank'});
   const {sessionId} = await send('Target.attachToTarget',{targetId,flatten:true});
   await send('Page.enable',{},sessionId);
-  const navigation = await send('Page.navigate',{url},sessionId);
-  if (navigation.errorText) throw Error('Could not open printed URL: ' + navigation.errorText);
+  const navigate=async destination=>{
+    const nav=await send('Page.navigate',{url:destination},sessionId);
+    if(nav.errorText)throw Error('Could not open URL: '+nav.errorText);
+  };
+  await navigate(url);
   let observed;
   try { await until('hydrated Settings and configured instances', async () => {
     const answer = await send('Runtime.evaluate',{expression:
@@ -74,6 +80,19 @@ async function browserSettings(url) {
   },120000); } catch (error) {
     throw Error(error.message + ' (last browser observation ' + JSON.stringify(observed) + ')');
   }
+  return {
+    navigate,
+    async evaluate(expression) {
+      const value=await send('Runtime.evaluate',{expression,returnByValue:true,awaitPromise:true},sessionId);
+      if(value.exceptionDetails)throw Error(value.exceptionDetails.exception?.description || value.exceptionDetails.text);
+      return value.result?.value;
+    },
+    async capture(name) {
+      if (!evidenceDir) return;
+      const image=await send('Page.captureScreenshot',{format:'png'},sessionId);
+      await fs.writeFile(path.join(evidenceDir,name+'.png'),Buffer.from(image.data,'base64'));
+    }
+  };
 }
 
 try {
@@ -101,14 +120,22 @@ try {
   // CI uses the documented default. Local rehearsals can share a machine with a live Hub.
   if (process.argv.includes('--free-port')) env.ZENITH_OPERATOR_PORT = available;
   stage = 'npm run setup';
-  const server = launch('npm',['run','setup']);
+  let server;
+  async function start() {
+  server = launch('npm',['run','setup']);
   let output = '';
   function capture(chunk) { process.stdout.write(chunk); output = (output+chunk).slice(-65536); }
   server.stdout.on('data',capture); server.stderr.on('data',capture);
-  const url = await until('launcher Settings URL',()=>{
+  return until('launcher Settings URL',()=>{
     if (server.exitCode !== null || server.signalCode) throw Error('Launcher exited during setup');
     return output.match(/Open Hub Settings at (http:\/\/127\.0\.0\.1:\d+\/settings)/)?.[1];
   },480000);
+  }
+  async function stop() {
+    execFileSync('npm',['run','hub','--','stop'],{cwd,env,timeout:30000});
+    await until('owned launcher to stop',()=>server.exitCode !== null || server.signalCode,30000);
+  }
+  const url=await start();
   assert.equal(new URL(url).port,env.ZENITH_OPERATOR_PORT || '4318');
 
   stage = 'verify serving instance';
@@ -123,14 +150,25 @@ try {
     } catch { return false; }
   },100000);
   stage = 'browser';
-  await browserSettings(url);
+  const browser=await browserSettings(url);
   stage = 'repeat setup';
   const repeat = execFileSync('npm',['run','setup'],{cwd,env,encoding:'utf8',timeout:60000});
   assert.ok(repeat.includes('Open Hub Settings at '+url));
   assert.deepEqual(JSON.parse(await fs.readFile(leaseFile,'utf8')),lease);
+  if(exampleGate){
+    stage='browser Case, Frank execution and recovery';
+    const {exerciseExample}=await import('./smoke-process-example.mjs');
+    const evidence=await exerciseExample({...browser,root,until,restart:async()=>{await stop();assert.equal(await start(),url);}});
+    stage='interrupted Service and Frank operations';
+    const exampleRoot=path.join(root,'local-process-example');
+    const workspace=JSON.parse(await fs.readFile(path.join(exampleRoot,'workspace.json'),'utf8'));
+    execFileSync(path.join(exampleRoot,workspace.generation,'bin/python'),
+      ['-I',path.join(cwd,'tests/process_example_recovery.py'),cwd,scratch],{cwd,env,stdio:'inherit',timeout:180000});
+    if(evidenceDir)await fs.writeFile(path.join(evidenceDir,'report.json'),JSON.stringify(evidence,null,2));
+    console.log('PASS: reviewed installation, Case to Frank output, restart, new Case and receipt verification');
+  }
   stage = 'stop';
-  execFileSync('npm',['run','hub','--','stop'],{cwd,env,timeout:30000});
-  await until('owned launcher to stop',()=>server.exitCode !== null || server.signalCode,30000);
+  await stop();
   await assert.rejects(fs.access(leaseFile),{code:'ENOENT'});
   console.log('PASS: fresh clone, busy-port diagnostic, live Settings, repeated setup, and stop');
 } catch (error) {

@@ -1,0 +1,53 @@
+{
+  "schema": "zenith.local-process-example.v1",
+  "bundleSha256": "d9359193f9b07ad54c49d80adc6fe922d9dc19f6fe30e2a9803859049c002edb",
+  "pin": {
+    "process_id": "hub-uppercase",
+    "process_version": "hub-uppercase-v1",
+    "compilation_hash": "9bfc5252056aec4b36c8ae6331cc1edf01c7acd396da7ae8636ef7ba19763a1d"
+  },
+  "draft": {
+    "schema": "process.draft.v1",
+    "process_id": "hub-uppercase",
+    "inputs": {
+      "text": {
+        "kind": "string"
+      }
+    },
+    "steps": [
+      {
+        "step_id": "uppercase",
+        "depends_on": [],
+        "capabilities": [
+          "uppercase"
+        ],
+        "resources": [
+          "example"
+        ],
+        "inputs": {
+          "text": {
+            "kind": "string"
+          }
+        },
+        "bindings": {
+          "text": {
+            "source": "run_input",
+            "name": "text"
+          }
+        },
+        "outputs": {
+          "text": {
+            "kind": "string"
+          }
+        },
+        "max_attempts": 1
+      }
+    ]
+  },
+  "input": {
+    "text": "hello hub"
+  },
+  "output": {
+    "text": "HELLO HUB"
+  }
+}
