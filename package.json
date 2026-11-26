@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "setup": "node scripts/setup.mjs",
     "dev": "node scripts/hub.mjs serve --dev",
     "build": "next build",
     "start": "node scripts/hub.mjs serve --production",

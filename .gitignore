@@ -1,4 +1,5 @@
 node_modules/
+.zenith-setup.lock
 .next/
 out/
 dist/

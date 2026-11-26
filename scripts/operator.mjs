@@ -1,15 +1,11 @@
 import path from "node:path";
-import os from "node:os";
+import {operatorPort, setupRoot as configuredRoot} from "./launcher-defaults.mjs";
 import { spawn } from "node:child_process";
 import { existsSync } from "node:fs";
 if (existsSync(".env.operator.local"))
   process.loadEnvFile(".env.operator.local");
-const port = Number(process.env.ZENITH_OPERATOR_PORT || 4208);
-if (!Number.isInteger(port) || port < 1024 || port > 65535)
-  throw Error("Invalid local port");
-const setupRoot =
-  process.env.ZENITH_HUB_SETUP_DIR ||
-  path.join(os.homedir(), "Library/Application Support/Zenith/Hub");
+const port = operatorPort();
+const setupRoot = configuredRoot();
 if(process.env.ZENITH_HUB_APPLICATION_DB==='1'){const {applicationForEnv}=await import('../src/lib/application/owner.mjs');await (await applicationForEnv()).status();}
 const child = spawn(
   process.execPath,

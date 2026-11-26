@@ -10,21 +10,26 @@ SDK, with further generalization tracked in `Task/create-general-roadmap-reposit
 
 ## Run on your Mac
 
-Prerequisites: Node.js 24 or later, npm, and Python 3.12. The installed Process
-profile requires macOS on Apple silicon. No VM or Docker is required.
+On an Apple silicon Mac, install Git, arm64 Node.js 24 with npm, and Python 3.12.
+Make Python available on your PATH as `python3.12` or `python3`. The first install
+downloads the locked npm packages and the pinned Matrix crypto binary.
 
 ```sh
-npm ci
-cp .env.operator.example .env.operator.local
-# Edit .env.operator.local if using a new installation/bundle or alternate ports.
-npm run build
-npm run operator:start
+git clone https://github.com/ZenithResearch/zenith-hub-lightweight.git
+cd zenith-hub-lightweight
+npm run setup
 ```
 
-Open **http://127.0.0.1:4318** (or the configured `ZENITH_OPERATOR_PORT`). By default the controller inspects the existing
-installation at `~/Library/Application Support/Zenith/Process`. All configuration
-for this UI lives in the ignored `.env.operator.local`; use absolute paths.
-`npm run operator` runs the same loopback bridge in development mode.
+Open the **Hub Settings** URL printed in the terminal. Keep the terminal open while
+using Hub. Running setup again from the same checkout verifies the running instance
+and prints its URL. Stop it with Ctrl-C or run `npm run hub -- stop` from that checkout.
+
+Hub defaults to loopback port 4318 and stores its database under
+`~/Library/Application Support/Zenith/Hub`. For a busy port, run
+`ZENITH_OPERATOR_PORT=4319 npm run setup` with a free port. Optional persistent
+overrides are documented in [.env.operator.example](.env.operator.example).
+For a production frontend build, stop the development launcher and run
+`npm run build` followed by `npm run operator:start`.
 
 To install a new Mac, launch Hub and choose **Install base stack**. Hub first
 shows the destination and pinned manifest digest. Only **Apply** downloads the

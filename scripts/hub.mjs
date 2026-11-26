@@ -2,9 +2,9 @@
 /** Initialize/check storage before starting the local app server. Browser launch is an owner action. */
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import os from 'node:os';
+import {operatorPort,processStamp as stamp,setupRoot} from './launcher-defaults.mjs';
 import {existsSync} from 'node:fs';
-import {spawn,spawnSync} from 'node:child_process';
+import {spawn} from 'node:child_process';
 import {randomUUID} from 'node:crypto';
 import {planMigration,applyMigration,publicPlan,locations} from '../src/lib/application/migration.mjs';
 import {activation,assertNoPendingMigration,assertActivatedStorage} from '../src/lib/application/owner.mjs';
@@ -15,10 +15,9 @@ const args=process.argv.slice(2),flags={},position=[];
 const values=new Set(['--setup-dir','--data-dir','--resources-file','--port','--plan','--software']);
 for(let i=0;i<args.length;i++){const token=args[i];if(values.has(token)){if(!args[i+1]||args[i+1].startsWith('--'))throw Error('Missing '+token);flags[token]=args[++i];}else if(['--dev','--production','--migrate','--json','--register'].includes(token))flags[token]=true;else if(token.startsWith('--'))throw Error('Unknown option '+token);else position.push(token);}
 const command=position.join(' ')||'serve';
-const root=path.resolve(flags['--setup-dir']||process.env.ZENITH_HUB_SETUP_DIR||path.join(os.homedir(),'Library/Application Support/Zenith/Hub'));
+const root=setupRoot(flags['--setup-dir']);
 const configured={setupRoot:root,...(flags['--data-dir']||process.env.ZENITH_HUB_DATA_DIR?{dataDir:flags['--data-dir']||process.env.ZENITH_HUB_DATA_DIR}:{}),...(flags['--resources-file']||process.env.ZENITH_HUB_RESOURCES_FILE?{resourcesFile:flags['--resources-file']||process.env.ZENITH_HUB_RESOURCES_FILE}:{}),...(process.env.ZENITH_HUB_ONTOLOGY_REGISTRY_FILE?{registryFile:process.env.ZENITH_HUB_ONTOLOGY_REGISTRY_FILE}:{})};
 const print=value=>console.log(JSON.stringify(value,null,2));
-const stamp=pid=>{const r=spawnSync('/bin/ps',['-p',String(pid),'-o','lstart=,comm='],{encoding:'utf8'});return r.status===0?r.stdout.trim():null;};
 let server;
 async function ready(options){await assertNoPendingMigration(root);const marker=await activation(root);if(marker){await assertActivatedStorage(marker);if(options.dataDir&&path.resolve(options.dataDir)!==marker.dataDir)throw Object.assign(Error('application_storage_configuration_changed'),{code:'application_storage_configuration_changed'});const config={...options,dataDir:marker.dataDir,resourcesFile:marker.resourcesFile};const app=await HubApplication.open(config);try{const catalog=await app.synchronizeCatalog();if(catalog.warning)print({phase:'catalog-last-good',...catalog});return {config,status:await app.status()};}finally{await app.close();}}
  const plan=await planMigration(options);if(plan.recoveryRequired)throw Object.assign(Error('migration_recovery_required'),{code:'migration_recovery_required',details:publicPlan(plan)});
@@ -40,12 +39,14 @@ try {
  else if(command==='prepare'||command==='db init'){print({phase:'database-ready',...(await ready(configured)).status});}
  else if(command==='serve'){
   try{const lease=JSON.parse(await readPrivate(path.join(root,'server.json'),65536));if(stamp(lease.pid)===lease.processStamp)throw Object.assign(Error('hub_already_running'),{code:'hub_already_running'});}catch(e){if(e.code!=='ENOENT')throw e;}
-  const {config,status}=await ready(configured),port=Number(flags['--port']||process.env.ZENITH_OPERATOR_PORT||4318);if(!Number.isInteger(port)||port<1024||port>65535)throw Error('Invalid local port.');
+  const port=operatorPort(flags['--port']);
+  const {config,status}=await ready(configured);
   const leaseFile=path.join(root,'server.json');try{const old=JSON.parse(await readPrivate(leaseFile,65536));if(stamp(old.pid)===old.processStamp)throw Object.assign(Error('hub_already_running'),{code:'hub_already_running'});await fs.unlink(leaseFile);}catch(e){if(e.code!=='ENOENT')throw e;}
   const token=randomUUID(),lease={schema:'zenith.hub-server.v1',pid:process.pid,processStamp:stamp(process.pid),source:process.cwd(),port,serverInstanceId:token,repositoryId:status.repositoryId};
   const f=await fs.open(leaseFile,'wx',0o600);try{await f.writeFile(JSON.stringify(lease,null,2)+'\n');await f.sync();}finally{await f.close();}
   print({phase:'database-ready',...status,url:'http://127.0.0.1:'+port});
   const env={...process.env,ZENITH_HUB_CATALOG_READY:'1',ZENITH_HUB_APPLICATION_DB:'1',ZENITH_HUB_REPOSITORY_FOUNDATION:'1',ZENITH_HUB_SETUP_DIR:root,ZENITH_HUB_DATA_DIR:config.dataDir,ZENITH_HUB_RESOURCES_FILE:config.resourcesFile,ZENITH_HUB_SERVER_INSTANCE:token,ZENITH_OPERATOR_PORT:String(port),ZENITH_PREVIEW_BUILD:flags['--production']?'0':'1',ZENITH_DEV_BUNDLER:'webpack',NEXT_TELEMETRY_DISABLED:'1'};
+  console.log('Open Hub Settings at http://127.0.0.1:'+port+'/settings');
   server=spawn(process.execPath,['scripts/operator.mjs',...(flags['--production']?['--production']:[])],{env,stdio:'inherit'});
   for(const signal of ['SIGTERM','SIGINT'])process.on(signal,()=>server.kill(signal));
   await new Promise((resolve,reject)=>{server.once('error',reject);server.once('exit',code=>{process.exitCode=code||0;resolve();});});

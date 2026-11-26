@@ -6,6 +6,7 @@
 - Show the Runtime’s reported storage, authority and admission checks in readiness failure history — an HTTP 503 alone concealed the production readiness blocker.
 
 ### Added
+- Bootstrap Hub from a fresh Apple silicon checkout with `npm run setup` and exercise the printed Settings URL in a real browser — first-time users need reproducible launcher defaults and proof that their installation serves the page.
 - Review, stage and roll back the pinned Process Runtime candidate from Hub Settings — operators can preserve the earlier environment and recover the selected release after interruption.
 - Record service checks and contemporaneous Hub-host CPU, memory and setup-volume usage in local monitoring history — operators can now inspect the failing step after a service recovers.
 
