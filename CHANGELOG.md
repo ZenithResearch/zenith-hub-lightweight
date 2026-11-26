@@ -3,6 +3,7 @@
 ## [Unreleased]
 
 ### Fixed
+- Retry a timed-out local service readiness read within the startup deadline and identify its owner on failure — one slow first probe could abort the reviewed example installation.
 - Detect local APFS and HFS mounts by filesystem name on macOS — boot-specific type numbers caused supported Macs to reject repository initialization.
 - Pin the headless Chromium used by the macOS clean-clone job and allow time for the first Settings navigation — the hosted desktop browser repeatedly timed out before the example could run.
 - Reconcile Frank’s retained completion after a lost Runtime acknowledgement and correlate its journal with the committed output — retrying must preserve one dispatch and let Hub recover the original receipt.

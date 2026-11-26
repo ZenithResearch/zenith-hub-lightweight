@@ -59,15 +59,21 @@ def service(module, root, args):
     argv = [sys.executable, "-I", str(HERE / "service.py"), module, "--database", str(root / (module + ".sqlite")),
             "--port", str(port), "--environment", "development", "--local-dev-untrusted", *args]
     with subprocess.Popen(argv, stdin=subprocess.PIPE, stdout=subprocess.DEVNULL) as proc:
+        last_check = "waiting for the listener"
         def readiness():
+            nonlocal last_check
             if proc.poll() is not None:
                 raise RuntimeError(module + " exited during startup")
             try:
                 return http(port, "/ready")
-            except (ConnectionError, RuntimeError):
+            except (ConnectionError, TimeoutError, RuntimeError) as error:
+                last_check = str(error)
                 return None
         try:
-            ready = poll(module + " readiness", readiness)
+            try:
+                ready = poll(module + " readiness", readiness, seconds=55)
+            except RuntimeError as error:
+                raise RuntimeError(f"{error}. Last {module} /ready check: {last_check}") from error
             yield port, ready
         finally:
             proc.stdin.close()
