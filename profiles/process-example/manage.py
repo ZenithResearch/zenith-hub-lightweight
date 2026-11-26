@@ -79,14 +79,24 @@ def install(root, plan, lock):
         bundle = Path(plan["source"])
         installer.validate_bundle(bundle, descriptor, MAC/"process_mac.py")
     else:
-        bundle = installer.ensure(DESCRIPTOR, root/"cache")
+        cache = root/"cache"
+        cached = cache/descriptor["bundleSha256"]
+        try:
+            bundle = installer.ensure(DESCRIPTOR, cache)
+        except ValueError:
+            if cached.exists():
+                cached.rename(cache/("rejected-" + uuid.uuid4().hex))
+            raise
     generation = root / ("software-" + uuid.uuid4().hex)
     try:
         venv.EnvBuilder(with_pip=True, symlinks=True).create(generation)
         python = generation/"bin/python"
-        wheels = [str(bundle/"wheels"/row["filename"]) for row in read(bundle/"profile.json")["wheels"]]
+        requirements = generation/"wheels.txt"
+        requirements.write_text("".join(
+            (bundle/"wheels"/row["filename"]).resolve().as_uri() + " --hash=sha256:" + row["sha256"] + "\n"
+            for row in read(MAC/"release.v1.json")["wheels"]))
         subprocess.run([str(python), "-I", "-m", "pip", "install", "--isolated", "--no-index", "--no-deps",
-                        "--no-cache-dir", "--disable-pip-version-check", *wheels], check=True, timeout=100,
+                        "--no-cache-dir", "--disable-pip-version-check", "--require-hashes", "-r", str(requirements)], check=True, timeout=100,
                        stdout=subprocess.DEVNULL)
         ready = workflow(python, root, lock, "prepare")
         first = str(uuid.uuid4())
@@ -138,7 +148,10 @@ def manage(root, operation, key=None):
             if operation == "verify":
                 if not action.get("result"):
                     raise ValueError("This example has no committed output to verify")
-                return workflow(python, root, lock, "verify", key)
+                observed = workflow(python, root, lock, "verify", key)
+                if any(observed[k] != value for k,value in action["result"].items() if k != "projection"):
+                    raise ValueError("Owner evidence differs from the retained action receipt")
+                return observed
             if not action.get("result"):
                 workflow(python, root, lock, "run", key)
         else:

@@ -22,6 +22,10 @@ export default function ExamplePage() {
       headers:{'content-type':'application/json','x-zenith-csrf':token},
       body:JSON.stringify({schema:'zenith.hub-action.v1',operation:'example-'+operation,...(key ? {key} : {})})});
     const body = await response.json();
+    if (response.status===403 && operation==='status' && body.error==='cross_site_action') {
+      const session=await fetch('/api/hub',{cache:'no-store'}).then(r=>r.json());
+      if(session.csrf && session.csrf!==token){setToken(session.csrf);return;}
+    }
     if (!response.ok) throw Error(body.error || 'Hub could not complete the operation');
     return body;
   }, [token]);
@@ -36,7 +40,7 @@ export default function ExamplePage() {
   useEffect(() => {
     if (!token) return;
     let active = true;
-    const refresh = () => call('status').then(v=>{if(active) setState(v);}).catch(e=>{if(active) setError(e.message);});
+    const refresh = () => call('status').then(v=>{if(active && v) setState(v);}).catch(e=>{if(active) setError(e.message);});
     void refresh();
     const timer = setInterval(refresh, 2500);
     return ()=>{active=false;clearInterval(timer);};
@@ -73,7 +77,7 @@ export default function ExamplePage() {
     {state?.actions.map(a=><section key={a.id}><h2>{a.stage}</h2><p>Action <code>{a.id}</code></p>
       {a.error && <p role="alert">{a.error}</p>}
       {a.runId && <p>Case <code>{a.caseId}</code> · Run <code>{a.runId}</code></p>}
-      {a.result && <><p>Frank actor <code>{a.result.actorId}</code> · Service projection {a.result.projection}</p>
+      {a.result && <><p>Frank actor <code>{a.result.actorId}</code> · Service projection at completion {a.result.projection}</p>
         <p>Committed output <output>{JSON.stringify(a.result.output)}</output></p>
         <p>Handoff <code>{a.result.handoffId}</code> · Runtime receipt <code>{a.result.receiptId}</code></p>
         <button disabled={busy} onClick={()=>act('verify',a.id)}>Verify receipt</button>

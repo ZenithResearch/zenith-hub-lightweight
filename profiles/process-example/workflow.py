@@ -123,7 +123,7 @@ def read_service(port, action, op):
     return http(port, "/v1/queries", json.dumps(body))["data"]
 
 
-def deliver(port, action, record):
+def deliver(port, action, record, runtime_port):
     stages = [("request.create", None, {"summary": "Uppercase a local example"}),
               ("request.qualify", 1, {"qualification": "Fixed local input"}),
               ("request.accept", 2, {"acceptance": "Accepted for the local example"}),
@@ -142,17 +142,33 @@ def deliver(port, action, record):
         record(op)
         action["acks"][op] = http(port, "/v1/commands", intent["body"])
         record(op + " acknowledged")
+    last_observation = None
     def started():
+        nonlocal last_observation
         handoff = read_service(port, action, "request.execution")["handoff"]
         if handoff and handoff["state"] == "failed":
-            raise RuntimeError("Service handoff failed: " + str(handoff.get("error_code")))
+            raise RuntimeError("Service handoff failed: " + str(handoff.get("last_error")))
+        if handoff and handoff["state"] == "pending":
+            admission = http(runtime_port, "/ready")["checks"]["admission"]
+            if admission["new_runs"] == "closed":
+                raise RuntimeError("Runtime admission closed. Service retained the pending handoff.")
+        if handoff and handoff["state"] == "pending" and handoff.get("last_error") != last_observation:
+            last_observation = handoff["last_error"]
+            record("Service handoff pending: " + str(last_observation))
         return handoff if handoff and handoff["state"] == "started" else None
     record("Waiting for Service handoff")
-    return poll("Service handoff acknowledgement", started)
+    try:
+        return poll("Service handoff acknowledgement", started)
+    except RuntimeError as error:
+        if last_observation:
+            raise RuntimeError("Service handoff awaits Runtime: " + last_observation) from error
+        raise
 
 
-def verify(client, port, root, action):
+def verify(client, port, root, action, *, historical=False):
     import sqlite3
+    from frank_executor.journal import Journal
+    from frank_executor.model import Binding, effect_key
     run_id = action["runId"]
     run = query(client, "run.get", run_id=run_id)
     step, = run["steps"]
@@ -168,8 +184,18 @@ def verify(client, port, root, action):
         any(row[k] != v for row in (attempt, output, receipt) for k, v in ids.items()) or
         any(row["actor_id"] != ACTOR or row["fence"] != step["fence"] for row in (receipt, attempt))):
         raise RuntimeError("Runtime receipt does not match the example")
-    commits = [event["data"] for page in client.event_pages() for event in page["events"]
-               if event["kind"] == "output.committed" and event["data"].get("run_id") == run_id]
+    commits = []
+    accepted = set()
+    source_event = action["acks"]["case.plan.approve"]["handoff"]["event_id"]
+    for page in client.event_pages():
+        for event in page["events"]:
+            data = event["data"]
+            if event["kind"] == "output.committed" and data.get("run_id") == run_id:
+                commits.append(data)
+            if event["kind"] == "handoff.accepted" and data.get("source_event_id") == source_event:
+                accepted.add(data["run_id"])
+    if accepted != {run_id}:
+        raise RuntimeError("Service handoff does not identify exactly one Runtime run")
     if len(commits) != 1 or commits[0]["attempt_id"] != ids["attempt_id"]:
         raise RuntimeError("Runtime must have exactly one committed output for the example run")
     with sqlite3.connect((root/"uppercase.sqlite").as_uri() + "?mode=ro", uri=True) as db:
@@ -177,9 +203,13 @@ def verify(client, port, root, action):
                    if json.loads(v)["binding"]["run_id"] == run_id]
     if len(matches) != 1 or matches[0]["outputs"] != expected or matches[0]["binding"] != {**ids, "fence": step["fence"]}:
         raise RuntimeError("Frank integration evidence differs from the committed output")
+    binding = Binding(run_id, ids["step_id"], ids["attempt_id"], step["fence"])
+    delivery = Journal(str(root / "frank.sqlite")).get(effect_key(binding, "uppercase", "example"))
+    if delivery["state"] != "committed" or delivery["result"] != matches[0]:
+        raise RuntimeError("Frank journal does not confirm the committed integration result")
     def projected():
         summary = read_service(port, action, "case.summary")
-        return summary if (summary.get("derived_runtime") or {}).get("state") == "succeeded" and summary["projection"]["freshness"] == "current" else None
+        return summary if (summary.get("derived_runtime") or {}).get("state") == "succeeded" and (historical or summary["projection"]["freshness"] == "current") else None
     summary = poll("current Service projection", projected)
     history = read_service(port, action, "case.plan-history")["revisions"]
     execution = read_service(port, action, "request.execution")
@@ -198,10 +228,11 @@ def main(root, mode, action_id=None):
     with service("process_runtime", root, []) as (runtime_port, runtime_ready):
         origin = f"http://127.0.0.1:{runtime_port}"
         client = RuntimeClient(origin, authority=LocalDevAuthority(environment="development"))
-        args = ["--runtime-endpoint", origin, "--projection-database", str(root / "projection.sqlite"),
-                "--poll-runtime", "--poll-interval", "0.25"]
+        args = ["--runtime-endpoint", origin, "--projection-database", str(root / "projection.sqlite")]
+        if mode != "verify":
+            args.extend(["--poll-runtime", "--poll-interval", "0.25"])
         with service("service_management", root, args) as (port, service_ready):
-            if not {"outbox_delivery", "runtime_projection"} <= service_ready["checks"].keys():
+            if mode != "verify" and not {"outbox_delivery", "runtime_projection"} <= service_ready["checks"].keys():
                 raise RuntimeError("Service delivery and projection workers are unavailable")
             if mode == "prepare":
                 publish(client)
@@ -214,18 +245,17 @@ def main(root, mode, action_id=None):
                 action["timeline"].append({"stage": stage, "at": time.time()})
                 save(file, action)
             if mode == "verify":
-                return verify(client, port, root, action)
+                return verify(client, port, root, action, historical=True)
             try:
                 action.pop("error", None)
                 if query(client, "version.get", process_version=PIN["process_version"])["pin"] != PIN:
                     raise RuntimeError("Process version no longer matches the recipe")
-                handoff = deliver(port, action, record)
+                handoff = deliver(port, action, record, runtime_port)
                 action["runId"] = handoff["run_id"]
-                record("Frank execution")
-                if query(client, "run.get", run_id=action["runId"])["state"] != "succeeded":
-                    result = worker(root, origin, "execute", action["runId"], action["id"] + "-claim")
-                    if result["state"] != "committed":
-                        raise RuntimeError("Frank effect requires reconciliation: " + result["state"])
+                record("Awaiting Frank actor for uppercase")
+                result = worker(root, origin, "execute", action["runId"], action["id"] + "-claim")
+                if result["state"] != "committed":
+                    raise RuntimeError("Frank effect requires reconciliation: " + result["state"])
                 record("Verifying Runtime receipt and Service projection")
                 action["result"] = verify(client, port, root, action)
                 record("Completed")

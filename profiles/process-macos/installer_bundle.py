@@ -48,7 +48,16 @@ def validate_bundle(bundle,value,controller):
     require(digest(bundle/'bundle.json')==value['bundleSha256'] and digest(bundle/'profile.json')==value['profileSha256'],'Cached installer differs from release')
     spec=importlib.util.spec_from_file_location('released_mac_controller',controller)
     module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
-    module.check_bundle(bundle,value['bundleSha256'])
+    try:
+        module.check_bundle(bundle,value['bundleSha256'])
+    except ValueError as error:
+        # Only use names from the already authenticated manifest for diagnostics.
+        for name, expected in json.loads((bundle/'bundle.json').read_text())['files'].items():
+            member=bundle/name
+            if (any(p.is_symlink() for p in (member,*member.parents)) or
+                    not member.is_file() or digest(member)!=expected):
+                raise InstallerError('Installer verification failed for '+name) from error
+        raise
 
 def extract(archive,destination):
     with zipfile.ZipFile(archive) as package:

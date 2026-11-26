@@ -98,6 +98,10 @@ async def execute(root, endpoint, action, run_id=None, request_id=None):
             if step.get("attempt_id"):
                 binding = Binding(run_id, OPERATION, step["attempt_id"], step["fence"])
                 key = effect_key(binding, OPERATION, SCOPE)
+                if run["state"] == "succeeded":
+                    if journal.get(key)["state"] != "committed":
+                        await executor.reconcile_completion(key)
+                    return {"effect_key": key, "state": journal.get(key)["state"]}
                 attempt = await executor.recover(binding, ACTOR)
                 # Missing or ambiguous delivery evidence cannot authorize a second dispatch.
                 journal.get(key)

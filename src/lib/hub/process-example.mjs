@@ -13,10 +13,10 @@ export async function localProcessExample(env, operation, key) {
   try {
     const run = async () => {
       const {stdout} = await execute(env.ZENITH_SETUP_PYTHON || env.ZENITH_PROCESS_PYTHON || 'python3.12', args, {
-      timeout: 360000, maxBuffer: 4 * 1024 * 1024,
-      env: {PATH:env.PATH, HOME:env.HOME, LANG:'en_US.UTF-8', PIP_CONFIG_FILE:'/dev/null',
-            ...(env.ZENITH_PROCESS_BUNDLE ? {ZENITH_PROCESS_BUNDLE:env.ZENITH_PROCESS_BUNDLE} : {})}
-    });
+        timeout: 360000, maxBuffer: 4 * 1024 * 1024,
+        env: {PATH:env.PATH, HOME:env.HOME, LANG:'en_US.UTF-8', PIP_CONFIG_FILE:'/dev/null',
+              ...(env.ZENITH_PROCESS_BUNDLE ? {ZENITH_PROCESS_BUNDLE:env.ZENITH_PROCESS_BUNDLE} : {})}
+      });
       return JSON.parse(stdout);
     };
     if (operation === 'verify') return await serviceMonitor(env,'Local process example')('Verify Case, Frank effect and Runtime receipt',run);

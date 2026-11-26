@@ -37,7 +37,10 @@ export async function exerciseExample({evaluate,navigate,until,root,restart,capt
   await evaluate(`(() => {const original=window.fetch;window.fetch=async(...args)=>{
     const result=await original(...args);
     if(JSON.parse(args[1]?.body || '{}').operation==='example-run' && result.ok){
-      window.fetch=original;window.exampleLostResponse=true;throw Error('Injected lost browser response');
+      window.fetch=original;
+      const replay=await original(...args);
+      if(!replay.ok)throw Error('Exact run retry failed');
+      window.exampleLostResponse=true;throw Error('Injected lost browser response');
     }
     return result;
   };return true;})()`);
@@ -55,6 +58,13 @@ export async function exerciseExample({evaluate,navigate,until,root,restart,capt
   await waitFor('Receipt verified.');
   assert.equal(await fs.readFile(path.join(destination,'action-'+first+'.json'),'utf8'),before);
   evidence.first=JSON.parse(before).result;
+  await evaluate(`(() => {const original=window.fetch; window.fetch=async(...args)=>{
+    const first=await original(...args);
+    if(JSON.parse(args[1]?.body || '{}').operation==='example-new' && first.ok){
+      window.fetch=original;return original(...args);
+    }
+    return first;
+  };return true;})()`);
   await click('Run new example');
   await results(2);
   const ids=(await state()).actions;
@@ -66,9 +76,13 @@ export async function exerciseExample({evaluate,navigate,until,root,restart,capt
   evidence.second=second.result;
   await capture('completed');
   await click('Verify receipt');
-  await waitFor('Receipt verified.');
+  await until('both receipt checks in monitor history', async()=>{
+    const h=await evaluate(`fetch('/api/hub/history?service=Local%20process%20example').then(r=>r.json())`);
+    return h.events.filter(e=>!e.reason).length===2;
+  },30000);
   const history=await evaluate(`fetch('/api/hub/history?service=Local%20process%20example').then(r=>r.json())`);
   assert.ok(history.events.some(e=>!e.reason && e.step==='Verify Case, Frank effect and Runtime receipt'));
   evidence.monitor=history.events[0];
+  for (const field of ["at","cpu","memoryUsed","diskUsed"]) assert.ok(Number.isFinite(evidence.monitor[field]));
   return evidence;
 }

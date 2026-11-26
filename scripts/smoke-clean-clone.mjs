@@ -163,7 +163,8 @@ try {
     const exampleRoot=path.join(root,'local-process-example');
     const workspace=JSON.parse(await fs.readFile(path.join(exampleRoot,'workspace.json'),'utf8'));
     execFileSync(path.join(exampleRoot,workspace.generation,'bin/python'),
-      ['-I',path.join(cwd,'tests/process_example_recovery.py'),cwd,scratch],{cwd,env,stdio:'inherit',timeout:180000});
+      ['-I',path.join(cwd,'tests/process_example_recovery.py'),cwd,scratch,
+        path.join(exampleRoot,'cache',JSON.parse(await fs.readFile(path.join(cwd,'profiles/process-example/recipe.json'),'utf8')).bundleSha256)],{cwd,env,stdio:'inherit',timeout:180000});
     if(evidenceDir)await fs.writeFile(path.join(evidenceDir,'report.json'),JSON.stringify(evidence,null,2));
     console.log('PASS: reviewed installation, Case to Frank output, restart, new Case and receipt verification');
   }
