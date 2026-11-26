@@ -5,8 +5,7 @@ import path from 'node:path';
 import net from 'node:net';
 import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { setTimeout as delay } from 'node:timers/promises';
-import { operatorPort, processStamp, setupRoot } from './launcher-defaults.mjs';
+import { operatorPort, processStamp, servingOrigin, setupRoot } from './launcher-defaults.mjs';
 
 function python312(override) {
   for (const command of override ? [override] : ['python3.12', 'python3']) {
@@ -34,17 +33,7 @@ async function existingHub(root) {
     throw Error('Invalid Hub server record at ' + root);
   if (processStamp(lease.pid) !== lease.processStamp) return;
   if (lease.source !== process.cwd()) throw Error('This Hub root is in use by ' + lease.source);
-  const origin = 'http://127.0.0.1:' + operatorPort(lease.port);
-  for (let attempt = 0; attempt < 10; attempt++) {
-    try {
-      const res = await fetch(origin + '/api/database', {redirect: 'error', signal: AbortSignal.timeout(3000)});
-      const status = await res.json();
-      if (res.ok && status.ready && status.repositoryId === lease.repositoryId &&
-          status.serverInstanceId === lease.serverInstanceId) return origin;
-    } catch { /* The dev server may still be compiling the route. */ }
-    await delay(500);
-  }
-  throw Error('The recorded Hub is running but its database readiness could not be verified at ' + origin);
+  return servingOrigin(lease, undefined, 30000);
 }
 
 async function checkPort(port) {

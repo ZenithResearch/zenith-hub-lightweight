@@ -35,9 +35,9 @@ async function until(description, get, timeout) {
 async function browserSettings(url) {
   // Chrome DevTools pipe uses NUL-terminated JSON on file descriptors 3/4.
   const chrome = launch(process.env.CHROME_BIN || '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
-    ['--headless', '--disable-gpu', '--no-first-run', '--disable-background-networking',
+    ['--headless', '--disable-gpu', '--no-first-run', '--disable-background-networking', '--disable-component-update', '--no-proxy-server',
      '--user-data-dir=' + path.join(scratch,'Chrome'), '--remote-debugging-pipe'],
-    {stdio:['ignore','ignore','inherit','pipe','pipe']});
+    {stdio:['ignore','ignore','ignore','pipe','pipe']});
   let buffer = '', id = 0;
   const pending = new Map();
   chrome.stdio[4].setEncoding('utf8').on('data', chunk => {
@@ -53,18 +53,27 @@ async function browserSettings(url) {
     const n = ++id;
     const response = new Promise(resolve => pending.set(n, resolve));
     chrome.stdio[3].write(JSON.stringify({id:n, method, params, sessionId})+'\0');
-    const msg = await Promise.race([response, delay(8000, null, {ref:false})]);
+    const msg = await Promise.race([response, delay(30000, null, {ref:false})]);
     if (!msg || msg.error) throw Error('Chrome command failed: ' + method);
     return msg.result;
   }
-  const {targetId} = await send('Target.createTarget',{url});
+  const {targetId} = await send('Target.createTarget',{url:'about:blank'});
   const {sessionId} = await send('Target.attachToTarget',{targetId,flatten:true});
-  await until('hydrated Settings and configured instances', async () => {
+  await send('Page.enable',{},sessionId);
+  const navigation = await send('Page.navigate',{url},sessionId);
+  if (navigation.errorText) throw Error('Could not open printed URL: ' + navigation.errorText);
+  let observed;
+  try { await until('hydrated Settings and configured instances', async () => {
     const answer = await send('Runtime.evaluate',{expression:
       'location.href === '+JSON.stringify(url)+' && document.querySelector("h1")?.textContent === "Settings & configuration" && !!document.querySelector(\'a[href="/settings/history"]\') && document.body.innerText.includes("Configured instances")',
       returnByValue:true},sessionId);
-    return answer.result?.value;
-  },120000);
+    if (answer.result?.value) return true;
+    observed = (await send('Runtime.evaluate',{expression:
+      '({url:location.href,title:document.title,body:document.body?.innerText.slice(0,250)})',
+      returnByValue:true},sessionId)).result?.value;
+  },120000); } catch (error) {
+    throw Error(error.message + ' (last browser observation ' + JSON.stringify(observed) + ')');
+  }
 }
 
 try {

@@ -2,7 +2,7 @@
 /** Initialize/check storage before starting the local app server. Browser launch is an owner action. */
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import {operatorPort,processStamp as stamp,setupRoot} from './launcher-defaults.mjs';
+import {operatorPort,processStamp as stamp,servingOrigin,setupRoot} from './launcher-defaults.mjs';
 import {existsSync} from 'node:fs';
 import {spawn} from 'node:child_process';
 import {randomUUID} from 'node:crypto';
@@ -46,10 +46,19 @@ try {
   const f=await fs.open(leaseFile,'wx',0o600);try{await f.writeFile(JSON.stringify(lease,null,2)+'\n');await f.sync();}finally{await f.close();}
   print({phase:'database-ready',...status,url:'http://127.0.0.1:'+port});
   const env={...process.env,ZENITH_HUB_CATALOG_READY:'1',ZENITH_HUB_APPLICATION_DB:'1',ZENITH_HUB_REPOSITORY_FOUNDATION:'1',ZENITH_HUB_SETUP_DIR:root,ZENITH_HUB_DATA_DIR:config.dataDir,ZENITH_HUB_RESOURCES_FILE:config.resourcesFile,ZENITH_HUB_SERVER_INSTANCE:token,ZENITH_OPERATOR_PORT:String(port),ZENITH_PREVIEW_BUILD:flags['--production']?'0':'1',ZENITH_DEV_BUNDLER:'webpack',NEXT_TELEMETRY_DISABLED:'1'};
-  console.log('Open Hub Settings at http://127.0.0.1:'+port+'/settings');
   server=spawn(process.execPath,['scripts/operator.mjs',...(flags['--production']?['--production']:[])],{env,stdio:'inherit'});
   for(const signal of ['SIGTERM','SIGINT'])process.on(signal,()=>server.kill(signal));
-  await new Promise((resolve,reject)=>{server.once('error',reject);server.once('exit',code=>{process.exitCode=code||0;resolve();});});
+  const controller = new AbortController();
+  const announce = servingOrigin(lease, controller.signal).then(origin => {
+    if (origin) console.log('Open Hub Settings at ' + origin + '/settings');
+  }).catch(error => {
+    console.error(error.message);
+    process.exitCode = 1;
+    server.kill('SIGTERM');
+  });
+  try {
+    await new Promise((resolve,reject)=>{server.once('error',reject);server.once('exit',code=>{process.exitCode ||= code||0;resolve();});});
+  } finally { controller.abort(); await announce; }
   const current=JSON.parse(await readPrivate(leaseFile,65536));if(current.serverInstanceId===token)await fs.unlink(leaseFile);
  }else throw Error('Use: hub [prepare|serve|stop|status|db plan|db apply|db recover|db status|catalog sync|catalog status] [--setup-dir PATH] [--data-dir PATH] [--resources-file FILE] [--port PORT] [--plan FILE] [--migrate] [--production]');
 }catch(error){print({ready:false,error:error.code||error.message,details:error.details});process.exitCode=1;}
