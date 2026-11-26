@@ -38,9 +38,11 @@ async function until(description, get, timeout) {
 async function browserSettings(url) {
   // Chrome DevTools pipe uses NUL-terminated JSON on file descriptors 3/4.
   const chrome = launch(process.env.CHROME_BIN || '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
-    ['--headless', '--disable-gpu', '--no-first-run', '--disable-background-networking', '--disable-component-update', '--no-proxy-server',
+    ['--headless', '--disable-gpu', '--use-mock-keychain', '--no-first-run', '--disable-background-networking', '--disable-component-update', '--no-proxy-server',
      '--user-data-dir=' + path.join(scratch,'Chrome'), '--remote-debugging-pipe'],
-    {stdio:['ignore','ignore','ignore','pipe','pipe']});
+    {stdio:['ignore','ignore','pipe','pipe','pipe']});
+  let browserLog='';
+  chrome.stderr.setEncoding('utf8').on('data',chunk=>{browserLog=(browserLog+chunk).slice(-3000);});
   let buffer = '', id = 0;
   const pending = new Map();
   chrome.stdio[4].setEncoding('utf8').on('data', chunk => {
@@ -52,19 +54,21 @@ async function browserSettings(url) {
       if (resolve) { pending.delete(msg.id); resolve(msg); }
     }
   });
-  async function send(method, params, sessionId) {
+  async function send(method, params, sessionId, timeout=30000) {
     const n = ++id;
     const response = new Promise(resolve => pending.set(n, resolve));
     chrome.stdio[3].write(JSON.stringify({id:n, method, params, sessionId})+'\0');
-    const msg = await Promise.race([response, delay(30000, null, {ref:false})]);
-    if (!msg || msg.error) throw Error('Chrome command failed: ' + method);
+    const msg = await Promise.race([response, delay(timeout, null, {ref:false})]);
+    pending.delete(n);
+    if (!msg || msg.error) throw Error('Chrome command failed: ' + method + ' (' +
+      (msg?.error?.message || 'timed out after ' + timeout + 'ms') + '). ' + browserLog);
     return msg.result;
   }
   const {targetId} = await send('Target.createTarget',{url:'about:blank'});
   const {sessionId} = await send('Target.attachToTarget',{targetId,flatten:true});
   await send('Page.enable',{},sessionId);
   const navigate=async destination=>{
-    const nav=await send('Page.navigate',{url:destination},sessionId);
+    const nav=await send('Page.navigate',{url:destination},sessionId,120000);
     if(nav.errorText)throw Error('Could not open URL: '+nav.errorText);
   };
   await navigate(url);
@@ -98,7 +102,8 @@ async function browserSettings(url) {
 try {
   await fs.mkdir(home,{mode:0o700});
   await fs.mkdir(env.TMPDIR,{mode:0o700});
-  execFileSync('git',['clone','--quiet','--no-local','--depth','1','--',process.cwd(),cwd],{env});
+  const source=process.argv.includes('--github-main') ? 'https://github.com/ZenithResearch/zenith-hub-lightweight.git' : process.cwd();
+  execFileSync('git',['clone','--quiet','--no-local','--depth','1','--',source,cwd],{env});
   assert.equal(execFileSync('git',['rev-parse','HEAD'],{cwd,env,encoding:'utf8'}).trim(),
     execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());
 

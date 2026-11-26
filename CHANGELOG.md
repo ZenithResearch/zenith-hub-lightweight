@@ -3,6 +3,7 @@
 ## [Unreleased]
 
 ### Fixed
+- Pin the headless Chromium used by the macOS clean-clone job and allow time for the first Settings navigation — the hosted desktop browser repeatedly timed out before the example could run.
 - Reconcile Frank’s retained completion after a lost Runtime acknowledgement and correlate its journal with the committed output — retrying must preserve one dispatch and let Hub recover the original receipt.
 - Wait for the running Hub to identify its database before printing the Settings link — a user opening the link immediately could otherwise reach a port that was still starting.
 - Show the Runtime’s reported storage, authority and admission checks in readiness failure history — an HTTP 503 alone concealed the production readiness blocker.
