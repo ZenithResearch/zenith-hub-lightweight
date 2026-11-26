@@ -3,6 +3,7 @@
 ## [Unreleased]
 
 ### Fixed
+- Extend the database design review’s checksum history through the monitoring, Runtime upgrade and clean-clone changes — the deployer was comparing shipped files against the earlier workspace review.
 - Allow the clean-clone checks to wait for the full owner operation and retain browser evidence before crash testing — hosted receipt verification could outlast the monitoring assertion.
 - Retry a timed-out local service readiness read within the startup deadline and identify its owner on failure — one slow first probe could abort the reviewed example installation.
 - Detect local APFS and HFS mounts by filesystem name on macOS — boot-specific type numbers caused supported Macs to reject repository initialization.

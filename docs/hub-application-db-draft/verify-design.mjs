@@ -58,5 +58,31 @@ async function publicationPins(name,before){
  const ledger=await read('publication-inputs.json');assert.equal(ledger.schema,'zenith.hub-publication-input-updates.v1');
  const baseline=ledger.baselines[name];assert.ok(baseline,name);assert.equal(baseline.sha256,digest(await fs.readFile(path.join(root,name))));
  const qualified=new Map();for(const update of baseline.updates){assert.ok(Object.hasOwn(before.inputs,update.path),update.path);assert.equal(update.previousSha256,before.inputs[update.path],update.path);assert.match(update.sha256,/^[a-f0-9]{64}$/);assert.ok(update.reason&&update.evidence?.length,update.path);assert.ok(!qualified.has(update.path),update.path);qualified.set(update.path,update.sha256);}
- const follow=await read('matrix-inputs.json');assert.equal(follow.schema,'zenith.hub-matrix-input-updates.v1');assert.equal(follow.previousLedgerSha256,digest(await fs.readFile(path.join(root,'publication-inputs.json'))));const next=follow.baselines[name];assert.equal(next.sha256,baseline.sha256);for(const update of next.updates){assert.ok(Object.hasOwn(before.inputs,update.path));assert.equal(update.previousSha256,qualified.get(update.path)||before.inputs[update.path]);assert.match(update.sha256,/^[a-f0-9]{64}$/);assert.ok(update.reason&&update.evidence?.length);qualified.set(update.path,update.sha256);}const workspace=await read('workspace-inputs.json');assert.equal(workspace.schema,'zenith.hub-workspace-input-updates.v1');assert.equal(workspace.previousLedgerSha256,digest(await fs.readFile(path.join(root,'matrix-inputs.json'))));const current=workspace.baselines[name];assert.equal(current.sha256,baseline.sha256);const seen=new Set();for(const update of current.updates){assert.ok(Object.hasOwn(before.inputs,update.path));assert.ok(!seen.has(update.path));seen.add(update.path);assert.equal(update.previousSha256,qualified.get(update.path)||before.inputs[update.path]);assert.match(update.sha256,/^[a-f0-9]{64}$/);assert.ok(update.reason&&update.evidence?.length);for(const file of update.evidence)await fs.access(file);qualified.set(update.path,update.sha256);}for(const [file,sha]of qualified)assert.equal(digest(await fs.readFile(file)),sha,file);return qualified;
+ const follow=await read('matrix-inputs.json');assert.equal(follow.schema,'zenith.hub-matrix-input-updates.v1');assert.equal(follow.previousLedgerSha256,digest(await fs.readFile(path.join(root,'publication-inputs.json'))));const next=follow.baselines[name];assert.equal(next.sha256,baseline.sha256);for(const update of next.updates){assert.ok(Object.hasOwn(before.inputs,update.path));assert.equal(update.previousSha256,qualified.get(update.path)||before.inputs[update.path]);assert.match(update.sha256,/^[a-f0-9]{64}$/);assert.ok(update.reason&&update.evidence?.length);qualified.set(update.path,update.sha256);}const workspace=await read('workspace-inputs.json');
+ assert.equal(workspace.schema,'zenith.hub-workspace-input-updates.v1');
+ assert.equal(workspace.previousLedgerSha256,digest(await fs.readFile(path.join(root,'matrix-inputs.json'))));
+ const current=workspace.baselines[name];
+ assert.equal(current.sha256,baseline.sha256);
+ await applyUpdates(current.updates);
+ const processInputs=await read('process-inputs.json');
+ assert.equal(processInputs.schema,'zenith.hub-process-input-updates.v1');
+ assert.equal(processInputs.previousLedgerSha256,digest(await fs.readFile(path.join(root,'workspace-inputs.json'))));
+ assert.deepEqual(Object.keys(processInputs.baselines).sort(),Object.keys(workspace.baselines).sort());
+ await applyUpdates([...processInputs.shared,...processInputs.baselines[name]]);
+ for(const [file,sha] of qualified)assert.equal(digest(await fs.readFile(file)),sha,file);
+ return qualified;
+
+ async function applyUpdates(updates){
+   const seen=new Set();
+   for(const update of updates){
+     assert.ok(Object.hasOwn(before.inputs,update.path),update.path);
+     assert.ok(!seen.has(update.path),update.path);
+     seen.add(update.path);
+     assert.equal(update.previousSha256,qualified.get(update.path)||before.inputs[update.path],update.path);
+     assert.match(update.sha256,/^[a-f0-9]{64}$/);
+     assert.ok(update.reason && update.evidence?.length,update.path);
+     for(const file of update.evidence)await fs.access(file);
+     qualified.set(update.path,update.sha256);
+   }
+ }
 }

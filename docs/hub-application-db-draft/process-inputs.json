@@ -1,0 +1,177 @@
+{
+  "schema": "zenith.hub-process-input-updates.v1",
+  "previousLedgerSha256": "2219c79abfaec7011bf777bc80e4fb4230889da563616c2ffc8c264f601083c4",
+  "shared": [
+    {
+      "path": "src/vendor/zenith-ui/YourHub/YourHub.css",
+      "previousSha256": "191d8eb7dbc3d167f0b0e930f82e40a06d6360225243918c12005c0be7d2020f",
+      "sha256": "a8635c1dd0d8926e5d9c02bc8fabd2003cbfc3b4199d91a5ddeb9d8c59567a0b",
+      "reason": "Import the monitoring history styles from zenith-ui-deployment at 14e29b4.",
+      "evidence": [
+        "profiles/source-provenance.json",
+        "tests/hub/monitoring.test.mjs"
+      ]
+    },
+    {
+      "path": "src/vendor/zenith-ui/YourHub/YourHub.tsx",
+      "previousSha256": "77a281999e8116465321f7cf03301aa46c4761d198af4690da070f3afd616b1c",
+      "sha256": "aab8fcace5d04c96cbb7234725e9c650217b3fad459398534bf27aa4ff596888",
+      "reason": "Expose monitoring history in Settings using the component published at 14e29b4.",
+      "evidence": [
+        "profiles/source-provenance.json",
+        "tests/hub/monitoring.test.mjs"
+      ]
+    },
+    {
+      "path": "profiles/source-provenance.json",
+      "previousSha256": "518e319a9a0dc58767a7d845c43e32629f3afa9302afea6b1c9941a0f7f16ce8",
+      "sha256": "a4e51fa52dd49f57baa8a02590c745264ab3ee6d90216bf3a519ba697990de17",
+      "reason": "Record the upstream revision and digests of the three vendored monitoring UI files.",
+      "evidence": [
+        "scripts/check-source.mjs",
+        "src/vendor/zenith-ui/YourHub/MonitoringHistory.tsx"
+      ]
+    },
+    {
+      "path": "src/lib/resource-controller.mjs",
+      "previousSha256": "ee1f106d812a097e4088a7b64a4232a688ed9e48cf920391d6e3416c491337ee",
+      "sha256": "555fce664b10360819f336f3b0cad9e2216124e3e415957db7aac772f6af242f",
+      "reason": "Record Devgraph readiness, credential and work-read checks separately.",
+      "evidence": [
+        "tests/hub/monitoring.test.mjs"
+      ]
+    },
+    {
+      "path": "src/lib/setup/network.mjs",
+      "previousSha256": "30e312df82db26cad909740d9f9da4d76b20f65c54b8400c4eba52db99545e46",
+      "sha256": "23596a249922093e97a894a2702f3e43247d50b8dac7d45e2073031f7f040287",
+      "reason": "Capture per-step readiness failures and verify Matrix identity independently of login discovery.",
+      "evidence": [
+        "tests/hub/monitoring.test.mjs",
+        "tests/matrix/direct.test.mjs"
+      ]
+    },
+    {
+      "path": "src/lib/setup/controller.mjs",
+      "previousSha256": "203c0115507ac778ebb6a02ee79a2f4b0d3ecc36c5a1c80a61dd9c5526f1c2c7",
+      "sha256": "5070ddb4e2fb8ffc9ef0b4b578d363bcc4a87d551d7f4e0b94d6f984bfd32e7b",
+      "reason": "Bind reviewed Runtime upgrades and rollbacks to the selected instance and reconcile interrupted changes.",
+      "evidence": [
+        "tests/hub/runtime-upgrade.test.mjs"
+      ]
+    },
+    {
+      "path": "src/lib/setup/adapters.mjs",
+      "previousSha256": "ed23c135919c1b6abf484f6dfe3e69b51060223ceb6ec81a9f3cbac0d6470c06",
+      "sha256": "edaefcf4a41b3803fc7ecf3628b2a159fae87525e2cb819eacdb010f859d228b",
+      "reason": "Report service checks and dispatch reviewed Runtime changes to the native adapter.",
+      "evidence": [
+        "tests/hub/monitoring.test.mjs",
+        "tests/hub/runtime-upgrade.test.mjs"
+      ]
+    },
+    {
+      "path": "src/lib/objects/representations.mjs",
+      "previousSha256": "f4884a7e89db1545731c694409a176716f6ae477e2ce6fd88612db9180f9268a",
+      "sha256": "3d3d3563d992331507bf7733f0b1d028d80637fa4d098a9e0b417a446e230899",
+      "reason": "Identify supported local macOS filesystems by mount type when opening Hub storage.",
+      "evidence": [
+        "scripts/smoke-clean-clone.mjs"
+      ]
+    },
+    {
+      "path": "src/lib/hub/resources.mjs",
+      "previousSha256": "94ca304a4ee1f1a0bbae0b3230503989b6915a9890a2e45b1d4d563aad56d2ac",
+      "sha256": "9a1931eabf8416903f0481aa4dc70772774329bf8699c6ae9c7b55294280c631",
+      "reason": "Show pending configuration and the available Runtime upgrade or rollback action.",
+      "evidence": [
+        "tests/hub/main-view.test.mjs",
+        "tests/hub/runtime-upgrade.test.mjs"
+      ]
+    },
+    {
+      "path": "src/lib/hub/controller.mjs",
+      "previousSha256": "e7cb817ea72504fb03b136b5fee9a16e6e526b2ce1eed092f248a94d406e1cd9",
+      "sha256": "9aecdb006e2001463eeb2c6c3aeac562da57abd68a47a08e7e20e8a0f19ed14e",
+      "reason": "Route the reviewed Runtime lifecycle and local process example actions through the Hub.",
+      "evidence": [
+        "tests/hub/runtime-upgrade.test.mjs",
+        "scripts/smoke-process-example.mjs"
+      ]
+    },
+    {
+      "path": "src/components/hub/YourHubPage.tsx",
+      "previousSha256": "93fe0208cd866f88839885f26c5b2ee6aef9263a691245eab0fcc275c24481f7",
+      "sha256": "e4ae12b5f1916f35af6bfc5fb7609333a63bfa4bffc05ab07e0cc6647d84fb4f",
+      "reason": "Expose process components, monitor history, Runtime changes and the local example from the Hub.",
+      "evidence": [
+        "tests/hub/main-view.test.mjs",
+        "tests/hub/monitoring.test.mjs",
+        "tests/hub/runtime-upgrade.test.mjs",
+        "scripts/smoke-process-example.mjs"
+      ]
+    },
+    {
+      "path": "profiles/process-macos/installer_bundle.py",
+      "previousSha256": "83394c2f6b4e344e9d78271af084325d5293899e06cb0adeb85af7002d6b015c",
+      "sha256": "4fb38edfcfddb17a0c117c961d0bc701a5c49c58663cbf6be21de453347ad9fc",
+      "reason": "Identify the failed installer member when authenticated bundle verification fails.",
+      "evidence": [
+        "scripts/smoke-clean-clone.mjs"
+      ]
+    }
+  ],
+  "baselines": {
+    "integration-inputs.json": [
+      {
+        "path": "scripts/operator.mjs",
+        "previousSha256": "affa06c83df339edcf72edb1b8a0322a18d34ee3bbb011050cfeb895e0ed6ede",
+        "sha256": "8ba434345babbc09e2860a5ecc8ac8b562dce2d288e3297517d3ef53628622c6",
+        "reason": "Use shared launcher defaults and run periodic read-only monitoring while the Hub is running.",
+        "evidence": [
+          "tests/hub/monitoring.test.mjs",
+          "scripts/smoke-clean-clone.mjs"
+        ]
+      },
+      {
+        "path": "scripts/setup/instance.py",
+        "previousSha256": "c203831496dc6da0daa225473ec51bb43e0bf6eb9642d9f4662be1fea2d6543e",
+        "sha256": "beea4bad1834a65025b9d97a9f9c877b507282719afebac1a7afc3145f96e7cc",
+        "reason": "Stage, verify, activate and roll back pinned Runtime generations with instance ownership checks.",
+        "evidence": [
+          "tests/hub/runtime-upgrade.test.mjs"
+        ]
+      }
+    ],
+    "catalog/input-baseline.json": [
+      {
+        "path": "scripts/hub.mjs",
+        "previousSha256": "874f6814a4fdf6bc4872143d98f7f36a6a97360f584e6b587fc111709763f72d",
+        "sha256": "74425590502f1feade3bded2bdebef479a27f4e7c4a14d1c0ddf64503a5a8357",
+        "reason": "Verify that the launched server owns the expected database before displaying its Settings URL.",
+        "evidence": [
+          "scripts/smoke-clean-clone.mjs"
+        ]
+      },
+      {
+        "path": "next.config.ts",
+        "previousSha256": "18dd07711f706556b2823d78285a08631f0059542091c82a161ad1c5d3d11a8b",
+        "sha256": "ae82303d45f1e826194c8c585f89f3240b2b2cdbeb8494348d923c6af3e92fed",
+        "reason": "Include the local process recipe and macOS installer files in the Hub route's standalone build.",
+        "evidence": [
+          "scripts/smoke-clean-clone.mjs",
+          "scripts/smoke-process-example.mjs"
+        ]
+      },
+      {
+        "path": "package.json",
+        "previousSha256": "a8fcea1fe90fd56aa72a2e81cc24b6e9b34ef7dff3cd7a358bbce48b3c3e8168",
+        "sha256": "533db59a0a85f67bb8ecc44e7ed6f26d95a5f680e27e292bd66d758d27982daa",
+        "reason": "Expose the Hub setup script as npm run setup for fresh clones.",
+        "evidence": [
+          "scripts/smoke-clean-clone.mjs"
+        ]
+      }
+    ]
+  }
+}
